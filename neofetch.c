@@ -64,6 +64,7 @@ int main() {
     if(!fork()) {
         execlp("whoami", "whoami", NULL);
     } else if(!fork()) {
+        static char hostname[33];
         FILE *fpointer = fopen("/etc/hostname", "r");
         fgets(hostname, 33, fpointer);
         fclose(fpointer);
