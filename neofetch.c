@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/wait.h>
 
 /*
@@ -45,8 +46,11 @@ int main() {
         " `++:.                           `-/+/",
         " .`                                 `/"
     };
+    
+    // CONFIGURATION OPTIONS:
+        static char spacing[4] = "    ";    // defines the spacing between the logo and the infos
 
-
+/*
     if(!fork()) {
         execlp("whoami", "whoami", NULL);
     } else if(!fork()) {
@@ -55,7 +59,22 @@ int main() {
 
     wait(NULL);
     wait(NULL);
+*/
+    static char hostname[33];
+    if(!fork()) {
+        execlp("whoami", "whoami", NULL);
+    } else if(!fork()) {
+        FILE *fpointer = fopen("/etc/hostname", "r");
+        fgets(hostname, 33, fpointer);
+        fclose(fpointer);
+        exit(0);
+    } else {
+        printf("%s", logo[1]);
+    }
+    wait(NULL);
+    wait(NULL);
 
+    printf("%salba4k@%s\n", spacing, hostname);
     /*
     REM
     change the logic from
