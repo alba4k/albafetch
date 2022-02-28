@@ -66,5 +66,5 @@ int main() {
     wait(NULL);
     wait(NULL);
 
-    printf("alba4k@%s\n%s%s\n", hostname, logo[1], spacing);
+    printf("alba4k@%s\n%s%s%s\n", hostname, logo[1], spacing, separator);
 }
