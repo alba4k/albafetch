@@ -48,7 +48,8 @@ int main() {
     };
     
     // CONFIGURATION OPTIONS:
-        static char spacing[4] = "    ";    // defines the spacing between the logo and the infos
+        static char spacing[4] = "    ";                // defines the spacing between the logo and the infos
+        static char separator[] = "—————————————————";  // defines what is used as separator between sections
 
     static char hostname[33];
     if(!fork()) {
@@ -60,10 +61,10 @@ int main() {
         fclose(fpointer);
         exit(0);
     } else {
-        printf("%s", logo[0]);
+        printf("%s%s", logo[0], spacing);
     }
     wait(NULL);
     wait(NULL);
 
-    printf("%salba4k@%s\n—————————————————\n", spacing, hostname);
+    printf("alba4k@%s\n%s%s\n", hostname, logo[1], spacing);
 }
