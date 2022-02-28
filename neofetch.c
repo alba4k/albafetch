@@ -48,8 +48,8 @@ int main() {
     };
     
     // CONFIGURATION OPTIONS:
-        static char spacing[4] = "    ";                // defines the spacing between the logo and the infos
-        static char separator[] = "—————————————————";  // defines what is used as separator between sections
+        static char spacing[5] = "    ";                // defines the spacing between the logo and the infos
+        static char separator[19] = "------------------";  // defines what is used as separator between sections
 
     static char hostname[33];
     if(!fork()) {
