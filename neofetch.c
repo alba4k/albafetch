@@ -54,17 +54,16 @@ int main() {
     static char hostname[33];
     if(!fork()) {
         execlp("whoami", "whoami", NULL);
-    } else if(!fork()) {
-        static char hostname[33];
-        FILE *fpointer = fopen("/etc/hostname", "r");
-        fgets(hostname, 33, fpointer);
-        fclose(fpointer);
-        exit(0);
     } else {
         printf("%s%s", logo[0], spacing);
     }
+
     wait(NULL);
     wait(NULL);
 
-    printf("alba4k@%s\n%s%s%s\n", hostname, logo[1], spacing, separator);
+    FILE *fpointer = fopen("/etc/hostname", "r");
+    fgets(hostname, 33, fpointer);
+    fclose(fpointer);
+
+    printf("alba4k@%s%s%s%s\n", hostname, logo[1], spacing, separator);
 }
