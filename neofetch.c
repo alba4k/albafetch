@@ -50,16 +50,6 @@ int main() {
     // CONFIGURATION OPTIONS:
         static char spacing[4] = "    ";    // defines the spacing between the logo and the infos
 
-/*
-    if(!fork()) {
-        execlp("whoami", "whoami", NULL);
-    } else if(!fork()) {
-            execlp("cat", "cat", "/etc/hostname", NULL);
-    }
-
-    wait(NULL);
-    wait(NULL);
-*/
     static char hostname[33];
     if(!fork()) {
         execlp("whoami", "whoami", NULL);
@@ -75,19 +65,5 @@ int main() {
     wait(NULL);
     wait(NULL);
 
-    printf("%salba4k@%s\n", spacing, hostname);
-    /*
-    REM
-    change the logic from
-
-    [prende tutte le info in dei child paralleli]
-    [stampa le linee dell'icona e le info]
-
-    to
-
-    [raccoglie le info e stampa la prima riga del logo contemporaneamente]
-    [stampa le info]
-    [ripete con la 2a riga]
-    ...
-    */
+    printf("%salba4k@%s\n——————————————\n", spacing, hostname);
 }
