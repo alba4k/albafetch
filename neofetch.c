@@ -60,10 +60,10 @@ int main() {
         fclose(fpointer);
         exit(0);
     } else {
-        printf("%s", logo[1]);
+        printf("%s", logo[0]);
     }
     wait(NULL);
     wait(NULL);
 
-    printf("%salba4k@%s\n——————————————\n", spacing, hostname);
+    printf("%salba4k@%s\n—————————————————\n", spacing, hostname);
 }
