@@ -6,7 +6,7 @@
 /*
                    -`                 .     (whoami)@(/etc/hostname) 
                   .o+`                .     —————————————— 
-                 `ooo/                .     Uptime: XXd XXh XXm 
+                 `ooo/                .     Uptime: XXd XXh XXm //
                 `+oooo:               .     —————————————————— 
                `+oooooo:              .     OS: Arch Linux x86_64 
                -+oooooo+:             .     Kernel: (uname -r) 
@@ -18,7 +18,7 @@
         .oossssso-````/ossssss+`      .     Host: HP ProBook 440 G6 
        -osssssso.      :ssssssso.     .     CPU: i5-8265U (8) @ 1.5GHz [44.0°C] 
       :osssssss/        osssso+++.    .     GPU: WhiskeyLake-U GT2 [UHD Graphics 620] 
-     /ossssssss/        +ssssooo/-    .     Memory: (free --mebi | grep M; 3nd element) / (free --mebi | grep M; 2nd element) (7%) 
+     /ossssssss/        +ssssooo/-    .     Memory: free --mebi | grep M | awk '{print $3 "MiB / " $2 "MiB"}
    `/ossssso+/:-        -:/+osssso+-  .
   `+sso+:-`                 `.-/+oso: .
  `++:.                           `-/+/.
