@@ -140,26 +140,12 @@ int main() {
     // ******** shell ********
 
     // TODO: find a way lol
-    printf("%s%sTerminal: %s\n", logo[8], spacing, term);
+    printf("%s%sTerminal: %s\n%s", logo[8], spacing, term, separator);
 
     // ******** packages ********
     // using pacman, only pacman, get away with it
 
-    static char pacmanQ[999999999];
-    pipe(pipes);
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
+    // TODO: idk
 
-        execlp("pacman", "pacman", "-Q", NULL);
-    } else {
-        printf("%s%sPackges: ", logo[5], spacing);
-    }
-
-    wait(NULL);
-
-    close(pipes[1]);
-    len = read(pipes[0], pacmanQ, 999999);
-    kernel[--len] = 0;
-    printf("%s\n", kernel);
+    // ******
 }
