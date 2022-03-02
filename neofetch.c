@@ -4,10 +4,12 @@
 #include <sys/wait.h>
 #include <limits.h>
 
+// TODO: get the uptime
+
 /*
                    -`                 .     (whoami)@(/etc/hostname) 
                   .o+`                .     —————————————— 
-                 `ooo/                .     Uptime: XXd XXh XXm //
+                 `ooo/                .     Uptime: XXd XXh XXm
                 `+oooo:               .     —————————————————— 
                `+oooooo:              .     OS: Arch Linux x86_64 
                -+oooooo+:             .     Kernel: (uname -r) 
@@ -49,9 +51,9 @@ int main() {
     };
     
     // CONFIGURATION OPTIONS:
-        const static char spacing[5] = "    ";                // defines the spacing between the logo and the infos
-        const static char separator[19] = "------------------";  // defines what is used as separator between sections
-
+        const static char spacing[5] = "    ";                      // defines the spacing between the logo and the infos
+        const static char separator[19] = "------------------\n";   // defines what is used as separator between sections
+        const static char OS[18] = "Arch Linux x86_64";             // idk how to implement it so get away with this
 // ******** first part ********
     static char hostname[HOST_NAME_MAX + 1];   // 64 characters max
     static char username[33];   // 32 characters max
@@ -67,24 +69,42 @@ int main() {
     }
 
     wait(NULL);
-    wait(NULL);
 
     close(pipes[1]);
-    size_t len = read(pipes[0], username, 32);
-    username[--len] = 0; // termina la stringa
+    size_t len = read(pipes[0], username, 33);
+    username[--len] = 0;
 
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%s@%s\n%s%s%s\n", username, hostname, logo[1], spacing, separator);
+    printf("%s@%s\n%s%s%s", username, hostname, logo[1], spacing, separator);
 
-// ******** second part ********
+// ******** uptime ********
     if(!fork()) {
+        // some way to get the uptime
         exit(0);
     } else {
         printf("%s%s", logo[2], spacing);
     }
     wait(NULL);
-    printf("Uptime:\n%s%s%s", logo[3], spacing, separator);
-// ******** thrd part ********
-    
+    printf("Uptime: \n%s%s%s", logo[3], spacing, separator);
+
+// ******** os, kernel ********
+    printf("%s%sOS: %s\n", logo[4], spacing, OS);
+    static char kernel[30];
+        pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        execlp("uname", "uname", "-r", NULL);
+    } else {
+        printf("%s%sKernel: ", logo[5], spacing);
+    }
+
+    wait(NULL);
+
+    close(pipes[1]);
+    len = read(pipes[0], kernel, 30);
+    kernel[--len] = 0;
+    printf("%s", kernel);
 }
