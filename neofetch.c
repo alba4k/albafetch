@@ -53,8 +53,12 @@ int main() {
     // CONFIGURATION OPTIONS:
         const static char spacing[5] = "    ";                      // defines the spacing between the logo and the infos
         const static char separator[19] = "------------------\n";   // defines what is used as separator between sections
-        const static char OS[18] = "Arch Linux x86_64";             // idk how to implement it so get away with this
-// ******** first part ********
+        const static char OS[18] = "Arch Linux";                    // idk how to implement it so get away with this
+        const static char WM[3] = "i3";
+        const static char shell[5] = "fish";
+        const static char term[6] = "kitty";
+
+    // ******** first part ********
     static char hostname[HOST_NAME_MAX + 1];   // 64 characters max
     static char username[33];   // 32 characters max
     int pipes[2];
@@ -78,7 +82,7 @@ int main() {
 
     printf("%s@%s\n%s%s%s", username, hostname, logo[1], spacing, separator);
 
-// ******** uptime ********
+    // ******** uptime ********
     if(!fork()) {
         // some way to get the uptime
         exit(0);
@@ -88,10 +92,27 @@ int main() {
     wait(NULL);
     printf("Uptime: \n%s%s%s", logo[3], spacing, separator);
 
-// ******** os, kernel ********
-    printf("%s%sOS: %s\n", logo[4], spacing, OS);
+    // ******** os ********
+    static char OS_arch[10];
+    pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        execlp("uname", "uname", "-m", NULL);
+    }
+    wait(NULL);
+
+    close(pipes[1]);
+    len = read(pipes[0], OS_arch, 10);
+    OS_arch[--len] = 0;
+
+    printf("%s%sOS: %s %s\n", logo[4], spacing, OS, OS_arch);
+
+    // ******* kernel ********
+
     static char kernel[30];
-        pipe(pipes);
+    pipe(pipes);
     if(!fork()) {
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
@@ -106,5 +127,39 @@ int main() {
     close(pipes[1]);
     len = read(pipes[0], kernel, 30);
     kernel[--len] = 0;
-    printf("%s", kernel);
+    printf("%s\n", kernel);
+
+    // ******** wm ********
+    printf("%s%sWM: %s\n", logo[6], spacing, WM);
+
+    // ******** shell ********
+
+    // TODO: find a way lol
+    printf("%s%sShell: %s\n", logo[7], spacing, shell);
+
+    // ******** shell ********
+
+    // TODO: find a way lol
+    printf("%s%sTerminal: %s\n", logo[8], spacing, term);
+
+    // ******** packages ********
+    // using pacman, only pacman, get away with it
+
+    static char pacmanQ[999999999];
+    pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        execlp("pacman", "pacman", "-Q", NULL);
+    } else {
+        printf("%s%sPackges: ", logo[5], spacing);
+    }
+
+    wait(NULL);
+
+    close(pipes[1]);
+    len = read(pipes[0], pacmanQ, 999999);
+    kernel[--len] = 0;
+    printf("%s\n", kernel);
 }
