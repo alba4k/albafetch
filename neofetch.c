@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <limits.h>
 
 /*
                    -`                 .     (whoami)@(/etc/hostname) 
@@ -51,8 +52,15 @@ int main() {
         const static char spacing[5] = "    ";                // defines the spacing between the logo and the infos
         const static char separator[19] = "------------------";  // defines what is used as separator between sections
 
-    static char hostname[33];
+// ******** first part ********
+    static char hostname[HOST_NAME_MAX + 1];   // 64 characters max
+    static char username[33];   // 32 characters max
+    int pipes[2];
+    pipe(pipes);    
     if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
         execlp("whoami", "whoami", NULL);
     } else {
         printf("%s%s", logo[0], spacing);
@@ -61,9 +69,22 @@ int main() {
     wait(NULL);
     wait(NULL);
 
-    FILE *fpointer = fopen("/etc/hostname", "r");
-    fgets(hostname, 33, fpointer);
-    fclose(fpointer);
+    close(pipes[1]);
+    size_t len = read(pipes[0], username, 32);
+    username[--len] = 0; // termina la stringa
 
-    printf("alba4k@%s%s%s%s\n", hostname, logo[1], spacing, separator);
+    gethostname(hostname, HOST_NAME_MAX + 1);
+
+    printf("%s@%s\n%s%s%s\n", username, hostname, logo[1], spacing, separator);
+
+// ******** second part ********
+    if(!fork()) {
+        exit(0);
+    } else {
+        printf("%s%s", logo[2], spacing);
+    }
+    wait(NULL);
+    printf("Uptime:\n%s%s%s", logo[3], spacing, separator);
+// ******** thrd part ********
+    
 }
