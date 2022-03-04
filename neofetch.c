@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 #include <limits.h>
 
-// TODO: get the uptime
+#include "config.h"
 
 /*
                    -`                 .     (whoami)@(/etc/hostname) 
@@ -28,35 +28,6 @@
  .`                                 `/.
 */
 int main() {
-    static char *logo[] = {
-        "                   -`                 ",
-        "                  .o+`                ",
-        "                 `ooo/                ",
-        "                `+oooo:               ",
-        "               `+oooooo:              ",
-        "               -+oooooo+:             ",
-        "             `/:-:++oooo+:            ",
-        "            `/++++/+++++++:           ",
-        "           `/++++++++++++++:          ",
-        "          `/+++ooooooooooooo/`        ",
-        "         ./ooosssso++osssssso+`       ",
-        "        .oossssso-````/ossssss+`      ",
-        "       -osssssso.      :ssssssso.     ",
-        "      :osssssss/        osssso+++.    ",
-        "     /ossssssss/        +ssssooo/-    ",
-        "   `/ossssso+/:-        -:/+osssso+-  ",
-        "  `+sso+:-`                 `.-/+oso: ",
-        " `++:.                           `-/+/",
-        " .`                                 `/"
-    };
-    
-    // CONFIGURATION OPTIONS:
-        const static char spacing[5] = "    ";                      // defines the spacing between the logo and the infos
-        const static char separator[19] = "------------------\n";   // defines what is used as separator between sections
-        const static char OS[18] = "Arch Linux";                    // idk how to implement it so get away with this
-        const static char WM[3] = "i3";
-        const static char shell[5] = "fish";
-        const static char term[6] = "kitty";
 
     // ******** first part ********
     static char hostname[HOST_NAME_MAX + 1];   // 64 characters max
@@ -140,12 +111,12 @@ int main() {
     // ******** shell ********
 
     // TODO: find a way lol
-    printf("%s%sTerminal: %s\n%s", logo[8], spacing, term, separator);
+    printf("%s%sTerminal: %s\n", logo[8], spacing, term);
 
     // ******** packages ********
     // using pacman, only pacman, get away with it
-
+    printf("%s%sPackages: \n%s%s%s", logo[9], spacing, logo[9], spacing, separator);
     // TODO: idk
 
-    // ******
+    // ****** 
 }
