@@ -47,7 +47,7 @@ int main() {
 
     close(pipes[1]);
     size_t len = read(pipes[0], username, 33);
-    username[--len] = 0;
+    username[len - 1] = 0;
 
     gethostname(hostname, HOST_NAME_MAX + 1);
 
@@ -76,7 +76,7 @@ int main() {
 
     close(pipes[1]);
     len = read(pipes[0], OS_arch, 10);
-    OS_arch[--len] = 0;
+    OS_arch[len - 1] = 0;
 
     printf("%s%sOS: %s %s\n", logo[4], spacing, OS, OS_arch);
 
@@ -92,12 +92,11 @@ int main() {
     } else {
         printf("%s%sKernel: ", logo[5], spacing);
     }
-
     wait(NULL);
-
     close(pipes[1]);
+
     len = read(pipes[0], kernel, 30);
-    kernel[--len] = 0;
+    kernel[len - 1] = 0;
     printf("%s\n", kernel);
 
     // ******** wm ********
@@ -115,8 +114,26 @@ int main() {
 
     // ******** packages ********
     // using pacman, only pacman, get away with it
-    printf("%s%sPackages: \n%s%s%s", logo[9], spacing, logo[9], spacing, separator);
-    // TODO: idk
+    printf("%s%sPackages: ", logo[9], spacing);
 
-    // ****** 
+    char packages[50];
+
+    pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        system("pacman -Q | wc -l");
+        exit(0);
+    }
+    close(pipes[1]);
+
+    len = read(pipes[0], packages, 30);
+    packages[len - 1] = 0;
+
+    printf("%s (pacman)\n%s%s%s", packages, logo[10], spacing, separator);
+
+    // ******** host ********
+
+    printf("%s%sHost: %s\n", logo[11], spacing, host);
 }

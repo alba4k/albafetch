@@ -1,9 +1,9 @@
 // CONFIGURATION OPTIONS:
-const static char spacing[5] = "    ";                      // defines the spacing between the logo and the infos
-const static char separator[20] = "------------------\n";   // defines what is used as separator between sections
+const char spacing[] = "    ";                      // defines the spacing between the logo and the infos
+const char separator[] = "------------------\n";   // defines what is used as separator between sections
 
 // add more logos if you want!
-const static char *logo[] = {
+const char *logo[] = {
     "                   -`                 ",
     "                  .o+`                ",
     "                 `ooo/                ",
@@ -26,7 +26,10 @@ const static char *logo[] = {
 };
 
 // was just too lazy to do it right, so it's hard coded. fuck you <3
-const static char OS[18] = "Arch Linux";                    // idk how to implement it so get away with this
-const static char WM[3] = "i3";
-const static char shell[5] = "fish";
-const static char term[6] = "kitty";
+const char OS[] = "Arch Linux";                    // idk how to implement it so get away with this
+const char WM[] = "i3";
+const char shell[] = "fish";
+const char term[] = "kitty";
+
+const char host[] = "HP ProBook 440 G6";
+const char cpu[] = "i5-8265U"
