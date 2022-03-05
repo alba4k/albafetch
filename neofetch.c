@@ -27,6 +27,7 @@
  `++:.                           `-/+/.
  .`                                 `/.
 */
+
 int main() {
 
     // ******** first part ********
@@ -58,10 +59,10 @@ int main() {
         // some way to get the uptime
         exit(0);
     } else {
-        printf("%s%s", logo[2], spacing);
+        printf("%s%sUptime:", logo[2], spacing);
     }
     wait(NULL);
-    printf("Uptime: \n%s%s%s", logo[3], spacing, separator);
+    printf("\n%s%s%s", logo[3], spacing, separator);
 
     // ******** os ********
     static char OS_arch[10];
@@ -136,4 +137,8 @@ int main() {
     // ******** host ********
 
     printf("%s%sHost: %s\n", logo[11], spacing, host);
+
+    // ******** cpu ********
+
+    printf("%s%sCPU: %s\n", logo[12], spacing, cpu);
 }
