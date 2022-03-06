@@ -1,8 +1,9 @@
 // CONFIGURATION OPTIONS:
-const char *spacing = "    ";                      // defines the spacing between the logo and the infos
-const char separator[] = "------------------\n";   // defines what is used as separator between sections
+#define SPACING "    "                      // defines the distance between the logo and the infos
+#define SEPARATOR "------------------\n"    // defines what is used as separator between sections
+#define COLOR "\e[36m\e[1m"                      // defines the color to use
 
-// add more logos if you want!
+// add more logos if you want, I couldn't care less
 const char *logo[] = {
     "                   -`                 ",
     "                  .o+`                ",
@@ -26,11 +27,11 @@ const char *logo[] = {
 };
 
 // was just too lazy to do it right, so it's hard coded. fuck you <3
-const char *OS = "Arch Linux";                    // idk how to implement it so get away with this
-const char *WM = "i3";
-const char *shell = "fish";
-const char *term = "kitty";
+#define OS "Arch Linux"
+#define WM "i3"
+#define SHELL "fish"
+#define TERM "kitty"
 
-const char *host = "HP ProBook 440 G6";
-const char *cpu = "i5-8265U";
-const char *gpu = "Intel UHD Graphics 620";
+#define HOST "HP ProBook 440 G6"
+#define CPU "i5-8265U"
+#define GPU "Intel UHD Graphics 620"

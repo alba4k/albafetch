@@ -2,31 +2,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <sys/sysinfo.h>
 #include <limits.h>
 
 #include "config.h"
-
-/*
-                   -`                 .     (whoami)@(/etc/hostname) 
-                  .o+`                .     —————————————— 
-                 `ooo/                .     Uptime: XXd XXh XXm
-                `+oooo:               .     —————————————————— 
-               `+oooooo:              .     OS: Arch Linux x86_64 
-               -+oooooo+:             .     Kernel: (uname -r) 
-             `/:-:++oooo+:            .     WM: i3 
-            `/++++/+++++++:           .     Shell: fish
-           `/++++++++++++++:          .     Terminal: kitty 
-          `/+++ooooooooooooo/`        .     Packages: (pacman -Q | wc -l) 
-         ./ooosssso++osssssso+`       .     ——————————————————————— 
-        .oossssso-````/ossssss+`      .     Host: HP ProBook 440 G6 
-       -osssssso.      :ssssssso.     .     CPU: i5-8265U (8) @ 1.5GHz [44.0°C] 
-      :osssssss/        osssso+++.    .     GPU: WhiskeyLake-U GT2 [UHD Graphics 620] 
-     /ossssssss/        +ssssooo/-    .     Memory: free --mebi | grep M | awk '{print $3 "MiB / " $2 "MiB"}
-   `/ossssso+/:-        -:/+osssso+-  .
-  `+sso+:-`                 `.-/+oso: .
- `++:.                           `-/+/.
- .`                                 `/.
-*/
 
 int main() {
 
@@ -43,7 +22,7 @@ int main() {
 
         execlp("whoami", "whoami", NULL);
     } else {
-        printf("%s%s", logo[0], spacing);
+        printf(COLOR "%s\e[0m" SPACING, logo[0]);
     }
 
     wait(NULL);
@@ -54,17 +33,22 @@ int main() {
 
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%s@%s\n%s%s%s", username, hostname, logo[1], spacing, separator);
+    printf(COLOR "%s\e[0m@" COLOR "%s\n%s\e[0m" SPACING SEPARATOR, username, hostname, logo[1]);
 
     // ******** uptime ********
+
+    struct sysinfo info;
+    sysinfo(&info);
+
+
     if(!fork()) {
         // some way to get the uptime
         exit(0);
     } else {
-        printf("%s%sUptime:", logo[2], spacing);
+        printf(COLOR "%s" SPACING "Uptime:\e[0m %i s\n", logo[2], info.uptime);
     }
     wait(NULL);
-    printf("\n%s%s%s", logo[3], spacing, separator);
+    // some way to use the uptime
 
     // ******** os ********
     static char OS_arch[10];
@@ -74,6 +58,8 @@ int main() {
         dup2(pipes[1], STDOUT_FILENO);
 
         execlp("uname", "uname", "-m", NULL);
+    } else {
+        printf(COLOR "%s\e[0m" SPACING SEPARATOR COLOR "%s" SPACING "OS:\e[0m ", logo[3], logo[4]);
     }
     wait(NULL);
 
@@ -81,7 +67,7 @@ int main() {
     len = read(pipes[0], OS_arch, 10);
     OS_arch[len - 1] = 0;
 
-    printf("%s%sOS: %s %s\n", logo[4], spacing, OS, OS_arch);
+    printf(OS "%s\n", OS_arch);
 
     // ******* kernel ********
 
@@ -93,7 +79,7 @@ int main() {
 
         execlp("uname", "uname", "-r", NULL);
     } else {
-        printf("%s%sKernel: ", logo[5], spacing);
+        printf(COLOR "%s" SPACING "Kernel:\e[0m ", logo[5]);
     }
     wait(NULL);
     close(pipes[1]);
@@ -103,17 +89,16 @@ int main() {
     printf("%s\n", kernel);
     
     // ******** wm ********
-    printf("%s%sWM: %s\n", logo[6], spacing, WM);
+    printf(COLOR"%s" SPACING "WM:\e[0m " WM "\n", logo[6]);
 
     // ******** shell ********
 
     // TODO: find a way lol
-    printf("%s%sShell: %s\n", logo[7], spacing, shell);
+    printf(COLOR "%s" SPACING "Shell:\e[0m " SHELL "\n", logo[7]);
 
-    // ******** shell ********
+    // ******** term ********
 
-    // TODO: find a way lol
-    printf("%s%sTerminal: %s\n", logo[8], spacing, term);
+    printf(COLOR "%s" SPACING "Terminal: \e[0m" TERM "\n", logo[8]);
 
     // ******** packages ********
     // using pacman, only pacman, get away with it
@@ -128,7 +113,7 @@ int main() {
         system("pacman -Q | wc -l");
         exit(0);
     } else {
-        printf("%s%sPackages: ", logo[9], spacing);
+        printf(COLOR "%s" SPACING "Packages: ", logo[9]);
     }
     wait(NULL);
     close(pipes[1]);
@@ -136,19 +121,19 @@ int main() {
     len = read(pipes[0], packages, 10);
     packages[len - 1] = 0;
 
-    printf("%s (pacman)\n%s%s%s", packages, logo[10], spacing, separator);
+    printf(COLOR "\e[0m%s (pacman)\n" COLOR "%s\e[0m" SPACING SEPARATOR, packages, logo[10]);
 
     // ******** host ********
 
-    printf("%s%sHost: %s\n", logo[11], spacing, host);
+    printf(COLOR "%s" SPACING "Host:\e[0m " HOST "\n", logo[11]);
 
-    // ******** cpu ********
+    // ******** CPU ********
 
-    printf("%s%sCPU: %s\n", logo[12], spacing, cpu);
+    printf(COLOR "%s" SPACING "CPU:\e[0m " CPU "\n", logo[12]);
 
-    // ******** cpu ********
+    // ******** GPU ********
 
-    printf("%s%sGPU: %s\n", logo[13], spacing, gpu);
+    printf(COLOR "%s" SPACING "GPU:\e[0m " GPU "\n", logo[13]);
 
     // ******** mem ********
 
@@ -172,7 +157,7 @@ int main() {
         system("free --mebi | grep M | awk '{print $2}'");
         exit(0);
     } else {
-        printf("%s%sMemory: ", logo[14], spacing);
+        printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
     }
 
     wait(NULL);
@@ -187,5 +172,9 @@ int main() {
     total[len - 1] = 0;
 
 
-    printf("%s / %s (%i%%)\n", used, total, (int)used / (int)total * 100);
+    printf("%s / %s (%i%%)\n", used, total, (atoi(used)*100) / atoi(total));
+
+    for(int i = 15; i < sizeof(logo) / sizeof(char*); i++) {
+        printf(COLOR "%s\n\e[0m", logo[i]);
+    }
 }
