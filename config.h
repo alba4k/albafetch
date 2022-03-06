@@ -28,9 +28,6 @@ const char *logo[] = {
 
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define OS "Arch Linux"
-#define WM "i3"
-#define SHELL "fish"
-#define TERM "kitty"
 
 #define HOST "HP ProBook 440 G6"
 #define CPU "i5-8265U"

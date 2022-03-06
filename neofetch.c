@@ -92,16 +92,15 @@ int main() {
     printf("%s\n", kernel);
     
     // ******** wm ********
-    printf(COLOR"%s" SPACING "WM:\e[0m " WM "\n", logo[6]);
+    printf(COLOR"%s" SPACING "Desktop:\e[0m %s\n", logo[6], getenv("XDG_CURRENT_DESKTOP"));
 
     // ******** shell ********
 
-    // TODO: find a way lol
-    printf(COLOR "%s" SPACING "Shell:\e[0m " SHELL "\n", logo[7]);
+    printf(COLOR "%s" SPACING "Shell:\e[0m %s\n", logo[7], getenv("SHELL"));
 
     // ******** term ********
 
-    printf(COLOR "%s" SPACING "Terminal: \e[0m" TERM "\n", logo[8]);
+    printf(COLOR "%s" SPACING "Terminal: \e[0m %s\n", logo[8], getenv("TERM"));
 
     // ******** packages ********
     // using pacman, only pacman, get away with it
@@ -144,6 +143,7 @@ int main() {
 
     unsigned long total = (info.totalram)/1048576;
     unsigned long used = total - info.freeram/1048576;
+    //printf("\n%lu\n", info.freeram / 1048576);
     printf("%lu MiB / %lu MiB (%lu%%)\n", used, total, (used * 100) / total);
 
     // ******** remaining lines of the logo ********
