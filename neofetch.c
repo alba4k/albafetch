@@ -9,6 +9,9 @@
 
 int main() {
 
+    struct sysinfo info;
+    sysinfo(&info);
+
     // ******** first part ********
     static char hostname[HOST_NAME_MAX + 1];
     static char username[33];   // 32 characters max
@@ -37,17 +40,17 @@ int main() {
 
     // ******** uptime ********
 
-    struct sysinfo info;
-    sysinfo(&info);
+    unsigned int secs = info.uptime;
+    unsigned int days = secs/86400;
+    unsigned int hours = secs/3600 - days*24;
+    unsigned int mins = secs/60 - days*864 - hours*60;
 
-
-    if(!fork()) {
-        // some way to get the uptime
-        exit(0);
-    } else {
-        printf(COLOR "%s" SPACING "Uptime:\e[0m %i s\n", logo[2], info.uptime);
+    printf(COLOR "%s" SPACING "Uptime:\e[0m ", logo[2]);
+    if(days) {
+        printf("%id, ", info.uptime/864000);    // print the number of days passed if more than 0
     }
-    wait(NULL);
+    printf("%ih, %im\n", hours, mins);
+    
     // some way to use the uptime
 
     // ******** os ********
@@ -137,42 +140,13 @@ int main() {
 
     // ******** mem ********
 
-    char used[8];
-    char total[8];
+    printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
 
-    int pipes2[2];
+    unsigned long total = (info.totalram)/1048576;
+    unsigned long used = total - info.freeram/1048576;
+    printf("%lu MiB / %lu MiB (%lu%%)\n", used, total, (used * 100) / total);
 
-    pipe(pipes);
-    pipe(pipes2);
-    if(!fork()) {           // this child gets the used memory
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-
-        system("free --mebi | grep M | awk '{print $3}'");
-        exit(0);
-    } else if(!fork()) {    // this child gets the total memory
-        close(pipes2[0]);
-        dup2(pipes2[1], STDOUT_FILENO);
-
-        system("free --mebi | grep M | awk '{print $2}'");
-        exit(0);
-    } else {
-        printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
-    }
-
-    wait(NULL);
-    wait(NULL);
-
-    close(pipes[1]);
-    len = read(pipes[0], used, 8);
-    used[len - 1] = 0;
-
-    close(pipes2[1]);
-    len = read(pipes2[0], total, 8);
-    total[len - 1] = 0;
-
-
-    printf("%s / %s (%i%%)\n", used, total, (atoi(used)*100) / atoi(total));
+    // ******** remaining lines of the logo ********
 
     for(int i = 15; i < sizeof(logo) / sizeof(char*); i++) {
         printf(COLOR "%s\n\e[0m", logo[i]);
