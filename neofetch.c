@@ -31,9 +31,11 @@
 int main() {
 
     // ******** first part ********
-    static char hostname[HOST_NAME_MAX + 1];   // 64 characters max
+    static char hostname[HOST_NAME_MAX + 1];
     static char username[33];   // 32 characters max
+
     int pipes[2];
+
     pipe(pipes);    
     if(!fork()) {
         close(pipes[0]);
@@ -99,7 +101,7 @@ int main() {
     len = read(pipes[0], kernel, 30);
     kernel[len - 1] = 0;
     printf("%s\n", kernel);
-
+    
     // ******** wm ********
     printf("%s%sWM: %s\n", logo[6], spacing, WM);
 
@@ -115,9 +117,8 @@ int main() {
 
     // ******** packages ********
     // using pacman, only pacman, get away with it
-    printf("%s%sPackages: ", logo[9], spacing);
 
-    char packages[50];
+    char packages[10];
 
     pipe(pipes);
     if(!fork()) {
@@ -126,10 +127,13 @@ int main() {
 
         system("pacman -Q | wc -l");
         exit(0);
+    } else {
+        printf("%s%sPackages: ", logo[9], spacing);
     }
+    wait(NULL);
     close(pipes[1]);
 
-    len = read(pipes[0], packages, 30);
+    len = read(pipes[0], packages, 10);
     packages[len - 1] = 0;
 
     printf("%s (pacman)\n%s%s%s", packages, logo[10], spacing, separator);
@@ -141,4 +145,47 @@ int main() {
     // ******** cpu ********
 
     printf("%s%sCPU: %s\n", logo[12], spacing, cpu);
+
+    // ******** cpu ********
+
+    printf("%s%sGPU: %s\n", logo[13], spacing, gpu);
+
+    // ******** mem ********
+
+    char used[8];
+    char total[8];
+
+    int pipes2[2];
+
+    pipe(pipes);
+    pipe(pipes2);
+    if(!fork()) {           // this child gets the used memory
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        system("free --mebi | grep M | awk '{print $3}'");
+        exit(0);
+    } else if(!fork()) {    // this child gets the total memory
+        close(pipes2[0]);
+        dup2(pipes2[1], STDOUT_FILENO);
+
+        system("free --mebi | grep M | awk '{print $2}'");
+        exit(0);
+    } else {
+        printf("%s%sMemory: ", logo[14], spacing);
+    }
+
+    wait(NULL);
+    wait(NULL);
+
+    close(pipes[1]);
+    len = read(pipes[0], used, 8);
+    used[len - 1] = 0;
+
+    close(pipes2[1]);
+    len = read(pipes2[0], total, 8);
+    total[len - 1] = 0;
+
+
+    printf("%s / %s (%i%%)\n", used, total, (int)used / (int)total * 100);
 }

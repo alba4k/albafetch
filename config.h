@@ -33,4 +33,4 @@ const char *term = "kitty";
 
 const char *host = "HP ProBook 440 G6";
 const char *cpu = "i5-8265U";
-const char *gpu = "Intel UHD Graphics 620"
+const char *gpu = "Intel UHD Graphics 620";
