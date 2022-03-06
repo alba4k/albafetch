@@ -70,7 +70,7 @@ int main() {
     len = read(pipes[0], OS_arch, 10);
     OS_arch[len - 1] = 0;
 
-    printf(OS "%s\n", OS_arch);
+    printf(OS " %s\n", OS_arch);
 
     // ******* kernel ********
 
