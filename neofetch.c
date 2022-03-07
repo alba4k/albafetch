@@ -99,9 +99,14 @@ int main() {
     printf(COLOR "%s" SPACING "Shell:\e[0m %s\n", logo[7], getenv("SHELL"));
 
     // ******** term ********
-
-    printf(COLOR "%s" SPACING "Terminal: \e[0m %s\n", logo[8], getenv("TERM"));
-
+    char *term = getenv("TERM");
+    if(term == "xterm-kitty") {
+        printf(COLOR "%s" SPACING "Terminal: \e[0m kitty\n", logo[8]);
+    } else if(term == "xterm-256color"){
+        printf(COLOR "%s" SPACING "Terminal: vscode\e[0m %s\n", logo[8]);
+    } else {
+        printf(COLOR "%s" SPACING "Terminal: \e[0m %s\n", logo[8], term);
+    }
     // ******** packages ********
     // using pacman, only pacman, get away with it
 
@@ -139,11 +144,12 @@ int main() {
 
     // ******** mem ********
 
-    printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
-
     unsigned long total = (info.totalram)/1048576;
-    char used[9];
-    pipe(pipes);
+    unsigned long used = total - (info.freeram + info.bufferram) / 1048576;
+
+    printf(COLOR "%s" SPACING "Memory:\e[0m %lu MiB / %lu MiB (%lu%%)\n", logo[14], used, total, (used * 100) / total);
+   /* char used[5];
+    
     pipe(pipes);
     if(!fork()) {
         close(pipes[0]);
@@ -151,17 +157,18 @@ int main() {
 
         system("free --mebi | grep M | awk '{print $3}'");
         exit(0);
+    } else {
+        printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
     }
     wait(NULL);
     close(pipes[1]);
 
-    len = read(pipes[0], used, 9);
+    len = read(pipes[0], used, 5);
     used[len - 1] = 0;
-
     //unsigned long used = total - info.freeram/1048576;
     //printf("\n%lu\n", info.freeram / 1048576);
     printf("%s MiB / %lu MiB (%lu%%)\n", used, total, (atoi(used) * 100) / total);
-
+*/
     // ******** remaining lines of the logo ********
 
     for(int i = 15; i < sizeof(logo) / sizeof(char*); i++) {
