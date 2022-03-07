@@ -135,7 +135,7 @@ int main() {
     printf(COLOR "%s" SPACING "Host:\e[0m " HOST "\n", logo[11]);
 
     // ******** CPU ********
-
+    // could get it from /proc/cpuingo
     printf(COLOR "%s" SPACING "CPU:\e[0m " CPU "\n", logo[12]);
 
     // ******** GPU ********
@@ -144,11 +144,11 @@ int main() {
 
     // ******** mem ********
 
-    unsigned long total = (info.totalram)/1048576;
-    unsigned long used = total - (info.freeram + info.bufferram) / 1048576;
+    unsigned long total = (info.totalram);
+    //unsigned long used = total - info.freeram - info.bufferram - info.sharedram;
 
-    printf(COLOR "%s" SPACING "Memory:\e[0m %lu MiB / %lu MiB (%lu%%)\n", logo[14], used, total, (used * 100) / total);
-   /* char used[5];
+    //printf(COLOR "%s" SPACING "Memory:\e[0m %lu MiB / %lu MiB (%lu%%)\n", logo[14], used/1048576, total/1048576, (used * 100) / (1048576*total));
+   char used[5];
     
     pipe(pipes);
     if(!fork()) {
@@ -165,10 +165,8 @@ int main() {
 
     len = read(pipes[0], used, 5);
     used[len - 1] = 0;
-    //unsigned long used = total - info.freeram/1048576;
-    //printf("\n%lu\n", info.freeram / 1048576);
     printf("%s MiB / %lu MiB (%lu%%)\n", used, total, (atoi(used) * 100) / total);
-*/
+
     // ******** remaining lines of the logo ********
 
     for(int i = 15; i < sizeof(logo) / sizeof(char*); i++) {
