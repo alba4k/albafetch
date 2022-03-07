@@ -34,6 +34,7 @@ void title() {          // prints a title in the format user@hostname
 
     gethostname(hostname, HOST_NAME_MAX + 1);
 
+    close(pipes[0]);
     printf(COLOR "%s\e[0m@" COLOR "%s", username, hostname);
 }
 
@@ -79,6 +80,7 @@ void os() {             // prints the os name + arch
     size_t len = read(pipes[0], OS_arch, 10);
     OS_arch[len - 1] = 0;
 
+    close(pipes[0]);
     printf(OS " %s", OS_arch);
 }
 
@@ -100,6 +102,8 @@ void kernel() {         // prints the kernel version
 
     size_t len = read(pipes[0], kernel, 30);
     kernel[len - 1] = 0;
+
+    close(pipes[0]);
     printf("%s", kernel);
 }
 
@@ -137,6 +141,7 @@ void packages() {       // prints the number of installed packages
     size_t len = read(pipes[0], packages, 10);
     packages[len - 1] = 0;
 
+    close(pipes[0]);
     printf("%s (pacman)", packages);
 }
 
@@ -183,6 +188,7 @@ void memory() {         // prints the sued memory in the format used MiB / total
     used_str[len - 1] = 0;
     uint64_t used = atol(used_str); 
 
+    close(pipes[0]);
     printf("%ld MiB / %lu MiB (%ld%%)", used/1048576, total/1048576, (used * 100) / total);
 }
 
