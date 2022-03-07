@@ -142,9 +142,25 @@ int main() {
     printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
 
     unsigned long total = (info.totalram)/1048576;
-    unsigned long used = total - info.freeram/1048576;
+    char used[9];
+    pipe(pipes);
+    pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        system("free --mebi | grep M | awk '{print $3}'");
+        exit(0);
+    }
+    wait(NULL);
+    close(pipes[1]);
+
+    len = read(pipes[0], used, 9);
+    used[len - 1] = 0;
+
+    //unsigned long used = total - info.freeram/1048576;
     //printf("\n%lu\n", info.freeram / 1048576);
-    printf("%lu MiB / %lu MiB (%lu%%)\n", used, total, (used * 100) / total);
+    printf("%s MiB / %lu MiB (%lu%%)\n", used, total, (atoi(used) * 100) / total);
 
     // ******** remaining lines of the logo ********
 
