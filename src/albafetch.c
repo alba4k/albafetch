@@ -130,8 +130,8 @@ void packages() {       // prints the number of installed packages
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        system("pacman -Q | wc -l");        // using "pacman --query" to list the installed packages
-        exit(0);                            // using "wc --lines" to get the number of lines (wordcount)
+        execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages
+                                                                    // using "wc --lines" to get the number of lines (wordcount)
     } else {
         printf("Packages:\e[0m ");
     }
@@ -176,8 +176,7 @@ void memory() {         // prints the sued memory in the format used MiB / total
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        system("free --byte | grep M | awk '{print $3}'");  // using free to count the used memory, 3rd arg
-        exit(0);
+        execlp("sh", "sh", "-c", "free --byte | grep M | awk '{print $3}'", NULL);  // using free to count the used memory, 3rd arg
     } else {
         printf("Memory:\e[0m ");
     }
