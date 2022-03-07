@@ -1,5 +1,8 @@
 # albafetch ~by alba4k
 
+![intro](images/albafetch.png)
+
+
 albafetch is a simple, fast system fetching program. It prints many info about the system in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable from a 10k+ lines shell script).
 
 **It was made, and only works, on Arch Linux, due to a dependency for pacman**
@@ -43,7 +46,7 @@ $ cd albafetch/
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/src/ 
 ```
-You can change some settings in `albafetch/src/config.h`, or by directly changing the main `albafetch/src/albafetch.c` file. You will need to recompile/reinstall after configuring.
+You can change some settings in `albafetch/srtime_neofetchc/config.h`, or by directly changing the main `albafetch/src/albafetch.c` file. You will need to recompile/reinstall after configuring.
 
 ---
 
