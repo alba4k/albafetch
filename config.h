@@ -1,7 +1,7 @@
 // CONFIGURATION OPTIONS:
 #define SPACING "    "                      // defines the distance between the logo and the infos
 #define SEPARATOR "------------------\n"    // defines what is used as separator between sections
-#define COLOR "\e[31m\e[1m"                 // defines the color to use (ex: "\e[36m" would be light blue; "\e[1m" makes the text bold)
+#define COLOR "\e[36m\e[1m"                 // defines the color to use (ex: "\e[36m" would be light blue; "\e[1m" makes the text bold)
 
 // add more logos if you want, I couldn't care less
 const char *logo[] = {
