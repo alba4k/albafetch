@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <sys/sysinfo.h>
-#include <limits.h>
+#include <limits.h>         // used to get max hostname lenght
 
 #include "config.h"
 
