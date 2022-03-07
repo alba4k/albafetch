@@ -8,11 +8,11 @@
 
 #include "config.h"
 
-void separator() {
+void separator() {      // prints a separator
     printf(SEPARATOR);
 }
 
-void title() {
+void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     static char username[33];   // 32 characters max
 
@@ -37,7 +37,7 @@ void title() {
     printf(COLOR "%s\e[0m@" COLOR "%s", username, hostname);
 }
 
-void uptime() {
+void uptime() {         // prints the uptime
     struct sysinfo info;
     sysinfo(&info);
 
@@ -61,7 +61,7 @@ void uptime() {
     }
 }
 
-void os() {
+void os() {             // prints the os name + arch
     static char OS_arch[10];
     int pipes[2];
     pipe(pipes);
@@ -82,7 +82,7 @@ void os() {
     printf(OS " %s", OS_arch);
 }
 
-void kernel() {
+void kernel() {         // prints the kernel version
     static char kernel[30];
     int pipes[2];
 
@@ -103,19 +103,19 @@ void kernel() {
     printf("%s", kernel);
 }
 
-void desktop() {
+void desktop() {        // prints the current desktop environment
         printf("Desktop:\e[0m %s", getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
 }
 
-void shell() {
+void shell() {          // prints the user default shell
     printf("Shell:\e[0m %s",getenv("SHELL"));        // $SHELL
 }
 
-void term() {
+void term() {           // prints the current terminal
     printf("Terminal: \e[0m %s", getenv("TERM"));     // $TERM
 }
 
-void packages() {
+void packages() {       // prints the number of installed packages
     // using pacman and only pacman, get away with it
 
     char packages[10];
@@ -140,20 +140,20 @@ void packages() {
     printf("%s (pacman)", packages);
 }
 
-void host() {
+void host() {           // prints the current host machine
     printf("Host:\e[0m " HOST);
 }
 
-void cpu() {
+void cpu() {            // prints the current CPU
     // could get it from /proc/cpuinfo
     printf("CPU:\e[0m " CPU "");
 }
 
-void gpu() {
+void gpu() {            // prints the current CPU
     printf("GPU:\e[0m " GPU);
 }
 
-void memory() {
+void memory() {         // prints the sued memory in the format used MiB / total MiB (XX%)
     struct sysinfo info;
     sysinfo(&info);
 
@@ -188,7 +188,7 @@ void memory() {
 
 int main() {
     printf(COLOR "%s" SPACING, logo[0]);
-    title();                    // printing the title username@hostname
+    title();
 
     printf(COLOR "\n%s" SPACING, logo[1]);
     separator();
