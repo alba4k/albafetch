@@ -14,28 +14,9 @@ void separator() {      // prints a separator
 
 void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
-    static char username[33];   // 32 characters max
-
-    int pipes[2];
-
-    pipe(pipes);    
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-
-        execlp("whoami", "whoami", NULL);
-    }
-
-    wait(NULL);
-
-    close(pipes[1]);
-    size_t len = read(pipes[0], username, 33);
-    username[len - 1] = 0;
-
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    close(pipes[0]);
-    printf(COLOR "%s\e[0m@" COLOR "%s", username, hostname);
+    printf(COLOR "%s\e[0m@" COLOR "%s", getlogin(), hostname);
 }
 
 void uptime() {         // prints the uptime
@@ -130,8 +111,7 @@ void packages() {       // prints the number of installed packages
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages
-                                                                    // using "wc --lines" to get the number of lines (wordcount)
+        execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
     } else {
         printf("Packages:\e[0m ");
     }
