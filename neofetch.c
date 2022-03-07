@@ -12,7 +12,7 @@ int main() {
     struct sysinfo info;
     sysinfo(&info);
 
-    // ******** first part ********
+    // ******** title ********
     static char hostname[HOST_NAME_MAX + 1];
     static char username[33];   // 32 characters max
 
@@ -50,8 +50,6 @@ int main() {
         printf("%id, ", info.uptime/864000);    // print the number of days passed if more than 0
     }
     printf("%ih, %im\n", hours, mins);
-    
-    // some way to use the uptime
 
     // ******** os ********
     static char OS_arch[10];
@@ -148,14 +146,14 @@ int main() {
     //unsigned long used = total - info.freeram - info.bufferram - info.sharedram;
 
     //printf(COLOR "%s" SPACING "Memory:\e[0m %lu MiB / %lu MiB (%lu%%)\n", logo[14], used/1048576, total/1048576, (used * 100) / (1048576*total));
-   char used[5];
+   char used_str[14];
     
     pipe(pipes);
     if(!fork()) {
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        system("free --mebi | grep M | awk '{print $3}'");
+        system("free --byte | grep M | awk '{print $3}'");
         exit(0);
     } else {
         printf(COLOR "%s" SPACING "Memory:\e[0m ", logo[14]);
@@ -163,9 +161,11 @@ int main() {
     wait(NULL);
     close(pipes[1]);
 
-    len = read(pipes[0], used, 5);
-    used[len - 1] = 0;
-    printf("%s MiB / %lu MiB (%lu%%)\n", used, total, (atoi(used) * 100) / total);
+    len = read(pipes[0], used_str, 14);
+    used_str[len - 1] = 0;
+    const unsigned int used = atoi(used_str); 
+
+    printf("%i MiB / %lu MiB (%lu%%)\n", used/1048576, total/1048576, (used * 100) / (total*1048576));
 
     // ******** remaining lines of the logo ********
 
