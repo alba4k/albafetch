@@ -38,7 +38,8 @@ void uptime() {         // prints the uptime
     }
     if(mins) {
         printf("%um ", mins);        // print the number of minutes passed if more than 0
-    } else {
+    }
+    else if(secs < 60) {
         printf("%us", sec);         // print the number of seconds passed if more than 0
     }
 }
