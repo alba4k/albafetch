@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <sys/sysinfo.h>
 #include <limits.h>         // used to get max hostname lenght
+#include <stdint.h>
 
 #include "config.h"
 
@@ -159,9 +160,9 @@ int main() {
 
     len = read(pipes[0], used_str, 14);
     used_str[len - 1] = 0;
-    const unsigned int used = atoi(used_str); 
+    uint64_t used = atol(used_str); 
 
-    printf("%i MiB / %lu MiB (%lu%%)\n", used/1048576, total/1048576, (used * 100) / (total*1048576));
+    printf("%ld MiB / %lu MiB (%ld%%)\n", used/1048576, total/1048576, (used * 100) / total);
 
     // ******** remaining lines of the logo ********
 
