@@ -23,6 +23,10 @@ Here is a time comparison (exact execution times change between machines and run
 
 All of those will be present by default on a normal Arch Linux installation.
 
+* lsb-release (getting the distro name)
+
+lsb-release will need to be installed
+
 You will be able to use this script by downloading an executable from the [releases page](https://github.com/alba4k/albafetch/releases) or by compiling it yourself. While compiling might appear more complicated, it will allow you to **customize the output**.
 
 # Compiling:
