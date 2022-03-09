@@ -26,9 +26,6 @@ const char *logo[] = {
     " .`                                 `/"
 };
 
-// was just too lazy to do it right, so it's hard coded. fuck you <3
-#define OS "Arch Linux"                 // what will be printed as os
-
 #define HOST "HP ProBook 440 G6"        // what will be printed as host
 #define CPU "i5-8265U"                  // what will be printed as cpu. could get it from /proc/cpuinfo
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
