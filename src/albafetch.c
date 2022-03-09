@@ -54,7 +54,7 @@ void os() {             // prints the os name + arch
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        execlp("sh", "sh", "-c", "{ lsb_release -ds; uname -m; } | tr '\n' ' '", NULL);
+        execlp("sh", "sh", "-c", "{ lsb_release -ds; uname -m; } | tr '\n' ' ' | tr -d '\"'", NULL);
     } else {
         printf("%-11s\e[0m", "OS:");
     }
