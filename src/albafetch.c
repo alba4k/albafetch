@@ -168,12 +168,8 @@ void memory() {         // prints the sued memory in the format used MiB / total
 
     size_t len = read(pipes[0], used_str, 14);
     used_str[len - 1] = 0;
-<<<<<<< HEAD
-    uint64_t used = atol(used_str); 
-=======
     uint64_t used = atol(used_str);
 
->>>>>>> 2a63a22bf8c1c28a4469bbe2259af70e3d0de813
     close(pipes[0]);
     
     printf("%ld MiB / %lu MiB (%ld%%)", used/1048576, total/1048576, (used * 100) / total);
