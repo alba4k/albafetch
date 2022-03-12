@@ -31,7 +31,7 @@ void uptime() {         // prints the uptime
 
     printf("%-11s\e[0m", "Uptime:");
     if(days) {
-        printf("%ud ", hours);     // print the number of days passed if more than 0
+        printf("%ud ", days);     // print the number of days passed if more than 0
     }
     if(hours) {
         printf("%uh ", hours);       // print the number of days passed if more than 0
