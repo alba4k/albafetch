@@ -26,7 +26,7 @@ void uptime() {         // prints the uptime
     unsigned int secs = info.uptime;            // total uptime in seconds
     unsigned int days = secs/86400;
     unsigned int hours = secs/3600 - days*24;
-    unsigned int mins = secs/60 - days*864 - hours*60;
+    unsigned int mins = secs/60 - days*1440 - hours*60;
     unsigned int sec = secs - days*86400 - hours*3600 - mins*60;
 
     printf("%-11s\e[0m", "Uptime:");
