@@ -19,6 +19,13 @@ void title() {          // prints a title in the format user@hostname
     printf(COLOR "%s\e[0m@" COLOR "%s", getlogin(), hostname);
 }
 
+void hostname() {
+    static char hostname[HOST_NAME_MAX + 1];
+    gethostname(hostname, HOST_NAME_MAX + 1);
+
+    printf(COLOR "Hostname:\e[0m %s", hostname);
+}
+
 void uptime() {         // prints the uptime
     struct sysinfo info;
     sysinfo(&info);
