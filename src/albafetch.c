@@ -94,8 +94,8 @@ void kernel() {         // prints the kernel version
     wait(NULL);
     close(pipes[1]);
 
-    size_t len = read(pipes[0], kernel, 30);
-    kernel[len - 1] = 0;
+    //size_t len = read(pipes[0], kernel, 30);
+    kernel[read(pipes[0], kernel, 29) - 1] = 0;
 
     close(pipes[0]);
     printf("%s", kernel);
@@ -131,8 +131,8 @@ void packages() {       // prints the number of installed packages
     wait(NULL);
     close(pipes[1]);
 
-    size_t len = read(pipes[0], packages, 10);
-    packages[len - 1] = 0;
+    //size_t len = read(pipes[0], packages, 10);
+    packages[read(pipes[0], packages, 9) - 1] = 0;
 
     close(pipes[0]);
     printf("%s (pacman)", packages);
@@ -155,8 +155,8 @@ void memory() {         // prints the sued memory in the format used MiB / total
     struct sysinfo info;
     sysinfo(&info);
 
-    unsigned long total = (info.totalram);
-    char used_str[14];
+    unsigned long total = info.totalram;
+    char used_str[15];
 
     // would be way more elegant, but leaves a slight gap? idk, I could also use /proc/meminfo
     //unsigned long used = total - info.freeram - info.bufferram - info.sharedram;
@@ -176,8 +176,8 @@ void memory() {         // prints the sued memory in the format used MiB / total
     wait(NULL);
     close(pipes[1]);
 
-    size_t len = read(pipes[0], used_str, 14);
-    used_str[len - 1] = 0;
+    //size_t len = read(pipes[0], used_str, 14);
+    used_str[read(pipes[0], used_str, 14) - 1] = 0;
     uint64_t used = atol(used_str);
 
     close(pipes[0]);
