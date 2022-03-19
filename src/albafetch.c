@@ -26,6 +26,10 @@ void hostname() {
     printf(COLOR "Hostname:\e[0m %s", hostname);
 }
 
+void user() {
+    printf(COLOR "User:\e[0m %s", getlogin());
+}
+
 void uptime() {         // prints the uptime
     struct sysinfo info;
     sysinfo(&info);
