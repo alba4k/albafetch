@@ -19,14 +19,14 @@ void title() {          // prints a title in the format user@hostname
     printf(COLOR "%s\e[0m@" COLOR "%s", getlogin(), hostname);
 }
 
-void hostname() {
+void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
     printf(COLOR "Hostname:\e[0m %s", hostname);
 }
 
-void user() {
+void user() {           // get the current login
     printf(COLOR "User:\e[0m %s", getlogin());
 }
 
@@ -57,9 +57,8 @@ void uptime() {         // prints the uptime
 
 void os() {             // prints the os name + arch
     // static char os_arch[10];
-    static char os_name[256];
+    static char os_name[128];
     int pipes[2];
-    pipe(pipes);
     pipe(pipes);
     if(!fork()) {
         close(pipes[0]);
@@ -72,7 +71,7 @@ void os() {             // prints the os name + arch
     wait(NULL);
 
     close(pipes[1]);
-    size_t len = read(pipes[0], os_name, 256);
+    size_t len = read(pipes[0], os_name, 128);
     os_name[len - 1] = 0;
 
     close(pipes[0]);
@@ -186,7 +185,18 @@ void memory() {         // prints the sued memory in the format used MiB / total
     printf("%ld MiB / %lu MiB (%ld%%)", used/1048576, total/1048576, (used * 100) / total);
 }
 
+void public_ip() {      // get the public IP adress - WORK IN PROGRESS
+
+}
+
+void local_ip() {      // get the local IP adress - WORK IN PROGRESS
+    
+}
+
 int main() {
+    public_ip();
+    printf("\n\n");
+
     printf(COLOR "%s" SPACING, logo[0]);
     title();
 
