@@ -193,7 +193,17 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
     
 }
 
-int main() {
+int main(int argc, char **argv) {
+
+    if(argv[0] == "--help" || "-h") {
+        puts("albafetch - a system fetch utility, by alba4k");
+        puts("\nFLAGS:");
+        puts("\t-h, --help:\t\tPrint this menu");
+        puts("\nReport a bug: https://github.com/alba4k/albafetch");
+
+        exit(0);
+    }
+
     public_ip();
     printf("\n\n");
 
