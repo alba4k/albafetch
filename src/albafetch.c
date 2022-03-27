@@ -10,7 +10,7 @@
 #include "config.h"
 
 void separator() {      // prints a separator
-    printf(SEPARATOR);
+    fputs(SEPARATOR, stdout);
 }
 
 void title(char *color) {          // prints a title in the format user@hostname
