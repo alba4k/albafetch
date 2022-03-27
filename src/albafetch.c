@@ -75,8 +75,7 @@ void os() {             // prints the os name + arch
     wait(NULL);
 
     close(pipes[1]);
-    size_t len = read(pipes[0], os_name, 128);
-    os_name[len - 1] = 0;
+    os_name[read(pipes[0], os_name, 128)] = 0;
 
     close(pipes[0]);
     printf("%s %s", os_name, name.machine);
@@ -102,7 +101,7 @@ void term() {           // prints the current terminal
 }
 
 void packages() {       // prints the number of installed packages
-    // using pacman and only pacman, get away with it
+    // using pacman, only pacman, and I'll get away with it
 
     char packages[10];
 
@@ -120,7 +119,7 @@ void packages() {       // prints the number of installed packages
     close(pipes[1]);
 
     //size_t len = read(pipes[0], packages, 10);
-    packages[read(pipes[0], packages, 9) - 1] = 0;
+    packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
     printf("%s (pacman)", packages);
@@ -173,8 +172,27 @@ void memory() {         // prints the used memory in the format used MiB / total
     printf("%ld MiB / %lu MiB (%ld%%)", used/1048576, total/1048576, (used * 100) / total);
 }
 
-void public_ip() {      // get the public IP adress - WORK IN PROGRESS
+void public_ip() {      // get the public IP adress
+    char public_ip[20];
 
+    int pipes[2];
+    pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
+    } else {
+        printf("%-11s\e[0m", "Public IP:");
+    }
+    wait(NULL);
+    close(pipes[1]);
+
+    
+    public_ip[read(pipes[0], public_ip, 20)] = 0;
+
+    close(pipes[0]);
+    printf("%s", public_ip);
 }
 
 void local_ip() {      // get the local IP adress - WORK IN PROGRESS
