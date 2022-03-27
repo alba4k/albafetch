@@ -13,11 +13,11 @@ void separator() {      // prints a separator
     printf(SEPARATOR);
 }
 
-void title() {          // prints a title in the format user@hostname
+void title(char *color) {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%s\e[0m@%s%s", getlogin(), color, hostname);
+    printf("%s\e[0m@%s%s\e[0m", getlogin(), color, hostname);
 }
 
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
@@ -204,9 +204,28 @@ int main(const int argc, char **argv) {
             puts("\nReport a bug: https://github.com/alba4k/albafetch");
 
             return 0;
-        } else if((!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color"))) {
+        } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
-                printf("%sasdf%s\n", color, argv[2]);
+                if(!strcmp(argv[i+1],"black")) {
+                    strcpy(color, "\e[30m\e[1m");
+                } else if(!strcmp(argv[i+1],"red")) {
+                    strcpy(color, "\e[31m\e[1m");
+                } else if(!strcmp(argv[i+1],"green")) {
+                    strcpy(color, "\e[32m\e[1m");
+                } else if(!strcmp(argv[i+1],"yellow")) {
+                    strcpy(color, "\e[33m\e[1m");
+                } else if(!strcmp(argv[i+1],"blue")) {
+                    strcpy(color, "\e[34m\e[1m");
+                } else if(!strcmp(argv[i+1],"pink")) {
+                    strcpy(color, "\e[35m\e[1m");
+                } else if(!strcmp(argv[i+1],"cyan")) {
+                    strcpy(color, "\e[36m\e[1m");
+                } else if(!strcmp(argv[i+1],"white")) {
+                    strcpy(color, "\e[38m\e[1m");
+                } else {
+                    puts("ERROR: invalid color!");
+                    return 0;
+                }
             } else {
                 puts("ERROR: must specify a color!");
                 return 1;
@@ -215,7 +234,7 @@ int main(const int argc, char **argv) {
     }
 
     printf("%s%s" SPACING, color, logo[0]);
-    title();
+    title(color);
 
     printf("%s\n%s" SPACING, color, logo[1]);
     separator();
