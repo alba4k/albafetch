@@ -197,11 +197,11 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 int main(const int argc, char **argv) {
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-            puts("albafetch - a system fetch utility, by alba4k");
-            puts("\nFLAGS:");
-            puts("\t-h, --help:\t\tPrint this menu");
-            puts("\t-c, --color:\t\t Change the output color. set to void for default");
-            puts("\nReport a bug: https://github.com/alba4k/albafetch");
+            printf("%salbafetch\e[0m - a system fetch utility\n", color);
+            printf("\n%sFLAGS:\e[0m\n", color);
+            printf("\t%s-h\e[0m,%s --help\e[0m:\t Print this menu\n", color, color);
+            printf("\t%s-c\e[0m,%s --color\e[0m:\t Change the output color\n", color, color);
+            printf("\nReport a bug: %shttps://github.com/alba4k/albafetch/issues\e[0m\n", color);
 
             return 0;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
