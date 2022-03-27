@@ -42,7 +42,7 @@ An executable file will appear in `albafetch/`
 ```
 # curl https://raw.githubusercontent.com/alba4k/albafetch/master/install.sh | sh
 ```
-`sh` will need to be ran as root (e.g. `sudo`, `doas`, or a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
+`sh` will need to be ran as root (e.g. using `sudo` or `doas`, or in a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
 
 ## Manually:
 
@@ -51,7 +51,7 @@ $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/
 # make install
 ```
-`# make install` needs to be ran as root (e.g. `sudo`, `doas`, or a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
+`# make install` needs to be ran as root (e.g. using `sudo` or `doas`, or in a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
 
 # Customizing
 ```
