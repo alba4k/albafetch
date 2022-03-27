@@ -9,6 +9,8 @@
 * user - displays the name of the currently logged user
 * hostname - displays the machine hostname
 
+## all data now alligns
+
 ## other minor changes
 
 ---
