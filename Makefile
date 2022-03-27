@@ -1,8 +1,8 @@
 albafetch: src/albafetch.c src/config.h
 	gcc src/albafetch.c -o albafetch
 
-install: src/albafetch.c src/config.h
-	gcc src/albafetch.c -o /usr/bin/albafetch
+install: src/albafetch.c src/config.h albafetch
+	cp albafetch /usr/bin/albafetch
 
 uninstall:
 	rm /usr/bin/albafetch
