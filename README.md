@@ -36,13 +36,22 @@ $ make
 ```
 An executable file will appear in `albafetch/`
 
-# Installing (automatically compiles)
+# Installation
+
+## Using the installation script:
+```
+# curl https://github.com/alba4k/albafetch/install.sh | sh
+```
+`sh` will need to be ran as root (e.g. `sudo`, `doas`, or a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
+
+## Manually:
+
 ```
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/
 # make install
 ```
-`# make install` needs to be ran as root to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
+`# make install` needs to be ran as root (e.g. `sudo`, `doas`, or a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
 
 # Customizing
 ```
