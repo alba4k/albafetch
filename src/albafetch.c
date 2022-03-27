@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <sys/sysinfo.h>
+#include <sys/utsname.h>
 #include <limits.h>         // used to get max hostname lenght
 #include <stdint.h>
 #include <string.h>
@@ -57,7 +58,9 @@ void uptime() {         // prints the uptime
 }
 
 void os() {             // prints the os name + arch
-    // static char os_arch[10];
+    struct utsname name;
+    uname(&name);
+
     static char os_name[128];
     int pipes[2];
     pipe(pipes);
@@ -65,7 +68,7 @@ void os() {             // prints the os name + arch
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        execlp("sh", "sh", "-c", "{ lsb_release -ds; uname -m; } | tr '\n' ' ' | tr -d '\"'", NULL);
+        execlp("sh", "sh", "-c", "{ lsb_release -ds; } | tr -d '\n' | tr -d '\"'", NULL);
     } else {
         printf("%-11s\e[0m", "OS:");
     }
@@ -76,30 +79,14 @@ void os() {             // prints the os name + arch
     os_name[len - 1] = 0;
 
     close(pipes[0]);
-    printf("%s", os_name);
+    printf("%s %s", os_name, name.machine);
 }
 
 void kernel() {         // prints the kernel version
-    static char kernel[30];
-    int pipes[2];
-
-    pipe(pipes);
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-
-        execlp("uname", "uname", "-r", NULL);   // using "uname --kernel-release" to get the kernel version
-    } else {
-        printf("%-11s\e[0m", "Kernel:");
-    }
-    wait(NULL);
-    close(pipes[1]);
-
-    //size_t len = read(pipes[0], kernel, 30);
-    kernel[read(pipes[0], kernel, 29) - 1] = 0;
-
-    close(pipes[0]);
-    printf("%s", kernel);
+    struct utsname name;
+    uname(&name);
+    
+    printf("%-11s\e[0m%s", "Kernel:" , name.release);
 }
 
 void desktop() {        // prints the current desktop environment
@@ -152,7 +139,7 @@ void gpu() {            // prints the current CPU
     printf("%-11s\e[0m%s", "GPU:", GPU);
 }
 
-void memory() {         // prints the sued memory in the format used MiB / total MiB (XX%)
+void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
     struct sysinfo info;
     sysinfo(&info);
 
