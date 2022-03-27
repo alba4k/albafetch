@@ -5,6 +5,7 @@
 #include <sys/sysinfo.h>
 #include <limits.h>         // used to get max hostname lenght
 #include <stdint.h>
+#include <string.h>
 
 #include "config.h"
 
@@ -16,18 +17,18 @@ void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf(COLOR "%s\e[0m@" COLOR "%s", getlogin(), hostname);
+    printf("%s\e[0m@%s%s", getlogin(), color, hostname);
 }
 
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf(COLOR "Hostname:\e[0m %s", hostname);
+    printf("Hostname:\e[0m %s", hostname);
 }
 
 void user() {           // get the current login
-    printf(COLOR "User:\e[0m %s", getlogin());
+    printf("User:\e[0m %s", getlogin());
 }
 
 void uptime() {         // prints the uptime
@@ -193,69 +194,75 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
     
 }
 
-int main(int argc, char **argv) {
+int main(const int argc, char **argv) {
+    for(int i = 0; i < argc; i++) {
+        if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+            puts("albafetch - a system fetch utility, by alba4k");
+            puts("\nFLAGS:");
+            puts("\t-h, --help:\t\tPrint this menu");
+            puts("\t-c, --color:\t\t Change the output color. set to void for default");
+            puts("\nReport a bug: https://github.com/alba4k/albafetch");
 
-    if(argv[0] == "--help" || "-h") {
-        puts("albafetch - a system fetch utility, by alba4k");
-        puts("\nFLAGS:");
-        puts("\t-h, --help:\t\tPrint this menu");
-        puts("\nReport a bug: https://github.com/alba4k/albafetch");
-
-        exit(0);
+            return 0;
+        } else if((!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color"))) {
+            if(argv[i+1]) {
+                printf("%sasdf%s\n", color, argv[2]);
+            } else {
+                puts("ERROR: must specify a color!");
+                return 1;
+            }
+        }
     }
 
-    public_ip();
-    printf("\n\n");
-
-    printf(COLOR "%s" SPACING, logo[0]);
+    printf("%s%s" SPACING, color, logo[0]);
     title();
 
-    printf(COLOR "\n%s" SPACING, logo[1]);
+    printf("%s\n%s" SPACING, color, logo[1]);
     separator();
 
-    printf(COLOR "\n%s" SPACING, logo[2]);
+    printf("%s\n%s" SPACING, color, logo[2]);
     uptime();
 
-    printf(COLOR "\n%s" SPACING, logo[3]);
+    printf("%s\n%s" SPACING, color, logo[3]);
     separator();
 
-    printf(COLOR "\n%s" SPACING, logo[4]);
+    printf("%s\n%s" SPACING, color, logo[4]);
     os();
 
-    printf(COLOR "\n%s" SPACING, logo[5]);
+    printf("%s\n%s" SPACING, color, logo[5]);
     kernel();
 
-    printf(COLOR "\n%s" SPACING, logo[6]);
+    printf("%s\n%s" SPACING, color, logo[6]);
     desktop();
 
-    printf(COLOR "\n%s" SPACING, logo[7]);
+    printf("%s\n%s" SPACING, color, logo[7]);
     shell();
 
-    printf(COLOR "\n%s" SPACING, logo[8]);
+    printf("%s\n%s" SPACING, color, logo[8]);
     term();
 
-    printf(COLOR "\n%s" SPACING, logo[9]);
+    printf("%s\n%s" SPACING, color, logo[9]);
     packages();
 
-    printf(COLOR "\n%s" SPACING, logo[10]);
+    printf("%s\n%s" SPACING, color, logo[10]);
     separator();
 
-    printf(COLOR "\n%s" SPACING, logo[11]);
+    printf("%s\n%s" SPACING, color, logo[11]);
     host();
 
-    printf(COLOR "\n%s" SPACING, logo[12]);
+    printf("%s\n%s" SPACING, color, logo[12]);
     cpu();
 
-    printf(COLOR "\n%s" SPACING, logo[13]);
+    printf("%s\n%s" SPACING, color, logo[13]);
     gpu();
 
-    printf(COLOR "\n%s" SPACING, logo[14]);
+    printf("%s\n%s" SPACING, color, logo[14]);
     memory();
 
     // ******** remaining lines of the logo ********
 
     for(int i = 15; i < sizeof(logo) / sizeof(char*); i++) {
-        printf(COLOR "\n%s\e[0m", logo[i]);
+        printf("%s\n%s\e[0m", color, logo[i]);
     }
     printf("\n");
 }
