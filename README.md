@@ -16,7 +16,6 @@ Here is a time comparison (exact execution times change between machines and run
 * whoami (username)
 * pacman (packages)
 * wc (packages)
-* uname (kernel, os arch)
 * free (memory)
 * grep (memory)
 * awk (memory)
