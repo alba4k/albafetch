@@ -40,7 +40,7 @@ An executable file will appear in `albafetch/`
 
 ## Using the installation script:
 ```
-# curl https://github.com/alba4k/albafetch/install.sh | sh
+# curl https://raw.githubusercontent.com/alba4k/albafetch/master/install.sh | sh
 ```
 `sh` will need to be ran as root (e.g. `sudo`, `doas`, or a root shell) to acces `/usr/bin`. It will compile `albafetch/src/albafetch.c` to this directory.
 
