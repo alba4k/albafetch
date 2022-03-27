@@ -195,44 +195,66 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 }
 
 int main(const int argc, char **argv) {
+    int help = 0;
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-            printf("%salbafetch\e[0m - a system fetch utility\n", color);
-            printf("\n%sFLAGS:\e[0m\n", color);
-            printf("\t%s-h\e[0m,%s --help\e[0m:\t Print this menu\n", color, color);
-            printf("\t%s-c\e[0m,%s --color\e[0m:\t Change the output color\n", color, color);
-            printf("\nReport a bug: %shttps://github.com/alba4k/albafetch/issues\e[0m\n", color);
-
-            return 0;
+            help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
                 if(!strcmp(argv[i+1],"black")) {
-                    strcpy(color, "\e[30m\e[1m");
+                    strcpy(color, "\e[30m");
                 } else if(!strcmp(argv[i+1],"red")) {
-                    strcpy(color, "\e[31m\e[1m");
+                    strcpy(color, "\e[31m");
                 } else if(!strcmp(argv[i+1],"green")) {
-                    strcpy(color, "\e[32m\e[1m");
+                    strcpy(color, "\e[32m");
                 } else if(!strcmp(argv[i+1],"yellow")) {
-                    strcpy(color, "\e[33m\e[1m");
+                    strcpy(color, "\e[33m");
                 } else if(!strcmp(argv[i+1],"blue")) {
-                    strcpy(color, "\e[34m\e[1m");
+                    strcpy(color, "\e[34m");
                 } else if(!strcmp(argv[i+1],"pink")) {
-                    strcpy(color, "\e[35m\e[1m");
+                    strcpy(color, "\e[35m");
                 } else if(!strcmp(argv[i+1],"cyan")) {
-                    strcpy(color, "\e[36m\e[1m");
+                    strcpy(color, "\e[36m");
                 } else if(!strcmp(argv[i+1],"white")) {
-                    strcpy(color, "\e[38m\e[1m");
+                    strcpy(color, "\e[38m");
                 } else {
-                    puts("ERROR: invalid color!");
+                    puts("ERROR: invalid color! Use --help for more info");
                     return 0;
                 }
             } else {
-                puts("ERROR: must specify a color!");
+                puts("ERROR: --color requires a color! Use --help for more info");
                 return 1;
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
-            // idk
+            if(argv[i+1]) {
+                if(!strcmp(argv[i+1], "on")) {
+                    strcpy(bold, "\e[1m");
+                } else if(!strcmp(argv[i+1], "off")) {
+                    strcpy(bold, "");
+                } else {
+                    puts("ERROR: invalid value for --bold! Use --help for more info");
+
+                    return 0;
+                }
+            } else {
+                puts("ERROR: --bold requires a value! Use --help for more info");
+
+                return 0;
+            }
         }
+    }
+
+    strcat(color, bold);
+
+    if(help) {  // print the help message if --help was used and exit
+        printf("%salbafetch\e[0m - a system fetch utility\n", color);
+        printf("\n%sFLAGS:\e[0m\n", color);
+        printf("\t%s-h\e[0m,%s --help\e[0m:\t Print this help menu and exit\n", color, color);
+        printf("\t%s-c\e[0m,%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, pink, cyan, white]\n", color, color);
+        printf("\t%s-b\e[0m,%s --bold\e[0m:\t Specify if bold should be used in colored parts (default: on) [on, off]", color, color);
+        printf("\nReport a bug: %shttps://github.com/alba4k/albafetch/issues\e[0m\n", color);
+
+        return 0;
     }
 
     printf("%s%s" SPACING, color, logo[0]);
