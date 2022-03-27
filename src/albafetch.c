@@ -85,7 +85,7 @@ void os() {             // prints the os name + arch
 void kernel() {         // prints the kernel version
     struct utsname name;
     uname(&name);
-    
+
     printf("%-11s\e[0m%s", "Kernel:" , name.release);
 }
 
@@ -135,7 +135,7 @@ void cpu() {            // prints the current CPU
     printf("%-11s\e[0m%s", "CPU:", CPU);
 }
 
-void gpu() {            // prints the current CPU
+void gpu() {            // prints the current GPU
     printf("%-11s\e[0m%s", "GPU:", GPU);
 }
 
