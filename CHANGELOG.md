@@ -10,3 +10,7 @@
 * hostname - displays the machine hostname
 
 ## other minor changes
+
+---
+
+### Aaron Blasko, March 2022
