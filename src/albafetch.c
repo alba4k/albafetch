@@ -230,6 +230,8 @@ int main(const int argc, char **argv) {
                 puts("ERROR: must specify a color!");
                 return 1;
             }
+        } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
+            // idk
         }
     }
 
