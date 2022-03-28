@@ -2,7 +2,8 @@
 #define SPACING "    "                          // defines the distance between the logo and the infos
 #define SEPARATOR "\e[0m------------------"     // defines what is used as separator between sections
 
-char *color = "\e[36m";                      // default color. Can be changed with --color
+// would reccomend also changing the --help display output to show the correct default
+char *color = "\e[36m";                         // default color. Can be changed with --color
 char *bold = "\e[1m";                           // text modifiers. Bold is \e[1m
 
 // add more logos if you want, I couldn't care less
