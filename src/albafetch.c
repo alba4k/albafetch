@@ -200,7 +200,9 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 }
 
 int main(const int argc, char **argv) {
-    int help = 0;
+    static int help = 0;
+    static short lines = 0;
+
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             help = 1;
@@ -262,53 +264,68 @@ int main(const int argc, char **argv) {
 
     printf("%s%s%s" SPACING, color, bold, logo[0]);
     title(color, bold);
+    lines++; 
 
     printf("%s\n%s%s" SPACING, color, bold, logo[1]);
     separator();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[2]);
     uptime();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[3]);
     separator();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[4]);
     os();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[5]);
     kernel();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[6]);
     desktop();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[7]);
     shell();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[8]);
     term();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[9]);
     packages();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[10]);
     separator();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[11]);
     host();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[12]);
     cpu();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[13]);
     gpu();
+    lines++; 
 
     printf("%s%s\n%s" SPACING, color, bold, logo[14]);
     memory();
+    lines++; 
 
     // ******** remaining lines of the logo ********
-
-    for(int i = 15; i < sizeof(logo) / sizeof(char*); i++) {
-        printf("%s%s\n%s\e[0m", color, bold, logo[i]);
+    while(lines < sizeof(logo) / sizeof(char*)) {
+        printf("%s%s\n%s\e[0m", color, bold, logo[lines]);
+        lines++;
     }
     printf("\n");
 }
