@@ -36,24 +36,24 @@ void uptime() {         // prints the uptime
     struct sysinfo info;
     sysinfo(&info);
 
-    unsigned int secs = info.uptime;            // total uptime in seconds
-    unsigned int days = secs/86400;
-    unsigned int hours = secs/3600 - days*24;
-    unsigned int mins = secs/60 - days*1440 - hours*60;
-    unsigned int sec = secs - days*86400 - hours*3600 - mins*60;
+    long secs = info.uptime;            // total uptime in seconds
+    long days = secs/86400;
+    long hours = secs/3600 - days*24;
+    long mins = secs/60 - days*1440 - hours*60;
+    long sec = secs - days*86400 - hours*3600 - mins*60;
 
     printf("%-11s\e[0m", "Uptime:");
     if(days) {
-        printf("%ud ", days);     // print the number of days passed if more than 0
+        printf("%ldd ", days);     // print the number of days passed if more than 0
     }
     if(hours) {
-        printf("%uh ", hours);       // print the number of days passed if more than 0
+        printf("%ldh ", hours);       // print the number of days passed if more than 0
     }
     if(mins) {
-        printf("%um ", mins);        // print the number of minutes passed if more than 0
+        printf("%ldm ", mins);        // print the number of minutes passed if more than 0
     }
     else if(secs < 60) {
-        printf("%us", sec);         // print the number of seconds passed if more than 0
+        printf("%lds", sec);         // print the number of seconds passed if more than 0
     }
 }
 
@@ -253,7 +253,7 @@ int main(const int argc, char **argv) {
 
     if(help) {  // print the help message if --help was used and exit
         printf("%salbafetch\e[0m - a system fetch utility\n", color);
-        printf("\n%sFLAGS:\e[0m\n", color);
+        printf("\n%sFLAGS\e[0m:\n", color);
         printf("\t%s-h\e[0m,%s --help\e[0m:\t Print this help menu and exit\n", color, color);
         printf("\t%s-c\e[0m,%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, pink, cyan, shell]\n", color, color);
         printf("\t%s-b\e[0m,%s --bold\e[0m:\t Specify if bold should be used in colored parts (default: on) [on, off]", color, color);
