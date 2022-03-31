@@ -218,7 +218,7 @@ int main(const int argc, char **argv) {
                     color = "\e[33m";
                 } else if(!strcmp(argv[i+1],"blue")) {
                     color = "\e[34m";
-                } else if(!strcmp(argv[i+1],"pink")) {
+                } else if(!strcmp(argv[i+1],"putple")) {
                     color = "\e[35m";
                 } else if(!strcmp(argv[i+1],"cyan")) {
                     color = "\e[36m";
