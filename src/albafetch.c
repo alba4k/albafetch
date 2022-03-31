@@ -68,14 +68,14 @@ void os() {             // prints the os name + arch
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        execlp("sh", "sh", "-c", "{ lsb_release -ds; } | tr -d '\n' | tr -d '\"'", NULL);
+        execlp("sh", "sh", "-c", "{ lsb_release -ds; } | tr -d '\"'", NULL);
     } else {
         printf("%-11s\e[0m", "OS:");
     }
     wait(NULL);
 
     close(pipes[1]);
-    os_name[read(pipes[0], os_name, 128)] = 0;
+    os_name[read(pipes[0], os_name, 128) - 1] = 0;
 
     close(pipes[0]);
     printf("%s %s", os_name, name.machine);
@@ -209,21 +209,21 @@ int main(const int argc, char **argv) {
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
                 if(!strcmp(argv[i+1],"black")) {
-                    color= "\e[30m";
+                    color = "\e[30m";
                 } else if(!strcmp(argv[i+1],"red")) {
-                    color= "\e[31m";
+                    color = "\e[31m";
                 } else if(!strcmp(argv[i+1],"green")) {
-                    color= "\e[32m";
+                    color = "\e[32m";
                 } else if(!strcmp(argv[i+1],"yellow")) {
-                    color= "\e[33m";
+                    color = "\e[33m";
                 } else if(!strcmp(argv[i+1],"blue")) {
-                    color= "\e[34m";
+                    color = "\e[34m";
                 } else if(!strcmp(argv[i+1],"pink")) {
-                    color= "\e[35m";
+                    color = "\e[35m";
                 } else if(!strcmp(argv[i+1],"cyan")) {
-                    color= "\e[36m";
+                    color = "\e[36m";
                 } else if(!strcmp(argv[i+1],"shell")) {
-                    color= "";
+                    color = "";
                 } else {
                     puts("ERROR: invalid color! Use --help for more info");
                     return 0;
