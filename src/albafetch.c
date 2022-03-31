@@ -223,7 +223,7 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1],"cyan")) {
                     color = "\e[36m";
                 } else if(!strcmp(argv[i+1],"shell")) {
-                    color = "";
+                    color = "\e[0m";
                 } else {
                     puts("ERROR: invalid color! Use --help for more info");
                     return 0;
