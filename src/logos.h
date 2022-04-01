@@ -1,4 +1,4 @@
-#include <stdio.h>
+// all logos should end wih a \0
 
 const char *archlinux[] = {
     "                   -`                 ",

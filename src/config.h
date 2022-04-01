@@ -9,27 +9,7 @@ char *color = "\e[36m";                         // default color. Can be changed
 char *bold = "\e[1m";                           // text modifiers. Bold is \e[1m
 
 // add more logos if you want, I couldn't care less
-const char **logo = debian;/*{
-    "                   -`                 ",
-    "                  .o+`                ",
-    "                 `ooo/                ",
-    "                `+oooo:               ",
-    "               `+oooooo:              ",
-    "               -+oooooo+:             ",
-    "             `/:-:++oooo+:            ",
-    "            `/++++/+++++++:           ",
-    "           `/++++++++++++++:          ",
-    "          `/+++ooooooooooooo/`        ",
-    "         ./ooosssso++osssssso+`       ",
-    "        .oossssso-````/ossssss+`      ",
-    "       -osssssso.      :ssssssso.     ",
-    "      :osssssss/        osssso+++.    ",
-    "     /ossssssss/        +ssssooo/-    ",
-    "   `/ossssso+/:-        -:/+osssso+-  ",
-    "  `+sso+:-`                 `.-/+oso: ",
-    " `++:.                           `-/+/",
-    " .`                                 `/"
-};*/
+char **logo = archlinux;
 
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define HOST "HP ProBook 440 G6"        // what will be printed as host

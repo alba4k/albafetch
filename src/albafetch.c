@@ -202,7 +202,7 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 
 int main(const int argc, char **argv) {
     static bool help = 0;
-    static short lines = 0;
+    static short line = 0;
 
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
@@ -263,70 +263,76 @@ int main(const int argc, char **argv) {
         return 0;
     }
 
-    printf("%s%s%s" SPACING, color, bold, logo[0]);
+    /* Adding modules:
+    printf("%s%s%s" SPACING, color, bold, logo[line]);
+    module();   // only change this part between lines
+    line++;
+    */
+
+    printf("%s%s%s" SPACING, color, bold, logo[line]);
     title(color, bold);
-    lines++; 
+    line++; 
 
-    printf("%s\n%s%s" SPACING, color, bold, logo[1]);
+    printf("%s\n%s%s" SPACING, color, bold, logo[line]);
     separator();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[2]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     uptime();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[3]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     separator();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[4]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     os();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[5]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     kernel();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[6]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     desktop();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[7]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     shell();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[8]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     term();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[9]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     packages();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[10]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     separator();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[11]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     host();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[12]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     cpu();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[13]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     gpu();
-    lines++; 
+    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[14]);
+    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
     memory();
-    lines++; 
+    line++; 
 
     // ******** remaining lines of the logo ********
-    while(logo[lines]) {
-        printf("%s%s\n%s\e[0m", color, bold, logo[lines]);
-        lines++;
+    while(logo[line]) {
+        printf("%s%s\n%s\e[0m", color, bold, logo[line]);
+        line++;
     }
     printf("\n");
 }
