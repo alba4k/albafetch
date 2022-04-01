@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-const char **archlinux = {
+const char *archlinux[] = {
     "                   -`                 ",
     "                  .o+`                ",
     "                 `ooo/                ",
@@ -19,10 +19,11 @@ const char **archlinux = {
     "   `/ossssso+/:-        -:/+osssso+-  ",
     "  `+sso+:-`                 `.-/+oso: ",
     " `++:.                           `-/+/",
-    " .`                                 `/"
+    " .`                                 `/",
+    0
 };
 
-const char **debian = {
+const char *debian[] = {
     "       _,met$$$$$gg.        ",
     "    ,g$$$$$$$$$$$$$$$P.     ",
     "  ,g$$P\"     \"\"\"Y$$.\".      ",
@@ -39,7 +40,8 @@ const char **debian = {
     "     `$$b.                  ",
     "       `Y$$b.               ",
     "          `\"Y$b._           ", 
-    "              `\"\"\"       "
+    "              `\"\"\"       ",
+    0
 };/*
 int main() {
 for(int i = 0; i < (sizeof(debian)/sizeof(char*)); i++) {

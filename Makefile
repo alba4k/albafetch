@@ -1,4 +1,4 @@
-albafetch: src/albafetch.c src/config.h
+albafetch: src/albafetch.c src/config.h src/logos.h
 	gcc src/albafetch.c -o albafetch
 
 install: src/albafetch.c src/config.h albafetch

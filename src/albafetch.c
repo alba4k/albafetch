@@ -324,9 +324,9 @@ int main(const int argc, char **argv) {
     lines++; 
 
     // ******** remaining lines of the logo ********
-    for(short i = lines; 1; i++) {
-        if(logo[i]) {
-            printf("%s%s\n%s\e[0m", color, bold, logo[i]);
-        }
+    while(logo[lines]) {
+        printf("%s%s\n%s\e[0m", color, bold, logo[lines]);
+        lines++;
     }
+    printf("\n");
 }
