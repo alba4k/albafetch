@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-const char *archlinux[] = {
+const char **archlinux = {
     "                   -`                 ",
     "                  .o+`                ",
     "                 `ooo/                ",
@@ -22,7 +22,7 @@ const char *archlinux[] = {
     " .`                                 `/"
 };
 
-const char *debian[] = {
+const char **debian = {
     "       _,met$$$$$gg.        ",
     "    ,g$$$$$$$$$$$$$$$P.     ",
     "  ,g$$P\"     \"\"\"Y$$.\".      ",
