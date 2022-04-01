@@ -7,6 +7,7 @@
 #include <limits.h>         // used to get max hostname lenght
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "config.h"
 
@@ -200,7 +201,7 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 }
 
 int main(const int argc, char **argv) {
-    static int help = 0;
+    static bool help = 0;
     static short lines = 0;
 
     for(int i = 0; i < argc; i++) {
@@ -323,9 +324,9 @@ int main(const int argc, char **argv) {
     lines++; 
 
     // ******** remaining lines of the logo ********
-    while(lines < sizeof(logo) / sizeof(char*)) {
-        printf("%s%s\n%s\e[0m", color, bold, logo[lines]);
-        lines++;
+    for(short i = lines; 1; i++) {
+        if(logo[i]) {
+            printf("%s%s\n%s\e[0m", color, bold, logo[i]);
+        }
     }
-    printf("\n");
 }

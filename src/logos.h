@@ -40,9 +40,9 @@ const char *debian[] = {
     "       `Y$$b.               ",
     "          `\"Y$b._           ", 
     "              `\"\"\"       "
-};
+};/*
 int main() {
 for(int i = 0; i < (sizeof(debian)/sizeof(char*)); i++) {
     printf("%s\n", debian[i]);
 }
-}
+}*/
