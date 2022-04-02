@@ -227,7 +227,7 @@ int main(const int argc, char **argv) {
                     color = "\e[0m";
                 } else {
                     puts("ERROR: invalid color! Use --help for more info");
-                    return 0;
+                    return 1;
                 }
             } else {
                 puts("ERROR: --color requires a color! Use --help for more info");
@@ -242,12 +242,26 @@ int main(const int argc, char **argv) {
                 } else {
                     puts("ERROR: invalid value for --bold! Use --help for more info");
 
-                    return 0;
+                    return 2;
                 }
             } else {
                 puts("ERROR: --bold requires a value! Use --help for more info");
 
-                return 0;
+                return 2;
+            }
+        } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
+            if(argv[i+1]) {
+                if(!strcmp(argv[i+1], "arch")) {
+                    **logo = archlinux;
+                } else if(!strcmp(argv[i+1], "debian")) {
+                    **logo = debian;
+                } else {
+                    puts("ERROR: invalid value for --logo! Use --help for more info");
+                    return 2;
+                }
+            } else {
+                puts("ERROR: --logo requires a value! Use --help for more info");
+                return 2;
             }
         }
     }

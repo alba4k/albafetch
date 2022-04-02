@@ -1,6 +1,6 @@
 // all logos should end wih a \0
 
-const char *archlinux[] = {
+char *archlinux[] = {
     "                   -`                 ",
     "                  .o+`                ",
     "                 `ooo/                ",
@@ -23,7 +23,7 @@ const char *archlinux[] = {
     0
 };
 
-const char *debian[] = {
+char *debian[] = {
     "       _,met$$$$$gg.        ",
     "    ,g$$$$$$$$$$$$$$$P.     ",
     "  ,g$$P\"     \"\"\"Y$$.\".      ",
