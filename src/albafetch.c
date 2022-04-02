@@ -221,7 +221,7 @@ int main(const int argc, char **argv) {
                     color = "\e[33m";
                 } else if(!strcmp(argv[i+1],"blue")) {
                     color = "\e[34m";
-                } else if(!strcmp(argv[i+1],"putple")) {
+                } else if(!strcmp(argv[i+1],"purple")) {
                     color = "\e[35m";
                 } else if(!strcmp(argv[i+1],"cyan")) {
                     color = "\e[36m";
@@ -312,7 +312,7 @@ int main(const int argc, char **argv) {
         printf("%s%salbafetch\e[0m - a system fetch utility\n", color, bold);
         printf("\n%s%sFLAGS\e[0m:\n", color, bold);
         printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n", color, bold, color, bold);
-        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, pink, cyan, shell]\n", color, bold, color, bold);
+        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, purple, cyan, shell]\n", color, bold, color, bold);
         printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: on) [on, off]\n", color, bold, color, bold);
         printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (default: arch) [arch, debian]\n", color, bold, color, bold);
 
