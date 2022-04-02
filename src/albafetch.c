@@ -4,10 +4,11 @@
 #include <sys/wait.h>
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
-#include <limits.h>         // used to get max hostname lenght
+#include <limits.h>         // get max hostname lenght
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "config.h"
 
@@ -203,7 +204,7 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 int main(const int argc, char **argv) {
     static bool help = 0;
     static short line = 0;
-    static bool colorerr = 0, bolderr = 0, logoerr = 0;
+    static char colorerr = 0, bolderr = 0, logoerr = 0;
 
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
@@ -227,11 +228,11 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1],"shell")) {
                     color = "\e[0m";
                 } else {
-                    fputs("\e[31mERROR\e[0m: invalid color! Use --help for more info", stderr);
+                    fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
                     colorerr = 1;
                 }
             } else {
-                fputs("\e[31mERROR\e[0m: --color requires a color! Use --help for more info", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
                 colorerr = 2;
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
@@ -241,50 +242,82 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1], "off")) {
                     bold = "";
                 } else {
-                    fputs("\e[31mERROR\e[0m: invalid value for --bold! Use --help for more info", stderr);
+                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --bold! Use --help for more info\n", stderr);
 
                     bolderr = 1;
                 }
             } else {
-                fputs("\e[31mERROR\e[0m: --bold requires a value! Use --help for more info", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --bold requires a value! Use --help for more info\n", stderr);
 
                 bolderr = 2;
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
             if(argv[i+1]) {
                 if(!strcmp(argv[i+1], "arch")) {
-                    **logo = archlinux;
+                    logo = archlinux;
                 } else if(!strcmp(argv[i+1], "debian")) {
-                    **logo = debian;
+                    logo = debian;
                 } else {
-                    fputs("\e[31mERROR\e[0m: invalid value for --logo! Use --help for more info", stderr);
+                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --logo! Use --help for more info\n", stderr);
                     logoerr = 1;
                 }
             } else {
-                fputs("\e[31mERROR\e[0m: --logo requires a value! Use --help for more info", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --logo requires a value! Use --help for more info\n", stderr);
                 logoerr = 2;
             }
+        } else if(!strcmp(argv[i], "--clean-log")) {
+            char path[56];
+            snprintf(path, 56, "%s/.albafetch.log", getenv("HOME"));
+
+            FILE *fp = fopen(path, "w");
+            if(!fp) {return 3;}     // file didn't open correctly
+
+            fputs("", fp);
+
+            fclose(fp);
+            return 0;
         }
     }
-    if(bolderr || colorerr || logoerr) {
-        fputs("\n\e[31mBad program call!\e[0m Check ~/.albafetch.log for more info!", stderr);
+
+    if(bolderr || colorerr || logoerr) {    // write the log file ~/.albafetch.log
+        time_t rawtime;
+        struct tm *timeinfo;
+
+        time(&rawtime);
+        char *time = asctime(localtime(&rawtime));
+
+        fputs("\n\e[31m\e[1mBad program call!\e[0m Check ~/.albafetch.log for more info!\n", stderr);
 
         char path[56];
         snprintf(path, 56, "%s/.albafetch.log", getenv("HOME"));
 
-        FILE *fp = fopen(path, "w");
-        if(!fp) {return 2;} // file didn't open correctly
+        FILE *log = fopen(path, "a");
+        if(!log) return 2; // file didn't open correctly
 
-        fprintf(fp, "%\n", );
+        fprintf(log, "%s", time);
+        if(colorerr == 1) fputs("\tInvalid argument for --color\n", log);
+        if(colorerr == 2) fputs("\t--color requires an additional argument\n", log);
+        if(bolderr == 1) fputs("\tInvalid argument for --bold\n", log);
+        if(bolderr == 2) fputs("\t--bold requires an additional argument\n", log);
+        if(logoerr == 1) fputs("\tInvalid argument for --logo\n", log);
+        if(logoerr == 2) fputs("\t--logo requires an additional argument\n", log);
+
+        fprintf(log, "\n");
+
+        fclose(log);
+        return 1;
     }
 
     if(help) {  // print the help message if --help was used and exit
-        printf("%salbafetch\e[0m - a system fetch utility\n", color);
-        printf("\n%sFLAGS\e[0m:\n", color);
-        printf("\t%s-h\e[0m,%s --help\e[0m:\t Print this help menu and exit\n", color, color);
-        printf("\t%s-c\e[0m,%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, pink, cyan, shell]\n", color, color);
-        printf("\t%s-b\e[0m,%s --bold\e[0m:\t Specify if bold should be used in colored parts (default: on) [on, off]", color, color);
-        printf("\nReport a bug: %shttps://github.com/alba4k/albafetch/issues\e[0m\n", color);
+        printf("%s%salbafetch\e[0m - a system fetch utility\n", color, bold);
+        printf("\n%s%sFLAGS\e[0m:\n", color, bold);
+        printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n", color, bold, color, bold);
+        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, pink, cyan, shell]\n", color, bold, color, bold);
+        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specify if bold should be used in colored parts (default: on) [on, off]\n", color, bold, color, bold);
+
+        printf("\n\t%s%s--clean-log\e[0m:\t Empty the log file ~/.albafetch.log\n", color, bold);
+
+        printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\n", color, bold);
 
         return 0;
     }

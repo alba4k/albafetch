@@ -1,14 +1,11 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 int main () {
-  time_t rawtime;
-  struct tm * timeinfo;
-
-  time(&rawtime);
-  timeinfo = localtime(&rawtime);
-  printf ("Current local time and date: %s", asctime(timeinfo));
-  
-  return 0;
+    char string[] = "abcde";
+    printf("%s\n%d\n", string, strlen(string));
+    string[strlen(string) -1] = 0;
+    printf("\n%s\n", string);
 }
