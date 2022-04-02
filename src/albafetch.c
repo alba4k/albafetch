@@ -313,7 +313,8 @@ int main(const int argc, char **argv) {
         printf("\n%s%sFLAGS\e[0m:\n", color, bold);
         printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n", color, bold, color, bold);
         printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, pink, cyan, shell]\n", color, bold, color, bold);
-        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specify if bold should be used in colored parts (default: on) [on, off]\n", color, bold, color, bold);
+        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: on) [on, off]\n", color, bold, color, bold);
+        printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (default: arch) [arch, debian]\n", color, bold, color, bold);
 
         printf("\n\t%s%s--clean-log\e[0m:\t Empty the log file ~/.albafetch.log\n", color, bold);
 
