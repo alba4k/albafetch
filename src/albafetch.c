@@ -226,11 +226,11 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1],"shell")) {
                     color = "\e[0m";
                 } else {
-                    puts("ERROR: invalid color! Use --help for more info");
+                    fputs("\e[31mERROR\e[0m: invalid color! Use --help for more info", stderr);
                     return 1;
                 }
             } else {
-                puts("ERROR: --color requires a color! Use --help for more info");
+                fputs("\e[31mERROR\e[0m: --color requires a color! Use --help for more info", stderr);
                 return 1;
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
@@ -240,12 +240,12 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1], "off")) {
                     bold = "";
                 } else {
-                    puts("ERROR: invalid value for --bold! Use --help for more info");
+                    fputs("\e[31mERROR\e[0m: invalid value for --bold! Use --help for more info", stderr);
 
                     return 2;
                 }
             } else {
-                puts("ERROR: --bold requires a value! Use --help for more info");
+                fputs("\e[31mERROR\e[0m: --bold requires a value! Use --help for more info", stderr);
 
                 return 2;
             }
@@ -256,12 +256,12 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1], "debian")) {
                     **logo = debian;
                 } else {
-                    puts("ERROR: invalid value for --logo! Use --help for more info");
-                    return 2;
+                    fputs("\e[31mERROR\e[0m: invalid value for --logo! Use --help for more info", stderr);
+                    return 3;
                 }
             } else {
-                puts("ERROR: --logo requires a value! Use --help for more info");
-                return 2;
+                fputs("\e[31mERROR\e[0m: --logo requires a value! Use --help for more info", stderr);
+                return 3;
             }
         }
     }
