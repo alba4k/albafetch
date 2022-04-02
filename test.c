@@ -1,10 +1,14 @@
+
 #include <stdio.h>
-#include <string.h>
-int main()
-{
-    char destination[] = "\e[36m";
-    char *source = "\e[1m";
-    strcat(destination,source);
-    printf("Concatenated String: %s\n", destination);
-    return 0;
+#include <time.h>
+
+int main () {
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+  printf ("Current local time and date: %s", asctime(timeinfo));
+  
+  return 0;
 }
