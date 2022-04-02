@@ -203,6 +203,7 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 int main(const int argc, char **argv) {
     static bool help = 0;
     static short line = 0;
+    static bool colorerr = 0, bolderr = 0, logoerr = 0;
 
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
@@ -227,11 +228,11 @@ int main(const int argc, char **argv) {
                     color = "\e[0m";
                 } else {
                     fputs("\e[31mERROR\e[0m: invalid color! Use --help for more info", stderr);
-                    return 1;
+                    colorerr = 1;
                 }
             } else {
                 fputs("\e[31mERROR\e[0m: --color requires a color! Use --help for more info", stderr);
-                return 1;
+                colorerr = 2;
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
             if(argv[i+1]) {
@@ -242,12 +243,12 @@ int main(const int argc, char **argv) {
                 } else {
                     fputs("\e[31mERROR\e[0m: invalid value for --bold! Use --help for more info", stderr);
 
-                    return 2;
+                    bolderr = 1;
                 }
             } else {
                 fputs("\e[31mERROR\e[0m: --bold requires a value! Use --help for more info", stderr);
 
-                return 2;
+                bolderr = 2;
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
             if(argv[i+1]) {
@@ -257,13 +258,24 @@ int main(const int argc, char **argv) {
                     **logo = debian;
                 } else {
                     fputs("\e[31mERROR\e[0m: invalid value for --logo! Use --help for more info", stderr);
-                    return 3;
+                    logoerr = 1;
                 }
             } else {
                 fputs("\e[31mERROR\e[0m: --logo requires a value! Use --help for more info", stderr);
-                return 3;
+                logoerr = 2;
             }
         }
+    }
+    if(bolderr || colorerr || logoerr) {
+        fputs("\n\e[31mBad program call!\e[0m Check ~/.albafetch.log for more info!", stderr);
+
+        char path[56];
+        snprintf(path, 56, "%s/.albafetch.log", getenv("HOME"));
+
+        FILE *fp = fopen(path, "w");
+        if(!fp) {return 2;} // file didn't open correctly
+
+        fprintf(fp, "%\n", );
     }
 
     if(help) {  // print the help message if --help was used and exit

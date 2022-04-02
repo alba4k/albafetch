@@ -1,10 +1,9 @@
 # Return codes and errors
-| Return Code   | Meaning           |
-|---            |---                |
-| 0             | Correct execution |
-| 1             | Error in --color  |
-| 2             | Error in --bold   |
-| 3             | Error in --logo   |
+| Return Code   | Meaning                                       |
+|---            |---                                            |
+| 0             | Correct execution                             |
+| 1             | Bad arguments (check ~/.albafetch.log)        |
+| 2             | Encountered error 1; Couldn't find log file   |
 
 # Adding new modules
 `src/albafetch.c`, in function main():
