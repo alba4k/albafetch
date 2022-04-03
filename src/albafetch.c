@@ -289,7 +289,7 @@ int main(const int argc, char **argv) {
         fputs("\n\e[31m\e[1mBad program call!\e[0m Check ~/.albafetch.log for more info!\n", stderr);
 
         char path[56];
-        snprintf(path, 56, "%s/.albafetch.log", getenv("HOME"));
+        snprintf(path, 56, "%s/.cache/albafetch.log", getenv("HOME"));
 
         FILE *log = fopen(path, "a");
         if(!log) return 2; // file didn't open correctly

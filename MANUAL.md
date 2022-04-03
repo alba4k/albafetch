@@ -2,7 +2,7 @@
 | Return Code   | Meaning                                       |
 |---            |---                                            |
 | 0             | Correct execution                             |
-| 1             | Bad arguments (check ~/.albafetch.log)        |
+| 1             | Bad arguments (check ~/.cache/albafetch.log)  |
 | 2             | Encountered error 1 + Couldn't open log file  |
 | 3             | Couldn't open log file when using --clean-log |
 
