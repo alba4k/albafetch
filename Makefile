@@ -1,6 +1,5 @@
 albafetch: src/albafetch.c src/config.h src/logos.h
 	gcc src/albafetch.c -o albafetch
-	touch ~/.albafetch.log
 
 test: test.c
 	gcc test.c -o test
