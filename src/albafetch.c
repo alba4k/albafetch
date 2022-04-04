@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
@@ -66,24 +67,40 @@ void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
 
-    static char os_name[128];
-    int pipes[2];
-    pipe(pipes);
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-
-        execlp("sh", "sh", "-c", "{ lsb_release -ds; } | tr -d '\"'", NULL);
-    } else {
-        printf("%-11s\e[0m", "OS:");
+    FILE *f = fopen("/etc/lsb-release", "r");
+    if(!f) {
+        fputs("[Missing /etc/lsb-release]", stderr);
+        printf(" %s", name.machine);
+        return;
     }
-    wait(NULL);
+    fseek(f, 0, SEEK_END);
+    size_t len = ftell(f);
+    rewind(f);
+    char *str = malloc(len + 1);
+    fread(str, len + 1, 1, f);
+    str[len] = 0;
+    const char *field = "DISTRIB_DESCRIPTION=\"";
+    char *os_name = strstr(str, field);
+    if(!os_name) {
+        goto error;
+    }
+    os_name += strlen(field);
+    char *end = strchr(os_name, '"');
+    if(!end) {
+        goto error;
+    }
+    *end = 0;
 
-    close(pipes[1]);
-    os_name[read(pipes[0], os_name, 128) - 1] = 0;
+    printf("%-11s\e[0m%s %s", "OS:", os_name, name.machine);
 
-    close(pipes[0]);
-    printf("%s %s", os_name, name.machine);
+    free(str);
+
+    return;
+
+    error:
+        fputs("[Unrecognized file content]", stderr);
+        printf(" %s", name.machine);
+        return;
 }
 
 void kernel() {         // prints the kernel version
@@ -135,33 +152,54 @@ void host() {           // prints the current host machine
 }
 
 void cpu() {            // prints the current CPU
-    // could get it from /proc/cpuinfo
     printf("%-11s\e[0m", "CPU:");
 
-    struct cpu_raw_data_t raw; 
-    struct cpu_id_t data;  
-
-    if (!cpuid_present()) {                     // check for CPUID presence
-		printf("no cpuid");
-	}
-    if (cpuid_get_raw_data(&raw) < 0) {         // obtain the raw CPUID data
-		printf("%s", cpuid_error());            // cpuid_error() gives the last error description
-	}
-    if (cpu_identify(&raw, &data) < 0) {        // identify the CPU, using the given raw data.
-		printf("%s", cpuid_error());
-	}
-    char *cpuname = data.brand_str;
-    /*
-    for(int i = 0; cpuname[i] != 0; i++) {
-        if(!PRINT_CPU_FREQ && cpuname[i] == ' ' && cpuname[i+1] == 'C' && cpuname[i+2] == 'P' && cpuname[i+3] == 'U') {
-            cpuname[i] = 0;
-            break;
-        }
+    FILE *f = fopen("/proc/cpuinfo", "r");
+    if(!f) {
+        printf("[Where /proc/cpuinfo?]");
+        return;
     }
-    */
-   if(!PRINT_CPU_FREQ) *(strstr(cpuname, " @")) = 0;
-    printf("%s", cpuname);
+    char *str = malloc(0x10000);
+    fread(str, 65536, 1, f);
+    str[65535] = 0;
+    char *cpu_info = strstr(str, "model name");
+    if(!cpu_info) {
+        goto error;
+    }
+
+    cpu_info = strchr(cpu_info, ':');
+    if(!cpu_info) {
+        goto error;
+    }
+    cpu_info += 2;
+
+    char *end;
+    if(PRINT_CPU_FREQ) {
+        end = strchr(cpu_info, '\n');
+        if(!end) {
+            goto error;
+        }
+    } else {
+        end = strchr(cpu_info, '@');
+        if(!end) {
+            goto error;
+        }
+        end--;
+    }
+    
+
+    (*end) = 0;
+
+    printf("%s", cpu_info);
     //fputs(CPU, stdout)
+
+    free(str);
+
+    return;
+
+    error:
+        fputs("[Unrecognized file content]", stderr);
+        return;
 }
 
 void gpu() {            // prints the current GPU
