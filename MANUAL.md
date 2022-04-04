@@ -1,10 +1,8 @@
 # Return codes and errors
-| Return Code   | Meaning                                       |
-|---            |---                                            |
-| 0             | Correct execution                             |
-| 1             | Bad arguments (check ~/.cache/albafetch.log)  |
-| 2             | Encountered error 1 + Couldn't open log file  |
-| 3             | Couldn't open log file when using --clean-log |
+| Return Code   | Meaning               |
+|---            |---                    |
+| 0             | Correct execution     |
+| 1             | Bad argument usage    |
 
 # Adding new modules
 `src/albafetch.c`, in function main():

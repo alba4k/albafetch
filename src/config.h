@@ -11,7 +11,10 @@ char *bold = "\e[1m";                           // text modifiers. Bold is \e[1m
 // add more logos if you want, I couldn't care less
 char **logo = archlinux;
 
+// actual config options
+#define PRINT_CPU_FREQ false
+
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define HOST "HP ProBook 440 G6"        // what will be printed as host
-#define CPU "i5-8265U"                  // what will be printed as cpu. could get it from /proc/cpuinfo
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
+//#define CPU "i5-8265U"                  // what will be printed as cpu. could get it from /proc/cpuinfo

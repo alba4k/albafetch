@@ -23,6 +23,7 @@ Here is a time comparison (exact execution times change between machines and run
 All of those will be present by default on a normal Arch Linux installation.
 
 * lsb-release (getting the distro name)
+* libcpuid (getting the cpu model)
 
 lsb-release will need to be installed via `# pacman -S lsb-release`
 
