@@ -151,14 +151,15 @@ void cpu() {            // prints the current CPU
 		printf("%s", cpuid_error());
 	}
     char *cpuname = data.brand_str;
-
+    /*
     for(int i = 0; cpuname[i] != 0; i++) {
         if(!PRINT_CPU_FREQ && cpuname[i] == ' ' && cpuname[i+1] == 'C' && cpuname[i+2] == 'P' && cpuname[i+3] == 'U') {
             cpuname[i] = 0;
             break;
         }
     }
-
+    */
+   if(!PRINT_CPU_FREQ) *(strstr(cpuname, " @")) = 0;
     printf("%s", cpuname);
     //fputs(CPU, stdout)
 }
