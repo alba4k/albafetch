@@ -1,5 +1,5 @@
 albafetch: src/albafetch.c src/config.h src/logos.h
-	gcc -o albafetch src/albafetch.c -I/usr/include/libcpuid -lcpuid
+	gcc -o albafetch src/albafetch.c
 
 test: test.c
 	gcc test.c -o test
