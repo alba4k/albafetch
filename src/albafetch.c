@@ -76,8 +76,7 @@ void os() {             // prints the os name + arch
     size_t len = ftell(f);
     rewind(f);
     char *str = malloc(len + 1);
-    fread(str, len + 1, 1, f);
-    str[len] = 0;
+    str[fread(str, 1, 0x10000, f)] = 0;
     const char *field = "DISTRIB_DESCRIPTION=\"";
     char *os_name = strstr(str, field);
     if(!os_name) {
@@ -159,8 +158,7 @@ void cpu() {            // prints the current CPU
         return;
     }
     char *str = malloc(0x10000);
-    fread(str, 0x10000, 1, f);
-    str[0x10000] = 0;
+    str[fread(str, 1, 0x10000, f)] = 0;
     char *cpu_info = strstr(str, "model name");
     if(!cpu_info) {
         goto error;
