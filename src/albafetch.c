@@ -98,7 +98,7 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("[Unrecognized file content]", stderr);
+        fputs("\e[0m[Unrecognized file content]\n", stderr);
         printf(" %s", name.machine);
         return;
 }
@@ -160,8 +160,8 @@ void cpu() {            // prints the current CPU
         return;
     }
     char *str = malloc(0x10000);
-    fread(str, 65536, 1, f);
-    str[65535] = 0;
+    fread(str, 0x10000, 1, f);
+    str[0x10000] = 0;
     char *cpu_info = strstr(str, "model name");
     if(!cpu_info) {
         goto error;
@@ -198,7 +198,7 @@ void cpu() {            // prints the current CPU
     return;
 
     error:
-        fputs("[Unrecognized file content]", stderr);
+        fputs("\e[0m[Unrecognized file content]\n", stderr);
         return;
 }
 
