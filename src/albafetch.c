@@ -10,7 +10,6 @@
 
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
-#include <libcpuid/libcpuid.h>  // http://libcpuid.sourceforge.net
 
 #include "config.h"
 
