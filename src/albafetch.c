@@ -13,6 +13,7 @@
 
 #include "config.h"
 
+// RTFM and stfu
 bool user_is_an_idiot = false;
 
 void separator() {      // prints a separator
