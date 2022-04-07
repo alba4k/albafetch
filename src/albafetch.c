@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <limits.h>             // get max hostname lenght
-#include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
@@ -231,7 +230,7 @@ void memory() {         // prints the used memory in the format used MiB / total
 
     //size_t len = read(pipes[0], used_str, 14);
     used_str[read(pipes[0], used_str, 14) - 1] = 0;
-    uint64_t used = atol(used_str);
+    long used = atol(used_str);
 
     close(pipes[0]);
     
