@@ -285,10 +285,8 @@ int main(const int argc, char **argv) {
                     {"shell", "\e[30m"},
                 };
 
-                for (int j = 0; j < 8; ++j)
-                {
-                    if (!strcmp(argv[i+1], colors[j][0]))
-                    {
+                for (int j = 0; j < 8; ++j) {
+                    if (!strcmp(argv[i+1], colors[j][0])) {
                         color = colors[j][1];
                         goto color_error;
                     }
