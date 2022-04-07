@@ -274,26 +274,30 @@ int main(const int argc, char **argv) {
             help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
-                if(!strcmp(argv[i+1],"black")) {
-                    color = "\e[30m";
-                } else if(!strcmp(argv[i+1],"red")) {
-                    color = "\e[31m";
-                } else if(!strcmp(argv[i+1],"green")) {
-                    color = "\e[32m";
-                } else if(!strcmp(argv[i+1],"yellow")) {
-                    color = "\e[33m";
-                } else if(!strcmp(argv[i+1],"blue")) {
-                    color = "\e[34m";
-                } else if(!strcmp(argv[i+1],"purple")) {
-                    color = "\e[35m";
-                } else if(!strcmp(argv[i+1],"cyan")) {
-                    color = "\e[36m";
-                } else if(!strcmp(argv[i+1],"shell")) {
-                    color = "\e[0m";
-                } else {
-                    fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
-                    user_is_an_idiot = true;
+                const char *colors[8][2] = {
+                    {"black", "\e[30m"},
+                    {"red", "\e[31m"},
+                    {"green", "\e[32m"},
+                    {"yellow", "\e[33m"},
+                    {"blue", "\e[34m"},
+                    {"purple", "\e[35m"},
+                    {"cyan", "\e[36m"},
+                    {"shell", "\e[30m"},
+                };
+
+                for (int j = 0; j < 8; ++j)
+                {
+                    if (!strcmp(argv[i+1], colors[j][0]))
+                    {
+                        color = colors[j][1];
+                        goto color_error;
+                    }
                 }
+
+                fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
+                user_is_an_idiot = true;
+
+                color_error:
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
                 return 1;
