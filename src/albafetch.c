@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>             // STDOUT_FILENO
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <limits.h>             // get max hostname lenght
@@ -11,8 +12,6 @@
 #include <sys/utsname.h>
 
 #include "config.h"
-
-#define	STDOUT_FILENO	1	// Standard output
 
 // RTFM and stfu
 bool user_is_an_idiot = false;
@@ -45,9 +44,9 @@ void uptime() {         // prints the uptime
 
     long secs = info.uptime;            // total uptime in seconds
     long days = secs/86400;
-    long hours = secs/3600 - days*24;
-    long mins = secs/60 - days*1440 - hours*60;
-    long sec = secs - days*86400 - hours*3600 - mins*60;
+    int hours = secs/3600 - days*24;
+    int mins = secs/60 - days*1440 - hours*60;
+    int sec = secs - days*86400 - hours*3600 - mins*60;
 
     printf("%-11s\e[0m", "Uptime:");
     if(days) {
