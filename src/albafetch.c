@@ -20,7 +20,7 @@ void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
 }
 
-void title(const char *color, const char * bold) {          // prints a title in the format user@hostname
+void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
