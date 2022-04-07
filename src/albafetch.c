@@ -287,14 +287,14 @@ int main(const int argc, char **argv) {
                 for (int j = 0; j < 8; ++j) {
                     if (!strcmp(argv[i+1], colors[j][0])) {
                         color = colors[j][1];
-                        goto color_error;
+                        goto color;
                     }
                 }
 
                 fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
 
-                color_error: ;
+                color: ;
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
                 return 1;
