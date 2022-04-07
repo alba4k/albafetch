@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <unistd.h>             // STDOUT_FILENO
+#include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <limits.h>             // get max hostname lenght
@@ -12,8 +12,10 @@
 
 #include "config.h"
 
-// RTFM and stfu
-bool user_is_an_idiot = false;
+void printLogo(char *line) {
+    printf("%s\n%s%s" SPACING, color, bold, logo[*line]);
+    (*line)++;
+}
 
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
@@ -266,7 +268,10 @@ void local_ip() {      // get the local IP adress - WORK IN PROGRESS
 
 int main(const int argc, char **argv) {
     static bool help = 0;
-    static short line = 0;
+    static char line = 0;
+
+    // RTFM and stfu
+    bool user_is_an_idiot = false;
 
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
@@ -345,76 +350,56 @@ int main(const int argc, char **argv) {
         return 0;
     }
 
-    /* Adding modules:
-    printf("%s%s%s" SPACING, color, bold, logo[line]);
-    module();   // only change this part between lines
-    line++;
-    */
+    printLogo(&line);
+    title();
 
-    printf("%s%s%s" SPACING, color, bold, logo[line]);
-    title(color, bold);
-    line++; 
-
-    printf("%s\n%s%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     separator();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     uptime();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     separator();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     os();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     kernel();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     desktop();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     shell();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
-    term();
-    line++; 
+    printLogo(&line);
+    term(); 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     packages();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     separator();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     host();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     cpu();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     gpu();
-    line++; 
 
-    printf("%s%s\n%s" SPACING, color, bold, logo[line]);
+    printLogo(&line);
     memory();
-    line++; 
 
     // ******** remaining lines of the logo ********
     while(logo[line]) {
-        printf("%s%s\n%s\e[0m", color, bold, logo[line]);
-        line++;
+        printLogo(&line);
     }
     printf("\n");
+
+    return 0;
 }
