@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <unistd.h>             // STDOUT_FILENO
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <limits.h>             // get max hostname lenght
@@ -12,6 +11,8 @@
 #include <sys/utsname.h>
 
 #include "config.h"
+
+#define	STDOUT_FILENO	1	// Standard output
 
 // RTFM and stfu
 bool user_is_an_idiot = false;
