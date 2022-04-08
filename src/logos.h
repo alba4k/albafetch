@@ -1,9 +1,9 @@
-#ifndef LOGOS
-#define LOGOS
+#ifndef LOGOS_H
+#define LOGOS_H
 
 // all logos should end wih a \0
 
-char *archlinux[] = {
+static char *archlinux[] = {
     "                   -`                 ",
     "                  .o+`                ",
     "                 `ooo/                ",
@@ -26,7 +26,7 @@ char *archlinux[] = {
     0
 };
 
-char *debian[] = {
+static char *debian[] = {
     "       _,met$$$$$gg.        ",
     "    ,g$$$$$$$$$$$$$$$P.     ",
     "  ,g$$P\"     \"\"\"Y$$.\".      ",

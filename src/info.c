@@ -1,10 +1,7 @@
-#include <stdio.h>
 #include <limits.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <sys/wait.h>
-#include <string.h>
 
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
@@ -27,11 +24,11 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("Hostname:\e[0m %s", hostname);
+    printf("%-11s\e[0m %s", HOSTNAME_LABEL DASH, hostname);
 }
 
 void user() {           // get the current login
-    printf("User:\e[0m %s", getlogin());
+    printf("%-11s\e[0m %s", USER_LABEL DASH, getlogin());
 }
 
 void uptime() {         // prints the uptime
@@ -40,22 +37,22 @@ void uptime() {         // prints the uptime
 
     long secs = info.uptime;            // total uptime in seconds
     long days = secs/86400;
-    int hours = secs/3600 - days*24;
-    int mins = secs/60 - days*1440 - hours*60;
-    int sec = secs - days*86400 - hours*3600 - mins*60;
+    char hours = secs/3600 - days*24;
+    char mins = secs/60 - days*1440 - hours*60;
+    char sec = secs - days*86400 - hours*3600 - mins*60;
 
-    printf("%-11s\e[0m", "Uptime:");
+    printf("%-11s\e[0m", UPTIME_LABEL DASH);
     if(days) {
         printf("%ldd ", days);     // print the number of days passed if more than 0
     }
     if(hours) {
-        printf("%ldh ", hours);       // print the number of days passed if more than 0
+        printf("%dh ", hours);       // print the number of days passed if more than 0
     }
     if(mins) {
-        printf("%ldm ", mins);        // print the number of minutes passed if more than 0
+        printf("%dm ", mins);        // print the number of minutes passed if more than 0
     }
     else if(secs < 60) {
-        printf("%lds", sec);         // print the number of seconds passed if more than 0
+        printf("%ds", sec);         // print the number of seconds passed if more than 0
     }
 }
 
@@ -86,7 +83,7 @@ void os() {             // prints the os name + arch
     }
     *end = 0;
 
-    printf("%-11s\e[0m%s %s", "OS:", os_name, name.machine);
+    printf("%-11s\e[0m%s %s", OS_LABEL DASH, os_name, name.machine);
 
     free(str);
 
@@ -102,19 +99,19 @@ void kernel() {         // prints the kernel version
     struct utsname name;
     uname(&name);
 
-    printf("%-11s\e[0m%s", "Kernel:" , name.release);
+    printf("%-11s\e[0m%s ", KERNEL_LABEL DASH, name.release);
 }
 
 void desktop() {        // prints the current desktop environment
-        printf("%-11s\e[0m%s", "Desktop:", getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
+        printf("%-11s\e[0m%s", DESKTOP_LABEL DASH, getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
 }
 
 void shell() {          // prints the user default shell
-    printf("%-11s\e[0m%s", "Shell:", getenv("SHELL"));        // $SHELL
+    printf("%-11s\e[0m%s", SHELL_LABEL DASH, getenv("SHELL"));        // $SHELL
 }
 
 void term() {           // prints the current terminal
-    printf("%-11s\e[0m%s", "Terminal:", getenv("TERM"));     // $TERM
+    printf("%-11s\e[0m%s", TERM_LABEL DASH, getenv("TERM"));     // $TERM
 }
 
 void packages() {       // prints the number of installed packages
@@ -130,7 +127,7 @@ void packages() {       // prints the number of installed packages
 
         execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
     } else {
-        printf("%-11s\e[0m", "Packages:");
+        printf("%-11s\e[0m", PACKAGES_LABEL DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -143,11 +140,11 @@ void packages() {       // prints the number of installed packages
 }
 
 void host() {           // prints the current host machine
-    printf("%-11s\e[0m%s", "Host:", HOST);
+    printf("%-11s\e[0m%s", HOST_LABEL DASH, HOST);
 }
 
 void cpu() {            // prints the current CPU
-    printf("%-11s\e[0m", "CPU:");
+    printf("%-11s\e[0m", CPU_LABEL DASH);
 
     FILE *f = fopen("/proc/cpuinfo", "r");
     if(!f) {
@@ -197,7 +194,7 @@ void cpu() {            // prints the current CPU
 }
 
 void gpu() {            // prints the current GPU
-    printf("%-11s\e[0m%s", "GPU:", GPU);
+    printf("%-11s\e[0m%s", GPU_LABEL DASH, GPU);
 }
 
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
@@ -220,7 +217,7 @@ void memory() {         // prints the used memory in the format used MiB / total
 
         execlp("sh", "sh", "-c", "free --byte | grep M | awk '{print $3}'", NULL);  // using free to count the used memory, 3rd arg
     } else {
-        printf("%-11s\e[0m", "Memory:");
+        printf("%-11s\e[0m", MEM_LABEL DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -245,7 +242,7 @@ void public_ip() {      // get the public IP adress
 
         execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
     } else {
-        printf("%-11s\e[0m", "Public IP:");
+        printf("%-11s\e[0m", PUB_IP_LABEL DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -258,5 +255,5 @@ void public_ip() {      // get the public IP adress
 }
 
 void local_ip() {      // get the local IP adress - WORK IN PROGRESS
-    
+   printf("%-11s\e[0m", PRIV_IP_LABEL DASH); 
 }

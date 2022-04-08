@@ -1,5 +1,9 @@
-#ifndef INFO
-#define INFO
+#ifndef INFO_H
+#define INFO_H
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
 void separator();   // prints a separator
 
 void title();       // prints a title in the format user@hostname
