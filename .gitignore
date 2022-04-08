@@ -1,4 +1,4 @@
 albafetch
-test
+test*
 *.o
 .vscode
