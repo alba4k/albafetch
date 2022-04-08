@@ -10,7 +10,7 @@ OBJ := main.o info.o
 INCLUDE := -I src
 
 albafetch: $(OBJ)
-	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
 
 main.o: $(SRC1) src/config.h src/vars.h src/info.h
 	$(CC) -c $(SRC1)
@@ -22,15 +22,15 @@ test: test.c
 	$(CC) -o test test.c
 	./test
 
-install: $(TARGET)
-	cp $(TARGET) /usr/bin/$(TARGET)
+install: build/$(TARGET)
+	cp build/$(TARGET) /usr/bin/$(TARGET)
 
 uninstall:
 	rm /usr/bin/$(TARGET)
 
 run: $(OBJ)
-	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
-	./$(TARGET)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
+	build/$(TARGET)
 
 clean:
 	rm $(TARGET) test *.o
