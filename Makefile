@@ -1,20 +1,31 @@
-albafetch: albafetch.o info.o
-	gcc -o albafetch albafetch.o info.o
+.PHONY: build
 
-albafetch.o: src/albafetch.c src/config.h src/info.h src/logos.h
-	gcc -c src/albafetch.c
+SHELL := /bin/bash
+CC := gcc
+CFLAGS := -Wall
+BUILDDIR := build
+TARGET := albafetch
+SRC := src/albafetch.c src/info.c
+OBJ := albafetch.o info.o
+INCLUDE := -I src
 
-info.o: src/info.c src/config.h src/info.h src/logos.h
-	gcc -c src/info.c
+build:
+	$(CC) -c $(SRC) $(CFLAGS)
+	$(CC) -o $(BUILDDIR)/$(TARGET) $(INCLUDE) $(OBJ)
 
-test: test.c
-	gcc test.c -o test
+time:
+	time $(CC) -c $(SRC) $(CFLAGS)
+	$(CC) -o $(BUILDDIR)/$(TARGET) $(INCLUDE) $(OBJ)
 
-install: src/albafetch.c src/config.h albafetch
-	cp albafetch /usr/bin/albafetch
+install:
+	cp $(BUILDDIR)/$(TARGET) usr/bin/$(TARGET)
 
 uninstall:
-	rm /usr/bin/albafetch
+	rm usr/bin/$(TARGET)
+
+run:
+	./build/$(TARGET)
 
 clean:
-	rm albafetch test *.o
+	rm $(TARGET) test *.o
+	
