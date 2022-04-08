@@ -5,10 +5,9 @@
 | 1             | Bad argument usage    |
 
 # Adding new modules
-`src/albafetch.c`, in function main():
+`src/main.c`, in function main():
 ```
-printf("%s%s%s" SPACING, color, bold, logo[line]);
+printLogo(&line);
 module();
-line++;
 ```
 Only change the module() function call with the desired one

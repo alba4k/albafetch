@@ -9,6 +9,9 @@
 #include "info.h"
 #include "config.h"
 
+char *color = DEFAULT_COLOR;
+char *bold = DEFAULT_BOLD;
+
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
 }
@@ -24,11 +27,11 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%-11s\e[0m %s", HOSTNAME_LABEL DASH, hostname);
+    printf("%-15s\e[0m %s", HOSTNAME_LABEL DASH_COLOR DASH, hostname);
 }
 
 void user() {           // get the current login
-    printf("%-11s\e[0m %s", USER_LABEL DASH, getlogin());
+    printf("%-15s\e[0m %s", USER_LABEL DASH_COLOR DASH, getlogin());
 }
 
 void uptime() {         // prints the uptime
@@ -41,7 +44,7 @@ void uptime() {         // prints the uptime
     char mins = secs/60 - days*1440 - hours*60;
     char sec = secs - days*86400 - hours*3600 - mins*60;
 
-    printf("%-11s\e[0m", UPTIME_LABEL DASH);
+    printf("%-15s\e[0m", UPTIME_LABEL DASH_COLOR DASH);
     if(days) {
         printf("%ldd ", days);     // print the number of days passed if more than 0
     }
@@ -83,7 +86,7 @@ void os() {             // prints the os name + arch
     }
     *end = 0;
 
-    printf("%-11s\e[0m%s %s", OS_LABEL DASH, os_name, name.machine);
+    printf("%-15s\e[0m%s %s", OS_LABEL DASH_COLOR DASH, os_name, name.machine);
 
     free(str);
 
@@ -99,19 +102,19 @@ void kernel() {         // prints the kernel version
     struct utsname name;
     uname(&name);
 
-    printf("%-11s\e[0m%s ", KERNEL_LABEL DASH, name.release);
+    printf("%-15s\e[0m%s ", KERNEL_LABEL DASH_COLOR DASH, name.release);
 }
 
 void desktop() {        // prints the current desktop environment
-        printf("%-11s\e[0m%s", DESKTOP_LABEL DASH, getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
+        printf("%-15s\e[0m%s", DESKTOP_LABEL DASH_COLOR DASH, getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
 }
 
 void shell() {          // prints the user default shell
-    printf("%-11s\e[0m%s", SHELL_LABEL DASH, getenv("SHELL"));        // $SHELL
+    printf("%-15s\e[0m%s", SHELL_LABEL DASH_COLOR DASH, getenv("SHELL"));        // $SHELL
 }
 
 void term() {           // prints the current terminal
-    printf("%-11s\e[0m%s", TERM_LABEL DASH, getenv("TERM"));     // $TERM
+    printf("%-15s\e[0m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
 }
 
 void packages() {       // prints the number of installed packages
@@ -127,7 +130,7 @@ void packages() {       // prints the number of installed packages
 
         execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
     } else {
-        printf("%-11s\e[0m", PACKAGES_LABEL DASH);
+        printf("%-15s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -140,11 +143,11 @@ void packages() {       // prints the number of installed packages
 }
 
 void host() {           // prints the current host machine
-    printf("%-11s\e[0m%s", HOST_LABEL DASH, HOST);
+    printf("%-15s\e[0m%s", HOST_LABEL DASH_COLOR DASH, HOST);
 }
 
 void cpu() {            // prints the current CPU
-    printf("%-11s\e[0m", CPU_LABEL DASH);
+    printf("%-15s\e[0m", CPU_LABEL DASH_COLOR DASH);
 
     FILE *f = fopen("/proc/cpuinfo", "r");
     if(!f) {
@@ -194,7 +197,7 @@ void cpu() {            // prints the current CPU
 }
 
 void gpu() {            // prints the current GPU
-    printf("%-11s\e[0m%s", GPU_LABEL DASH, GPU);
+    printf("%-15s\e[0m%s", GPU_LABEL DASH_COLOR DASH, GPU);
 }
 
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
@@ -217,7 +220,7 @@ void memory() {         // prints the used memory in the format used MiB / total
 
         execlp("sh", "sh", "-c", "free --byte | grep M | awk '{print $3}'", NULL);  // using free to count the used memory, 3rd arg
     } else {
-        printf("%-11s\e[0m", MEM_LABEL DASH);
+        printf("%-15s\e[0m", MEM_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -242,7 +245,7 @@ void public_ip() {      // get the public IP adress
 
         execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
     } else {
-        printf("%-11s\e[0m", PUB_IP_LABEL DASH);
+        printf("%-15s\e[0m", PUB_IP_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -255,5 +258,5 @@ void public_ip() {      // get the public IP adress
 }
 
 void local_ip() {      // get the local IP adress - WORK IN PROGRESS
-   printf("%-11s\e[0m", PRIV_IP_LABEL DASH); 
+   printf("%-15s\e[0m", PRIV_IP_LABEL DASH_COLOR DASH); 
 }
