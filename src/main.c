@@ -1,14 +1,19 @@
 #include "config.h"
 #include "info.h"
 
-void printLogo(int *line) {
-    printf("%s\n%s%s" SPACING, color, bold, logo[*line]);
-    (*line)++;
+int printLogo(const int line) {
+    if(logo[line]) {
+        printf("%s\n%s%s" SPACING, color, bold, logo[line]);
+        return line+1;
+    } else {
+        printf("\n%s%s%s" SPACING, logo[0], color, bold);
+        return line;
+    }
 }
 
 int main(const int argc, char **argv) {
-    static bool help = 0;
-    static int line = 0;
+    bool help = 0;
+    int line = 1;
 
     // RTFM and stfu
     bool user_is_an_idiot = false;
@@ -90,54 +95,54 @@ int main(const int argc, char **argv) {
         return 0;
     }
 
-    printLogo(&line);
+    line = printLogo(line);
     title();
 
-    printLogo(&line);
+    line = printLogo(line);
     separator();
 
-    printLogo(&line);
+    line = printLogo(line);
     uptime();
 
-    printLogo(&line);
+    line = printLogo(line);
     separator();
 
-    printLogo(&line);
+    line = printLogo(line);
     os();
 
-    printLogo(&line);
+    line = printLogo(line);
     kernel();
 
-    printLogo(&line);
+    line = printLogo(line);
     desktop();
 
-    printLogo(&line);
+    line = printLogo(line);
     shell();
 
-    printLogo(&line);
+    line = printLogo(line);
     term(); 
 
-    printLogo(&line);
+    line = printLogo(line);
     packages();
 
-    printLogo(&line);
+    line = printLogo(line);
     separator();
 
-    printLogo(&line);
+    line = printLogo(line);
     host();
 
-    printLogo(&line);
+    line = printLogo(line);
     cpu();
 
-    printLogo(&line);
+    line = printLogo(line);
     gpu();
 
-    printLogo(&line);
+    line = printLogo(line);
     memory();
 
     // ******** remaining lines of the logo ********
     while(logo[line]) {
-        printLogo(&line);
+        line = printLogo(line);
     }
     printf("\e[0m\n");
 

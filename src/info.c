@@ -22,14 +22,14 @@ void separator() {      // prints a separator
 }
 
 void title() {          // prints a title in the format user@hostname
-    static char hostname[HOST_NAME_MAX + 1];
+    char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
     printf("%s\e[0m@%s%s%s\e[0m", getlogin(), color, bold, hostname);
 }
 
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
-    static char hostname[HOST_NAME_MAX + 1];
+    char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
     printf("%-16s\e[0m %s", HOSTNAME_LABEL DASH_COLOR DASH, hostname);

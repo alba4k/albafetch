@@ -7,7 +7,7 @@
 # Adding new modules
 `src/main.c`, in function main():
 ```
-printLogo(&line);
+line = printLogo(line);
 module();
 ```
 Only change the module() function call with the desired one

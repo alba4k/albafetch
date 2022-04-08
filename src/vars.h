@@ -7,6 +7,7 @@ extern char *bold;
 // all logos should end wih a \0
 
 static char *archlinux[] = {
+    "                                      ",             // first line is just spaces. This line is printed when there is more line than text
     "                   -`                 ",
     "                  .o+`                ",
     "                 `ooo/                ",
@@ -26,10 +27,11 @@ static char *archlinux[] = {
     "  `+sso+:-`                 `.-/+oso: ",
     " `++:.                           `-/+/",
     " .`                                 `/",
-    0
+    0                                                   // last line is 0 to know when to spo printing
 };
 
 static char *debian[] = {
+    "                            ",             // first line is just spaces. This line is printed when there is more line than text
     "       _,met$$$$$gg.        ",
     "    ,g$$$$$$$$$$$$$$$P.     ",
     "  ,g$$P\"     \"\"\"Y$$.\".      ",
@@ -47,7 +49,7 @@ static char *debian[] = {
     "       `Y$$b.               ",
     "          `\"Y$b._           ", 
     "              `\"\"\"       ",
-    0
+    0                                           // last line is 0 to know when to spo printing
 };
 
 #endif
