@@ -3,10 +3,14 @@
 
 #include "vars.h"
 
+// would reccomend also changing the --help display output to show the correct default
+#define DEFAULT_COLOR "\e[36m"
+#define DEFAULT_BOLD "\e[1m"
+
 // CONFIGURATION OPTIONS:
 #define SPACING "    "                          // defines the distance between the logo and the infos
 #define SEPARATOR "\e[0m------------------"     // defines what is used as separator between sections
-#define DASH_COLOR "\e[39m"
+#define DASH_COLOR "\e[39m"                     // \e[39m or DEFAULT_COLOR to make it white or like the text
 #define DASH ":"
 
 // options
@@ -32,10 +36,6 @@
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define HOST "HP ProBook 440 G6"        // what will be printed as host
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
-
-// would reccomend also changing the --help display output to show the correct default
-#define DEFAULT_COLOR "\e[36m"
-#define DEFAULT_BOLD "\e[1m"
 
 // add more logos if you want, I couldn't care less
 static char **logo = archlinux;

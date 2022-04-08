@@ -1,30 +1,36 @@
-.PHONY: build
+.PHONY: albafetch
 
 SHELL := /bin/bash
 CC := gcc
 CFLAGS := -Wall
 TARGET := albafetch
-SRC := src/main.c src/info.c
+SRC1 := src/main.c
+SRC2 := src/info.c
 OBJ := main.o info.o
 INCLUDE := -I src
 
-build:
-	$(CC) -c $(SRC) $(CFLAGS)
+albafetch: $(OBJ)
 	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
 
-test:
-	$(CC) -o test test.c
+main.o: $(SRC1) src/config.h src/vars.h src/info.h
+	$(CC) -c $(SRC1)
 
-install:
+info.o: $(SRC2) src/config.h src/vars.h src/info.h
+	$(CC) -c $(SRC2)
+
+test: test.c
+	$(CC) -o test test.c
+	./test
+
+install: $(TARGET)
 	cp $(TARGET) /usr/bin/$(TARGET)
 
 uninstall:
-	rm usr/bin/$(TARGET)
+	rm /usr/bin/$(TARGET)
 
-run:
-	$(CC) -c $(SRC)
+run: $(OBJ)
 	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
-	$(TARGET)
+	./$(TARGET)
 
 clean:
 	rm $(TARGET) test *.o
