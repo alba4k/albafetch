@@ -18,8 +18,8 @@
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
 
 // would reccomend also changing the --help display output to show the correct default
-char *color = "\e[36m";                         // default color. Can be changed with --color
-char *bold = "\e[1m";                           // text modifiers. Bold is \e[1m
+char *color = "\e[36m";                 // default color. Can be changed with --color
+char *bold = "\e[1m";                   // text modifiers. Bold is \e[1m
 
 // add more logos if you want, I couldn't care less
 char **logo = archlinux;
