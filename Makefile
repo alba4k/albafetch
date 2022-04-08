@@ -1,8 +1,8 @@
 albafetch: albafetch.o info.o
 	gcc -o albafetch albafetch.o info.o
 
-albafetch.o: src/albafetch.c src/config.h src/info.h src/vars.h
-	gcc -c src/albafetch.c
+albafetch.o: src/main.c src/config.h src/info.h src/vars.h
+	gcc -c src/main.c
 
 info.o: src/info.c src/config.h src/info.h src/vars.h
 	gcc -c src/info.c
@@ -10,7 +10,7 @@ info.o: src/info.c src/config.h src/info.h src/vars.h
 test: test.c
 	gcc test.c -o test
 
-install: src/albafetch.c src/config.h albafetch
+install: src/main.c src/config.h albafetch
 	cp albafetch /usr/bin/albafetch
 
 uninstall:
