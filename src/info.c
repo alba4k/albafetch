@@ -78,7 +78,7 @@ void os() {             // prints the os name + arch
     size_t len = ftell(f);
     rewind(f);
     char *str = malloc(len + 1);
-    str[fread(str, 1, 0x10000, f)] = 0;
+    str[fread(str, 1, len, f)] = 0;
     const char *field = "DISTRIB_DESCRIPTION=\"";
     char *os_name = strstr(str, field);
     if(!os_name) {
@@ -100,6 +100,7 @@ void os() {             // prints the os name + arch
     error:
         fputs("\e[0m[Unrecognized file content]\n", stderr);
         printf(" %s", name.machine);
+        free(str);
         return;
 }
 
@@ -198,6 +199,7 @@ void cpu() {            // prints the current CPU
 
     error:
         fputs("\e[0m[Unrecognized file content]\n", stderr);
+        free(str);
         return;
 }
 
