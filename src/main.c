@@ -1,14 +1,14 @@
 #include "config.h"
 #include "info.h"
 
-void printLogo(char *line) {
+void printLogo(int *line) {
     printf("%s\n%s%s" SPACING, color, bold, logo[*line]);
     (*line)++;
 }
 
 int main(const int argc, char **argv) {
     static bool help = 0;
-    static char line = 0;
+    static int line = 0;
 
     // RTFM and stfu
     bool user_is_an_idiot = false;
@@ -139,7 +139,7 @@ int main(const int argc, char **argv) {
     while(logo[line]) {
         printLogo(&line);
     }
-    printf("\n");
+    printf("\e[0m\n");
 
     return 0;
 }
