@@ -1,3 +1,6 @@
+#ifndef LOGOS
+#define LOGOS
+
 // all logos should end wih a \0
 
 char *archlinux[] = {
@@ -42,9 +45,6 @@ char *debian[] = {
     "          `\"Y$b._           ", 
     "              `\"\"\"       ",
     0
-};/*
-int main() {
-for(int i = 0; i < (sizeof(debian)/sizeof(char*)); i++) {
-    printf("%s\n", debian[i]);
-}
-}*/
+};
+
+#endif
