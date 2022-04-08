@@ -12,10 +12,6 @@ build:
 	$(CC) -c $(SRC) $(CFLAGS)
 	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
 
-time:
-	time $(CC) -c $(SRC) $(CFLAGS)
-	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
-
 test:
 	$(CC) -o test test.c
 
