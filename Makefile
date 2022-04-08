@@ -16,12 +16,14 @@ test:
 	$(CC) -o test test.c
 
 install:
-	cp $(TARGET) usr/bin/$(TARGET)
+	cp $(TARGET) /usr/bin/$(TARGET)
 
 uninstall:
 	rm usr/bin/$(TARGET)
 
 run:
+	$(CC) -c $(SRC)
+	$(CC) -o $(TARGET) $(INCLUDE) $(OBJ)
 	$(TARGET)
 
 clean:

@@ -42,7 +42,7 @@ int main(const int argc, char **argv) {
                 color: ;
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
-                return 1;
+                user_is_an_idiot = true;
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
             if(argv[i+1]) {
@@ -52,13 +52,11 @@ int main(const int argc, char **argv) {
                     bold = "";
                 } else {
                     fputs("\e[31m\e[1mERROR\e[0m: invalid value for --bold! Use --help for more info\n", stderr);
-
-                    return 2;
+                    user_is_an_idiot = true;
                 }
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m: --bold requires a value! Use --help for more info\n", stderr);
-
-                return 2;
+                user_is_an_idiot = true;
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
             if(argv[i+1]) {
@@ -68,14 +66,16 @@ int main(const int argc, char **argv) {
                     logo = debian;
                 } else {
                     fputs("\e[31m\e[1mERROR\e[0m: invalid value for --logo! Use --help for more info\n", stderr);
-                    return 3;
+                    user_is_an_idiot = true;
                 }
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m: --logo requires a value! Use --help for more info\n", stderr);
-                return 3;
+                user_is_an_idiot = true;
             }
         }
     }
+
+    if(user_is_an_idiot) return 1;
 
     if(help) {  // print the help message if --help was used and exit
         printf("%s%salbafetch\e[0m - a system fetch utility\n", color, bold);
