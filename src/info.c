@@ -6,6 +6,11 @@
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
 
+#include <stdio.h>      
+#include <ifaddrs.h>
+#include <string.h> 
+#include <arpa/inet.h>
+
 #include "info.h"
 #include "config.h"
 
@@ -257,6 +262,25 @@ void public_ip() {      // get the public IP adress
     printf("%s", public_ip);
 }
 
-void local_ip() {      // get the local IP adress - WORK IN PROGRESS
-   printf("%-16s\e[0m", PRIV_IP_LABEL DASH_COLOR DASH); 
+void local_ip() {      // get the local IP adress
+struct ifaddrs *ifAddrStruct=NULL;
+    struct ifaddrs *ifa=NULL;
+    
+    void *tmpAddrPtr=NULL;
+
+    getifaddrs(&ifAddrStruct);
+
+    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) {
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
+            // is a valid IP4 Ad§dress
+            tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+            char addressBuffer[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+            if(strcmp(addressBuffer, "127.0.0.1")) 
+                printf("%-16s\e[0m%s", PRIV_IP_LABEL DASH_COLOR DASH, addressBuffer);
+        }
+    } 
 }

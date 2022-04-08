@@ -30,8 +30,8 @@
 #define CPU_LABEL "CPU"
 #define GPU_LABEL "GPU"
 #define MEM_LABEL "Memory"
-#define PUB_IP_LABEL "Public IP"
-#define PRIV_IP_LABEL "Private IP"
+#define PUB_IP_LABEL "Publ. IP"
+#define PRIV_IP_LABEL "Priv. IP"
 
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define HOST "HP ProBook 440 G6"        // what will be printed as host
