@@ -1,10 +1,10 @@
 albafetch: albafetch.o info.o
 	gcc -o albafetch albafetch.o info.o
 
-albafetch.o: src/albafetch.c src/config.h src/info.h src/logos.h
+albafetch.o: src/albafetch.c src/config.h src/info.h src/vars.h
 	gcc -c src/albafetch.c
 
-info.o: src/info.c src/config.h src/info.h src/logos.h
+info.o: src/info.c src/config.h src/info.h src/vars.h
 	gcc -c src/info.c
 
 test: test.c

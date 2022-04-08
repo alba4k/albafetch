@@ -1,6 +1,9 @@
 #ifndef LOGOS_H
 #define LOGOS_H
 
+extern char *color;
+extern char *bold;
+
 // all logos should end wih a \0
 
 static char *archlinux[] = {
