@@ -33,4 +33,4 @@ run: $(OBJ)
 	build/$(TARGET)
 
 clean:
-	rm $(TARGET) test *.o
+	rm -r build/* test *.o

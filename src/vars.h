@@ -5,6 +5,8 @@ extern char *color;
 extern char *bold;
 
 // all logos should end wih a \0
+// add more, i couldn't care less
+// just remember to add them to --logo and --help in src/main.c
 
 static char *archlinux[] = {
     "                                      ",             // first line is just spaces. This line is printed when there is more line than text

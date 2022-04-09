@@ -23,7 +23,7 @@ int main(const int argc, char **argv) {
             help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
-                char * colors[8][2] = {
+                char * colors[9][2] = {
                     {"black", "\e[30m"},
                     {"red", "\e[31m"},
                     {"green", "\e[32m"},
@@ -31,10 +31,10 @@ int main(const int argc, char **argv) {
                     {"blue", "\e[34m"},
                     {"purple", "\e[35m"},
                     {"cyan", "\e[36m"},
-                    {"shell", "\e[30m"},
+                    {"white", "\e[39m"},
                 };
 
-                for (int j = 0; j < 8; ++j) {
+                for (int j = 0; j < 9; ++j) {
                     if (!strcmp(argv[i+1], colors[j][0])) {
                         color = colors[j][1];
                         goto color;
@@ -86,7 +86,7 @@ int main(const int argc, char **argv) {
         printf("%s%salbafetch\e[0m - a system fetch utility\n", color, bold);
         printf("\n%s%sFLAGS\e[0m:\n", color, bold);
         printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n", color, bold, color, bold);
-        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, purple, cyan, shell]\n", color, bold, color, bold);
+        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (default: cyan) [black, red, green, yellow, blue, purple, cyan, white]\n", color, bold, color, bold);
         printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: on) [on, off]\n", color, bold, color, bold);
         printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (default: arch) [arch, debian]\n", color, bold, color, bold);
 
