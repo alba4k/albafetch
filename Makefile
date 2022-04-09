@@ -22,7 +22,8 @@ test: test.c
 	$(CC) -o test test.c
 	./test
 
-install: build/$(TARGET)
+install: build/$(TARGET) $(OBJ)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
 	cp build/$(TARGET) /usr/bin/$(TARGET)
 
 uninstall:

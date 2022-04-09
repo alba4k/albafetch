@@ -23,7 +23,7 @@ int main(const int argc, char **argv) {
             help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
-                char * colors[9][2] = {
+                char * colors[8][2] = {
                     {"black", "\e[30m"},
                     {"red", "\e[31m"},
                     {"green", "\e[32m"},
@@ -34,7 +34,7 @@ int main(const int argc, char **argv) {
                     {"white", "\e[39m"},
                 };
 
-                for (int j = 0; j < 9; ++j) {
+                for (int j = 0; j < 8; ++j) {
                     if (!strcmp(argv[i+1], colors[j][0])) {
                         color = colors[j][1];
                         goto color;
