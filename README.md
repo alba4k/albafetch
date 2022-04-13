@@ -42,7 +42,7 @@ $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/
 # make install
 ```
-`# make install` needs to be ran as root (e.g. using `sudo` or `doas`, or in a root shell) to acces `/usr/bin/`. It will compile `albafetch/src/main.c` to this directory.
+`make install` needs to be ran as root (e.g. using `sudo` or `doas`, or in a root shell) to acces `/usr/bin/`. It will compile `albafetch/src/main.c` to this directory.
 
 # Customizing
 ```
