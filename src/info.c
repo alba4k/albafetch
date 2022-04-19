@@ -134,7 +134,7 @@ void packages() {       // prints the number of installed packages
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
+        execlp("sh", "sh", "-c", "pacman -Q | wc -l 2> /dev/null", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
     } else {
         printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
     }
