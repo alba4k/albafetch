@@ -15,7 +15,7 @@ int main(const int argc, char **argv) {
     bool help = 0;
     int line = 1;
 
-    // RTFM and stfu
+    // rtfm and stfu
     bool user_is_an_idiot = false;
 
     for(int i = 0; i < argc; i++) {
