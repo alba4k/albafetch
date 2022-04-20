@@ -42,14 +42,14 @@ $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/
 # make install
 ```
-`# make install` needs to be ran as root (e.g. using `sudo` or `doas`, or in a root shell) to acces `/usr/bin/`. It will compile `albafetch/src/main.c` to this directory.
+`make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to acces `/usr/bin/`. It will compile `albafetch/src/main.c` to this directory.
 
 # Customizing
 ```
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/src/ 
 ```
-You can change some settings in `albafetch/src/config.h`, or by directly changing the entire source code in `albafetch/src/`. You will need to recompile/reinstall after configuring.
+You can change some settings in `albafetch/src/config.h`, or by directly modifying the entire source code in `albafetch/src/`. You will need to recompile/reinstall after configuring. Please note that the "logo" entry in `albafech/src/config.h` only changes the defalt logo. New logos can be added in `albafetch/src/logos.h` (as `char* []`) and in `./src/main.c` (to launch with the `--logo` argument).
 
 ---
 
