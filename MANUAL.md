@@ -1,6 +1,6 @@
 # Return codes and errors
 | Return Code   | Meaning               |
-|---            |---                    |
+| ---           | ---                   |
 | 0             | Correct execution     |
 | 1             | Bad argument usage    |
 
