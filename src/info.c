@@ -68,17 +68,18 @@ void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
 
-    FILE *f = fopen("/etc/lsb-release", "r");
-    if(!f) {
+    FILE *fp = fopen("/etc/lsb-release", "r");
+    if(!fp) {
         fputs("[Missing /etc/lsb-release]", stderr);
         printf(" %s", name.machine);
+        fclose(fp);
         return;
     }
-    fseek(f, 0, SEEK_END);
-    size_t len = ftell(f);
-    rewind(f);
+    fseek(fp, 0, SEEK_END);
+    size_t len = ftell(fp);
+    rewind(fp);
     char *str = malloc(len + 1);
-    str[fread(str, 1, len, f)] = 0;
+    str[fread(str, 1, len, fp)] = 0;
     const char *field = "DISTRIB_DESCRIPTION=\"";
     char *os_name = strstr(str, field);
     if(!os_name) {
@@ -93,6 +94,7 @@ void os() {             // prints the os name + arch
 
     printf("%-16s\e[0m%s %s", OS_LABEL DASH_COLOR DASH, os_name, name.machine);
 
+    fclose(fp);
     free(str);
 
     return;
@@ -100,6 +102,7 @@ void os() {             // prints the os name + arch
     error:
         fputs("\e[0m[Unrecognized file content]\n", stderr);
         printf(" %s", name.machine);
+        fclose(fp);
         free(str);
         return;
 }
@@ -149,19 +152,31 @@ void packages() {       // prints the number of installed packages
 }
 
 void host() {           // prints the current host machine
-    printf("%-16s\e[0m%s", HOST_LABEL DASH_COLOR DASH, HOST);
+    FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
+    char *model = malloc(128);
+    if(!fp) {
+        printf("[Where /sys/devices/virtual/dmi/id/product_name?]");
+        free(model);
+        fclose(fp);
+        return;
+    }
+    model[fread(model, 1, 0x10000, fp) - 1] = 0;
+    fclose(fp);
+
+    printf("%-16s\e[0m%s", HOST_LABEL DASH_COLOR DASH, model);
 }
 
 void cpu() {            // prints the current CPU
     printf("%-16s\e[0m", CPU_LABEL DASH_COLOR DASH);
 
-    FILE *f = fopen("/proc/cpuinfo", "r");
-    if(!f) {
+    FILE *fp = fopen("/proc/cpuinfo", "r");
+    if(!fp) {
         printf("[Where /proc/cpuinfo?]");
+        fclose(fp);
         return;
     }
     char *str = malloc(0x10000);
-    str[fread(str, 1, 0x10000, f)] = 0;
+    str[fread(str, 1, 0x10000, fp)] = 0;
     char *cpu_info = strstr(str, "model name");
     if(!cpu_info) {
         goto error;
@@ -193,12 +208,14 @@ void cpu() {            // prints the current CPU
     printf("%s", cpu_info);
     //fputs(CPU, stdout)
 
+    fclose(fp);
     free(str);
 
     return;
 
     error:
         fputs("\e[0m[Unrecognized file content]\n", stderr);
+        fclose(fp);
         free(str);
         return;
 }

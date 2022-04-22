@@ -34,7 +34,6 @@
 #define PRIV_IP_LABEL "Priv. IP"
 
 // was just too lazy to do it right, so it's hard coded. fuck you <3
-#define HOST "HP ProBook 440 G6"        // what will be printed as host
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
 
 // add more logos if you want, I couldn't care less
