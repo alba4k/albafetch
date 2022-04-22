@@ -38,4 +38,5 @@ void public_ip();   // get the public IP adress
 
 void local_ip();    // get the local IP adress - WORK IN PROGRESS
 
+void bios();	    // prints the current BIOS version 
 #endif
