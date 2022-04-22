@@ -6,7 +6,7 @@ CFLAGS := -Wall
 TARGET := albafetch
 SRC1 := src/main.c
 SRC2 := src/info.c
-OBJ := main.o info.o
+OBJ := info.o main.o
 INCLUDE := -I src
 
 albafetch: $(OBJ)

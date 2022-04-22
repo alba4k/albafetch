@@ -27,6 +27,7 @@
 #define TERM_LABEL "Terminal"
 #define PACKAGES_LABEL "Packages"
 #define HOST_LABEL "Host"
+#define BIOS_LABEL "BIOS"
 #define CPU_LABEL "CPU"
 #define GPU_LABEL "GPU"
 #define MEM_LABEL "Memory"

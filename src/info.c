@@ -153,17 +153,52 @@ void packages() {       // prints the number of installed packages
 
 void host() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
-    char *model = malloc(128);
     if(!fp) {
-        printf("[Where /sys/devices/virtual/dmi/id/product_name?]");
-        free(model);
+        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
         fclose(fp);
         return;
     }
+    char *model = malloc(128);
     model[fread(model, 1, 0x10000, fp) - 1] = 0;
+
     fclose(fp);
 
     printf("%-16s\e[0m%s", HOST_LABEL DASH_COLOR DASH, model);
+
+    free(model);
+}
+
+void bios() {           // prints the current host machine
+    printf("%-16s\e[0m", BIOS_LABEL DASH_COLOR DASH);
+
+
+    FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
+    if(!fp) {
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
+        fclose(fp);
+        return;
+    }
+
+    char *vendor = malloc(128);
+    vendor[fread(vendor, 1, 0x10000, fp) - 1] = 0;
+
+    printf("%s", vendor);
+    free(vendor);
+
+    fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
+    if(!fp) {
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
+        fclose(fp);
+        return;
+    }
+
+    char *version = malloc(128);
+    version[fread(version, 1, 0x10000, fp) - 1] = 0;
+
+    printf(" %s", version);
+    free(version);
+
+    fclose(fp);
 }
 
 void cpu() {            // prints the current CPU
@@ -171,7 +206,7 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
-        printf("[Where /proc/cpuinfo?]");
+        fputs("[Missing /proc/cpuinfo]", stderr);
         fclose(fp);
         return;
     }
