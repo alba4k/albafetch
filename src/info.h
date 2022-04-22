@@ -16,6 +16,8 @@ void uptime();      // prints the uptime
 
 void os();          // prints the os name + arch
 
+void bios();	    // prints the current BIOS version 
+
 void kernel();      // prints the kernel version
 
 void desktop();     // prints the current desktop environment
@@ -38,5 +40,4 @@ void public_ip();   // get the public IP adress
 
 void local_ip();    // get the local IP adress - WORK IN PROGRESS
 
-void bios();	    // prints the current BIOS version 
 #endif
