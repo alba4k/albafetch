@@ -14,7 +14,7 @@
 #define DASH ":"
 
 // options
-#define PRINT_CPU_FREQ false // doesn't work for Ryzen processors. Please set this option to true
+#define PRINT_CPU_FREQ false // doesn't work for AMD Ryzen processors
 
 // Labels:
 #define HOSTNAME_LABEL "Hostname"

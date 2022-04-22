@@ -224,17 +224,18 @@ void cpu() {            // prints the current CPU
     cpu_info += 2;
 
     char *end;
-    if(PRINT_CPU_FREQ) {
-        end = strchr(cpu_info, '\n');
-        if(!end) {
-            goto error;
-        }
-    } else {
+
+    if(!PRINT_CPU_FREQ && cpu_info[0] == 'I') {
         end = strchr(cpu_info, '@');
         if(!end) {
             goto error;
         }
         end--;
+    } else {
+        end = strchr(cpu_info, '\n');
+        if(!end) {
+            goto error;
+        }
     }
     
 
