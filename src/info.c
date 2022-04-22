@@ -68,9 +68,9 @@ void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
 
-    FILE *fp = fopen("/etc/lsb-release", "r");
+    FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
-        fputs("[Missing /etc/lsb-release]", stderr);
+        fputs("[Missing /etc/os-release]", stderr);
         printf(" %s", name.machine);
         fclose(fp);
         return;
@@ -80,7 +80,7 @@ void os() {             // prints the os name + arch
     rewind(fp);
     char *str = malloc(len + 1);
     str[fread(str, 1, len, fp)] = 0;
-    const char *field = "DISTRIB_DESCRIPTION=\"";
+    const char *field = "PRETTY_NAME=\"";
     char *os_name = strstr(str, field);
     if(!os_name) {
         goto error;
