@@ -96,9 +96,6 @@ int main(const int argc, char **argv) {
     }
 
     line = printLogo(line);
-    bios();
-
-    line = printLogo(line);
     title();
 
     line = printLogo(line);
