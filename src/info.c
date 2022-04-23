@@ -154,7 +154,7 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages) {
+    if(packages == "0") {
         printf("%s (pacman) ", packages);
         return;
     }
@@ -180,7 +180,7 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages) {
+    if(packages == "0") {
         printf("%s (apt) ", packages);
         return;
     }
