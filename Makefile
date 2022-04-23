@@ -13,10 +13,10 @@ build/albafetch: $(OBJ)
 	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
 
-main.o: $(SRC1) src/config.h src/vars.h src/info.h
+main.o: $(SRC1) src/config.h src/logos.h src/info.h
 	$(CC) -c $(SRC1)
 
-info.o: $(SRC2) src/config.h src/vars.h src/info.h
+info.o: $(SRC2) src/config.h src/logos.h src/info.h
 	$(CC) -c $(SRC2)
 
 test: test.c

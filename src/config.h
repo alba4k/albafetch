@@ -1,11 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "vars.h"
-
-// would reccomend also changing the --help display output to show the correct default
-#define DEFAULT_COLOR "\e[36m"
-#define DEFAULT_BOLD "\e[1m"
+#include "logos.h"
 
 // CONFIGURATION OPTIONS:
 #define SPACING "    "                          // defines the distance between the logo and the infos
@@ -37,7 +33,16 @@
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
 
-// add more logos if you want, I couldn't care less
+// add more logos in src/logos.h if you want, I couldn't care less
+// would reccomend also changing the --help display output to show the correct default
+
+// examples:
+// static char **logo = debian;     // set debian as default logo
+// static char *color = "\e[31m";   // set archlinux as default logo
+// static char *bold;               // leave empty to use the OS's default
+
 static char **logo = archlinux;
+static char *color = "\e[36m";      // leave empty to use the logo default
+static char *bold = "\e[1m";        // leave empty to use the logo default
 
 #endif

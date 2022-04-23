@@ -14,9 +14,6 @@
 #include "info.h"
 #include "config.h"
 
-char *color = DEFAULT_COLOR;
-char *bold = DEFAULT_BOLD;
-
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
 }
