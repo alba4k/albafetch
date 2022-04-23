@@ -21,7 +21,26 @@ void title() {          // prints a title in the format user@hostname
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", getlogin(), color, bold, hostname);
+    char *username = getlogin();
+    if(!username) {
+        int pipes[2];
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("whoami", "whoami", NULL);
+        }
+        wait(NULL);
+        close(pipes[1]);
+
+        //size_t len = read(pipes[0], packages, 10);
+        username[read(pipes[0], username, 10) - 1] = 0;
+
+        close(pipes[0]);
+    }
+
+    printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", username, color, bold, hostname);
 }
 
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
@@ -32,7 +51,25 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 }
 
 void user() {           // get the current login
-    printf("%-16s\e[0m\e[97m %s", USER_LABEL DASH_COLOR DASH, getlogin());
+    char *username = getlogin();
+    if(!username) {
+        int pipes[2];
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("whoami", "whoami", NULL);
+        }
+        wait(NULL);
+        close(pipes[1]);
+
+        //size_t len = read(pipes[0], packages, 10);
+        username[read(pipes[0], username, 10) - 1] = 0;
+
+        close(pipes[0]);
+    }
+    printf("%-16s\e[0m\e[97m %s", USER_LABEL DASH_COLOR DASH, username);
 }
 
 void uptime() {         // prints the uptime

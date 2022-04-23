@@ -110,7 +110,6 @@ int main(const int argc, char **argv) {
         rewind(fp);
         char *str = malloc(len + 1);
         str[fread(str, 1, len, fp)] = 0;
-        printf("%s\n\n\n", str);
         const char *field = "ID=";
         char *os_id = strstr(str, field);
         if(!os_id) {
