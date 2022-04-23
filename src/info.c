@@ -127,7 +127,7 @@ void term() {           // prints the current terminal
 }
 
 void packages() {       // prints the number of installed packages
-    // using pacman, only pacman, and I'll get away with it
+    printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
 
     char packages[10];
 
@@ -142,8 +142,6 @@ void packages() {       // prints the number of installed packages
         dup2(pipes2[1], STDERR_FILENO);
 
         execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
-    } else {
-        printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -168,8 +166,6 @@ void packages() {       // prints the number of installed packages
         dup2(pipes2[1], STDERR_FILENO);
 
         execlp("sh", "sh", "-c", "apt list --installed | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
-    } else {
-        printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -194,8 +190,6 @@ void packages() {       // prints the number of installed packages
         dup2(pipes2[1], STDERR_FILENO);
 
         execlp("sh", "sh", "-c", "dnf list installed | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
-    } else {
-        printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
