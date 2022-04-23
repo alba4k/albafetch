@@ -172,9 +172,9 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages != "0") {
+    if(packages[0] != '0') {
         printf("%s (pacman) ", packages);
-        if(flatpaks != "0")
+        if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
@@ -198,9 +198,9 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages != "0") {
+    if(packages[0] != '0') {
         printf("%s (apt) ", packages);
-        if(flatpaks != "0")
+        if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
@@ -224,9 +224,9 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages != "0") {
+    if(packages[0] != '0') {
         printf("%i (rpm) ", atoi(packages) - 1);
-        if(flatpaks != "0")
+        if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
