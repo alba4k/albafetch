@@ -3,20 +3,27 @@
 
 int printLogo(const int line) {
     if(logo[line]) {
-        printf("%s\n%s%s" SPACING, color, bold, logo[line]);
+        printf("\n%s%s%s" SPACING, bold, logo[line], color);
         return line+1;
     } else {
-        printf("\n%s%s%s" SPACING, logo[0], color, bold);
+        printf("\n%s%s%s" SPACING, bold, logo[0], color);
         return line;
     }
 }
 
 int main(const int argc, char **argv) {
     bool help = 0;
-    int line = 1;
+    int line = 2;
 
     // rtfm and stfu
     bool user_is_an_idiot = false;
+    if(!logo) {
+        FILE *fp = fopen("/etc/os-release", "r");
+        
+    }
+    if(!color) {
+        color = logo[0];
+    }
 
     for(int i = 0; i < argc; i++) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {

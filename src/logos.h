@@ -6,7 +6,8 @@
 // just remember to add them to --logo and --help in src/main.c
 
 static char *archlinux[] = {
-    "\e[36m                                      ",             // first line is just spaces. This line is printed when there is more line than text
+    "\e[36m",
+    "\e[36m                                      ",   // this line is just spaces. This line is printed when there is more line than text
     "\e[36m                   -`                 ",
     "\e[36m                  .o+`                ",
     "\e[36m                 `ooo/                ",
@@ -26,11 +27,12 @@ static char *archlinux[] = {
     "\e[36m  `+sso+:-`                 `.-/+oso: ",
     "\e[36m `++:.                           `-/+/",
     "\e[36m .`                                 `/",
-    0                                                   // last line is 0 to know when to spo printing
+    0                                           // last line is 0 to know when to spo printing
 };
 
-static char *debian[] = {
-    "\e[31m                            ",             // first line is just spaces. This line is printed when there is more line than text
+static char *debian[] = {  
+    "\e[31m",
+    "\e[31m                            ",
     "\e[31m       _,met$$$$$gg.        ",
     "\e[31m    ,g$$$$$$$$$$$$$$$P.     ",
     "\e[31m  ,g$$P\"     \"\"\"Y$$.\".      ",
@@ -48,7 +50,7 @@ static char *debian[] = {
     "\e[31m       `Y$$b.               ",
     "\e[31m          `\"Y$b._           ", 
     "\e[31m              `\"\"\"       ",
-    0                                           // last line is 0 to know when to spo printing
+    0
 };
 
 #endif

@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include "logos.h"
+#include <stdlib.h>
 
 // CONFIGURATION OPTIONS:
 #define SPACING "    "                          // defines the distance between the logo and the infos
@@ -38,11 +39,11 @@
 
 // examples:
 // static char **logo = debian;     // set debian as default logo
-// static char *color = "\e[31m";   // set archlinux as default logo
-// static char *bold;               // leave empty to use the OS's default
+// static char *color = "\e[31m";   // set red as default color
+// static char *bold = "\e[1m";     // use bold. leave "" to turn the bold off 
 
-static char **logo = archlinux;
-static char *color = "\e[36m";      // leave empty to use the logo default
-static char *bold = "\e[1m";        // leave empty to use the logo default
+static char **logo = debian;        // use NULL for OS default 
+static char *color = NULL;          // use NULL for logo default
+static char *bold = "\e[1m";        // leave "" to turn off
 
 #endif
