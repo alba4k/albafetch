@@ -100,7 +100,7 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]\n", stderr);
+        fputs("\e[0m[Unrecognized file content]", stderr);
         printf(" %s", name.machine);
         fclose(fp);
         free(str);
@@ -332,7 +332,7 @@ void cpu() {            // prints the current CPU
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]\n", stderr);
+        fputs("\e[0m[Unrecognized file content]", stderr);
         fclose(fp);
         free(str);
         return;
@@ -355,9 +355,9 @@ void memory() {         // prints the used memory in the format used MiB / total
     char used_str[15];
     char *str = malloc(0x1000);
 
-    FILE *fp = fopen("/proc/cpuinfo", "r");     // open the file and copy its contents into str
+    FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
-        fputs("[Missing /proc/cpuinfo]", stderr);
+        fputs("[Missing /proc/meminfo]", stderr);
         fclose(fp);
         return;
     }
@@ -376,23 +376,22 @@ void memory() {         // prints the used memory in the format used MiB / total
     cachedram += 2;
 
     char *end;
-    end = strchr(cachedram, 'kB') -1;
+    end = strstr(cachedram, "kB");
     if(!end) {
         goto error;     
     }
+    free(str);
+    end--;
     (*end) = 0;
 
     unsigned long usedram = totalram - freeram - bufferram - sharedram - atol(cachedram);
-
-    fclose(fp);
-    free(str);
 
     printf("%lu MiB / %lu MiB (%lu%%)", usedram/1048576, totalram/1048576, (usedram * 100) / totalram);
 
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]\n", stderr);
+        fputs("\e[0m[Unrecognized file content]", stderr);
         fclose(fp);
         free(str);
         return;
