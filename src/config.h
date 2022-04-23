@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "logos.h"
+#include "vars.h"
 #include <stdlib.h>
 
 // CONFIGURATION OPTIONS:
@@ -34,7 +34,7 @@
 // was just too lazy to do it right, so it's hard coded. fuck you <3
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
 
-// add more logos in src/logos.h if you want, I couldn't care less
+// add more logos in src/vars.h if you want, I couldn't care less
 // would reccomend also changing the --help display output to show the correct default
 
 // examples:
@@ -42,8 +42,8 @@
 // static char *color = "\e[31m";   // set red as default color
 // static char *bold = "\e[1m";     // use bold. leave "" to turn the bold off 
 
-static char **logo = debian;        // use NULL for OS default 
-static char *color = NULL;          // use NULL for logo default
-static char *bold = "\e[1m";        // leave "" to turn off
+static char **logo = archlinux;     // use NULL for OS default 
+#define DEFAULT_COLOR NULL          // use NULL for logo default
+#define DEFAULT_BOLD "\e[1m"        // use "" to turn off
 
 #endif

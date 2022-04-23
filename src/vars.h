@@ -53,4 +53,12 @@ static char *debian[] = {
     0
 };
 
+static char *linux[] = {
+    "\e[38m"
+}
+
+extern char *os_name;
+extern char *color;
+extern char *bold;
+
 #endif

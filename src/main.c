@@ -1,6 +1,10 @@
 #include "config.h"
 #include "info.h"
 
+char *color = DEFAULT_COLOR;
+char *bold = DEFAULT_BOLD;
+char *os_name = NULL;
+
 int printLogo(const int line) {
     if(logo[line]) {
         printf("\n%s%s%s" SPACING, bold, logo[line], color);
@@ -19,7 +23,31 @@ int main(const int argc, char **argv) {
     bool user_is_an_idiot = false;
     if(!logo) {
         FILE *fp = fopen("/etc/os-release", "r");
-        
+        if(!fp) {
+            fclose(fp);
+            return -1;
+        }
+        fseek(fp, 0, SEEK_END);
+        size_t len = ftell(fp);
+        rewind(fp);
+        char *str = malloc(len + 1);
+        str[fread(str, 1, len, fp)] = 0;
+        const char *field = "PRETTY_NAME=\"";
+        os_name = strstr(str, field);
+        if(!os_name) {
+            fclose(fp);
+            free(str);
+            return -1;
+        }
+        os_name += strlen(field);
+        char *end = strchr(os_name, '"');
+        if(!end) {
+            fputs("\e[0m[Unrecognized file content]", stderr);
+            fclose(fp);
+            free(str);
+            return -1;
+        }
+        *end = 0;
     }
     if(!color) {
         color = logo[0];
@@ -77,8 +105,7 @@ int main(const int argc, char **argv) {
                 } else if(!strcmp(argv[i+1], "debian")) {
                     logo = debian;
                 } else {
-                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --logo! Use --help for more info\n", stderr);
-                    user_is_an_idiot = true;
+                    logo = linux;
                 }
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m: --logo requires a value! Use --help for more info\n", stderr);

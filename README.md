@@ -37,7 +37,7 @@ $ cd albafetch/
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/src/ 
 ```
-You can change some settings in `albafetch/src/config.h`, or by directly modifying the entire source code in `albafetch/src/`. You will need to recompile/reinstall after configuring. Please note that the "logo" entry in `albafech/src/config.h` only changes the defalt logo. New logos can be added in `albafetch/src/logos.h` (as `char* []`) and in `./src/main.c` (to launch with the `--logo` argument).
+You can change some settings in `albafetch/src/config.h`, or by directly modifying the entire source code in `albafetch/src/`. You will need to recompile/reinstall after configuring. Please note that the "logo" entry in `albafech/src/config.h` only changes the defalt logo. New logos can be added in `albafetch/src/vars.h` (as `char* []`) and in `./src/main.c` (to launch with the `--logo` argument).
 
 ---
 
