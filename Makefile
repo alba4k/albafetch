@@ -33,8 +33,7 @@ uninstall:
 
 run: $(OBJ)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
-	build/$(TARGET)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) && build/$(TARGET)
 
 clean:
 	rm -r build/* test *.o
