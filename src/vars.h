@@ -6,8 +6,8 @@
 // just remember to add them to --logo and --help in src/main.c
 
 static char *archlinux[] = {
-    "\e[36m",
-    "\e[36m                                      ",   // this line is just spaces. This line is printed when there is more line than text
+    "\e[36m",                                   // this line defines the default text color 
+    "                                     ",    // this line is just spaces. This line is printed when there is more line than text
     "\e[36m                   -`                 ",
     "\e[36m                  .o+`                ",
     "\e[36m                 `ooo/                ",
@@ -32,7 +32,7 @@ static char *archlinux[] = {
 
 static char *debian[] = {  
     "\e[31m",
-    "\e[31m                            ",
+    "                            ",
     "\e[31m       _,met$$$$$gg.        ",
     "\e[31m    ,g$$$$$$$$$$$$$$$P.     ",
     "\e[31m  ,g$$P\"     \"\"\"Y$$.\".      ",
@@ -53,9 +53,34 @@ static char *debian[] = {
     0
 };
 
+static char *linuxmint[] = {
+    "\e[32m",
+    "                                        ",
+    "\e[97m             ...-:::::-...              ",
+    "\e[97m          .-MMMMMMMMMMMMMMM-.           ",
+    "\e[97m      .-MMMM\e[32m`..-:::::::-..`\e[97mMMMM-.       ",
+    "\e[97m    .:MMMM\e[32m.:MMMMMMMMMMMMMMM:.\e[97mMMMM:.     ",
+    "\e[97m   -MMM\e[32m-M---MMMMMMMMMMMMMMMMMMM.\e[97mMMM-    ",
+    "\e[97m `:MMM\e[32m:MM`  :MMMM:....::-...-MMMM:\e[97mMMM:` ",
+    "\e[97m :MMM\e[32m:MMM`  :MM:`  ``    ``  `:MMM:\e[97mMMM: ",
+    "\e[97m.MMM\e[32m.MMMM`  :MM.  -MM.  .MM-  `MMMM.\e[97mMMM.",
+    "\e[97m:MMM\e[32m:MMMM`  :MM.  -MM-  .MM:  `MMMM-\e[97mMMM:",
+    "\e[97m:MMM\e[32m:MMMM`  :MM.  -MM-  .MM:  `MMMM:\e[97mMMM:",
+    "\e[97m:MMM\e[32m:MMMM`  :MM.  -MM-  .MM:  `MMMM-\e[97mMMM:",
+    "\e[97m.MMM\e[32m.MMMM`  :MM:--:MM:--:MM:  `MMMM.\e[97mMMM.",
+    "\e[97m :MMM\e[32m:MMM-  `-MMMMMMMMMMMM-`  -MMM-\e[97mMMM: ",
+    "\e[97m  :MMM\e[32m:MMM:`                `:MMM:\e[97mMMM:  ",
+    "\e[97m   .MMM\e[32m.MMMM:--------------:MMMM.\e[97mMMM.   ",
+    "\e[97m     '-MMMM\e[32m.-MMMMMMMMMMMMMMM-.\e[97mMMMM-'    ",
+    "\e[97m       '.-MMMM\e[32m``--:::::--``\e[97mMMMM-.'      ",
+    "\e[97m            '-MMMMMMMMMMMMM-'           ",
+    "\e[97m               ``-:::::-``              ",
+    0
+};
+
 static char *generic[] = {  
     "\e[90m",
-    "\e[90m                     ",
+    "                     ",
     "\e[90m        #####        ",
     "\e[90m       #######       ",
     "\e[90m       ##\e[97mO\e[90m#\e[97mO\e[90m##       ",
