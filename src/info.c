@@ -348,10 +348,9 @@ void memory() {         // prints the used memory in the format used MiB / total
 
     printf("%-16s\e[0m", MEM_LABEL DASH_COLOR DASH);
 
-    unsigned long totalram = info.totalram;
-    unsigned long freeram = info.freeram;
-    unsigned long bufferram = info.bufferram;
-    unsigned long sharedram = info.sharedram;
+    unsigned long totalram = info.totalram / 1024;
+    unsigned long freeram = info.freeram / 1024;
+    unsigned long bufferram = info.bufferram / 1024;
     char used_str[15];
     char *str = malloc(0x1000);
 
@@ -384,7 +383,7 @@ void memory() {         // prints the used memory in the format used MiB / total
     end--;
     (*end) = 0;
 
-    unsigned long usedram = totalram/1024 - freeram/1024 - bufferram/1024 - atol(cachedram);
+    unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
 
     printf("%lu MiB / %lu MiB (%lu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
 
