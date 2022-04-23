@@ -9,7 +9,7 @@ SRC2 := src/info.c
 OBJ := info.o main.o
 INCLUDE := -I src
 
-albafetch: $(OBJ)
+build/albafetch: $(OBJ)
 	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
 
