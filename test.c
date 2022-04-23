@@ -29,4 +29,5 @@ int main() {
     free(str);
 
     return 0;
+    printf("%lu", totalram/1048576);
 }

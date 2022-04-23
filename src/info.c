@@ -384,7 +384,7 @@ void memory() {         // prints the used memory in the format used MiB / total
     end--;
     (*end) = 0;
 
-    unsigned long usedram = totalram - freeram - bufferram - sharedram - atol(cachedram);
+    unsigned long usedram = totalram - freeram - bufferram - sharedram - atol(cachedram)*1024;
 
     printf("%lu MiB / %lu MiB (%lu%%)", usedram/1048576, totalram/1048576, (usedram * 100) / totalram);
 
