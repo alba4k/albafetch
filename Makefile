@@ -10,6 +10,7 @@ OBJ := info.o main.o
 INCLUDE := -I src
 
 albafetch: $(OBJ)
+	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
 
 main.o: $(SRC1) src/config.h src/vars.h src/info.h
@@ -23,6 +24,7 @@ test: test.c
 	./test
 
 install: build/$(TARGET) $(OBJ)
+	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
 	cp build/$(TARGET) /usr/bin/$(TARGET)
 
