@@ -100,7 +100,7 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]\n", stderr);
+        fputs("\e[0m[Unrecognized file content]", stderr);
         printf(" %s", name.machine);
         fclose(fp);
         free(str);
@@ -293,6 +293,8 @@ void cpu() {            // prints the current CPU
     }
     char *str = malloc(0x10000);
     str[fread(str, 1, 0x10000, fp)] = 0;
+    fclose(fp);
+
     char *cpu_info = strstr(str, "model name");
     if(!cpu_info) {
         goto error;
@@ -325,13 +327,12 @@ void cpu() {            // prints the current CPU
     printf("%s", cpu_info);
     //fputs(CPU, stdout)
 
-    fclose(fp);
     free(str);
 
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]\n", stderr);
+        fputs("\e[0m[Unrecognized file content]", stderr);
         fclose(fp);
         free(str);
         return;
@@ -345,34 +346,55 @@ void memory() {         // prints the used memory in the format used MiB / total
     struct sysinfo info;
     sysinfo(&info);
 
-    unsigned long total = info.totalram;
+    printf("%-16s\e[0m", MEM_LABEL DASH_COLOR DASH);
+
+    unsigned long totalram = info.totalram;
+    unsigned long freeram = info.freeram;
+    unsigned long bufferram = info.bufferram;
+    unsigned long sharedram = info.sharedram;
     char used_str[15];
+    char *str = malloc(0x1000);
 
-    // would be way more elegant, but leaves a slight gap? idk, I could also use /proc/meminfo
-    //unsigned long used = total - info.freeram - info.bufferram - info.sharedram;
-
-    //printf(COLOR "%s" SPACING "Memory:\e[0m %lu MiB / %lu MiB (%lu%%)\n", logo[14], used/1048576, total/1048576, (used * 100) / (1048576*total));
-
-    int pipes[2];
-    pipe(pipes);
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-
-        execlp("sh", "sh", "-c", "free --byte | grep M | awk '{print $3}'", NULL);  // using free to count the used memory, 3rd arg
-    } else {
-        printf("%-16s\e[0m", MEM_LABEL DASH_COLOR DASH);
+    FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
+    if(!fp) {
+        fputs("[Missing /proc/meminfo]", stderr);
+        fclose(fp);
+        return;
     }
-    wait(NULL);
-    close(pipes[1]);
+    str[fread(str, 1, 0x1000, fp)] = 0;
+    fclose(fp);
 
-    //size_t len = read(pipes[0], used_str, 14);
-    used_str[read(pipes[0], used_str, 14) - 1] = 0;
-    long used = atol(used_str);
+    char *cachedram = strstr(str, "Cached");
+    if(!cachedram) {
+        goto error;
+    }
 
-    close(pipes[0]);
-    
-    printf("%ld MiB / %lu MiB (%ld%%)", used/1048576, total/1048576, (used * 100) / total);
+    cachedram = strchr(cachedram, ':');
+    if(!cachedram) {
+        goto error;
+    }
+    cachedram += 2;
+
+    char *end;
+    end = strstr(cachedram, "kB");
+    if(!end) {
+        goto error;     
+    }
+    free(str);
+    end--;
+    (*end) = 0;
+
+    unsigned long usedram = totalram/1024 - freeram/1024 - bufferram/1024 - atol(cachedram);
+
+    printf("%lu MiB / %lu MiB (%lu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
+
+    return;
+
+    error:
+        fputs("\e[0m[Unrecognized file content]", stderr);
+        fclose(fp);
+        free(str);
+        return;
 }
 
 void public_ip() {      // get the public IP adress
@@ -399,7 +421,7 @@ void public_ip() {      // get the public IP adress
 }
 
 void local_ip() {      // get the local IP adress
-struct ifaddrs *ifAddrStruct=NULL;
+    struct ifaddrs *ifAddrStruct=NULL;
     struct ifaddrs *ifa=NULL;
     
     void *tmpAddrPtr=NULL;
@@ -411,7 +433,7 @@ struct ifaddrs *ifAddrStruct=NULL;
             continue;
         }
         if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
-            // is a valid IP4 Ad§dress
+            // is a valid IP4 Address
             tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
