@@ -172,9 +172,9 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages != "0") {
+    if(packages[0] != '0') {
         printf("%s (pacman) ", packages);
-        if(flatpaks != "0")
+        if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
@@ -198,9 +198,9 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages != "0") {
+    if(packages[0] != '0') {
         printf("%s (apt) ", packages);
-        if(flatpaks != "0")
+        if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
@@ -224,9 +224,9 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages != "0") {
+    if(packages[0] != '0') {
         printf("%i (rpm) ", atoi(packages) - 1);
-        if(flatpaks != "0")
+        if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
@@ -399,7 +399,7 @@ void public_ip() {      // get the public IP adress
 }
 
 void local_ip() {      // get the local IP adress
-struct ifaddrs *ifAddrStruct=NULL;
+    struct ifaddrs *ifAddrStruct=NULL;
     struct ifaddrs *ifa=NULL;
     
     void *tmpAddrPtr=NULL;
@@ -411,7 +411,7 @@ struct ifaddrs *ifAddrStruct=NULL;
             continue;
         }
         if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
-            // is a valid IP4 Ad§dress
+            // is a valid IP4 Address
             tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
