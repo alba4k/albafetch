@@ -97,6 +97,8 @@ void os() {             // prints the os name + arch
     fclose(fp);
     free(str);
 
+
+
     return;
 
     error:
@@ -225,11 +227,18 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%i (rpm) ", atoi(packages) - 1);
+        printf("%s (rpm) ", packages);
         if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
         return;
     }
+
+    if(flatpaks[0] != '0') {
+        printf("%s (flatpak)", flatpaks);
+        return;
+    }
+    
+    fprintf(stderr, "[Unsupported]");
 }
 
 void host() {           // prints the current host machine
