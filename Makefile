@@ -20,8 +20,7 @@ info.o: $(SRC2) src/config.h src/vars.h src/info.h
 	$(CC) -c $(SRC2)
 
 test: test.c
-	$(CC) -o test test.c
-	./test
+	$(CC) -o test test.c && ./test
 
 install: build/$(TARGET) $(OBJ)
 	mkdir -p build
