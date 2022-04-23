@@ -1,4 +1,3 @@
-test*
 *.o
 .vscode
 build
