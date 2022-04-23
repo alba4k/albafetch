@@ -21,18 +21,18 @@ void title() {          // prints a title in the format user@hostname
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%s\e[0m@%s%s%s\e[0m", getlogin(), color, bold, hostname);
+    printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", getlogin(), color, bold, hostname);
 }
 
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%-16s\e[0m %s", HOSTNAME_LABEL DASH_COLOR DASH, hostname);
+    printf("%-16s\e[0m\e[97m %s", HOSTNAME_LABEL DASH_COLOR DASH, hostname);
 }
 
 void user() {           // get the current login
-    printf("%-16s\e[0m %s", USER_LABEL DASH_COLOR DASH, getlogin());
+    printf("%-16s\e[0m\e[97m %s", USER_LABEL DASH_COLOR DASH, getlogin());
 }
 
 void uptime() {         // prints the uptime
@@ -45,7 +45,7 @@ void uptime() {         // prints the uptime
     char mins = secs/60 - days*1440 - hours*60;
     char sec = secs - days*86400 - hours*3600 - mins*60;
 
-    printf("%-16s\e[0m", UPTIME_LABEL DASH_COLOR DASH);
+    printf("%-16s\e[0m\e[97m", UPTIME_LABEL DASH_COLOR DASH);
     if(days) {
         printf("%ldd ", days);     // print the number of days passed if more than 0
     }
@@ -88,7 +88,7 @@ void os() {             // prints the os name + arch
     }
     *end = 0;
 
-    printf("%-16s\e[0m%s %s", OS_LABEL DASH_COLOR DASH, os_name, name.machine);
+    printf("%-16s\e[0m\e[97m%s %s", OS_LABEL DASH_COLOR DASH, os_name, name.machine);
 
     fclose(fp);
     free(str);
@@ -98,7 +98,7 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]", stderr);
+        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
         printf(" %s", name.machine);
         fclose(fp);
         free(str);
@@ -109,23 +109,23 @@ void kernel() {         // prints the kernel version
     struct utsname name;
     uname(&name);
 
-    printf("%-16s\e[0m%s ", KERNEL_LABEL DASH_COLOR DASH, name.release);
+    printf("%-16s\e[0m\e[97m%s ", KERNEL_LABEL DASH_COLOR DASH, name.release);
 }
 
 void desktop() {        // prints the current desktop environment
-        printf("%-16s\e[0m%s", DESKTOP_LABEL DASH_COLOR DASH, getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
+        printf("%-16s\e[0m\e[97m%s", DESKTOP_LABEL DASH_COLOR DASH, getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
 }
 
 void shell() {          // prints the user default shell
-    printf("%-16s\e[0m%s", SHELL_LABEL DASH_COLOR DASH, getenv("SHELL"));        // $SHELL
+    printf("%-16s\e[0m\e[97m%s", SHELL_LABEL DASH_COLOR DASH, getenv("SHELL"));        // $SHELL
 }
 
 void term() {           // prints the current terminal
-    printf("%-16s\e[0m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
+    printf("%-16s\e[0m\e[97m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
 }
 
 void packages() {       // prints the number of installed packages
-    printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
+    printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
     char packages[10];
     char flatpaks[10];
@@ -249,13 +249,13 @@ void host() {           // prints the current host machine
 
     fclose(fp);
 
-    printf("%-16s\e[0m%s", HOST_LABEL DASH_COLOR DASH, model);
+    printf("%-16s\e[0m\e[97m%s", HOST_LABEL DASH_COLOR DASH, model);
 
     free(model);
 }
 
 void bios() {           // prints the current host machine
-    printf("%-16s\e[0m", BIOS_LABEL DASH_COLOR DASH);
+    printf("%-16s\e[0m\e[97m", BIOS_LABEL DASH_COLOR DASH);
 
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
@@ -288,7 +288,7 @@ void bios() {           // prints the current host machine
 }
 
 void cpu() {            // prints the current CPU
-    printf("%-16s\e[0m", CPU_LABEL DASH_COLOR DASH);
+    printf("%-16s\e[0m\e[97m", CPU_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
@@ -337,21 +337,21 @@ void cpu() {            // prints the current CPU
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]", stderr);
+        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
         fclose(fp);
         free(str);
         return;
 }
 
 void gpu() {            // prints the current GPU
-    printf("%-16s\e[0m%s", GPU_LABEL DASH_COLOR DASH, GPU);
+    printf("%-16s\e[0m\e[97m%s", GPU_LABEL DASH_COLOR DASH, GPU);
 }
 
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
     struct sysinfo info;
     sysinfo(&info);
 
-    printf("%-16s\e[0m", MEM_LABEL DASH_COLOR DASH);
+    printf("%-16s\e[0m\e[97m", MEM_LABEL DASH_COLOR DASH);
 
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
@@ -395,7 +395,7 @@ void memory() {         // prints the used memory in the format used MiB / total
     return;
 
     error:
-        fputs("\e[0m[Unrecognized file content]", stderr);
+        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
         fclose(fp);
         free(str);
         return;
@@ -412,7 +412,7 @@ void public_ip() {      // get the public IP adress
 
         execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
     } else {
-        printf("%-16s\e[0m", PUB_IP_LABEL DASH_COLOR DASH);
+        printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -442,7 +442,7 @@ void local_ip() {      // get the local IP adress
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
             if(strcmp(addressBuffer, "127.0.0.1")) 
-                printf("%-16s\e[0m%s", PRIV_IP_LABEL DASH_COLOR DASH, addressBuffer);
+                printf("%-16s\e[0m\e[97m%s", PRIV_IP_LABEL DASH_COLOR DASH, addressBuffer);
         }
     } 
 }
