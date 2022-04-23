@@ -133,6 +133,9 @@ void packages() {       // prints the number of installed packages
 
     int pipes[2];
     int pipes2[2];
+
+    printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
+
     pipe(pipes);
     pipe(pipes2);
     if(!fork()) {
@@ -142,9 +145,8 @@ void packages() {       // prints the number of installed packages
         dup2(pipes2[1], STDERR_FILENO);
 
         execlp("sh", "sh", "-c", "pacman -Q | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
-    } else {
-        printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
     }
+
     wait(NULL);
     close(pipes[1]);
     close(pipes2[0]);
@@ -154,12 +156,12 @@ void packages() {       // prints the number of installed packages
     packages[read(pipes[0], packages, 10) - 1] = 0;
 
     close(pipes[0]);
-    if(packages) {
+    if(packages == "0") {
         printf("%s (pacman) ", packages);
         return;
     }
     
-   pipe(pipes);
+    pipe(pipes);
     pipe(pipes2);
     if(!fork()) {
         close(pipes[0]);
@@ -168,9 +170,8 @@ void packages() {       // prints the number of installed packages
         dup2(pipes2[1], STDERR_FILENO);
 
         execlp("sh", "sh", "-c", "apt list --installed | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
-    } else {
-        printf("%-16s\e[0m", PACKAGES_LABEL DASH_COLOR DASH);
-    }
+    } 
+    
     wait(NULL);
     close(pipes[1]);
     close(pipes2[0]);
