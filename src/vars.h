@@ -5,7 +5,7 @@
 // add more, i couldn't care less
 // just remember to add them to --logo and --help in src/main.c
 
-static char logos[][2][32][64] = {
+static char logos[][32][64] = {
 {
     "arch",                                         // this line defines the name of the logo
     "\e[36m",                                       // this line defines the default text color 
