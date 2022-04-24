@@ -7,7 +7,7 @@
 
 static char *logos[][32] = {
     {  
-        "generic",
+        "linux",
         "\e[90m",
         "                     ",
         "\e[90m        #####        ",
