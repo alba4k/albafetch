@@ -6,9 +6,10 @@
 // just remember to add them to --logo and --help in src/main.c
 
 static char logos[][2][32][64] = {
-{{"arch"}, {
-    "\e[36m",                                   // this line defines the default text color 
-    "                                     ",    // this line is just spaces. This line is printed when there is more line than text
+{
+    "arch",                                         // this line defines the name of the logo
+    "\e[36m",                                       // this line defines the default text color 
+    "                                     ",        // this line is just spaces. This line is printed when there is more line than text
     "\e[36m                   -`                 ",
     "\e[36m                  .o+`                ",
     "\e[36m                 `ooo/                ",
@@ -28,9 +29,10 @@ static char logos[][2][32][64] = {
     "\e[36m  `+sso+:-`                 `.-/+oso: ",
     "\e[36m `++:.                           `-/+/",
     "\e[36m .`                                 `/",
-    0                                           // last line is 0 to know when to stop printing
+    0                                               // last line is 0 to know when to stop printing
 }},
-{{"debian"}, {  
+{
+    "debian",
     "\e[31m",
     "                            ",
     "\e[31m       _,met$$$$$gg.        ",
@@ -52,7 +54,8 @@ static char logos[][2][32][64] = {
     "\e[31m              `\"\"\"       ",
     0
 }},
-{{"linuxmint"}, {
+{
+    "linuxmint",
     "\e[32m",
     "                                        ",
     "\e[97m             ...-:::::-...              ",
@@ -75,8 +78,9 @@ static char logos[][2][32][64] = {
     "\e[97m            '-MMMMMMMMMMMMM-'           ",
     "\e[97m               ``-:::::-``              ",
     0
-}},
-{{"generic"}, {  
+},
+{  
+    "generic",
     "\e[90m",
     "                     ",
     "\e[90m        #####        ",
@@ -92,8 +96,8 @@ static char logos[][2][32][64] = {
     "\e[33m#######\e[90m#\e[97m#####\e[90m#\e[33m#######",
     "\e[33m  #####\e[90m#######\e[33m#####  ",
     0
-}},
-}
+},
+};
 extern char *color;
 extern char *bold;
 
