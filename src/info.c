@@ -21,9 +21,9 @@ void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX);
     
-    static char username[LOGIN_NAME_MAX + 1];
+    static char username[LOGIN_NAME_MAX + 1] = "";
     getlogin_r(username, LOGIN_NAME_MAX);
-    if(!username) {
+    if(!username[0]) {
         int pipes[2];
         pipe(pipes);
         if(!fork()) {
