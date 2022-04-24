@@ -18,11 +18,11 @@ void separator() {      // prints a separator
 }
 
 void title() {          // prints a title in the format user@hostname
-    char hostname[HOST_NAME_MAX + 1];
+    static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX);
     
-    char username[LOGIN_NAME_MAX + 1];
-    //getlogin_r(username, LOGIN_NAME_MAX);
+    static char username[LOGIN_NAME_MAX + 1];
+    getlogin_r(username, LOGIN_NAME_MAX);
     if(!username) {
         int pipes[2];
         pipe(pipes);
@@ -42,7 +42,7 @@ void title() {          // prints a title in the format user@hostname
     printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", username, color, bold, hostname);
 }
 
-void hostname() {       // getting the computer hostname (defined in /etc/hostname)
+void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
@@ -50,9 +50,11 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 }
 
 void user() {           // get the current login
-    char username[LOGIN_NAME_MAX + 1];
-    getlogin_r(username, LOGIN_NAME_MAX);
+    char *username = 0;
+    username = getlogin();
+    //getlogin_r(username, LOGIN_NAME_MAX);
     if(!username) {
+        printf("\n\n\nCIAO\n\n\n");
         int pipes[2];
         pipe(pipes);
         if(!fork()) {
@@ -64,7 +66,7 @@ void user() {           // get the current login
         wait(NULL);
         close(pipes[1]);
 
-        username[read(pipes[0], username, 10) - 1] = 0;
+        username[read(pipes[0], username, LOGIN_NAME_MAX) - 1] = 0;
 
         close(pipes[0]);
     }
