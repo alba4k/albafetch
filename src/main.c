@@ -114,14 +114,16 @@ int main(const int argc, char **argv) {
         }
         *end = 0;
 
-        if(!strcmp(os_id, "arch"))
+        /*if(!strcmp(os_id, "arch"))
             logo = archlinux;
         else if(!strcmp(os_id, "debian"))
             logo = debian;
         else if(!strcmp(os_id, "linuxmint"))
             logo = linuxmint;
         else
-            logo = generic;
+            logo = generic;*/
+
+        for(int i = 0; i < ) {}
     }
     if(!color) {
         color = logo[0];
