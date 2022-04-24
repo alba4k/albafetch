@@ -30,7 +30,7 @@ static char logos[][32][64] = {
     "\e[36m `++:.                           `-/+/",
     "\e[36m .`                                 `/",
     0                                               // last line is 0 to know when to stop printing
-}},
+},
 {
     "debian",
     "\e[31m",
@@ -53,7 +53,7 @@ static char logos[][32][64] = {
     "\e[31m          `\"Y$b._           ", 
     "\e[31m              `\"\"\"       ",
     0
-}},
+},
 {
     "linuxmint",
     "\e[32m",
