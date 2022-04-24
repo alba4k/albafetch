@@ -5,7 +5,8 @@
 // add more, i couldn't care less
 // just remember to add them to --logo and --help in src/main.c
 
-static char *archlinux[] = {
+static char logos[][2][32][64] = {
+{{"arch"}, {
     "\e[36m",                                   // this line defines the default text color 
     "                                     ",    // this line is just spaces. This line is printed when there is more line than text
     "\e[36m                   -`                 ",
@@ -27,10 +28,9 @@ static char *archlinux[] = {
     "\e[36m  `+sso+:-`                 `.-/+oso: ",
     "\e[36m `++:.                           `-/+/",
     "\e[36m .`                                 `/",
-    0                                           // last line is 0 to know when to spo printing
-};
-
-static char *debian[] = {  
+    0                                           // last line is 0 to know when to stop printing
+}},
+{{"debian"}, {  
     "\e[31m",
     "                            ",
     "\e[31m       _,met$$$$$gg.        ",
@@ -51,9 +51,8 @@ static char *debian[] = {
     "\e[31m          `\"Y$b._           ", 
     "\e[31m              `\"\"\"       ",
     0
-};
-
-static char *linuxmint[] = {
+}},
+{{"linuxmint"}, {
     "\e[32m",
     "                                        ",
     "\e[97m             ...-:::::-...              ",
@@ -76,9 +75,8 @@ static char *linuxmint[] = {
     "\e[97m            '-MMMMMMMMMMMMM-'           ",
     "\e[97m               ``-:::::-``              ",
     0
-};
-
-static char *generic[] = {  
+}},
+{{"generic"}, {  
     "\e[90m",
     "                     ",
     "\e[90m        #####        ",
@@ -94,8 +92,8 @@ static char *generic[] = {
     "\e[33m#######\e[90m#\e[97m#####\e[90m#\e[33m#######",
     "\e[33m  #####\e[90m#######\e[33m#####  ",
     0
-};
-
+}},
+}
 extern char *color;
 extern char *bold;
 

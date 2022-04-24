@@ -5,7 +5,7 @@ char *color = DEFAULT_COLOR;
 char *bold = DEFAULT_BOLD;
 
 int printLogo(const int line) {
-    if(logo[line]) {
+    if(logo[line][0]) {
         printf("\n%s%s%s" SPACING, bold, logo[line], color);
         return line+1;
     } else {
@@ -86,19 +86,6 @@ int main(const int argc, char **argv) {
 
     if(user_is_an_idiot) return 1;
 
-    if(help) {  // print the help message if --help was used and exit
-        printf("%s%salbafetch\e[0m\e[97m - a system fetch utility\n", color, bold);
-        printf("\n%s%sFLAGS\e[0m\e[97m:\n", color, bold);
-        printf("\t%s%s-h\e[0m\e[97m,%s%s --help\e[0m\e[97m:\t Print this help menu and exit\n", color, bold, color, bold);
-        printf("\t%s%s-c\e[0m\e[97m,%s%s --color\e[0m\e[97m:\t Change the output color (default: \e[36mcyan\e[0m\e[97m]) [\e[30mblack\e[0m\e[97m, \e[31mred\e[0m\e[97m, \e[32mgreen\e[0m\e[97m, \e[33myellow\e[0m\e[97m, \e[34mblue\e[0m\e[97m, \e[35mpurple\e[0m\e[97m, \e[36mcyan\e[0m\e[97m, \e[90mgray\e[0m\e[97m]\n, \e[97mwhite\e[0m\e[97m", color, bold, color, bold);
-        printf("\t%s%s-b\e[0m\e[97m,%s%s --bold\e[0m\e[97m:\t Specifies if bold should be used in colored parts (default: \e[1mon\e[0m\e[97m]) [\e[1mon\e[0m\e[97m, off]\n", color, bold, color, bold);
-        printf("\t%s%s-l\e[0m\e[97m,%s%s --logo\e[0m\e[97m:\t Changes the logo that will be displayed (default: arch) [arch, debian, mint, everything else defaults to linux]\n", color, bold, color, bold);
-
-        printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\e[97m\n", color, bold);
-
-        return 0;
-    }
-
     if(!logo) {
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
@@ -138,6 +125,19 @@ int main(const int argc, char **argv) {
     }
     if(!color) {
         color = logo[0];
+    }
+
+    if(help) {  // print the help message if --help was used and exit
+        printf("%s%salbafetch\e[0m\e[97m - a system fetch utility\n", color, bold);
+        printf("\n%s%sFLAGS\e[0m\e[97m:\n", color, bold);
+        printf("\t%s%s-h\e[0m\e[97m,%s%s --help\e[0m\e[97m:\t Print this help menu and exit\n", color, bold, color, bold);
+        printf("\t%s%s-c\e[0m\e[97m,%s%s --color\e[0m\e[97m:\t Change the output color (default: \e[36mcyan\e[0m\e[97m]) [\e[30mblack\e[0m\e[97m, \e[31mred\e[0m\e[97m, \e[32mgreen\e[0m\e[97m, \e[33myellow\e[0m\e[97m, \e[34mblue\e[0m\e[97m, \e[35mpurple\e[0m\e[97m, \e[36mcyan\e[0m\e[97m, \e[90mgray\e[0m\e[97m, \e[97mwhite\e[0m\e[97m]\n", color, bold, color, bold);
+        printf("\t%s%s-b\e[0m\e[97m,%s%s --bold\e[0m\e[97m:\t Specifies if bold should be used in colored parts (default: \e[1mon\e[0m\e[97m]) [\e[1mon\e[0m\e[97m, off]\n", color, bold, color, bold);
+        printf("\t%s%s-l\e[0m\e[97m,%s%s --logo\e[0m\e[97m:\t Changes the logo that will be displayed (default: arch) [arch, debian, mint, everything else defaults to linux]\n", color, bold, color, bold);
+
+        printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\e[97m\n", color, bold);
+
+        return 0;
     }
 
     line = printLogo(line);
