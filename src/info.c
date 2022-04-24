@@ -236,17 +236,17 @@ void host() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
-        fclose(fp);
         return;
     }
-    char *model = malloc(128);
-    model[fread(model, 1, 0x10000, fp) - 1] = 0;
+
+    const int model_len = 128;
+    char model[model_len];
+    model[fread(model, 1, model_len, fp) - 1] = 0;
 
     fclose(fp);
 
     printf("%-16s\e[0m%s", HOST_LABEL DASH_COLOR DASH, model);
 
-    free(model);
 }
 
 void bios() {           // prints the current host machine
@@ -256,28 +256,28 @@ void bios() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
-        fclose(fp);
         return;
     }
 
-    char *vendor = malloc(128);
-    vendor[fread(vendor, 1, 0x10000, fp) - 1] = 0;
+    const int vendor_len = 128;
+    char vendor[vendor_len];
+    vendor[fread(vendor, 1, vendor_len, fp) - 1] = 0;
+
+    fclose(fp);
 
     printf("%s", vendor);
-    free(vendor);
 
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
-        fclose(fp);
         return;
     }
 
-    char *version = malloc(128);
-    version[fread(version, 1, 0x10000, fp) - 1] = 0;
+    const int version_len = 128;
+    char version[version_len];
+    version[fread(version, 1, version_len, fp) - 1] = 0;
 
     printf(" %s", version);
-    free(version);
 
     fclose(fp);
 }
@@ -288,12 +288,14 @@ void cpu() {            // prints the current CPU
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
         fputs("[Missing /proc/cpuinfo]", stderr);
-        fclose(fp);
         return;
     }
-    char *str = malloc(0x10000);
-    str[fread(str, 1, 0x10000, fp)] = 0;
+
+    const int buffer_len = 0x10000;
+    char *str = malloc(buffer_len);
+    str[fread(str, 1, buffer_len, fp)] = 0;
     char *cpu_info = strstr(str, "model name");
+
     if(!cpu_info) {
         goto error;
     }
