@@ -97,6 +97,27 @@ static char *logos[][32] = {
         "\e[97m               ``-:::::-``              ",
         ""
     },
+    {
+        "endeavouros",
+        "\e[35m",
+        "                                        ",
+        "\e[31m                     ./\e[35mo\e[34m.               ",
+        "\e[31m                   ./\e[35msssso\e[34m-             ",
+        "\e[31m                 `:\e[35mosssssss+\e[34m-           ",
+        "\e[31m               `:+\e[35msssssssssso\e[34m/.         ",
+        "\e[31m             `-/o\e[35mssssssssssssso\e[34m/.       ",
+        "\e[31m           `-/+\e[35msssssssssssssssso\e[34m+:`     ",
+        "\e[31m         `-:/+\e[35msssssssssssssssssso«\e[34m+/.   ",
+        "\e[31m       `.://\e[35mosssssssssssssssssssso\e[34m++-   ",
+        "\e[31m      .://+\e[35mssssssssssssssssssssssso\e[34m++:  ",
+        "\e[31m    .:///\e[35mossssssssssssssssssssssssso\e[34m++: ",
+        "\e[31m  `:////\e[35mssssssssssssssssssssssssssso\e[34m+++.",
+        "\e[31m`-////+\e[35mssssssssssssssssssssssssssso\e[34m++++-",
+        "\e[31m `..-+\e[35moosssssssssssssssssssssssso\e[34m+++++/`",
+        "\e[34m   ./++++++++++++++++++++++++++++++/:.  ",
+        "\e[34m  `:::::::::::::::::::::::::------``    ",
+        ""
+    },
 };
 extern char *color;
 extern char *bold;
