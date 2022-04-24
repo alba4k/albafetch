@@ -112,15 +112,19 @@ void os() {             // prints the os name + arch
     rewind(fp);
     char *str = malloc(len + 1);
     str[fread(str, 1, len, fp)] = 0;
-    const char *field = "PRETTY_NAME=\"";
-    char *os_name = strstr(str, field);
+    char *os_name = strstr(str, "PRETTY_NAME=\"");
     if(!os_name) {
-        goto error;
+        os_name = strstr(str, "PRETTY_NAME=\'");
+        if(!os_name)
+            goto error;
     }
-    os_name += strlen(field);
+    os_name += strlen("PRETTY_NAME=\"");
+    *strstr(os_name, "ID") = 0;
     char *end = strchr(os_name, '"');
     if(!end) {
-        goto error;
+        end = strchr(os_name, '\'');
+        if(!end)
+            goto error;
     }
     *end = 0;
 
