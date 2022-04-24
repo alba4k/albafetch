@@ -22,7 +22,7 @@ static char *logos[][32] = {
         "\e[33m######\e[90m#\e[97m#######\e[90m#\e[33m######",
         "\e[33m#######\e[90m#\e[97m#####\e[90m#\e[33m#######",
         "\e[33m  #####\e[90m#######\e[33m#####  ",
-        0
+        ""
     },
     {
         "arch",                                         // this line defines the name of the logo
@@ -47,7 +47,7 @@ static char *logos[][32] = {
         "\e[36m  `+sso+:-`                 `.-/+oso: ",
         "\e[36m `++:.                           `-/+/",
         "\e[36m .`                                 `/",
-        0                                               // last line is 0 to know when to stop printing
+        ""                                               // last line is 0 to know when to stop printing
     },
     {
         "debian",
@@ -70,7 +70,7 @@ static char *logos[][32] = {
         "\e[31m       `Y$$b.               ",
         "\e[31m          `\"Y$b._           ", 
         "\e[31m              `\"\"\"       ",
-        0
+        ""
     },
     {
         "linuxmint",
@@ -95,7 +95,7 @@ static char *logos[][32] = {
         "\e[97m       '.-MMMM\e[32m``--:::::--``\e[97mMMMM-.'      ",
         "\e[97m            '-MMMMMMMMMMMMM-'           ",
         "\e[97m               ``-:::::-``              ",
-        0
+        ""
     },
 };
 extern char *color;
