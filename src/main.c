@@ -141,7 +141,7 @@ int main(const int argc, char **argv) {
     }
 
     line = printLogo(line);
-    title();
+    user();
 
     line = printLogo(line);
     separator();
