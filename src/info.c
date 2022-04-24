@@ -78,10 +78,8 @@ void os() {             // prints the os name + arch
     fseek(fp, 0, SEEK_END);
     size_t len = ftell(fp);
     rewind(fp);
-
     char *str = malloc(len + 1);
     str[fread(str, 1, len, fp)] = 0;
-
     const char *field = "PRETTY_NAME=\"";
     char *os_name = strstr(str, field);
     if(!os_name) {
@@ -241,10 +239,8 @@ void host() {           // prints the current host machine
         fclose(fp);
         return;
     }
-
-    const int max_model_size = 128;
-    char *model = malloc(max_model_size);
-    model[fread(model, 1, max_model_size, fp) - 1] = 0;
+    char *model = malloc(128);
+    model[fread(model, 1, 0x10000, fp) - 1] = 0;
 
     fclose(fp);
 
@@ -256,6 +252,7 @@ void host() {           // prints the current host machine
 void bios() {           // prints the current host machine
     printf("%-16s\e[0m", BIOS_LABEL DASH_COLOR DASH);
 
+
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
@@ -263,11 +260,11 @@ void bios() {           // prints the current host machine
         return;
     }
 
-    const int max_vendor_len = 128;
-    char vendor[max_vender_len];
-    vendor[fread(vendor, 1, max_vendor_len, fp) - 1] = 0;
+    char *vendor = malloc(128);
+    vendor[fread(vendor, 1, 0x10000, fp) - 1] = 0;
 
     printf("%s", vendor);
+    free(vendor);
 
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
@@ -276,11 +273,11 @@ void bios() {           // prints the current host machine
         return;
     }
 
-    const int max_version_len = 128;
-    char version[max_vendor_len];
-    version[fread(version, 1, max_version_len, fp) - 1] = 0;
+    char *version = malloc(128);
+    version[fread(version, 1, 0x10000, fp) - 1] = 0;
 
     printf(" %s", version);
+    free(version);
 
     fclose(fp);
 }
@@ -289,19 +286,14 @@ void cpu() {            // prints the current CPU
     printf("%-16s\e[0m", CPU_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
-
     if(!fp) {
         fputs("[Missing /proc/cpuinfo]", stderr);
         fclose(fp);
         return;
     }
-
-    const int max_read_size = 0x10000;
-    char *read_buffer = malloc(max_cpuinfo_size);
-    size_t last_read_index = fread(read_buffer, 1, max_read_size, fp);
-    read_buffer[last_read_index] = 0;
-
-    char *cpu_info = strstr(read_buffer, "model name");
+    char *str = malloc(0x10000);
+    str[fread(str, 1, 0x10000, fp)] = 0;
+    char *cpu_info = strstr(str, "model name");
     if(!cpu_info) {
         goto error;
     }
@@ -326,6 +318,7 @@ void cpu() {            // prints the current CPU
             goto error;
         }
     }
+    
 
     (*end) = 0;
 
@@ -333,14 +326,14 @@ void cpu() {            // prints the current CPU
     //fputs(CPU, stdout)
 
     fclose(fp);
-    free(read_buffer);
+    free(str);
 
     return;
 
     error:
         fputs("\e[0m[Unrecognized file content]\n", stderr);
         fclose(fp);
-        free(read_buffer);
+        free(str);
         return;
 }
 
