@@ -50,11 +50,9 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 }
 
 void user() {           // get the current login
-    char *username = 0;
-    username = getlogin();
-    //getlogin_r(username, LOGIN_NAME_MAX);
-    if(username) {
-        printf("\n\n\nCIAO\n\n\n");
+    static char username[LOGIN_NAME_MAX + 1] = "";
+    getlogin_r(username, LOGIN_NAME_MAX);
+    if(!username[0]) {
         int pipes[2];
         pipe(pipes);
         if(!fork()) {
