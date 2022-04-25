@@ -95,50 +95,23 @@ int main(const int argc, char **argv) {
         return 0;
     }
 
-    line = printLogo(line);
-    title();
+    void (* infos[])() = {
+        title, separator, 
+        uptime, separator, 
+        os, kernel, desktop, 
+        shell, term, packages, 
+        separator, host, cpu,
+        gpu, memory
+    };
 
-    line = printLogo(line);
-    separator();
+    // The following line works because infos is declared on the stack,
+    // so sizeof returns it's real size and not the size of a pointer.
+    size_t info_lines = sizeof(infos) / sizeof(infos[0]);
 
-    line = printLogo(line);
-    uptime();
-
-    line = printLogo(line);
-    separator();
-
-    line = printLogo(line);
-    os();
-
-    line = printLogo(line);
-    kernel();
-
-    line = printLogo(line);
-    desktop();
-
-    line = printLogo(line);
-    shell();
-
-    line = printLogo(line);
-    term(); 
-
-    line = printLogo(line);
-    packages();
-
-    line = printLogo(line);
-    separator();
-
-    line = printLogo(line);
-    host();
-
-    line = printLogo(line);
-    cpu();
-
-    line = printLogo(line);
-    gpu();
-
-    line = printLogo(line);
-    memory();
+    for (size_t i = 0; i < info_lines; ++i) {
+        line = printLogo(line);
+        infos[i]();
+    }
 
     // ******** remaining lines of the logo ********
     while(logo[line]) {
