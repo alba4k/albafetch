@@ -192,7 +192,7 @@ void packages() {       // prints the number of installed packages
     close(pipes2[1]);
 
     //size_t len = read(pipes[0], packages, 10);
-    flatpaks[read(pipes[0], snaps, 10) - 1] = 0;
+    flatpaks[read(pipes[0], snaps, 10) - 2] = 0;
 
     pipe(pipes);
     pipe(pipes2);
@@ -217,8 +217,9 @@ void packages() {       // prints the number of installed packages
         printf("%s (pacman) ", packages);
         if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
+        
         if(snaps[0] != '0')
-            printf("%s (snap) ", snaps);
+            printf("%s (snap) ", atoi(snaps) - 1);
         return;
     }
     
@@ -245,8 +246,9 @@ void packages() {       // prints the number of installed packages
         printf("%s (apt) ", packages);
         if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
+        
         if(snaps[0] != '0')
-            printf("%s (snap) ", snaps);
+            printf("%s (snap) ", atoi(snaps) - 1);
         return;
     }
 
@@ -273,15 +275,17 @@ void packages() {       // prints the number of installed packages
         printf("%s (rpm) ", packages);
         if(flatpaks[0] != '0')
             printf("%s (flatpak) ", flatpaks);
+        
         if(snaps[0] != '0')
-            printf("%s (snap) ", snaps);
+            printf("%s (snap) ", atoi(snaps) - 1);
         return;
     }
 
     if(flatpaks[0] != '0') {
         printf("%s (flatpak)", flatpaks);
+        
         if(snaps[0] != '0')
-            printf("%s (snap) ", snaps);
+            printf("%s (snap) ", atoi(snaps) - 1);
         return;
     }
     
