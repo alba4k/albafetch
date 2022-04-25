@@ -96,19 +96,28 @@ int main(const int argc, char **argv) {
     }
 
     void (* infos[])() = {
-        title, separator, 
-        uptime, separator, 
-        os, kernel, desktop, 
-        shell, term, packages, 
-        separator, host, cpu,
-        gpu, memory
+        title,
+        separator,
+        uptime,
+        separator, 
+        os,
+        kernel,
+        desktop, 
+        shell,
+        term,
+        packages, 
+        separator,
+        host,
+        cpu,
+        gpu,
+        memory,
     };
 
     // The following line works because infos is declared on the stack,
     // so sizeof returns it's real size and not the size of a pointer.
     size_t info_lines = sizeof(infos) / sizeof(infos[0]);
 
-    for (size_t i = 0; i < info_lines; ++i) {
+    for (size_t i = 0; i < info_lines; i++) {
         line = printLogo(line);
         infos[i]();
     }
