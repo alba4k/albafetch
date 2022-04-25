@@ -4,11 +4,12 @@
 
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
+#include <pwd.h>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
 
 #include <stdio.h>      
-#include <ifaddrs.h>
 #include <string.h> 
-#include <arpa/inet.h>
 
 #include "info.h"
 #include "config.h"
@@ -21,23 +22,13 @@ void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX);
     
-    static char username[LOGIN_NAME_MAX + 1] = "";
-    getlogin_r(username, LOGIN_NAME_MAX);
-    if(!username[0]) {
-        int pipes[2];
-        pipe(pipes);
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    struct passwd *pw;
+    uid_t uid = geteuid();
 
-            execlp("whoami", "whoami", NULL);
-        }
-        wait(NULL);
-        close(pipes[1]);
-
-        username[read(pipes[0], username, LOGIN_NAME_MAX) - 1] = 0;
-        close(pipes[0]);
-    }
+    pw = uid == -1 && 0 ? NULL : getpwuid(uid);
+    if(!pw)
+        fputs("[Not Found]", stdout);
+    char *username = pw->pw_name;
 
     printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", username, color, bold, hostname);
 }
@@ -50,25 +41,16 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 }
 
 void user() {           // get the current login
-    static char username[LOGIN_NAME_MAX + 1] = "";
-    getlogin_r(username, LOGIN_NAME_MAX);
-    if(!username[0]) {
-        int pipes[2];
-        pipe(pipes);
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    printf("%-16s\e[0m\e[97m", USER_LABEL DASH_COLOR DASH);
 
-            execlp("whoami", "whoami", NULL);
-        }
-        wait(NULL);
-        close(pipes[1]);
+    struct passwd *pw;
+    uid_t uid = geteuid();
 
-        username[read(pipes[0], username, LOGIN_NAME_MAX) - 1] = 0;
-
-        close(pipes[0]);
-    }
-    printf("%-16s\e[0m\e[97m %s", USER_LABEL DASH_COLOR DASH, username);
+    pw = uid == -1 && 0 ? NULL : getpwuid(uid);
+    if(!pw)
+        fputs("[Not Found]", stdout);
+    char *username = pw->pw_name;
+    fputs(username, stdout);
 }
 
 void uptime() {         // prints the uptime
@@ -100,6 +82,8 @@ void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
 
+    printf("%-16s\e[0m\e[97m", OS_LABEL DASH_COLOR DASH);
+
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
         fputs("[Not Found]", stdout);
@@ -128,7 +112,7 @@ void os() {             // prints the os name + arch
     }
     *end = 0;
 
-    printf("%-16s\e[0m\e[97m%s %s", OS_LABEL DASH_COLOR DASH, os_name, name.machine);
+    printf("%s %s", os_name, name.machine);
 
     fclose(fp);
     free(str);
@@ -278,6 +262,8 @@ void packages() {       // prints the number of installed packages
 }
 
 void host() {           // prints the current host machine
+    printf("%-16s\e[0m\e[97m", HOST_LABEL DASH_COLOR DASH);
+
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fputs("[Not Found]", stdout);
@@ -289,7 +275,7 @@ void host() {           // prints the current host machine
 
     fclose(fp);
 
-    printf("%-16s\e[0m\e[97m%s", HOST_LABEL DASH_COLOR DASH, model);
+    printf("%s", model);
 
 }
 
@@ -382,7 +368,8 @@ void cpu() {            // prints the current CPU
 }
 
 void gpu() {            // prints the current GPU
-    printf("%-16s\e[0m\e[97m%s", GPU_LABEL DASH_COLOR DASH, GPU);
+    printf("%-16s\e[0m\e[97m", GPU_LABEL DASH_COLOR DASH);
+    printf("%s", GPU);
 }
 
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
@@ -440,17 +427,17 @@ void memory() {         // prints the used memory in the format used MiB / total
 }
 
 void public_ip() {      // get the public IP adress
-    char public_ip[20];
+    printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
 
+    char public_ip[20];
     int pipes[2];
+
     pipe(pipes);
     if(!fork()) {
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
         execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
-    } else {
-        printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -463,6 +450,8 @@ void public_ip() {      // get the public IP adress
 }
 
 void local_ip() {      // get the local IP adress
+    printf("%-16s\e[0m\e[97m", PRIV_IP_LABEL DASH_COLOR DASH);
+
     struct ifaddrs *ifAddrStruct=NULL;
     struct ifaddrs *ifa=NULL;
     
@@ -480,7 +469,7 @@ void local_ip() {      // get the local IP adress
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
             if(strcmp(addressBuffer, "127.0.0.1")) 
-                printf("%-16s\e[0m\e[97m%s", PRIV_IP_LABEL DASH_COLOR DASH, addressBuffer);
+                printf("%s", addressBuffer);
         }
     } 
 }
