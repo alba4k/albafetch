@@ -214,11 +214,11 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%s (pacman) ", packages);
+        printf("%s (pacman)", packages);
         if(flatpaks[0] != '0')
-            printf("%s (flatpak) ", flatpaks);
+            printf(", %s (flatpak)", flatpaks);
         if(snaps[0] != '0')
-            printf("%d (snap) ", atoi(snaps) - 1);
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
     
@@ -242,11 +242,11 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%s (apt) ", packages);
+        printf("%s (apt)", packages);
         if(flatpaks[0] != '0')
-            printf("%s (flatpak) ", flatpaks);
+            printf(", %s (flatpak)", flatpaks);
         if(snaps[0] != '0')
-            printf("%d (snap) ", atoi(snaps) - 1);
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
 
@@ -270,25 +270,25 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%s (rpm) ", packages);
+        printf(", %s (rpm)", packages);
         if(flatpaks[0] != '0')
-            printf("%s (flatpak) ", flatpaks);
+            printf(", %s (flatpak)", flatpaks);
         if(snaps[0] != '0')
-            printf("%d (snap) ", atoi(snaps) - 1);
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
 
     if(flatpaks[0] != '0') {
         printf("%s (flatpak)", flatpaks);
         if(snaps[0] != '0')
-            printf("%d (snap) ", atoi(snaps) - 1);
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
     
     if(snaps[0] != '0')
-        printf("%s (snap) ", snaps);
+        printf("%s (snap)", snaps);
         return;
-    
+
     fputs("[Unsupported]", stdout);
 }
 
