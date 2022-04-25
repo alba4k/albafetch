@@ -102,7 +102,7 @@ void os() {             // prints the os name + arch
 
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
-        fputs("[Missing /etc/os-release]", stderr);
+        fputs("[Not Found]", stdout);
         printf(" %s", name.machine);
         fclose(fp);
         return;
@@ -138,7 +138,7 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fputs("[Bad Format]", stdout);
         printf(" %s", name.machine);
         fclose(fp);
         free(str);
@@ -274,13 +274,13 @@ void packages() {       // prints the number of installed packages
         return;
     }
     
-    fprintf(stderr, "[Unsupported]");
+    fputs("[Unsupported]", stdout);
 }
 
 void host() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
-        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
+        fputs("[Not Found]", stdout);
         return;
     }
 
@@ -299,7 +299,7 @@ void bios() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
+        fputs("[Not Found]", stdout);
         return;
     }
 
@@ -312,7 +312,7 @@ void bios() {           // prints the current host machine
 
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
+        fputs("[Not Found]", stdout);
         return;
     }
 
@@ -329,7 +329,7 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
-        fputs("[Missing /proc/cpuinfo]", stderr);
+        fputs("[Not Found]", stderr);
         return;
     }
 
@@ -375,7 +375,7 @@ void cpu() {            // prints the current CPU
     return;
 
     error:
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fputs("[Bad Format]", stdout);
         fclose(fp);
         free(str);
         return;
@@ -399,7 +399,7 @@ void memory() {         // prints the used memory in the format used MiB / total
 
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
-        fputs("[Missing /proc/meminfo]", stderr);
+        fputs("[Not Found]", stdout);
         fclose(fp);
         return;
     }
@@ -433,7 +433,7 @@ void memory() {         // prints the used memory in the format used MiB / total
     return;
 
     error:
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fputs("[Bad Format]", stdout);
         fclose(fp);
         free(str);
         return;
