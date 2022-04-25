@@ -26,8 +26,12 @@ void title() {          // prints a title in the format user@hostname
     uid_t uid = geteuid();
 
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
-    if(!pw)
-        fputs("[Not Found]", stdout);
+    if(!pw) {
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
+        return;
+    }
     char *username = pw->pw_name;
 
     printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", username, color, bold, hostname);
@@ -47,8 +51,11 @@ void user() {           // get the current login
     uid_t uid = geteuid();
 
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
-    if(!pw)
-        fputs("[Not Found]", stdout);
+    if(!pw) {
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
+    }
     char *username = pw->pw_name;
     fputs(username, stdout);
 }
@@ -86,7 +93,9 @@ void os() {             // prints the os name + arch
 
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
-        fputs("[Not Found]", stdout);
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
         printf(" %s", name.machine);
         fclose(fp);
         return;
@@ -122,7 +131,9 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("[Bad Format]", stdout);
+        fflush(stdout);
+        fputs("[Bad Format]", stderr);
+        fflush(stderr);
         printf(" %s", name.machine);
         fclose(fp);
         free(str);
@@ -289,7 +300,9 @@ void packages() {       // prints the number of installed packages
         printf("%s (snap)", snaps);
         return;
 
-    fputs("[Unsupported]", stdout);
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
 }
 
 void host() {           // prints the current host machine
@@ -297,7 +310,9 @@ void host() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
-        fputs("[Not Found]", stdout);
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
         return;
     }
 
@@ -316,7 +331,9 @@ void bios() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
-        fputs("[Not Found]", stdout);
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
         return;
     }
 
@@ -329,7 +346,9 @@ void bios() {           // prints the current host machine
 
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
-        fputs("[Not Found]", stdout);
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
         return;
     }
 
@@ -392,7 +411,9 @@ void cpu() {            // prints the current CPU
     return;
 
     error:
-        fputs("[Bad Format]", stdout);
+        fflush(stdout);
+        fputs("[Bad Format]", stderr);
+        fflush(stderr);
         fclose(fp);
         free(str);
         return;
@@ -417,7 +438,9 @@ void memory() {         // prints the used memory in the format used MiB / total
 
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
-        fputs("[Not Found]", stdout);
+        fflush(stdout);
+        fputs("[Not Found]", stderr);
+        fflush(stderr);
         fclose(fp);
         return;
     }
@@ -451,7 +474,9 @@ void memory() {         // prints the used memory in the format used MiB / total
     return;
 
     error:
-        fputs("[Bad Format]", stdout);
+        fflush(stdout);
+        fputs("[Bad Format]", stderr);
+        fflush(stderr);
         fclose(fp);
         free(str);
         return;
