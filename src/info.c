@@ -4,11 +4,12 @@
 
 #include <sys/sysinfo.h>
 #include <sys/utsname.h>
+#include <pwd.h>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
 
 #include <stdio.h>      
-#include <ifaddrs.h>
 #include <string.h> 
-#include <arpa/inet.h>
 
 #include "info.h"
 #include "config.h"
@@ -21,23 +22,13 @@ void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX);
     
-    static char username[LOGIN_NAME_MAX + 1] = "";
-    getlogin_r(username, LOGIN_NAME_MAX);
-    if(!username[0]) {
-        int pipes[2];
-        pipe(pipes);
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    struct passwd *pw;
+    uid_t uid = geteuid();
 
-            execlp("whoami", "whoami", NULL);
-        }
-        wait(NULL);
-        close(pipes[1]);
-
-        username[read(pipes[0], username, LOGIN_NAME_MAX) - 1] = 0;
-        close(pipes[0]);
-    }
+    pw = uid == -1 && 0 ? NULL : getpwuid(uid);
+    if(!pw)
+        fputs("[Not Found]", stdout);
+    char *username = pw->pw_name;
 
     printf("%s\e[0m\e[97m@%s%s%s\e[0m\e[97m", username, color, bold, hostname);
 }
@@ -50,25 +41,16 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 }
 
 void user() {           // get the current login
-    static char username[LOGIN_NAME_MAX + 1] = "";
-    getlogin_r(username, LOGIN_NAME_MAX);
-    if(!username[0]) {
-        int pipes[2];
-        pipe(pipes);
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    printf("%-16s\e[0m\e[97m", USER_LABEL DASH_COLOR DASH);
 
-            execlp("whoami", "whoami", NULL);
-        }
-        wait(NULL);
-        close(pipes[1]);
+    struct passwd *pw;
+    uid_t uid = geteuid();
 
-        username[read(pipes[0], username, LOGIN_NAME_MAX) - 1] = 0;
-
-        close(pipes[0]);
-    }
-    printf("%-16s\e[0m\e[97m %s", USER_LABEL DASH_COLOR DASH, username);
+    pw = uid == -1 && 0 ? NULL : getpwuid(uid);
+    if(!pw)
+        fputs("[Not Found]", stdout);
+    char *username = pw->pw_name;
+    fputs(username, stdout);
 }
 
 void uptime() {         // prints the uptime
@@ -100,9 +82,11 @@ void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
 
+    printf("%-16s\e[0m\e[97m", OS_LABEL DASH_COLOR DASH);
+
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
-        fputs("[Missing /etc/os-release]", stderr);
+        fputs("[Not Found]", stdout);
         printf(" %s", name.machine);
         fclose(fp);
         return;
@@ -128,7 +112,7 @@ void os() {             // prints the os name + arch
     }
     *end = 0;
 
-    printf("%-16s\e[0m\e[97m%s %s", OS_LABEL DASH_COLOR DASH, os_name, name.machine);
+    printf("%s %s", os_name, name.machine);
 
     fclose(fp);
     free(str);
@@ -138,7 +122,7 @@ void os() {             // prints the os name + arch
     return;
 
     error:
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fputs("[Bad Format]", stdout);
         printf(" %s", name.machine);
         fclose(fp);
         free(str);
@@ -167,8 +151,9 @@ void term() {           // prints the current terminal
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
-    char packages[10];
-    char flatpaks[10];
+    char packages[10] = "";
+    char flatpaks[10] = "";
+    char snaps[10] = "";
 
     int pipes[2];
     int pipes2[2];
@@ -199,6 +184,24 @@ void packages() {       // prints the number of installed packages
         close(pipes2[0]);
         dup2(pipes2[1], STDERR_FILENO);
 
+        execlp("sh", "sh", "-c", "snap list | wc -l", NULL);        // using flatpak to list packages
+    }
+    wait(NULL);
+    close(pipes[1]);
+    close(pipes2[0]);
+    close(pipes2[1]);
+
+    //size_t len = read(pipes[0], packages, 10);
+    flatpaks[read(pipes[0], snaps, 10) - 2] = 0;
+
+    pipe(pipes);
+    pipe(pipes2);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+        close(pipes2[0]);
+        dup2(pipes2[1], STDERR_FILENO);
+
         execlp("sh", "sh", "-c", "pacman -Qq | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
     }
     wait(NULL);
@@ -211,9 +214,11 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%s (pacman) ", packages);
+        printf("%s (pacman)", packages);
         if(flatpaks[0] != '0')
-            printf("%s (flatpak) ", flatpaks);
+            printf(", %s (flatpak)", flatpaks);
+        if(snaps[0] != '0')
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
     
@@ -237,9 +242,11 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%s (apt) ", packages);
+        printf("%s (apt)", packages);
         if(flatpaks[0] != '0')
-            printf("%s (flatpak) ", flatpaks);
+            printf(", %s (flatpak)", flatpaks);
+        if(snaps[0] != '0')
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
 
@@ -263,24 +270,34 @@ void packages() {       // prints the number of installed packages
 
     close(pipes[0]);
     if(packages[0] != '0') {
-        printf("%s (rpm) ", packages);
+        printf(", %s (rpm)", packages);
         if(flatpaks[0] != '0')
-            printf("%s (flatpak) ", flatpaks);
+            printf(", %s (flatpak)", flatpaks);
+        if(snaps[0] != '0')
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
 
     if(flatpaks[0] != '0') {
         printf("%s (flatpak)", flatpaks);
+        if(snaps[0] != '0')
+            printf(", %d (snap)", atoi(snaps) - 1);
         return;
     }
     
-    fprintf(stderr, "[Unsupported]");
+    if(snaps[0] != '0')
+        printf("%s (snap)", snaps);
+        return;
+
+    fputs("[Unsupported]", stdout);
 }
 
 void host() {           // prints the current host machine
+    printf("%-16s\e[0m\e[97m", HOST_LABEL DASH_COLOR DASH);
+
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
-        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
+        fputs("[Not Found]", stdout);
         return;
     }
 
@@ -289,7 +306,7 @@ void host() {           // prints the current host machine
 
     fclose(fp);
 
-    printf("%-16s\e[0m\e[97m%s", HOST_LABEL DASH_COLOR DASH, model);
+    printf("%s", model);
 
 }
 
@@ -299,7 +316,7 @@ void bios() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
+        fputs("[Not Found]", stdout);
         return;
     }
 
@@ -312,7 +329,7 @@ void bios() {           // prints the current host machine
 
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
+        fputs("[Not Found]", stdout);
         return;
     }
 
@@ -329,7 +346,7 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
-        fputs("[Missing /proc/cpuinfo]", stderr);
+        fputs("[Not Found]", stderr);
         return;
     }
 
@@ -375,14 +392,15 @@ void cpu() {            // prints the current CPU
     return;
 
     error:
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fputs("[Bad Format]", stdout);
         fclose(fp);
         free(str);
         return;
 }
 
 void gpu() {            // prints the current GPU
-    printf("%-16s\e[0m\e[97m%s", GPU_LABEL DASH_COLOR DASH, GPU);
+    printf("%-16s\e[0m\e[97m", GPU_LABEL DASH_COLOR DASH);
+    printf("%s", GPU);
 }
 
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
@@ -399,7 +417,7 @@ void memory() {         // prints the used memory in the format used MiB / total
 
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
-        fputs("[Missing /proc/meminfo]", stderr);
+        fputs("[Not Found]", stdout);
         fclose(fp);
         return;
     }
@@ -433,24 +451,24 @@ void memory() {         // prints the used memory in the format used MiB / total
     return;
 
     error:
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fputs("[Bad Format]", stdout);
         fclose(fp);
         free(str);
         return;
 }
 
 void public_ip() {      // get the public IP adress
-    char public_ip[20];
+    printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
 
+    char public_ip[20];
     int pipes[2];
+
     pipe(pipes);
     if(!fork()) {
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
         execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
-    } else {
-        printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
     }
     wait(NULL);
     close(pipes[1]);
@@ -463,6 +481,8 @@ void public_ip() {      // get the public IP adress
 }
 
 void local_ip() {      // get the local IP adress
+    printf("%-16s\e[0m\e[97m", PRIV_IP_LABEL DASH_COLOR DASH);
+
     struct ifaddrs *ifAddrStruct=NULL;
     struct ifaddrs *ifa=NULL;
     
@@ -480,7 +500,7 @@ void local_ip() {      // get the local IP adress
             char addressBuffer[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
             if(strcmp(addressBuffer, "127.0.0.1")) 
-                printf("%-16s\e[0m\e[97m%s", PRIV_IP_LABEL DASH_COLOR DASH, addressBuffer);
+                printf("%s", addressBuffer);
         }
     } 
 }

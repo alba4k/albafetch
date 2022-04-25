@@ -6,11 +6,11 @@
 // just remember to add them to --logo and --help in src/main.c
 
 static char *logos[][32] = {
-    {  
-        "linux",
-        "\e[90m",
-        "                     ",
-        "\e[90m        #####        ",
+    {                                   // every logo needs to follow the following scheme:
+        "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
+        "\e[90m",                                               // default color for the printed text
+        "                     ",                                // numbers of spaces to use when ran out of logo space
+        "\e[90m        #####        ",                          // just the logo
         "\e[90m       #######       ",
         "\e[90m       ##\e[97mO\e[90m#\e[97mO\e[90m##       ",
         "\e[90m       #\e[33m#####\e[90m#       ",
@@ -22,12 +22,12 @@ static char *logos[][32] = {
         "\e[33m######\e[90m#\e[97m#######\e[90m#\e[33m######",
         "\e[33m#######\e[90m#\e[97m#####\e[90m#\e[33m#######",
         "\e[33m  #####\e[90m#######\e[33m#####  ",
-        ""
+        ""                                                      // an empty string concludes the logo, to know when it should stop printing
     },
     {
-        "arch",                                         // this line defines the name of the logo
-        "\e[36m",                                       // this line defines the default text color 
-        "                                     ",        // this line is just spaces. This line is printed when there is more line than text
+        "arch",
+        "\e[36m",
+        "                                     ",
         "\e[36m                   -`                 ",
         "\e[36m                  .o+`                ",
         "\e[36m                 `ooo/                ",
@@ -47,7 +47,7 @@ static char *logos[][32] = {
         "\e[36m  `+sso+:-`                 `.-/+oso: ",
         "\e[36m `++:.                           `-/+/",
         "\e[36m .`                                 `/",
-        ""                                               // last line is 0 to know when to stop printing
+        ""
     },
     {
         "debian",
@@ -118,7 +118,34 @@ static char *logos[][32] = {
         "\e[34m  `:::::::::::::::::::::::::------``    ",
         ""
     },
+    {
+        "ubuntu",
+        "\e[31m",
+        "                                        ",
+        "\e[31m            .-/+oossssoo+/-.            ",
+        "\e[31m        `:+ssssssssssssssssss+:`        ",
+        "\e[31m      -+ssssssssssssssssssyyssss+-      ",
+        "\e[31m    .ossssssssssssssssss\e[97mdMMMNy\e[31msssso.    ",
+        "\e[31m   /sssssssssss\e[97mhdmmNNmmyNMMMMh\e[31mssssss/   ",
+        "\e[31m  +sssssssss\e[97mhm\e[31myd\e[97mMMMMMMMNddddy\e[31mssssssss+  ",
+        "\e[31m /ssssssss\e[97mhNMMM\e[31myh\e[97mhyyyyhmNMMMNh\e[31mssssssss/ ",
+        "\e[31m.ssssssss\e[97mdMMMNh\e[31mssssssssss\e[97mhNMMMd\e[31mssssssss.",
+        "\e[31m+ssss\e[97mhhhyNMMNy\e[31mssssssssssss\e[97myNMMMy\e[31msssssss+",
+        "\e[31moss\e[97myNMMMNyMMh\e[31mssssssssssssss\e[97mhmmmh\e[31mssssssso",
+        "\e[31moss\e[97myNMMMNyMMh\e[31msssssssssssssshmmmhssssssso",
+        "\e[31m+ssss\e[97mhhhyNMMNy\e[31mssssssssssss\e[97myNMMMy\e[31msssssss+",
+        "\e[31m.ssssssss\e[97mdMMMNh\e[31mssssssssss\e[97mhNMMMd\e[31mssssssss.",
+        "\e[31m /ssssssss\e[97mhNMMM\e[31myh\e[97mhyyyyhdNMMMNh\e[31mssssssss/ ",
+        "\e[31m  +sssssssss\e[97mdm\e[31myd\e[97mMMMMMMMMddddy\e[31mssssssss+  ",
+        "\e[31m   /sssssssssss\e[97mhdmNNNNmyNMMMMh\e[31mssssss/   ",
+        "\e[31m    .ossssssssssssssssss\e[97mdMMMNy\e[31msssso.    ",
+        "\e[31m      -+sssssssssssssssss\e[97myyy\e[31mssss+-      ",
+        "\e[31m        `:+ssssssssssssssssss+:`        ",
+        "\e[31m            .-/+oossssoo+/-.            ",
+        ""
+    },
 };
+
 extern char *color;
 extern char *bold;
 
