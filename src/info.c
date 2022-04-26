@@ -2,7 +2,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#ifdef __linux__
 #include <sys/sysinfo.h>
+#else
+#include <sys/sysctl.h>
+#endif
 #include <sys/utsname.h>
 
 #include <stdio.h>      
@@ -12,6 +16,15 @@
 
 #include "info.h"
 #include "config.h"
+
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#endif
+
+// Not sure if this 
+#ifndef LOGIN_NAME_MAX
+#define LOGIN_NAME_MAX HOST_NAME_MAX
+#endif
 
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
@@ -71,11 +84,44 @@ void user() {           // get the current login
     printf("%-16s\e[0m\e[97m %s", USER_LABEL DASH_COLOR DASH, username);
 }
 
-void uptime() {         // prints the uptime
+#ifdef __APPLE__
+static long macos_uptime() {
+    struct timeval boottime;
+    size_t len = sizeof(boottime);
+    int mib[] = { CTL_KERN, KERN_BOOTTIME };
+
+    int error = sysctl(mib, 2, &boottime, &len, NULL, 0);
+
+    if (error < 0)
+        return -1;
+
+    time_t boot_seconds = boottime.tv_sec;
+    time_t current_seconds = time(NULL);
+
+    return (long) difftime(current_seconds, boot_seconds);
+
+}
+#endif
+
+#ifdef __linux__
+static long linux_uptime() {
     struct sysinfo info;
     sysinfo(&info);
 
-    long secs = info.uptime;            // total uptime in seconds
+    return info.uptime;
+}
+#endif
+
+void uptime() {         // prints the uptime
+    long uptime;  
+
+#ifdef __linux    
+    uptime = linux_uptime();
+#else
+    uptime = macos_uptime();
+#endif
+
+    long secs = uptime;            // total uptime in seconds
     long days = secs/86400;
     char hours = secs/3600 - days*24;
     char mins = secs/60 - days*1440 - hours*60;
