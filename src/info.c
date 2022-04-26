@@ -45,6 +45,8 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 }
 
 void user() {           // get the current login
+    // imagine stealing code from whoami, couldn't be me
+
     printf("%-16s\e[0m\e[97m", USER_LABEL DASH_COLOR DASH);
 
     struct passwd *pw;
@@ -162,9 +164,9 @@ void term() {           // prints the current terminal
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
-    char packages[10] = "";
-    char flatpaks[10] = "";
-    char snaps[10] = "";
+    char packages[10];
+    char flatpaks[10];
+    char snaps[10];
 
     int pipes[2];
     int pipes2[2];
@@ -203,7 +205,7 @@ void packages() {       // prints the number of installed packages
     close(pipes2[1]);
 
     //size_t len = read(pipes[0], packages, 10);
-    flatpaks[read(pipes[0], snaps, 10) - 2] = 0;
+    snaps[read(pipes[0], snaps, 10) - 1] = 0;
 
     pipe(pipes);
     pipe(pipes2);
