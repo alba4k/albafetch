@@ -2,11 +2,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#ifdef __linux__
-#include <sys/sysinfo.h>
+#ifdef __APPLE__
+#include "bsdwrap.h"
+#include "macos_infos.h"
 #else
-#include <sys/sysctl.h>
+#include <sys/sysinfo.h>
 #endif
+
 #include <sys/utsname.h>
 
 #include <stdio.h>      
@@ -86,20 +88,18 @@ void user() {           // get the current login
 
 #ifdef __APPLE__
 static long macos_uptime() {
-    struct timeval boottime;
-    size_t len = sizeof(boottime);
-    int mib[] = { CTL_KERN, KERN_BOOTTIME };
 
-    int error = sysctl(mib, 2, &boottime, &len, NULL, 0);
+    struct timeval boottime;
+    int error;
+    error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
     if (error < 0)
-        return -1;
+        return 0;
 
     time_t boot_seconds = boottime.tv_sec;
     time_t current_seconds = time(NULL);
 
     return (long) difftime(current_seconds, boot_seconds);
-
 }
 #endif
 
@@ -429,6 +429,21 @@ void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[97m%s", GPU_LABEL DASH_COLOR DASH, GPU);
 }
 
+#ifdef __APPLE__ 
+void memory() {
+
+    bytes_t usedram = used_mem_size();
+    bytes_t totalram = system_mem_size();
+
+    if (usedram == 0 || totalram == 0) {
+        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        return;
+    }
+
+    printf("%llu MiB / %llu MiB (%llu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
+    return;
+}
+#else
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
     struct sysinfo info;
     sysinfo(&info);
@@ -482,6 +497,7 @@ void memory() {         // prints the used memory in the format used MiB / total
         free(str);
         return;
 }
+#endif
 
 void public_ip() {      // get the public IP adress
     char public_ip[20];
