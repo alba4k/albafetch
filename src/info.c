@@ -150,7 +150,6 @@ void os() {             // prints the os name + arch
     if(!fp) {
         fputs("[Missing /etc/os-release]", stderr);
         printf(" %s", name.machine);
-        fclose(fp);
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -206,6 +205,7 @@ void term() {           // prints the current terminal
     printf("%-16s\e[0m\e[97m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
 }
 
+#ifndef __APPLE__
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
@@ -318,16 +318,22 @@ void packages() {       // prints the number of installed packages
     
     fprintf(stderr, "[Unsupported]");
 }
+#else
+void packages() {
+    fprintf(stderr, "Not implemented yet.");
+}
+#endif
 
 void host() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
-        fclose(fp);
         return;
     }
-    char *model = malloc(128);
-    model[fread(model, 1, 0x10000, fp) - 1] = 0;
+
+    size_t alloc_size = 128;
+    char *model = malloc(alloc_size);
+    model[fread(model, 1, alloc_size, fp) - 1] = 0;
 
     fclose(fp);
 
@@ -343,25 +349,25 @@ void bios() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
-        fclose(fp);
         return;
     }
 
-    char *vendor = malloc(128);
-    vendor[fread(vendor, 1, 0x10000, fp) - 1] = 0;
+    size_t alloc_size = 128;
+    char *vendor = malloc(alloc_size);
+    vendor[fread(vendor, 1, alloc_size, fp) - 1] = 0;
 
     printf("%s", vendor);
     free(vendor);
 
+    fclose(fp);
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
         fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
-        fclose(fp);
         return;
     }
 
-    char *version = malloc(128);
-    version[fread(version, 1, 0x10000, fp) - 1] = 0;
+    char *version = malloc(alloc_size);
+    version[fread(version, 1, alloc_size, fp) - 1] = 0;
 
     printf(" %s", version);
     free(version);
@@ -375,7 +381,6 @@ void cpu() {            // prints the current CPU
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
         fputs("[Missing /proc/cpuinfo]", stderr);
-        fclose(fp);
         return;
     }
     char *str = malloc(0x10000);
@@ -453,13 +458,12 @@ void memory() {         // prints the used memory in the format used MiB / total
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
     unsigned long bufferram = info.bufferram / 1024;
-    char used_str[15];
     char *str = malloc(0x1000);
 
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
         fputs("[Missing /proc/meminfo]", stderr);
-        fclose(fp);
+        free(str);
         return;
     }
     str[fread(str, 1, 0x1000, fp)] = 0;

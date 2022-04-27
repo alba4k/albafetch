@@ -102,7 +102,6 @@ int main(const int argc, char **argv) {
     if(!logo) {
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
-            fclose(fp);
             return -1;
         }
         fseek(fp, 0, SEEK_END);

@@ -1,11 +1,11 @@
 #ifndef LOGOS_H
 #define LOGOS_H
 
-// all logos should end wih a \0
+// all logos should end with a \0
 // add more, i couldn't care less
 // just remember to add them to --logo and --help in src/main.c
 
-static char *archlinux[] = {
+static const char *archlinux[] = {
     "\e[36m",                                   // this line defines the default text color 
     "                                     ",    // this line is just spaces. This line is printed when there is more line than text
     "\e[36m                   -`                 ",
@@ -30,7 +30,7 @@ static char *archlinux[] = {
     0                                           // last line is 0 to know when to spo printing
 };
 
-static char *debian[] = {  
+static const char *debian[] = {  
     "\e[31m",
     "                            ",
     "\e[31m       _,met$$$$$gg.        ",
@@ -53,7 +53,7 @@ static char *debian[] = {
     0
 };
 
-static char *linuxmint[] = {
+static const char *linuxmint[] = {
     "\e[32m",
     "                                        ",
     "\e[97m             ...-:::::-...              ",
@@ -78,7 +78,7 @@ static char *linuxmint[] = {
     0
 };
 
-static char *generic[] = {  
+static const char *generic[] = {  
     "\e[90m",
     "                     ",
     "\e[90m        #####        ",
