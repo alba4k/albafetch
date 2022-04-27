@@ -42,7 +42,11 @@
 // static char *color = "\e[31m";   // set red as default color
 // static char *bold = "\e[1m";     // use bold. leave "" to turn the bold off 
 
+<<<<<<< HEAD
 static char **logo = NULL;          // use NULL for OS default
+=======
+static char **logo = archlinux;     // use NULL for OS default 
+>>>>>>> 4deeaa2 (Build now has output)
 #define DEFAULT_COLOR NULL          // use NULL for logo default
 #define DEFAULT_BOLD "\e[1m"        // use "" to turn off
 

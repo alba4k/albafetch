@@ -145,7 +145,6 @@ void os() {             // prints the os name + arch
         fputs("[Not Found]", stderr);
         fflush(stderr);
         printf(" %s", name.machine);
-        fclose(fp);
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -207,6 +206,7 @@ void term() {           // prints the current terminal
     printf("%-16s\e[0m\e[97m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
 }
 
+#ifndef __APPLE__
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
@@ -352,12 +352,18 @@ void packages() {       // prints the number of installed packages
     fputs("[Unsupported]", stderr);
     fflush(stderr);
 }
+#else
+void packages() {
+    fprintf(stderr, "Not implemented yet.");
+}
+#endif
 
 void host() {           // prints the current host machine
     printf("%-16s\e[0m\e[97m", HOST_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
+<<<<<<< HEAD
         fflush(stdout);
         fputs("[Not Found]", stderr);
         fflush(stderr);
@@ -366,6 +372,15 @@ void host() {           // prints the current host machine
 
     char model[128];
     model[fread(model, 1, 128, fp) - 1] = 0;
+=======
+        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
+        return;
+    }
+
+    size_t alloc_size = 128;
+    char *model = malloc(alloc_size);
+    model[fread(model, 1, alloc_size, fp) - 1] = 0;
+>>>>>>> 4deeaa2 (Build now has output)
 
     fclose(fp);
 
@@ -379,6 +394,7 @@ void bios() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
+<<<<<<< HEAD
         fflush(stdout);
         fputs("[Not Found]", stderr);
         fflush(stderr);
@@ -389,11 +405,22 @@ void bios() {           // prints the current host machine
     vendor[fread(vendor, 1, 128, fp) - 1] = 0;
 
     fclose(fp);
+=======
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
+        return;
+    }
+
+    size_t alloc_size = 128;
+    char *vendor = malloc(alloc_size);
+    vendor[fread(vendor, 1, alloc_size, fp) - 1] = 0;
+>>>>>>> 4deeaa2 (Build now has output)
 
     printf("%s", vendor);
 
+    fclose(fp);
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
+<<<<<<< HEAD
         fflush(stdout);
         fputs("[Not Found]", stderr);
         fflush(stderr);
@@ -402,6 +429,14 @@ void bios() {           // prints the current host machine
 
     char version[128];
     version[fread(version, 1, 128, fp) - 1] = 0;
+=======
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
+        return;
+    }
+
+    char *version = malloc(alloc_size);
+    version[fread(version, 1, alloc_size, fp) - 1] = 0;
+>>>>>>> 4deeaa2 (Build now has output)
 
     printf(" %s", version);
 
@@ -413,7 +448,11 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
+<<<<<<< HEAD
         fputs("[Not Found]", stderr);
+=======
+        fputs("[Missing /proc/cpuinfo]", stderr);
+>>>>>>> 4deeaa2 (Build now has output)
         return;
     }
 
@@ -496,15 +535,19 @@ void memory() {         // prints the used memory in the format used MiB / total
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
     unsigned long bufferram = info.bufferram / 1024;
-    char used_str[15];
     char *str = malloc(0x1000);
 
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
+<<<<<<< HEAD
         fflush(stdout);
         fputs("[Not Found]", stderr);
         fflush(stderr);
         fclose(fp);
+=======
+        fputs("[Missing /proc/meminfo]", stderr);
+        free(str);
+>>>>>>> 4deeaa2 (Build now has output)
         return;
     }
     str[fread(str, 1, 0x1000, fp)] = 0;
