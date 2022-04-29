@@ -41,4 +41,4 @@ run: $(OBJ)
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) && build/$(TARGET)
 
 clean:
-	rm -r build/* test *.o
+	rm -rf build test *.o

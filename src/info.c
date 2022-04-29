@@ -352,17 +352,11 @@ void packages() {       // prints the number of installed packages
     fputs("[Unsupported]", stderr);
     fflush(stderr);
 }
+
 #else
 void packages() {
-    fprintf(stderr, "Not implemented yet.");
+    fprintf(stderr, "[Not implemented yet]");
 }
-<<<<<<< HEAD
-=======
-#else
-void packages() {
-    fprintf(stderr, "Not implemented yet.");
-}
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
 #endif
 
 void host() {           // prints the current host machine
@@ -370,28 +364,15 @@ void host() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
-<<<<<<< HEAD
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
         fflush(stderr);
         return;
     }
 
     char model[128];
     model[fread(model, 1, 128, fp) - 1] = 0;
-=======
-        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
-        return;
-    }
-
-    size_t alloc_size = 128;
-    char *model = malloc(alloc_size);
-    model[fread(model, 1, alloc_size, fp) - 1] = 0;
-<<<<<<< HEAD
->>>>>>> 4deeaa2 (Build now has output)
-=======
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
-
+    
     fclose(fp);
 
     printf("%s", model);
@@ -404,9 +385,8 @@ void bios() {           // prints the current host machine
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
-<<<<<<< HEAD
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
         fflush(stderr);
         return;
     }
@@ -414,45 +394,19 @@ void bios() {           // prints the current host machine
     char vendor[128];
     vendor[fread(vendor, 1, 128, fp) - 1] = 0;
 
-    fclose(fp);
-=======
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
-        return;
-    }
-
-    size_t alloc_size = 128;
-    char *vendor = malloc(alloc_size);
-    vendor[fread(vendor, 1, alloc_size, fp) - 1] = 0;
-<<<<<<< HEAD
->>>>>>> 4deeaa2 (Build now has output)
-=======
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
-
     printf("%s", vendor);
 
     fclose(fp);
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
-<<<<<<< HEAD
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
         fflush(stderr);
         return;
     }
 
     char version[128];
     version[fread(version, 1, 128, fp) - 1] = 0;
-=======
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
-        return;
-    }
-
-    char *version = malloc(alloc_size);
-    version[fread(version, 1, alloc_size, fp) - 1] = 0;
-<<<<<<< HEAD
->>>>>>> 4deeaa2 (Build now has output)
-=======
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
 
     printf(" %s", version);
 
@@ -464,14 +418,7 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
-<<<<<<< HEAD
-        fputs("[Not Found]", stderr);
-=======
         fputs("[Missing /proc/cpuinfo]", stderr);
-<<<<<<< HEAD
->>>>>>> 4deeaa2 (Build now has output)
-=======
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
         return;
     }
 
@@ -554,26 +501,16 @@ void memory() {         // prints the used memory in the format used MiB / total
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
     unsigned long bufferram = info.bufferram / 1024;
-    char *str = malloc(0x1000);
 
+    char *str = malloc(0x1000);
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
+                                                //
     if(!fp) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        fflush(stdout);
-        fputs("[Not Found]", stderr);
-        fflush(stderr);
-        fclose(fp);
-=======
         fputs("[Missing /proc/meminfo]", stderr);
         free(str);
->>>>>>> 4deeaa2 (Build now has output)
-=======
-        fputs("[Missing /proc/meminfo]", stderr);
-        free(str);
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
         return;
     }
+
     str[fread(str, 1, 0x1000, fp)] = 0;
     fclose(fp);
 
@@ -613,7 +550,7 @@ void memory() {         // prints the used memory in the format used MiB / total
 }
 #endif
 
-void public_ip() {      // get the public IP adress
+void public_ip() {      // get the public IP address
     printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
 
     char public_ip[20];
@@ -636,7 +573,7 @@ void public_ip() {      // get the public IP adress
     printf("%s", public_ip);
 }
 
-void local_ip() {      // get the local IP adress
+void local_ip() {      // get the local IP address
     printf("%-16s\e[0m\e[97m", PRIV_IP_LABEL DASH_COLOR DASH);
 
     struct ifaddrs *ifAddrStruct=NULL;
