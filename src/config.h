@@ -35,22 +35,15 @@
 #define GPU "Intel UHD Graphics 620"    // what will be printed as gpu
 
 // add more logos in src/vars.h if you want, I couldn't care less
-// would reccomend also changing the --help display output to show the correct default
+// would recommend also changing the --help display output to show the correct default
 
 // examples:
 // static char **logo = debian;     // set debian as default logo
 // static char *color = "\e[31m";   // set red as default color
 // static char *bold = "\e[1m";     // use bold. leave "" to turn the bold off 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-static char **logo = NULL;          // use NULL for OS default
-=======
-static char **logo = archlinux;     // use NULL for OS default 
->>>>>>> 4deeaa2 (Build now has output)
-=======
-static char **logo = archlinux;     // use NULL for OS default 
->>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
+static char **logo = (char **) logos[1];     // use NULL for OS default 
+                                    //
 #define DEFAULT_COLOR NULL          // use NULL for logo default
 #define DEFAULT_BOLD "\e[1m"        // use "" to turn off
 
