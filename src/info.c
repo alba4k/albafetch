@@ -356,6 +356,13 @@ void packages() {       // prints the number of installed packages
 void packages() {
     fprintf(stderr, "Not implemented yet.");
 }
+<<<<<<< HEAD
+=======
+#else
+void packages() {
+    fprintf(stderr, "Not implemented yet.");
+}
+>>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
 #endif
 
 void host() {           // prints the current host machine
@@ -380,7 +387,10 @@ void host() {           // prints the current host machine
     size_t alloc_size = 128;
     char *model = malloc(alloc_size);
     model[fread(model, 1, alloc_size, fp) - 1] = 0;
+<<<<<<< HEAD
 >>>>>>> 4deeaa2 (Build now has output)
+=======
+>>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
 
     fclose(fp);
 
@@ -413,7 +423,10 @@ void bios() {           // prints the current host machine
     size_t alloc_size = 128;
     char *vendor = malloc(alloc_size);
     vendor[fread(vendor, 1, alloc_size, fp) - 1] = 0;
+<<<<<<< HEAD
 >>>>>>> 4deeaa2 (Build now has output)
+=======
+>>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
 
     printf("%s", vendor);
 
@@ -436,7 +449,10 @@ void bios() {           // prints the current host machine
 
     char *version = malloc(alloc_size);
     version[fread(version, 1, alloc_size, fp) - 1] = 0;
+<<<<<<< HEAD
 >>>>>>> 4deeaa2 (Build now has output)
+=======
+>>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
 
     printf(" %s", version);
 
@@ -452,7 +468,10 @@ void cpu() {            // prints the current CPU
         fputs("[Not Found]", stderr);
 =======
         fputs("[Missing /proc/cpuinfo]", stderr);
+<<<<<<< HEAD
 >>>>>>> 4deeaa2 (Build now has output)
+=======
+>>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
         return;
     }
 
@@ -540,6 +559,7 @@ void memory() {         // prints the used memory in the format used MiB / total
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
 <<<<<<< HEAD
+<<<<<<< HEAD
         fflush(stdout);
         fputs("[Not Found]", stderr);
         fflush(stderr);
@@ -548,6 +568,10 @@ void memory() {         // prints the used memory in the format used MiB / total
         fputs("[Missing /proc/meminfo]", stderr);
         free(str);
 >>>>>>> 4deeaa2 (Build now has output)
+=======
+        fputs("[Missing /proc/meminfo]", stderr);
+        free(str);
+>>>>>>> 4deeaa2721357e80a3d42672c75500b152774b3b
         return;
     }
     str[fread(str, 1, 0x1000, fp)] = 0;
