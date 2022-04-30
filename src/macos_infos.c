@@ -38,8 +38,7 @@ bytes_t system_mem_size() {
     uint64_t size;
     int error;
 
-    error = sysctl_wrap(&size, sizeof(uint64_t), 
-                        CTL_HW, HW_MEMSIZE);
+    error = sysctl_wrap(&size, sizeof(uint64_t), CTL_HW, HW_MEMSIZE);
 
     // Since no computer should have 0 bytes of memory,
     // 0 indicates failure.
@@ -63,6 +62,3 @@ bytes_t used_mem_size() {
 
     return (internal + wired + compressed) * page_size(host);
 }
-
-
-

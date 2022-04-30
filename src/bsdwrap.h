@@ -32,6 +32,5 @@
  *             HW_MEMSIZE); // Get memory size from the hardware domain.
  * ```
  */
-int sysctl_wrap(void *out, size_t outsize, 
-                int domain, int field);
 
+int sysctl_wrap(void *out, size_t outsize, int domain, int field);
