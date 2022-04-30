@@ -358,6 +358,7 @@ void packages() {       // prints the number of installed packages
 
 #else
 void packages() {
+    printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
     fflush(stdout);
     fputs("[Unsupported]", stderr);
     fflush(stderr);
@@ -497,6 +498,7 @@ void gpu() {            // prints the current GPU
 // memory
 #ifdef __APPLE__ 
 void memory() {
+    printf("%-16s\e[0m\e[97m", MEM_LABEL DASH_COLOR DASH);
 
     bytes_t usedram = used_mem_size();
     bytes_t totalram = system_mem_size();
