@@ -137,9 +137,8 @@ int main(const int argc, char **argv) {
             logo_found: ;
 
     }
-    if(!color) {
+    if(!color)
         color = logo[1];
-    }
 
     if(help) {  // print the help message if --help was used and exit
         printf("%s%salbafetch\e[0m\e[97m - a system fetch utility\n", color, bold);

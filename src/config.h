@@ -5,13 +5,12 @@
 #include <stdlib.h>
 
 // CONFIGURATION OPTIONS:
-#define SPACING "    "                          // defines the distance between the logo and the infos
-#define SEPARATOR "\e[0m\e[97m------------------"     // defines what is used as separator between sections
-#define DASH_COLOR "\e[39m"                     // \e[39m or DEFAULT_COLOR to make it white or like the text
-#define DASH ":"
+#define SPACING "    "                              // defines the distance between the logo and the infos
+#define SEPARATOR "\e[0m\e[97m------------------"   // defines what is used as separator between sections
+#define DASH_COLOR "\e[39m"                         // \e[39m or DEFAULT_COLOR to make it white or like the text
+#define DASH ":"                                    // default separator
 
-// options
-#define PRINT_CPU_FREQ false // doesn't work for AMD Ryzen processors
+#define PRINT_CPU_FREQ true
 
 // Labels:
 #define HOSTNAME_LABEL "Hostname"

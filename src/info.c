@@ -25,9 +25,11 @@
 #endif
 
 // Not sure if this 
+/*
 #ifndef LOGIN_NAME_MAX
 #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
+*/
 
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
@@ -357,7 +359,7 @@ void packages() {       // prints the number of installed packages
 void packages() {
     fflush(stdout);
     fputs("[Unsupported]", stderr);
-    fflush(stderr);;
+    fflush(stderr);
 }
 #endif
 
@@ -425,10 +427,8 @@ void cpu() {            // prints the current CPU
 
     char *str = malloc(0x10000);
     str[fread(str, 1, 0x10000, fp)] = 0;
-    fclose(fp);
 
     char *cpu_info = strstr(str, "model name");
-
     if(!cpu_info) {
         goto error;
     }
@@ -439,28 +439,41 @@ void cpu() {            // prints the current CPU
     }
     cpu_info += 2;
 
-    char *end;
-
-    if(!PRINT_CPU_FREQ && cpu_info[0] == 'I') {
-        end = strchr(cpu_info, '@');
-        if(!end) {
-            goto error;
-        }
-        end--;
-    } else {
+    char *end = strchr(cpu_info, '@');
+    if(!end) {
         end = strchr(cpu_info, '\n');
-        if(!end) {
+        if(!end)
             goto error;
-        }
     }
-    
-
-    (*end) = 0;
+    *end = 0;
 
     printf("%s", cpu_info);
-    //fputs(CPU, stdout)
+
+    if(PRINT_CPU_FREQ) {
+        *end = ' ';
+
+        char *cpu_freq = strstr(str, "cpu MHz");
+        if(!cpu_freq)
+            goto error;
+
+        cpu_freq = strchr(cpu_freq, ':');
+        if(!cpu_freq)
+            goto error;
+        cpu_freq += 2;
+
+        end = strchr(cpu_freq, '\n');
+        if(!end)
+            goto error;
+
+        *end = 0;
+
+        
+
+        printf("@ %g GHz", (float)(atoi(cpu_freq)/100)/10);
+    }
 
     free(str);
+    fclose(fp);
 
     return;
 
