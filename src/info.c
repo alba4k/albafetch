@@ -161,7 +161,6 @@ void os() {             // prints the os name + arch
             goto error;
     }
     os_name += strlen("PRETTY_NAME=\"");
-    *strstr(os_name, "ID") = 0;
     char *end = strchr(os_name, '"');
     if(!end) {
         end = strchr(os_name, '\'');
@@ -174,8 +173,6 @@ void os() {             // prints the os name + arch
 
     fclose(fp);
     free(str);
-
-
 
     return;
 
@@ -431,6 +428,7 @@ void cpu() {            // prints the current CPU
 
     char *str = malloc(0x10000);
     str[fread(str, 1, 0x10000, fp)] = 0;
+    fclose(fp);
 
     char *cpu_info = strstr(str, "model name");
     if(!cpu_info) {
@@ -471,13 +469,10 @@ void cpu() {            // prints the current CPU
 
         *end = 0;
 
-        
-
         printf("@ %g GHz", (float)(atoi(cpu_freq)/100)/10);
     }
 
     free(str);
-    fclose(fp);
 
     return;
 
@@ -524,7 +519,7 @@ void memory() {         // prints the used memory in the format used MiB / total
     unsigned long freeram = info.freeram / 1024;
     unsigned long bufferram = info.bufferram / 1024;
 
-    char *str = malloc(0x1000);
+    char *str = malloc(0x8000);
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
     if(!fp) {
         fputs("[Not Found]", stderr);
@@ -532,7 +527,7 @@ void memory() {         // prints the used memory in the format used MiB / total
         return;
     }
 
-    str[fread(str, 1, 0x1000, fp)] = 0;
+    str[fread(str, 1, 0x8000, fp)] = 0;
     fclose(fp);
 
     char *cachedram = strstr(str, "Cached");
@@ -552,7 +547,7 @@ void memory() {         // prints the used memory in the format used MiB / total
         goto error;     
     }
     free(str);
-    (*end) = 0;
+    *end = 0;
 
     unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
 
