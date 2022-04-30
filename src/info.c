@@ -422,7 +422,9 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
+        fflush(stdout);
         fputs("[Not Found]", stderr);
+        fflush(stderr);
         return;
     }
 
