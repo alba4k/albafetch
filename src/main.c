@@ -96,7 +96,6 @@ int main(const int argc, char **argv) {
     if(!logo) {
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
-            fclose(fp);
             return -1;
         }
         fseek(fp, 0, SEEK_END);
@@ -114,7 +113,6 @@ int main(const int argc, char **argv) {
         os_id += strlen(field);
         char *end = strchr(os_id, '\n');
         if(!end) {
-            fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
             fclose(fp);
             free(str);
             return -1;
