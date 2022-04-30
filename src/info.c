@@ -79,6 +79,7 @@ void user() {           // get the current login
     fputs(username, stdout);
 }
 
+// uptime
 #ifdef __APPLE__
 static long macos_uptime() {
 
@@ -95,7 +96,6 @@ static long macos_uptime() {
     return (long) difftime(current_seconds, boot_seconds);
 }
 #endif
-
 #ifdef __linux__
 static long linux_uptime() {
     struct sysinfo info;
@@ -208,6 +208,7 @@ void term() {           // prints the current terminal
     printf("%-16s\e[0m\e[97m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
 }
 
+// packages
 #ifndef __APPLE__
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
@@ -491,6 +492,7 @@ void gpu() {            // prints the current GPU
     printf("%s", GPU);
 }
 
+// memory
 #ifdef __APPLE__ 
 void memory() {
 
@@ -504,7 +506,7 @@ void memory() {
         return;
     }
 
-    printf("%llu MiB / %llu MiB (%llu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
+    printf("%llu MiB / %llu MiB (%llu%%)", usedram/1048576, totalram/1048576, (usedram * 100) / totalram);
     return;
 }
 #else
