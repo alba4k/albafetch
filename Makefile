@@ -29,12 +29,12 @@ test: test.c
 	$(CC) -o test test.c && ./test
 
 linux: main.o info.o
+	mkdir -p build
 	$(CC) src/info.c src/main.c -o build/linux
 
-install: build/$(TARGET) $(OBJ)
+install:
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)
-	cp build/$(TARGET) /usr/bin/$(TARGET)
+	cp build/linux /usr/bin/$(TARGET) || cp build/$(TARGET) /usr/bin/$(TARGET)
 
 uninstall:
 	rm /usr/bin/$(TARGET)

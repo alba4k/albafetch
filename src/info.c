@@ -195,7 +195,7 @@ void kernel() {         // prints the kernel version
 }
 
 void desktop() {        // prints the current desktop environment
-        printf("%-16s\e[0m\e[97m%s", DESKTOP_LABEL DASH_COLOR DASH, getenv("XDG_CURRENT_DESKTOP")); // $XDG_CURRENT_DESKTOP
+        printf("%-16s\e[0m\e[97m%s", DESKTOP_LABEL DASH_COLOR DASH, getenv("XDG_CURRENT_DESKTOP") ? getenv("XDG_CURRENT_DESKTOP") : "none"); // $XDG_CURRENT_DESKTOP
 }
 
 void shell() {          // prints the user default shell
