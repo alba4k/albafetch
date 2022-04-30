@@ -28,6 +28,9 @@ macos_infos.o: src/macos_infos.c
 test: test.c
 	$(CC) -o test test.c && ./test
 
+linux: main.o info.o
+	$(CC) src/info.c src/main.c -o build/linux
+
 install: build/$(TARGET) $(OBJ)
 	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ)

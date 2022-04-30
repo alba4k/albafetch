@@ -355,7 +355,9 @@ void packages() {       // prints the number of installed packages
 
 #else
 void packages() {
-    fprintf(stderr, "[Not implemented yet]");
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);;
 }
 #endif
 
@@ -365,7 +367,7 @@ void host() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
+        fputs("[Not Found]", stderr);
         fflush(stderr);
         return;
     }
@@ -376,7 +378,6 @@ void host() {           // prints the current host machine
     fclose(fp);
 
     printf("%s", model);
-
 }
 
 void bios() {           // prints the current host machine
@@ -386,7 +387,7 @@ void bios() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
+        fputs("[Not Found]", stderr);
         fflush(stderr);
         return;
     }
@@ -400,7 +401,7 @@ void bios() {           // prints the current host machine
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
+        fputs("[Not Found]", stderr);
         fflush(stderr);
         return;
     }
@@ -418,7 +419,7 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
-        fputs("[Missing /proc/cpuinfo]", stderr);
+        fputs("[Not Found]", stderr);
         return;
     }
 
@@ -484,7 +485,9 @@ void memory() {
     bytes_t totalram = system_mem_size();
 
     if (usedram == 0 || totalram == 0) {
-        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        fflush(stdout);
+        fputs("[Bad Format]", stderr);
+        fflush(stderr);
         return;
     }
 
@@ -504,9 +507,8 @@ void memory() {         // prints the used memory in the format used MiB / total
 
     char *str = malloc(0x1000);
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
-                                                //
     if(!fp) {
-        fputs("[Missing /proc/meminfo]", stderr);
+        fputs("[Not Found]", stderr);
         free(str);
         return;
     }
@@ -526,12 +528,11 @@ void memory() {         // prints the used memory in the format used MiB / total
     cachedram += 2;
 
     char *end;
-    end = strstr(cachedram, "kB");
+    end = strstr(cachedram, " kB");
     if(!end) {
         goto error;     
     }
     free(str);
-    end--;
     (*end) = 0;
 
     unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);

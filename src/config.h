@@ -42,8 +42,8 @@
 // static char *color = "\e[31m";   // set red as default color
 // static char *bold = "\e[1m";     // use bold. leave "" to turn the bold off 
 
-static char **logo = (char **) logos[1];     // use NULL for OS default 
-                                    //
+static char **logo = NULL;     // use NULL for OS default
+
 #define DEFAULT_COLOR NULL          // use NULL for logo default
 #define DEFAULT_BOLD "\e[1m"        // use "" to turn off
 

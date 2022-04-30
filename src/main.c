@@ -79,10 +79,10 @@ int main(const int argc, char **argv) {
                     logo = generic;*/
                 for(int j = 0; j < sizeof(logos)/sizeof(logos[0]); j++)
                     if(!strcmp(logos[j][0], argv[i+1])) {
-                        logo = logos[j];
+                        logo = (char**)logos[j];
                         goto logo_arg_found;
                     }
-                    logo = logos[0];
+                    logo = (char**)logos[0];
                     logo_arg_found: ;
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m\e[97m: --logo requires a value! Use --help for more info\n", stderr);
@@ -130,10 +130,10 @@ int main(const int argc, char **argv) {
 
         for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
             if(!strcmp(logos[i][0], os_id)) {
-                logo = logos[i];
+                logo = (char**)logos[i];
                 goto logo_found;
             }
-            logo = logos[0];
+            logo = (char**)logos[0];
             logo_found: ;
 
     }
