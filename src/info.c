@@ -2,7 +2,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#ifdef __APPLE__
+#include "bsdwrap.h"
+#include "macos_infos.h"
+#else
 #include <sys/sysinfo.h>
+#endif
+
 #include <sys/utsname.h>
 #include <pwd.h>
 #include <ifaddrs.h>
@@ -13,6 +19,15 @@
 
 #include "info.h"
 #include "config.h"
+
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#endif
+
+// Not sure if this 
+#ifndef LOGIN_NAME_MAX
+#define LOGIN_NAME_MAX HOST_NAME_MAX
+#endif
 
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
@@ -62,11 +77,42 @@ void user() {           // get the current login
     fputs(username, stdout);
 }
 
-void uptime() {         // prints the uptime
+#ifdef __APPLE__
+static long macos_uptime() {
+
+    struct timeval boottime;
+    int error;
+    error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
+
+    if (error < 0)
+        return 0;
+
+    time_t boot_seconds = boottime.tv_sec;
+    time_t current_seconds = time(NULL);
+
+    return (long) difftime(current_seconds, boot_seconds);
+}
+#endif
+
+#ifdef __linux__
+static long linux_uptime() {
     struct sysinfo info;
     sysinfo(&info);
 
-    long secs = info.uptime;            // total uptime in seconds
+    return info.uptime;
+}
+#endif
+
+void uptime() {         // prints the uptime
+    long uptime;  
+
+#ifdef __linux    
+    uptime = linux_uptime();
+#else
+    uptime = macos_uptime();
+#endif
+
+    long secs = uptime;            // total uptime in seconds
     long days = secs/86400;
     char hours = secs/3600 - days*24;
     char mins = secs/60 - days*1440 - hours*60;
@@ -99,7 +145,6 @@ void os() {             // prints the os name + arch
         fputs("[Not Found]", stderr);
         fflush(stderr);
         printf(" %s", name.machine);
-        fclose(fp);
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -161,6 +206,7 @@ void term() {           // prints the current terminal
     printf("%-16s\e[0m\e[97m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
 }
 
+#ifndef __APPLE__
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
@@ -307,20 +353,26 @@ void packages() {       // prints the number of installed packages
     fflush(stderr);
 }
 
+#else
+void packages() {
+    fprintf(stderr, "[Not implemented yet]");
+}
+#endif
+
 void host() {           // prints the current host machine
     printf("%-16s\e[0m\e[97m", HOST_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /sys/devices/virtual/dmi/id/product_name]", stderr);
         fflush(stderr);
         return;
     }
 
     char model[128];
     model[fread(model, 1, 128, fp) - 1] = 0;
-
+    
     fclose(fp);
 
     printf("%s", model);
@@ -334,7 +386,7 @@ void bios() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_vendor]", stderr);
         fflush(stderr);
         return;
     }
@@ -342,14 +394,13 @@ void bios() {           // prints the current host machine
     char vendor[128];
     vendor[fread(vendor, 1, 128, fp) - 1] = 0;
 
-    fclose(fp);
-
     printf("%s", vendor);
 
+    fclose(fp);
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /sys/devices/virtual/dmi/id/bios_version]", stderr);
         fflush(stderr);
         return;
     }
@@ -367,7 +418,7 @@ void cpu() {            // prints the current CPU
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
-        fputs("[Not Found]", stderr);
+        fputs("[Missing /proc/cpuinfo]", stderr);
         return;
     }
 
@@ -426,6 +477,21 @@ void gpu() {            // prints the current GPU
     printf("%s", GPU);
 }
 
+#ifdef __APPLE__ 
+void memory() {
+
+    bytes_t usedram = used_mem_size();
+    bytes_t totalram = system_mem_size();
+
+    if (usedram == 0 || totalram == 0) {
+        fputs("\e[0m\e[97m[Unrecognized file content]", stderr);
+        return;
+    }
+
+    printf("%llu MiB / %llu MiB (%llu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
+    return;
+}
+#else
 void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
     struct sysinfo info;
     sysinfo(&info);
@@ -435,17 +501,16 @@ void memory() {         // prints the used memory in the format used MiB / total
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
     unsigned long bufferram = info.bufferram / 1024;
-    char used_str[15];
-    char *str = malloc(0x1000);
 
+    char *str = malloc(0x1000);
     FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
+                                                //
     if(!fp) {
-        fflush(stdout);
-        fputs("[Not Found]", stderr);
-        fflush(stderr);
-        fclose(fp);
+        fputs("[Missing /proc/meminfo]", stderr);
+        free(str);
         return;
     }
+
     str[fread(str, 1, 0x1000, fp)] = 0;
     fclose(fp);
 
@@ -483,8 +548,9 @@ void memory() {         // prints the used memory in the format used MiB / total
         free(str);
         return;
 }
+#endif
 
-void public_ip() {      // get the public IP adress
+void public_ip() {      // get the public IP address
     printf("%-16s\e[0m\e[97m", PUB_IP_LABEL DASH_COLOR DASH);
 
     char public_ip[20];
@@ -507,7 +573,7 @@ void public_ip() {      // get the public IP adress
     printf("%s", public_ip);
 }
 
-void local_ip() {      // get the local IP adress
+void local_ip() {      // get the local IP address
     printf("%-16s\e[0m\e[97m", PRIV_IP_LABEL DASH_COLOR DASH);
 
     struct ifaddrs *ifAddrStruct=NULL;

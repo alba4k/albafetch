@@ -1,11 +1,11 @@
 #ifndef LOGOS_H
 #define LOGOS_H
 
-// all logos should end wih a \0
+// all logos should end with a \0
 // add more, i couldn't care less
 // just remember to add them to --logo and --help in src/main.c
 
-static char *logos[][32] = {
+static const char *logos[][32] = {
     {                                   // every logo needs to follow the following scheme:
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
         "\e[90m",                                               // default color for the printed text
