@@ -209,149 +209,106 @@ void term() {           // prints the current terminal
 void packages() {       // prints the number of installed packages
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
 
-    char packages[10];
-    char flatpaks[10];
-    char snaps[10];
-
     int pipes[2];
-    int pipes2[2];
+    char packages[10];
+    bool supported;
 
-    pipe(pipes);
-    pipe(pipes2);
-    if(!fork()) {
+    if(!access("/usr/bin/pacman", F_OK)) {
+        pipe(pipes);
+
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("sh", "sh", "-c", "pacman -Qq | wc -l", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        packages[read(pipes[0], packages, 10) - 1] = 0;
         close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        close(pipes2[0]);
-        dup2(pipes2[1], STDERR_FILENO);
 
-        execlp("sh", "sh", "-c", "flatpak list | wc -l", NULL);        // using flatpak to list packages
-    }
-    wait(NULL);
-    close(pipes[1]);
-    close(pipes2[0]);
-    close(pipes2[1]);
-
-    //size_t len = read(pipes[0], packages, 10);
-    flatpaks[read(pipes[0], flatpaks, 10) - 1] = 0;
-
-    pipe(pipes);
-    pipe(pipes2);
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        close(pipes2[0]);
-        dup2(pipes2[1], STDERR_FILENO);
-
-        execlp("sh", "sh", "-c", "snap list | wc -l", NULL);        // using flatpak to list packages
-    }
-    wait(NULL);
-    close(pipes[1]);
-    close(pipes2[0]);
-    close(pipes2[1]);
-
-    //size_t len = read(pipes[0], packages, 10);
-    snaps[read(pipes[0], snaps, 10) - 1] = 0;
-
-    pipe(pipes);
-    pipe(pipes2);
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        close(pipes2[0]);
-        dup2(pipes2[1], STDERR_FILENO);
-
-        execlp("sh", "sh", "-c", "pacman -Qq | wc -l", NULL);        // using "pacman --query" to list the installed packages; using "wc --lines" to get the number of lines (wordcount)
-    }
-    wait(NULL);
-    close(pipes[1]);
-    close(pipes2[0]);
-    close(pipes2[1]);
-
-    //size_t len = read(pipes[0], packages, 10);
-    packages[read(pipes[0], packages, 10) - 1] = 0;
-
-    close(pipes[0]);
-    if(packages[0] != '0') {
-        printf("%s (pacman)", packages);
-        if(flatpaks[0] != '0')
-            printf(", %s (flatpak)", flatpaks);
-        if(snaps[0] != '0')
-            printf(", %d (snap)", atoi(snaps) - 1);
-        return;
+        printf("%s (pacman) ", packages);
+        supported = true;
     }
     
-    pipe(pipes);
-    pipe(pipes2);
-    if(!fork()) {
+    if(!access("/usr/bin/dpkg-query", F_OK)) {
+        pipe(pipes);
+
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("sh", "sh", "-c", "dpkg-query -f '.\n' -W | wc -l", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        packages[read(pipes[0], packages, 10) - 1] = 0;
         close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        close(pipes2[0]);
-        dup2(pipes2[1], STDERR_FILENO);
 
-        execlp("sh", "sh", "-c", "apt list --installed | wc -l", NULL);        // using apt to list packages
-    }
-    wait(NULL);
-    close(pipes[1]);
-    close(pipes2[0]);
-    close(pipes2[1]);
-
-    //size_t len = read(pipes[0], packages, 10);
-    packages[read(pipes[0], packages, 10) - 1] = 0;
-
-    close(pipes[0]);
-    if(packages[0] != '0') {
-        printf("%s (apt)", packages);
-        if(flatpaks[0] != '0')
-            printf(", %s (flatpak)", flatpaks);
-        if(snaps[0] != '0')
-            printf(", %d (snap)", atoi(snaps) - 1);
-        return;
+        printf("%s (dpkg) ", packages);
+        supported = true;
     }
 
-    pipe(pipes);
-    pipe(pipes2);
-    if(!fork()) {
+    if(!access("/usr/bin/rpm", F_OK)) {
+        pipe(pipes);
+
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("sh", "sh", "-c", "rpm -qa | wc -l", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        packages[read(pipes[0], packages, 10) - 1] = 0;
         close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        close(pipes2[0]);
-        dup2(pipes2[1], STDERR_FILENO);
 
-        execlp("sh", "sh", "-c", "rpm -qa | wc -l", NULL);        // using rpm to list packages
-    }
-    wait(NULL);
-    close(pipes[1]);
-    close(pipes2[0]);
-    close(pipes2[1]);
-
-    //size_t len = read(pipes[0], packages, 10);
-    packages[read(pipes[0], packages, 10) - 1] = 0;
-
-    close(pipes[0]);
-    if(packages[0] != '0') {
-        printf(", %s (rpm)", packages);
-        if(flatpaks[0] != '0')
-            printf(", %s (flatpak)", flatpaks);
-        if(snaps[0] != '0')
-            printf(", %d (snap)", atoi(snaps) - 1);
-        return;
+        printf("%s (rpm) ", packages);
+        supported = true;
     }
 
-    if(flatpaks[0] != '0') {
-        printf("%s (flatpak)", flatpaks);
-        if(snaps[0] != '0')
-            printf(", %d (snap)", atoi(snaps) - 1);
-        return;
-    }
-    
-    if(snaps[0] != '0')
-        printf("%s (snap)", snaps);
-        return;
+    if(!access("/usr/bin/flatpak", F_OK)) {
+        pipe(pipes);
 
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("sh", "sh", "-c", "flatpak list | wc -l", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        packages[read(pipes[0], packages, 10) - 1] = 0;
+        close(pipes[0]);
+
+        printf("%s (flatpak) ", packages);
+        supported = true;
+    }
+
+    if(!access("/usr/bin/snap", F_OK)) {
+        pipe(pipes);
+
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("sh", "sh", "-c", "snap list | wc -l", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        packages[read(pipes[0], packages, 10) - 1] = 0;
+        close(pipes[0]);
+
+        printf("%s (snap) ", packages);
+        supported = true;
+    }
+
+    if(!supported) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+    }
 }
-
 #else
 void packages() {
     printf("%-16s\e[0m\e[97m", PACKAGES_LABEL DASH_COLOR DASH);
