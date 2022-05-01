@@ -247,7 +247,7 @@ void packages() {       // prints the number of installed packages
         close(pipes[0]);
 
         if(packages[0] != '0')
-            printf("%s (pacman) ", packages);
+            printf("%s (dpkg) ", packages);
         supported = true;
     }
 
@@ -266,7 +266,7 @@ void packages() {       // prints the number of installed packages
         close(pipes[0]);
 
         if(packages[0] != '0')
-            printf("%s (pacman) ", packages);
+            printf("%s (rpm) ", packages);
         supported = true;
     }
 
@@ -285,7 +285,7 @@ void packages() {       // prints the number of installed packages
         close(pipes[0]);
 
         if(packages[0] != '0')
-            printf("%s (pacman) ", packages);
+            printf("%s (flatpak) ", packages);
         supported = true;
     }
 
@@ -303,7 +303,7 @@ void packages() {       // prints the number of installed packages
         packages[read(pipes[0], packages, 10) - 1] = 0;
         close(pipes[0]);
 
-                if(packages[0] != '0')
+        if(packages[0] != '0')
             printf("%d (snap) ", atoi(packages) - 1);
         supported = true;
     }
