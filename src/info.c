@@ -25,11 +25,10 @@
 #endif
 
 // Not sure if this 
-/*
 #ifndef LOGIN_NAME_MAX
 #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
-*/
+
 
 void separator() {      // prints a separator
     fputs(SEPARATOR, stdout);
