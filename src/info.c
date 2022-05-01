@@ -292,7 +292,7 @@ void packages() {       // prints the number of installed packages
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "snap list | wc -l", NULL); 
+            execlp("sh", "sh", "-c", "snap list 2> /dev/null | wc -l", NULL);   // sending stderr to null to avoid snap printing shit when installed with 0 pacakges
         }
         wait(NULL);
         close(pipes[1]);
