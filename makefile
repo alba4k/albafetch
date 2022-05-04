@@ -5,17 +5,19 @@ CC := gcc
 CFLAGS := -Wall
 TARGET := albafetch
 OBJ := info.o main.o
-OBJ_OSX := info.o main.o macos_infos.o bsdwrap.o
+OBJ_OSX := macos_infos.o bsdwrap.o
+SRC := src/info.c src/main.c
+SRC_OSX := macos_infos.c bsdwrap.c
 INCLUDE := -I src
 
 build/albafetch: $(OBJ_OSX) $(OBJ)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
-main.o: $(SRC1) src/config.h src/vars.h src/info.h
+main.o: src/main.c src/config.h src/vars.h src/info.h
 	$(CC) -c src/main.c
 
-info.o: $(SRC2) src/config.h src/vars.h src/info.h
+info.o: src/info.c src/config.h src/vars.h src/info.h
 	$(CC) -c src/info.c
 
 bsdwrap.o: src/bsdwrap.c
@@ -26,7 +28,7 @@ macos_infos.o: src/macos_infos.c
 
 run: $(OBJ_OSX) $(OBJ)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 	build/$(TARGET)
 
 install: build/$(TARGET)

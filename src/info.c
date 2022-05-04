@@ -470,7 +470,7 @@ void memory() {
     return;
 }
 #else
-void memory() {         // prints the used memory in the format used MiB / total MiB (XX%)
+void memory() {
     struct sysinfo info;
     sysinfo(&info);
 
@@ -480,48 +480,47 @@ void memory() {         // prints the used memory in the format used MiB / total
     unsigned long freeram = info.freeram / 1024;
     unsigned long bufferram = info.bufferram / 1024;
 
-    char *str = malloc(0x8000);
-    FILE *fp = fopen("/proc/meminfo", "r");     // open the file and copy its contents into str
+    FILE *fp = fopen("/proc/meminfo", "r");
     if(!fp) {
-        fputs("[Not Found]", stderr);
-        free(str);
-        return;
+        goto error;
     }
+    char *str = malloc(0x1000);
 
-    str[fread(str, 1, 0x8000, fp)] = 0;
+    str[fread(str, 1, 0x1000, fp)] = 0;
     fclose(fp);
 
     char *cachedram = strstr(str, "Cached");
     if(!cachedram) {
+        free(str);
         goto error;
     }
 
     cachedram = strchr(cachedram, ':');
     if(!cachedram) {
+        free(str);
         goto error;
     }
-    cachedram += 2;
 
-    char *end;
-    end = strstr(cachedram, " kB");
+    cachedram+=2;
+
+    char *end = strchr(cachedram, 'k') - 1;
     if(!end) {
-        goto error;     
+        free(str);
+        goto error;
     }
-    free(str);
     *end = 0;
 
     unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
 
     printf("%lu MiB / %lu MiB (%lu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
 
+    free(str);
     return;
 
     error:
         fflush(stdout);
-        fputs("[Bad Format]", stderr);
+        fputs("[Not Found]", stderr);
         fflush(stderr);
-        fclose(fp);
-        free(str);
         return;
 }
 #endif
