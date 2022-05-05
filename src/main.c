@@ -55,11 +55,11 @@ int main(const int argc, char **argv) {
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
             if(argv[i+1]) {
-                if(!strcmp(argv[i+1], "on")) {
+                if(!strcmp(argv[i+1], "on"))
                     bold = "\e[1m";
-                } else if(!strcmp(argv[i+1], "off")) {
+                else if(!strcmp(argv[i+1], "off"))
                     bold = "";
-                } else {
+                else {
                     fputs("\e[31m\e[1mERROR\e[0m\e[97m: invalid value for --bold! Use --help for more info\n", stderr);
                     user_is_an_idiot = true;
                 }
@@ -94,6 +94,10 @@ int main(const int argc, char **argv) {
     if(user_is_an_idiot) return 1;
 
     if(!logo) {
+        #ifdef __APPLE__
+            logo = (char**)logos[1];
+            goto logo_found;
+        #endif
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
             return -1;
@@ -119,22 +123,13 @@ int main(const int argc, char **argv) {
         }
         *end = 0;
 
-        /*if(!strcmp(os_id, "arch"))
-            logo = archlinux;
-        else if(!strcmp(os_id, "debian"))
-            logo = debian;
-        else if(!strcmp(os_id, "linuxmint"))
-            logo = linuxmint;
-        else
-            logo = generic;*/
-
         for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
             if(!strcmp(logos[i][0], os_id)) {
                 logo = (char**)logos[i];
                 goto logo_found;
             }
-            logo = (char**)logos[0];
-            logo_found: ;
+        logo = (char**)logos[0];
+        logo_found: ;
 
     }
     if(!color)
