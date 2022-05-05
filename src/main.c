@@ -91,46 +91,48 @@ int main(const int argc, char **argv) {
         }
     }
 
-    if(user_is_an_idiot) return 1;
+    if(user_is_an_idiot)
+        return 1;
 
     if(!logo) {
         #ifdef __APPLE__
             logo = (char**)logos[1];
             goto logo_found;
-        #endif
-        FILE *fp = fopen("/etc/os-release", "r");
-        if(!fp) {
-            return -1;
-        }
-        fseek(fp, 0, SEEK_END);
-        size_t len = ftell(fp);
-        rewind(fp);
-        char *str = malloc(len + 1);
-        str[fread(str, 1, len, fp)] = 0;
-        const char *field = "ID=";
-        char *os_id = strstr(str, field);
-        if(!os_id) {
-            fclose(fp);
-            free(str);
-            return -1;
-        }
-        os_id += strlen(field);
-        char *end = strchr(os_id, '\n');
-        if(!end) {
-            fclose(fp);
-            free(str);
-            return -1;
-        }
-        *end = 0;
-
-        for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
-            if(!strcmp(logos[i][0], os_id)) {
-                logo = (char**)logos[i];
-                goto logo_found;
+        #else
+            FILE *fp = fopen("/etc/os-release", "r");
+            if(!fp) {
+                return -1;
             }
-        logo = (char**)logos[0];
-        logo_found: ;
+            fseek(fp, 0, SEEK_END);
+            size_t len = ftell(fp);
+            rewind(fp);
+            char *str = malloc(len + 1);
+            str[fread(str, 1, len, fp)] = 0;
+            const char *field = "ID=";
+            char *os_id = strstr(str, field);
+            if(!os_id) {
+                fclose(fp);
+                free(str);
+                return -1;
+            }
+            os_id += strlen(field);
+            char *end = strchr(os_id, '\n');
+            if(!end) {
+                fclose(fp);
+                free(str);
+                return -1;
+            }
+            *end = 0;
 
+            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
+                if(!strcmp(logos[i][0], os_id)) {
+                    logo = (char**)logos[i];
+                    goto logo_found;
+                }
+            logo = (char**)logos[0];
+        #endif
+
+        logo_found: ;
     }
     if(!color)
         color = logo[1];

@@ -5,8 +5,8 @@
 // add more, i couldn't care less
 // just remember to add them to --logo and --help in src/main.c
 
-static const char *logos[][32] = {
-    {                                   // every logo needs to follow the following scheme:
+static const char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to OSX
+    {                                                           // every logo needs to follow the following scheme:
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
         "\e[90m",                                               // default color for the printed text
         "                     ",                                // numbers of spaces to use when ran out of logo space
