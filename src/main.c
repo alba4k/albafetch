@@ -6,10 +6,10 @@ char *bold = DEFAULT_BOLD;
 
 int printLogo(const int line) {
     if(logo[line][0]) {
-        printf("\n%s%s%s" SPACING, bold, logo[line], color);
+        printf("%s%s%s" SPACING, bold, logo[line], color);
         return line+1;
     } else {
-        printf("\n%s%s%s" SPACING, bold, logo[2], color);
+        printf("%s%s%s" SPACING, bold, logo[2], color);
         return line;
     }
 }
@@ -153,7 +153,7 @@ int main(const int argc, char **argv) {
         return 0;
     }
 
-    void (* infos[])() = {
+    void (*infos[])() = {
         title,
         separator,
         uptime,
@@ -178,13 +178,15 @@ int main(const int argc, char **argv) {
     for (size_t i = 0; i < info_lines; i++) {
         line = printLogo(line);
         infos[i]();
+        printf("\n");
     }
 
     // ******** remaining lines of the logo ********
     while(logo[line][0]) {
         line = printLogo(line);
+        printf("\n");
     }
-    printf("\e[0m\n");
+    printf("\e[0m");
 
     return 0;
 }

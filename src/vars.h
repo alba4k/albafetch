@@ -144,6 +144,36 @@ static const char *logos[][32] = {
         "\e[31m            .-/+oossssoo+/-.            ",
         ""
     },
+    {
+        "parrot",
+        "\e[36m",
+        "                                       ",
+        "\e[36m  `:oho/-`                             ",
+        "\e[36m`mMMMMMMMMMMMNmmdhy-                   ",
+        "\e[36m dMMMMMMMMMMMMMMMMMMs`                 ",
+        "\e[36m +MMsohNMMMMMMMMMMMMMm/                ",
+        "\e[36m .My   .+dMMMMMMMMMMMMMh.              ",
+        "\e[36m  +       :NMMMMMMMMMMMMNo             ",
+        "\e[36m           `yMMMMMMMMMMMMMm:           ",
+        "\e[36m             /NMMMMMMMMMMMMMy`         ",
+        "\e[36m              .hMMMMMMMMMMMMMN+        ",
+        "\e[36m                  ``-NMMMMMMMMMd-      ",
+        "\e[36m                     /MMMMMMMMMMMs`    ",
+        "\e[36m                      mMMMMMMMsyNMN/   ",
+        "\e[36m                      +MMMMMMMo  :sNh. ",
+        "\e[36m                      `NMMMMMMm     -o/",
+        "\e[36m                       oMMMMMMM.       ",
+        "\e[36m                       `NMMMMMM+       ",
+        "\e[36m                        +MMd/NMh       ",
+        "\e[36m                         mMm -mN`      ",
+        "\e[36m                         /MM  `h:      ",
+        "\e[36m                          dM`   .      ",
+        "\e[36m                          :M-          ",
+        "\e[36m                           d:          ",
+        "\e[36m                           -+          ",
+        "\e[36m                            -          ",
+        ""
+    },
 };
 
 extern char *color;

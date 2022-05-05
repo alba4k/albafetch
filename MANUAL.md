@@ -8,7 +8,22 @@
 # Adding new modules
 `src/main.c`, in function main():
 ```
-line = printLogo(line);
-module();
+    void (*infos[])() = {
+        title,
+        separator,
+        uptime,
+        separator, 
+        os,
+        kernel,
+        desktop, 
+        shell,
+        term,
+        packages, 
+        separator,
+        host,
+        cpu,
+        gpu,
+        memory,
+    };
 ```
-Only change the module() function call with the desired one
+Change the order the infos is printed in or add more
