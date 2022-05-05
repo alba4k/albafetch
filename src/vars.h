@@ -199,7 +199,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
     },
     {
         "manjaro",
-        "\e[31m",
+        "\e[32m",
         "                            ",
         "\e[32m██████████████████  ████████",
         "\e[32m██████████████████  ████████",
