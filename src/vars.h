@@ -6,7 +6,7 @@
 // just remember to add them to --logo and --help in src/main.c
 
 static const char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to OSX
-    {                                                           // every logo needs to follow the following scheme:
+    {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
         "\e[90m",                                               // default color for the printed text
         "                     ",                                // numbers of spaces to use when ran out of logo space
@@ -24,7 +24,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[33m  #####\e[90m#######\e[33m#####  ",
         ""                                                      // an empty string concludes the logo, to know when it should stop printing
     },
-    {
+    {   // MacOS X
         "apple",
         "\e[35m",
         "                              ",
@@ -47,7 +47,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[34m       .cooc,.    .,coo:.     ",
         ""
     },
-    {
+    {   // Arch Linux
         "arch",
         "\e[36m",
         "                                     ",
@@ -72,7 +72,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m .`                                 `/",
         ""
     },
-    {
+    {   // Debian
         "debian",
         "\e[31m",
         "                            ",
@@ -95,7 +95,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[31m              `\"\"\"       ",
         ""
     },
-    {
+    {   // Linux Mint
         "linuxmint",
         "\e[32m",
         "                                        ",
@@ -120,7 +120,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[97m               ``-:::::-``              ",
         ""
     },
-    {
+    {   // Endeavour OS
         "endeavouros",
         "\e[35m",
         "                                        ",
@@ -141,7 +141,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[34m  `:::::::::::::::::::::::::------``    ",
         ""
     },
-    {
+    {   // Ubuntu
         "ubuntu",
         "\e[31m",
         "                                        ",
@@ -167,7 +167,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[31m            .-/+oossssoo+/-.            ",
         ""
     },
-    {
+    {   // Parrot OS
         "parrot",
         "\e[36m",
         "                                       ",
@@ -197,7 +197,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m                            -          ",
         ""
     },
-    {
+    {   // Manjaro Linux
         "manjaro",
         "\e[32m",
         "                            ",
@@ -217,9 +217,58 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[32m████████  ████████  ████████",
         ""
     },
+    {   // Fedora
+        "fedora",
+        "\e[34m",
+        "                                  ",
+        "\e[34m          /:-------------:\\       ",
+        "\e[34m       :-------------------::     ",
+        "\e[34m     :-----------\e[39m/shhOHbmp\e[34m---:\\   ",
+        "\e[34m   /-----------\e[39momMMMNNNMMD\e[34m]  ---:  ",
+        "\e[34m  :-----------\e[39msMMMMNMNMP\e[34m.    ---: ",
+        "\e[34m :-----------\e[39m:MMMdP\e[34m-------    ---\\",
+        "\e[34m,------------\e[39m:MMMd\e[34m--------    ---:",
+        "\e[34m:------------\e[39m:MMMd\e[34m-------    .---:",
+        "\e[34m:----    \e[39moNMMMMMMMMMNho\e[34m     .----:",
+        "\e[34m:--     .\e[39m+shhhMMMmhhy++\e[34m   .------/",
+        "\e[34m:-    -------\e[39m:MMMd\e[34m--------------: ",
+        "\e[34m:-   --------\e[39m/MMMd\e[34m-------------;  ",
+        "\e[34m:-    ------\e[39m/hMMMy\e[34m------------:   ",
+        "\e[34m:-- \e[39m:dMNdhhdNMMNo\e[34m------------;    ",
+        "\e[34m:---\e[39m:sdNMMMMNds:\e[34m------------:     ",
+        "\e[34m:------\e[39m:://:\e[34m-------------::       ",
+        "\e[34m:---------------------://         ",
+        ""
+    },
+    {   // KDE Neon
+        "neon",
+        "\e[32m",
+        "                                        ",
+        "\e[32m             `..---+/---..`             ",
+        "\e[32m         `---.``   ``   `.---.`         ",
+        "\e[32m      .--.`        ``        `-:-.      ",
+        "\e[32m    `:/:     `.----//----.`     :/-     ",
+        "\e[32m   .:.    `---`          `--.`    .:`   ",
+        "\e[32m  .:`   `--`                .:-    `:.  ",
+        "\e[32m `/    `:.      `.-::-.`      -:`   `/` ",
+        "\e[32m /.    /.     `:++++++++:`     .:    .: ",
+        "\e[32m`/    .:     `+++++++++++/      /`   `+`",
+        "\e[32m/+`   --     .++++++++++++`     :.   .+:",
+        "\e[32m`/    .:     `+++++++++++/      /`   `+`",
+        "\e[32m /`    /.     `:++++++++:`     .:    .: ",
+        "\e[32m ./    `:.      `.:::-.`      -:`   `/` ",
+        "\e[32m  .:`   `--`                .:-    `:.  ",
+        "\e[32m   .:.    `---`          `--.`    .:`   ",
+        "\e[32m    `:/:     `.----//----.`     :/-     ",
+        "\e[32m      .-:.`        ``        `-:-.      ",
+        "\e[32m         `---.``   ``   `.---.`         ",
+        "\e[32m             `..---+/---..`             ",
+        ""
+    },
 };
 
 extern char *color;
 extern char *bold;
+extern char **logo;
 
 #endif
