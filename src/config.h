@@ -35,10 +35,10 @@
 
 // add more logos in src/vars.h if you want, I couldn't care less
 
-// examples:
-// static char **logo = debian;     // set debian as default logo
-// static char *color = "\e[31m";   // set red as default color
-// static char *bold = "\e[1m";     // use bold. leave "" to turn the bold off 
+// example:
+// #define DEFAULT_LOGO "debian"    // set debian as default logo
+// #define DEFAULT_COLOR "\e[32m"   // set green as default text color
+// #define DEFAULT_BOLD "\e[1m"     // use bold 
 
 #define DEFAULT_LOGO ""             // use "" for OS default
 #define DEFAULT_COLOR ""            // use "" for logo default

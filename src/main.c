@@ -156,15 +156,15 @@ int main(const int argc, char **argv) {
         printf("\t%s%s-h\e[0m\e[97m,%s%s --help\e[0m\e[97m:\t Print this help menu and exit\n",
                color, bold, color, bold);
 
-        printf("\t%s%s-c\e[0m\e[97m,%s%s --color\e[0m\e[97m:\t Change the output color (%scolor\e[0m) "
+        printf("\t%s%s-c\e[0m\e[97m,%s%s --color\e[0m\e[97m:\t Change the output color (%s%s\e[0m) "
                "[\e[30mblack\e[0m\e[97m, \e[31mred\e[0m\e[97m, \e[32mgreen\e[0m\e[97m, \e[33myellow\e[0m\e[97m,"
                " \e[34mblue\e[0m\e[97m, \e[35mpurple\e[0m\e[97m, \e[36mcyan\e[0m\e[97m, \e[90mgray\e[0m\e[97m,"
                " \e[97mwhite\e[0m\e[97m]\n",
-               color, bold, color, bold, DEFAULT_COLOR[0] ? DEFAULT_COLOR "default " : logo[1]);
+               color, bold, color, bold, DEFAULT_COLOR[0] ? DEFAULT_COLOR : logo[1], DEFAULT_COLOR[0] ? "default" : "logo default");
 
-        printf("\t%s%s-b\e[0m\e[97m,%s%s --bold\e[0m\e[97m:\t Specifies if bold should be used in colored parts (" DEFAULT_BOLD "default\e[0m)\n"
+        printf("\t%s%s-b\e[0m\e[97m,%s%s --bold\e[0m\e[97m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
                "\t\t\t [\e[1mon\e[0m\e[97m, off]\n",
-               color, bold, color, bold);
+               color, bold, color, bold, DEFAULT_BOLD[0] ? "\e[1mon" : "off");
         
         printf("\t%s%s-l\e[0m\e[97m,%s%s --logo\e[0m\e[97m:\t Changes the logo that will be displayed (%s)\n"
                "\t\t\t [linux, apple, arch, debian, mint, endeavouros, ubuntu, parrot, manjaro, fedora, neon]\n",
