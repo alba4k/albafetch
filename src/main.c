@@ -15,7 +15,7 @@ int printLogo(const int line) {
     }
 }
 
-int main(const int argc, char **argv) {
+int main(const int argc, const char **argv) {
     bool help = 0;
     int line = 3;
 
@@ -70,21 +70,13 @@ int main(const int argc, char **argv) {
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
             if(argv[i+1]) {
-                /*if(!strcmp(argv[i+1], "arch"))
-                    logo = archlinux;
-                else if(!strcmp(argv[i+1], "debian"))
-                    logo = debian;
-                else if(!strcmp(argv[i+1], "mint"))
-                    logo = linuxmint;
-                else 
-                    logo = generic;*/
                 for(int j = 0; j < sizeof(logos)/sizeof(logos[0]); j++)
                     if(!strcmp(logos[j][0], argv[i+1])) {
                         logo = (char**)logos[j];
                         goto logo_arg_found;
                     }
-                    logo = (char**)logos[0];
-                    logo_arg_found: ;
+                logo = (char**)logos[0];
+                logo_arg_found: ;
             } else {
                 fputs("\e[31m\e[1mERROR\e[0m\e[97m: --logo requires a value! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
@@ -145,10 +137,6 @@ int main(const int argc, char **argv) {
         color = logo[1];
 
     if(help) {  // print the help message if --help was used and exit
-        static bool default_given = false;
-        if(DEFAULT_LOGO)
-            default_given = true;
-
         printf("%s%salbafetch\e[0m\e[97m - a system fetch utility\n",
                color, bold);
         printf("\n%s%sFLAGS\e[0m\e[97m:\n",
@@ -190,7 +178,6 @@ int main(const int argc, char **argv) {
         separator,
         host,
         cpu,
-        gpu,
         memory,
     };
 

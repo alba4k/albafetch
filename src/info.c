@@ -448,7 +448,7 @@ void cpu() {            // prints the current CPU
 
 void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[97m", GPU_LABEL DASH_COLOR DASH);
-    printf("%s", GPU);
+    printf("%s", "Unsupported");
 }
 
 // memory
