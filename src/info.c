@@ -193,7 +193,19 @@ void kernel() {         // prints the kernel version
 }
 
 void desktop() {        // prints the current desktop environment
-        printf("%-16s\e[0m\e[97m%s", DESKTOP_LABEL DASH_COLOR DASH, getenv("XDG_CURRENT_DESKTOP") ? getenv("XDG_CURRENT_DESKTOP") : "none"); // $XDG_CURRENT_DESKTOP
+        printf("%-16s\e[0m\e[97m", DESKTOP_LABEL DASH_COLOR DASH);
+
+        const char *desktop = 
+                              getenv("XDG_CURRENT_DESKTOP") ? getenv("XDG_CURRENT_DESKTOP") :
+                              getenv("DESKTOP_SESSION") ? getenv("DESKTOP_SESSION") :
+                              getenv("KDE_SESSION_VERSION") ? "KDE" :
+                              getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
+                              getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
+                              getenv("TDE_FULL_SESSION") ? "Trinity" :
+                              getenv("TERM") == "linux" ? "none" :
+                              "Unsupported";
+
+        printf("%s", desktop); 
 }
 
 void shell() {          // prints the user default shell
