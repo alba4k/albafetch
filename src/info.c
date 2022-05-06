@@ -202,8 +202,7 @@ void desktop() {        // prints the current desktop environment
                               getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
                               getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
                               getenv("TDE_FULL_SESSION") ? "Trinity" :
-                              getenv("TERM") == "linux" ? "none" :
-                              "Unsupported";
+                              "[Unsupported]";
 
         printf("%s", desktop); 
 }
