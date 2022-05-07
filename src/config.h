@@ -6,7 +6,7 @@
 
 // CONFIGURATION OPTIONS:
 #define SPACING "    "                              // defines the distance between the logo and the infos
-#define SEPARATOR "\e[0m\e[97m------------------"   // defines what is used as separator between sections
+#define SEPARATOR "\e[0m\e[37m------------------"   // defines what is used as separator between sections
 #define DASH_COLOR "\e[37m"                         // \e[39m or DEFAULT_COLOR to make it white or like the text
 #define DASH ":"                                    // default separator
 

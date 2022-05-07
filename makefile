@@ -14,7 +14,7 @@ build/albafetch: $(OBJ_OSX) $(OBJ)
 	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
-main.o: src/main.c src/config.h src/vars.h src/info.h
+main.o: src/main.c src/config.h src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c
 
 info.o: src/info.c src/config.h src/vars.h src/info.h
