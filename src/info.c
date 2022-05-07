@@ -459,7 +459,53 @@ void cpu() {            // prints the current CPU
 
 void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[97m", GPU_LABEL DASH_COLOR DASH);
-    printf("%s", "Unsupported");
+
+    int pipes[2];
+    char *lspci = malloc(0x2000);
+
+    pipe(pipes);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+        execlp("lspci", "lspci", "-mm", NULL); 
+    }
+    wait(NULL);
+    close(pipes[1]);
+    lspci[read(pipes[0], lspci, 0x2000)] = 0;
+    close(pipes[0]);
+
+    char *gpu = strstr(lspci, "3D");
+    if(!gpu) {
+        gpu = strstr(lspci, "VGA");
+        if(!gpu)
+            goto error;
+    }                           
+
+    for(int i = 0; i < 4; i++) {
+        gpu = strchr(gpu, '"');
+        if(!gpu)
+            goto error;
+        gpu++;
+        // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+        //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+        // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+        //  "WhiskeyLake-U GT2 [UHD Graphics 620]"
+        // WhiskeyLake-U GT2 [UHD Graphics 620]"
+    }
+
+    char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
+    if(!end)
+        goto error;
+    *end = 0;
+
+    printf("%s", gpu);
+
+    return;
+
+    error:
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
 }
 
 // memory
