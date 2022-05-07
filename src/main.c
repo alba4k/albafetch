@@ -105,19 +105,25 @@ int main(const int argc, const char **argv) {
             fseek(fp, 0, SEEK_END);
             size_t len = ftell(fp);
             rewind(fp);
-            char *str = malloc(len + 1);
-            str[fread(str, 1, len, fp)] = 0;
-            const char *field = "ID=";
+            char *raw = malloc(len+1);
+            raw[fread(raw, 1, len, fp)] = 0;
+            fclose(fp);
+
+            char *str = malloc(len+2);
+            strcpy(str, "\n");
+            strcat(str, raw);
+            free(raw);
+
+            const char *field = "\nID=";
             char *os_id = strstr(str, field);
             if(!os_id) {
-                fclose(fp);
                 free(str);
                 return -1;
             }
             os_id += strlen(field);
+
             char *end = strchr(os_id, '\n');
             if(!end) {
-                fclose(fp);
                 free(str);
                 return -1;
             }
@@ -126,9 +132,12 @@ int main(const int argc, const char **argv) {
             for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
                 if(!strcmp(logos[i][0], os_id)) {
                     logo = (char**)logos[i];
+                    free(str);
                     goto logo_found;
                 }
             logo = (char**)logos[0];
+
+            free(str);
         #endif
 
         logo_found: ;

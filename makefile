@@ -28,8 +28,7 @@ macos_infos.o: src/macos_infos.c
 
 run: $(OBJ_OSX) $(OBJ)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
-	build/$(TARGET)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS) && build/$(TARGET)
 
 install: build/$(TARGET)
 	cp build/$(TARGET) /usr/bin/$(TARGET)

@@ -344,9 +344,12 @@ void host() {           // prints the current host machine
         fflush(stderr);
         return;
     }
+    fseek(fp, 0, SEEK_END);
+    size_t len = ftell(fp);
+    rewind(fp);
 
-    char model[128];
-    model[fread(model, 1, 128, fp) - 1] = 0;
+    char model[len];
+    model[fread(model, 1, len, fp) - 1] = 0;
     
     fclose(fp);
 
@@ -364,9 +367,12 @@ void bios() {           // prints the current host machine
         fflush(stderr);
         return;
     }
+    fseek(fp, 0, SEEK_END);
+    size_t len = ftell(fp);
+    rewind(fp);
 
-    char vendor[128];
-    vendor[fread(vendor, 1, 128, fp) - 1] = 0;
+    char vendor[len];
+    vendor[fread(vendor, 1, len, fp) - 1] = 0;
 
     printf("%s", vendor);
 
@@ -378,9 +384,12 @@ void bios() {           // prints the current host machine
         fflush(stderr);
         return;
     }
+    fseek(fp, 0, SEEK_END);
+    len = ftell(fp);
+    rewind(fp);
 
-    char version[128];
-    version[fread(version, 1, 128, fp) - 1] = 0;
+    char version[len];
+    version[fread(version, 1, len, fp) - 1] = 0;
 
     printf(" %s", version);
 
@@ -500,9 +509,12 @@ void gpu() {            // prints the current GPU
 
     printf("%s", gpu);
 
+    free(lspci);
+
     return;
 
     error:
+        free(lspci);
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
