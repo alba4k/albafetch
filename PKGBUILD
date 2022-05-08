@@ -1,6 +1,6 @@
 # Maintainer: alba4k <blaskoazzolaaaron@gmail.com>
 pkgname=albafetch-git
-pkgver=2.5.r.b52d5a9
+pkgver=2.5.r.6f809e7
 pkgrel=1
 epoch=
 pkgdesc="Noefetch, but written in C; both faster and worse than the original"
