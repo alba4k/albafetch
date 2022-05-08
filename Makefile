@@ -8,7 +8,7 @@ OBJ := info.o main.o
 OBJ_OSX := macos_infos.o bsdwrap.o
 SRC := src/info.c src/main.c
 SRC_OSX := macos_infos.c bsdwrap.c
-INCLUDE := -I src -l alpm
+INCLUDE := -I src
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build
