@@ -2,7 +2,6 @@
 
 ![intro](images/albafetch.png)
 
-
 albafetch is a simple, fast system fetching program. It prints many info about the system in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable from a 10k+ lines shell script).
 
 Here is a time comparison (exact execution times change between machines and runs):
@@ -25,12 +24,19 @@ $ make
 An executable file will appear in `albafetch/`
 
 # Installation
+### FForor Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
+
+Manual installation:
+
 ```
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch/
-# make && make install
+# make install
 ```
+
 `make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to acces `/usr/bin/`. It will compile `albafetch/src/main.c` to this directory.
+
+
 
 # Customizing
 ```

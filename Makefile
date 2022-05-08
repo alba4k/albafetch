@@ -10,7 +10,7 @@ SRC := src/info.c src/main.c
 SRC_OSX := macos_infos.c bsdwrap.c
 INCLUDE := -I src
 
-build/albafetch: $(OBJ)
+build/$(TARGET): $(OBJ)
 	mkdir -p build
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
@@ -33,7 +33,7 @@ osx: $(OBJ) $(OBJ_OSX)
 run: build/$(TARGET)
 	build/$(TARGET)
 
-install:
+install: build/$(TARGET)
 	cp -f build/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 
 uninstall:

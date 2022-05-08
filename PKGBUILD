@@ -15,11 +15,6 @@ pkgver() {
     printf "2.5.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-build() {
-    cd albafetch
-    make
-}
-
 package() {
     cd albafetch
     mkdir -p "$pkgdir/usr/bin/"
