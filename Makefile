@@ -8,7 +8,7 @@ OBJ := info.o main.o
 OBJ_OSX := macos_infos.o bsdwrap.o
 SRC := src/info.c src/main.c
 SRC_OSX := macos_infos.c bsdwrap.c
-INCLUDE := -I src
+INCLUDE := -I src -l alpm
 PREFIX := /usr
 
 build/albafetch: $(OBJ)

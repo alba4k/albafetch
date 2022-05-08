@@ -13,6 +13,8 @@
 #include <pwd.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+#include <alpm.h>
+#include <alpm_list.h>
 
 #include <stdio.h>      
 #include <string.h> 
@@ -225,21 +227,18 @@ void packages() {       // prints the number of installed packages
     bool supported;
 
     if(!access("/usr/bin/pacman", F_OK)) {
-        pipe(pipes);
+        alpm_errno_t err;
+        alpm_handle_t *handle = alpm_initialize("/", "/var/lib/pacman/", &err);
+        alpm_db_t *db_local = alpm_get_localdb(handle);
+        size_t pkgs = 0;
 
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+        for(alpm_list_t *entry = alpm_db_get_pkgcache(db_local); entry; entry = alpm_list_next(entry))
+            pkgs++;
 
-            execlp("sh", "sh", "-c", "pacman -Qq | wc -l", NULL); 
-        }
-        wait(NULL);
-        close(pipes[1]);
-        packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(pipes[0]);
+        alpm_release(handle);
 
-        if(packages[0] != '0')
-            printf("%s (pacman) ", packages);
+        if(pkgs)
+            printf("%ld (pacman) ", pkgs);
         supported = true;
     }
     
