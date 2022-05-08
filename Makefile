@@ -12,7 +12,7 @@ INCLUDE := -I src -l alpm
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+	cat /usr/bin/pacman >/dev/null 2>/dev/null && $(CC) -o build/$(TARGET) $(INCLUDE) -l alpm $(OBJ) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
 main.o: src/main.c src/config.h src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c
