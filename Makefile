@@ -34,9 +34,8 @@ osx: $(OBJ) $(OBJ_OSX)
 run: build/$(TARGET)
 	build/$(TARGET)
 
-install: build/$(TARGET)
-	cp -f build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
-	chmod 755 $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+install:
+	cp -f build/$(TARGET) $(PREFIX)/bin/$(TARGET)
 
 uninstall:
 	rm /usr/bin/$(TARGET)
