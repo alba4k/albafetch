@@ -18,7 +18,7 @@ main.o: src/main.c src/config.h src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c
 
 info.o: src/info.c src/config.h src/vars.h src/info.h
-	$(CC) -c src/info.c
+	cat /usr/bin/pacman >/dev/null 2>/dev/null && $(CC) -c src/info.c -D ARCH_BASED || $(CC) -c src/info.c
 
 bsdwrap.o: src/bsdwrap.c
 	-$(CC) -c src/bsdwrap.c

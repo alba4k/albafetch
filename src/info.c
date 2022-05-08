@@ -13,9 +13,11 @@
 #include <pwd.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+
+#ifdef ARCH_BASED
 #include <alpm.h>
 #include <alpm_list.h>
-
+#endif
 #include <stdio.h>      
 #include <string.h> 
 
@@ -226,6 +228,7 @@ void packages() {       // prints the number of installed packages
     char packages[10];
     bool supported;
 
+    #ifdef ARCH_BASED
     if(!access("/usr/bin/pacman", F_OK)) {
         alpm_errno_t err;
         alpm_handle_t *handle = alpm_initialize("/", "/var/lib/pacman/", &err);
@@ -241,7 +244,7 @@ void packages() {       // prints the number of installed packages
             printf("%ld (pacman) ", pkgs);
         supported = true;
     }
-    
+    #endif
     if(!access("/usr/bin/dpkg-query", F_OK)) {
         pipe(pipes);
 
