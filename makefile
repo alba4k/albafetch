@@ -10,9 +10,9 @@ SRC := src/info.c src/main.c
 SRC_OSX := macos_infos.c bsdwrap.c
 INCLUDE := -I src
 
-build/albafetch: $(OBJ_OSX) $(OBJ)
+build/albafetch: $(OBJ)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
 main.o: src/main.c src/config.h src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c
@@ -26,9 +26,12 @@ bsdwrap.o: src/bsdwrap.c
 macos_infos.o: src/macos_infos.c
 	-$(CC) -c src/macos_infos.c
 
-run: $(OBJ_OSX) $(OBJ)
+osx: $(OBJ) $(OBJ_OSX)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS) && build/$(TARGET)
+	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS)
+
+run: build/$(TARGET)
+	build/$(TARGET)
 
 install: build/$(TARGET)
 	cp build/$(TARGET) /usr/bin/$(TARGET)
