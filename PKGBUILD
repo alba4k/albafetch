@@ -1,6 +1,6 @@
 # Maintainer: alba4k <blaskoazzolaaaron@gmail.com>
 pkgname=albafetch-git
-pkgver=2.5.r.d6b14d6
+pkgver=2.5.r.b52d5a9
 pkgrel=1
 epoch=
 pkgdesc="Noefetch, but written in C; both faster and worse than the original"
@@ -38,7 +38,7 @@ package() {
     cd albafetch
     mkdir -p $(pkgdir)/opt/${pkgname}
     cp -rf * ${pkgdir}/opt/${pkgname}
-    make DESTDIR="${pkgdir}" install
+    make DESTDIR="${pkgdir}" PREFIX="/usr" install
     install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
     install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
 }
