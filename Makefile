@@ -8,11 +8,10 @@ OBJ := info.o main.o
 OBJ_OSX := macos_infos.o bsdwrap.o
 SRC := src/info.c src/main.c
 SRC_OSX := macos_infos.c bsdwrap.c
-INCLUDE := -I src
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build
-	cat /usr/bin/pacman >/dev/null 2>/dev/null && $(CC) -o build/$(TARGET) $(INCLUDE) -l alpm $(OBJ) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+	cat /usr/bin/pacman >/dev/null 2>/dev/null && $(CC) -o build/$(TARGET) -l alpm $(OBJ) $(CFLAGS) || $(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
 main.o: src/main.c src/config.h src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c
@@ -28,7 +27,7 @@ macos_infos.o: src/macos_infos.c
 
 osx: $(OBJ) $(OBJ_OSX)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(OBJ_OSX) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_OSX) $(CFLAGS)
 
 run: build/$(TARGET)
 	build/$(TARGET)

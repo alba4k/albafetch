@@ -424,7 +424,7 @@ void cpu() {            // prints the current CPU
     }
     cpu_info += 2;
 
-    char *end = strchr(cpu_info, '@');
+    char *end = strstr(cpu_info, " @");
     if(!end) {
         end = strchr(cpu_info, '\n');
         if(!end)
@@ -452,7 +452,7 @@ void cpu() {            // prints the current CPU
 
         *end = 0;
 
-        printf("@ %g GHz", (float)(atoi(cpu_freq)/100)/10);
+        printf(" @ %g GHz", (float)(atoi(cpu_freq)/100)/10);
     }
 
     free(str);
