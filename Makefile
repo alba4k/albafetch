@@ -9,7 +9,6 @@ OBJ_OSX := macos_infos.o bsdwrap.o
 SRC := src/info.c src/main.c
 SRC_OSX := macos_infos.c bsdwrap.c
 INCLUDE := -I src
-PREFIX := /usr
 
 build/albafetch: $(OBJ)
 	mkdir -p build
@@ -35,7 +34,7 @@ run: build/$(TARGET)
 	build/$(TARGET)
 
 install:
-	cp -f build/$(TARGET) $(PREFIX)/bin/$(TARGET)
+	cp -f build/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 
 uninstall:
 	rm /usr/bin/$(TARGET)
