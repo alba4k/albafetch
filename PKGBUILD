@@ -1,8 +1,8 @@
 # Maintainer: alba4k <blaskoazzolaaaron@gmail.com>
 pkgname=albafetch-git
-pkgver=2.5.r305.3e83d70
+pkgver=2.5.r306.b445a89
 pkgrel=1
-pkgdesc="Noefetch, but written in C; both faster and worse than the original"
+pkgdesc="Neofetch, but written in C; both faster and worse than the original"
 arch=(x86_64)
 url="https://github.com/alba4k/albafetch"
 license=('MIT')
@@ -22,8 +22,8 @@ build() {
 
 package() {
     cd albafetch
-    make DESTDIR="$pkgdir" install
     mkdir -p "$pkgdir/usr/bin/"
-    install -Dm644 LICENSE "/usr/share/licenses/${pkgname}/LICENSE"
-    install -Dm644 README.md "/usr/share/doc/${pkgname}/README.md"
+    make DESTDIR="$pkgdir" install
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 README.md "$pkgdir/usr/share/doc/${pkgname}/README.md"
 }
