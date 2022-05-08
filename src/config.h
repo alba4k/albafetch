@@ -30,7 +30,7 @@
 #define PUB_IP_LABEL "Publ. IP"
 #define PRIV_IP_LABEL "Priv. IP"
 
-// add more logos in src/vars.h if you want, I couldn't care less
+// add more logos in src/logos.h if you want, I couldn't care less
 
 // example:
 // #define DEFAULT_LOGO "debian"    // set debian as default logo

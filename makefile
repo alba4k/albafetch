@@ -1,4 +1,4 @@
-.PHONY: albafetch
+.PHONY: build/albafetch
 
 SHELL := /bin/bash
 CC := gcc
