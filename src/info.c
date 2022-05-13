@@ -477,7 +477,7 @@ void cpu() {            // prints the current CPU
 
     error:
         fflush(stdout);
-        fputs("[Bad Format]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         free(str);
         return;
@@ -534,6 +534,7 @@ void gpu() {            // prints the current GPU
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
+        return;
 }
 
 // memory
