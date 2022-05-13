@@ -496,22 +496,11 @@ void cpu() {            // prints the current CPU
 void cpu() {
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
 
-    int pipes[2];
-    pipe(pipes);
-    char cpu[64];
+    size_t buf_size = 100;
+    char buf[buf_size];
+    sysctlbyname("machdep.cpu.brand_string", &buf, &buf_size, NULL, 0);
 
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-
-        execlp("sysctl", "-n", "machdep.cpu.brand_string", NULL); 
-    }
-    wait(NULL);
-    close(pipes[1]);
-    cpu[read(pipes[0], cpu, 10) - 1] = 0;
-    close(pipes[0]);
-
-    printf("%s", cpu);
+    printf("%s", buf);
 }
 #endif
 
