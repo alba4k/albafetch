@@ -48,7 +48,7 @@ void title() {          // prints a title in the format user@hostname
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
     if(!pw) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -75,7 +75,7 @@ void user() {           // get the current login
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
     if(!pw) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
     }
     char *username = pw->pw_name;
@@ -144,7 +144,7 @@ void os() {
     uname(&name);
 
     printf("%-16s\e[0m\e[37m", OS_LABEL DASH_COLOR DASH);
-    printf("MacOS X %s", name.machine);
+    printf("macOS %s", name.machine);
 }
 #else
 void os() {             // prints the os name + arch
@@ -156,7 +156,7 @@ void os() {             // prints the os name + arch
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         printf(" %s", name.machine);
         return;
@@ -357,7 +357,7 @@ void host() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -381,7 +381,7 @@ void bios() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -398,7 +398,7 @@ void bios() {           // prints the current host machine
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -420,7 +420,7 @@ void cpu() {            // prints the current CPU
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -479,7 +479,6 @@ void cpu() {            // prints the current CPU
         fflush(stdout);
         fputs("[Bad Format]", stderr);
         fflush(stderr);
-        fclose(fp);
         free(str);
         return;
 }
@@ -501,8 +500,8 @@ void gpu() {            // prints the current GPU
     lspci[read(pipes[0], lspci, 0x2000)] = 0;
     close(pipes[0]);
 
-    char *gpu = strstr(lspci, "3D");
-    if(!gpu) {
+    char *gpu;
+    if(!(gpu = strstr(lspci, "3D"))) {
         gpu = strstr(lspci, "VGA");
         if(!gpu)
             goto error;
@@ -528,7 +527,6 @@ void gpu() {            // prints the current GPU
     printf("%s", gpu);
 
     free(lspci);
-
     return;
 
     error:
@@ -606,7 +604,7 @@ void memory() {
 
     error:
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
 }
