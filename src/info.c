@@ -206,6 +206,8 @@ void kernel() {         // prints the kernel version
     printf("%-16s\e[0m\e[37m%s ", KERNEL_LABEL DASH_COLOR DASH, name.release);
 }
 
+//desktop
+#ifndef __APPLE__
 void desktop() {        // prints the current desktop environment
     printf("%-16s\e[0m\e[37m", DESKTOP_LABEL DASH_COLOR DASH);
     const char *de;
@@ -220,6 +222,12 @@ void desktop() {        // prints the current desktop environment
 
     printf("%s", desktop); 
 }
+#else
+void desktop() {
+    printf("%-16s\e[0m\e[37m", DESKTOP_LABEL DASH_COLOR DASH);
+    printf("Aqua");
+}
+#endif
 
 void shell() {          // prints the user default shell
     printf("%-16s\e[0m\e[37m%s", SHELL_LABEL DASH_COLOR DASH, getenv("SHELL"));        // $SHELL
@@ -414,6 +422,8 @@ void bios() {           // prints the current host machine
     fclose(fp);
 }
 
+//cpu
+#ifndef __APPLE__
 void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
 
@@ -482,6 +492,28 @@ void cpu() {            // prints the current CPU
         free(str);
         return;
 }
+#else
+void cpu() {
+    printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
+
+    int pipes[2];
+    pipe(pipes);
+    char cpu[64];
+
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        execlp("sysctl", "-n", "machdep.cpu.brand_string", NULL); 
+    }
+    wait(NULL);
+    close(pipes[1]);
+    cpu[read(pipes[0], cpu, 10) - 1] = 0;
+    close(pipes[0]);
+
+    printf("%s", cpu);
+}
+#endif
 
 void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
