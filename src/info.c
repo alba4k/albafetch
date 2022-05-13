@@ -485,56 +485,61 @@ void cpu() {            // prints the current CPU
 
 void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
+    if(!access("/usr/bin/lspci", F_OK)) {
+        int pipes[2];
+        char *lspci = malloc(0x2000);
 
-    int pipes[2];
-    char *lspci = malloc(0x2000);
-
-    pipe(pipes);
-    if(!fork()) {
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+            execlp("lspci", "lspci", "-mm", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        lspci[read(pipes[0], lspci, 0x2000)] = 0;
         close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        execlp("lspci", "lspci", "-mm", NULL); 
-    }
-    wait(NULL);
-    close(pipes[1]);
-    lspci[read(pipes[0], lspci, 0x2000)] = 0;
-    close(pipes[0]);
 
-    char *gpu;
-    if(!(gpu = strstr(lspci, "3D"))) {
-        gpu = strstr(lspci, "VGA");
-        if(!gpu)
+        char *gpu = strstr(lspci, "3D");
+        if(!gpu) {
+            gpu = strstr(lspci, "VGA");
+            if(!gpu)
+                goto error;
+        }                           
+
+        for(int i = 0; i < 4; i++) {
+            gpu = strchr(gpu, '"');
+            if(!gpu)
+                goto error;
+            gpu++;
+            // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            //  "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            // WhiskeyLake-U GT2 [UHD Graphics 620]"
+        }
+
+        char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
+        if(!end)
             goto error;
-    }                           
+        *end = 0;
 
-    for(int i = 0; i < 4; i++) {
-        gpu = strchr(gpu, '"');
-        if(!gpu)
-            goto error;
-        gpu++;
-        // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        //  "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        // WhiskeyLake-U GT2 [UHD Graphics 620]"
-    }
+        printf("%s", gpu);
 
-    char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
-    if(!end)
-        goto error;
-    *end = 0;
-
-    printf("%s", gpu);
-
-    free(lspci);
-    return;
-
-    error:
         free(lspci);
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
         return;
+
+        error:
+            free(lspci);
+            fflush(stdout);
+            fprintf("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+    }
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
+    return;
 }
 
 // memory
