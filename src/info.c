@@ -532,7 +532,7 @@ void gpu() {            // prints the current GPU
         error:
             free(lspci);
             fflush(stdout);
-            fprintf("[Unsupported]", stderr);
+            fputs("[Unsupported]", stderr);
             fflush(stderr);
             return;
     }
