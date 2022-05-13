@@ -107,15 +107,14 @@ static long linux_uptime() {
     return info.uptime;
 }
 #endif
+void uptime() {         // prints the uptime    
+    long uptime;
 
-void uptime() {         // prints the uptime
-    long uptime;  
-
-#ifdef __linux    
+    #ifdef __linux
     uptime = linux_uptime();
-#else
+    #else
     uptime = macos_uptime();
-#endif
+    #endif
 
     long secs = uptime;            // total uptime in seconds
     long days = secs/86400;
@@ -138,6 +137,16 @@ void uptime() {         // prints the uptime
     }
 }
 
+//os
+#ifdef __APPLE__
+void os() {
+    struct utsname name;
+    uname(&name);
+
+    printf("%-16s\e[0m\e[37m", OS_LABEL DASH_COLOR DASH);
+    printf("MacOS X %s", name.machine);
+}
+#else
 void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
@@ -188,6 +197,7 @@ void os() {             // prints the os name + arch
         free(str);
         return;
 }
+#endif
 
 void kernel() {         // prints the kernel version
     struct utsname name;
@@ -229,7 +239,6 @@ void packages() {       // prints the number of installed packages
     bool supported;
 
     #ifdef ARCH_BASED
-    if(!access("/usr/bin/pacman", F_OK)) {
         alpm_errno_t err;
         alpm_handle_t *handle = alpm_initialize("/", "/var/lib/pacman/", &err);
         alpm_db_t *db_local = alpm_get_localdb(handle);
@@ -243,7 +252,6 @@ void packages() {       // prints the number of installed packages
         if(pkgs)
             printf("%ld (pacman) ", pkgs);
         supported = true;
-    }
     #endif
     if(!access("/usr/bin/dpkg-query", F_OK)) {
         pipe(pipes);
@@ -336,6 +344,13 @@ void packages() {
 }
 #endif
 
+// host
+#ifdef __APPLE__
+void host() {
+    printf("%-16s\e[0m\e[37m", HOST_LABEL DASH_COLOR DASH);
+    printf("Apple");
+}
+#else
 void host() {           // prints the current host machine
     printf("%-16s\e[0m\e[37m", HOST_LABEL DASH_COLOR DASH);
 
@@ -357,6 +372,7 @@ void host() {           // prints the current host machine
 
     printf("%s", model);
 }
+#endif
 
 void bios() {           // prints the current host machine
     printf("%-16s\e[0m\e[37m", BIOS_LABEL DASH_COLOR DASH);
