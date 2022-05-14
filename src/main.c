@@ -101,7 +101,8 @@ int main(const int argc, const char **argv) {
         #else
             FILE *fp = fopen("/etc/os-release", "r");
             if(!fp) {
-                return -1;
+                logo = (char**)logos[0];
+                goto logo_found;
             }
             fseek(fp, 0, SEEK_END);
             size_t len = ftell(fp);
@@ -119,21 +120,23 @@ int main(const int argc, const char **argv) {
             char *os_id = strstr(str, field);
             if(!os_id) {
                 free(str);
-                return -1;
+                logo = (char**)logos[0];
+                goto logo_found;
             }
             os_id += strlen(field);
 
             char *end = strchr(os_id, '\n');
             if(!end) {
                 free(str);
-                return -1;
+                logo = (char**)logos[0];
+                goto logo_found;
             }
             *end = 0;
 
             for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
                 if(!strcmp(logos[i][0], os_id)) {
-                    logo = (char**)logos[i];
                     free(str);
+                    logo = (char**)logos[i];
                     goto logo_found;
                 }
             logo = (char**)logos[0];
