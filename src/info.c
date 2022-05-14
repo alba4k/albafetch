@@ -181,7 +181,6 @@ void os() {             // prints the os name + arch
     printf("%s %s", os_name, name.machine);
 
     fclose(fp);
-    free(str);
 
     return;
 
@@ -191,7 +190,6 @@ void os() {             // prints the os name + arch
         fflush(stderr);
         printf(" %s", name.machine);
         fclose(fp);
-        free(str);
         return;
 }
 #endif
@@ -424,9 +422,9 @@ void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
-    if(!fp) {
+    if (!fp) {
         fflush(stdout);
-        fputs("[Unsupported]", stderr);
+        fputs("[Could not open `/proc/info`]", stderr);
         fflush(stderr);
         return;
     }
@@ -435,20 +433,20 @@ void cpu() {            // prints the current CPU
     char buf[cpu_info_len];
     char *cpu_info = &buf[0];
 
-    read_after_sequence(fp, "model name:", (int *) buf, cpu_info_len);
-    ++cpu_info;
+    read_after_sequence(fp, "model name", buf, cpu_info_len);
+    cpu_info += 2;
 
     char *end;
 
-    if(!PRINT_CPU_FREQ && cpu_info[0] == 'I') {
+    if (!PRINT_CPU_FREQ && cpu_info[0] == 'I') {
         end = strchr(cpu_info, '@');
-        if(!end) {
+        if (!end) {
             goto error;
         }
         end--;
     } else {
         end = strchr(cpu_info, '\n');
-        if(!end) {
+        if (!end) {
             goto error;
         }
     }
@@ -457,10 +455,10 @@ void cpu() {            // prints the current CPU
 
     printf("%s", cpu_info);
 
-    if(PRINT_CPU_FREQ) {
+    if (PRINT_CPU_FREQ) {
         *end = ' ';
 
-        char *cpu_freq = strstr(str, "cpu MHz");
+        char *cpu_freq = strstr(cpu_info, "cpu MHz");
         if(!cpu_freq)
             goto error;
 
@@ -478,15 +476,12 @@ void cpu() {            // prints the current CPU
         printf(" @ %g GHz", (float)(atoi(cpu_freq)/100)/10);
     }
 
-    free(str);
-
     return;
 
     error:
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
-        free(str);
         return;
 }
 #else
@@ -590,38 +585,38 @@ void memory() {
     unsigned long bufferram = info.bufferram / 1024;
 
     FILE *fp = fopen("/proc/meminfo", "r");
-    if(!fp) {
-        goto error;
+
+    if (!fp) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+        return;
     }
 
     const size_t cachedram_len = 256;
     char buf[cachedram_len];
     char *cachedram = &buf[0]; 
 
-    read_after_sequence(fp, "Cached:", (int *) buf, cachedram_len);
-    ++cachedram;
+    read_after_sequence(fp, "Cached:", buf, cachedram_len);
+    cachedram += 2;
 
     char *end;
     end = strstr(cachedram, " kB");
-    if(!end) {
-        goto error;     
+    
+    if (!end) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+        return;     
     }
+    
     (*end) = 0;
-
-
 
     unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
 
     printf("%lu MiB / %lu MiB (%lu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
 
-    free(str);
     return;
-
-    error:
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
 }
 #endif
 

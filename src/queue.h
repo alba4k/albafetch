@@ -17,23 +17,23 @@ typedef struct
     size_t offset;
     size_t size;
     size_t alloc_size;
-    int *data;
+    char *data;
 } Queue;
 
 Queue *queue_with_size(size_t size);
 
 int requeue(Queue *q);
 
-int enqueue(Queue *q, int val);
+int enqueue(Queue *q, char val);
 
-int dequeue(Queue *q, int *out);
+int dequeue(Queue *q, char *out);
 
 void destroy_queue(Queue *q);
 
 void test_queue();
 
 void read_after_sequence(FILE *fp, const char *seq, 
-        int *buffer, size_t buffer_size);
+        char *buffer, size_t buffer_size);
 
 
 #endif	// QUEUE_H

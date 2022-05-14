@@ -4,7 +4,7 @@ Queue *queue_with_size(size_t size)
 {
     Queue *q = malloc(sizeof(Queue));
 
-    size_t byte_size = sizeof(int) * size;
+    size_t byte_size = sizeof(char) * size;
     q->data = malloc(byte_size);
     memset(q->data, 0, byte_size);
 
@@ -22,10 +22,10 @@ int requeue(Queue *q)
     if (q->size == q->alloc_size)
         return -1;
     
-    size_t used_byte_size = sizeof(int) * q->size;
-    int buf[q->size];
+    size_t used_byte_size = sizeof(char) * q->size;
+    char buf[q->size];
 
-    int *relevant_data_start = q->data + q->offset;
+    char *relevant_data_start = q->data + q->offset;
     memcpy(buf, relevant_data_start, used_byte_size);
 
     memcpy(q->data, buf, used_byte_size);
@@ -34,7 +34,7 @@ int requeue(Queue *q)
     return 0;
 }
 
-int enqueue(Queue *q, int val)
+int enqueue(Queue *q, char val)
 {
     if (q->size >= q->alloc_size)
         return QUEUE_FULL;
@@ -54,7 +54,7 @@ int enqueue(Queue *q, int val)
     return QUEUE_OK;
 }
 
-int dequeue(Queue *q, int *out)
+int dequeue(Queue *q, char *out)
 {
     // If there is no elements in the array, returns the null character.
     if (q->size < 1)
@@ -65,7 +65,7 @@ int dequeue(Queue *q, int *out)
     if (q->offset >= q->alloc_size)
         return QUEUE_EMPTY;
 
-    int front = q->data[q->offset];
+    char front = q->data[q->offset];
 
     q->offset++; // Increment the front.
     q->size--;   // Decrease the size since we removed a character.
@@ -82,15 +82,15 @@ void destroy_queue(Queue *q)
 }
 
 void read_after_sequence(FILE *fp, const char *seq, 
-        int *buffer, size_t buffer_size) {
-    size_t seq_size = strlen(seq);
-    // Bigger q => more speed => more mem
-    Queue *q = queue_with_size(3 * seq_size); 
-    int ch;
+    char *buffer, size_t buffer_size) 
+{
 
-    // Read file until we find seq.
+    size_t seq_size = strlen(seq);
+    Queue *q = queue_with_size(3 * seq_size); 
+    int ch, error;
+    char elem;
+
     while ((ch = fgetc(fp)) != EOF) {
-        // Sliding window effect.
         if (q->size < seq_size) {
             enqueue(q, ch);
             continue;
@@ -98,25 +98,18 @@ void read_after_sequence(FILE *fp, const char *seq,
 
         assert(q->size == seq_size && "Window is of correct width.");
 
-        // Use strncmp because q doesn't have null char.
         if (strncmp((char *) q->data + q->offset, seq, seq_size) == 0)
             break;
 
-        int error; 
-        int elem; // Dummy, queue will try to write to this.
+         
         error = dequeue(q, &elem);
-
-        // We ensure this does not happen at the start of the loop.
         assert(error != QUEUE_EMPTY && "Queue should always have at least `seq_size` items.");
 
         error = enqueue(q, ch);
-        // We literally just freed up space.
         assert(error != QUEUE_FULL 
             && "Queue should maintain same size, as 1 item is added and another is removed.");
     }
 
-    // The queue is a heap allocation, so it
-    // must be released.
     destroy_queue(q);
 
     // Actually read for the rest of the file, or the buffer.
