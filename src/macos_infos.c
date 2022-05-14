@@ -62,7 +62,7 @@ bytes_t used_mem_size() {
 
     return (internal + wired + compressed) * page_size(host);
 }
-
+/*
 char *processor() {
     pages_t cpu;
-}
+}*/
