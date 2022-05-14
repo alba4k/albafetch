@@ -161,18 +161,14 @@ void os() {             // prints the os name + arch
         printf(" %s", name.machine);
         return;
     }
-    fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
-    rewind(fp);
-    char *str = malloc(len + 1);
-    str[fread(str, 1, len, fp)] = 0;
-    char *os_name = strstr(str, "PRETTY_NAME=\"");
-    if(!os_name) {
-        os_name = strstr(str, "PRETTY_NAME=\'");
-        if(!os_name)
-            goto error;
-    }
-    os_name += strlen("PRETTY_NAME=\"");
+
+    const size_t os_name_len = 256;
+    char buf[os_name_len];
+    char *os_name = &buf[0];
+
+    read_after_sequence(fp, "PRETTY_NAME", (int *) buf, os_name_len);
+    ++os_name; 
+
     char *end = strchr(os_name, '"');
     if(!end) {
         end = strchr(os_name, '\'');
@@ -422,7 +418,6 @@ void bios() {           // prints the current host machine
     fclose(fp);
 }
 
-//cpu
 #ifndef __APPLE__
 void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
@@ -435,28 +430,29 @@ void cpu() {            // prints the current CPU
         return;
     }
 
-    char *str = malloc(0x10000);
-    str[fread(str, 1, 0x10000, fp)] = 0;
-    fclose(fp);
+    const size_t cpu_info_len = 256;
+    char buf[cpu_info_len];
+    char *cpu_info = &buf[0];
 
-    char *cpu_info = strstr(str, "model name");
-    if(!cpu_info) {
-        goto error;
-    }
+    read_after_sequence(fp, "model name:", (int *) buf, cpu_info_len);
+    ++cpu_info;
 
-    cpu_info = strchr(cpu_info, ':');
-    if(!cpu_info) {
-        goto error;
-    }
-    cpu_info += 2;
+    char *end;
 
-    char *end = strstr(cpu_info, " @");
-    if(!end) {
-        end = strchr(cpu_info, '\n');
-        if(!end)
+    if(!PRINT_CPU_FREQ && cpu_info[0] == 'I') {
+        end = strchr(cpu_info, '@');
+        if(!end) {
             goto error;
+        }
+        end--;
+    } else {
+        end = strchr(cpu_info, '\n');
+        if(!end) {
+            goto error;
+        }
     }
-    *end = 0;
+    
+    (*end) = 0;
 
     printf("%s", cpu_info);
 
@@ -596,31 +592,22 @@ void memory() {
     if(!fp) {
         goto error;
     }
-    char *str = malloc(0x1000);
 
-    str[fread(str, 1, 0x1000, fp)] = 0;
-    fclose(fp);
+    const size_t cachedram_len = 256;
+    char buf[cachedram_len];
+    char *cachedram = &buf[0]; 
 
-    char *cachedram = strstr(str, "Cached");
-    if(!cachedram) {
-        free(str);
-        goto error;
-    }
+    read_after_sequence(fp, "Cached:", (int *) buf, cachedram_len);
+    ++cachedram;
 
-    cachedram = strchr(cachedram, ':');
-    if(!cachedram) {
-        free(str);
-        goto error;
-    }
-
-    cachedram+=2;
-
-    char *end = strchr(cachedram, 'k') - 1;
+    char *end;
+    end = strstr(cachedram, " kB");
     if(!end) {
-        free(str);
-        goto error;
+        goto error;     
     }
-    *end = 0;
+    (*end) = 0;
+
+
 
     unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
 
