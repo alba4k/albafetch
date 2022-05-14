@@ -5,9 +5,9 @@ CC := gcc
 CFLAGS := -Wall
 TARGET := albafetch
 OBJ := info.o main.o
-OBJ_OSX := macos_infos.o bsdwrap.o
+OBJ_OSX := macos_infos.o bsdwrap.o macos_gpu_string.o
 SRC := src/info.c src/main.c
-SRC_OSX := macos_infos.c bsdwrap.c
+SRC_OSX := macos_infos.c bsdwrap.c macos_gpu_string.m
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build
@@ -25,9 +25,12 @@ bsdwrap.o: src/bsdwrap.c
 macos_infos.o: src/macos_infos.c
 	-$(CC) -c src/macos_infos.c
 
+macos_gpu_string.o: src/macos_gpu_string.m
+	-$(CC) -c src/macos_gpu_string.m -framework Foundation -framework IOKit
+
 osx: $(OBJ) $(OBJ_OSX)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_OSX) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_OSX) $(CFLAGS) -framework Foundation -framework IOKit
 
 run: build/$(TARGET)
 	build/$(TARGET)
