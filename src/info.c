@@ -23,6 +23,7 @@
 
 #include "info.h"
 #include "config.h"
+#include "queue.h"
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
