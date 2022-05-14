@@ -25,7 +25,7 @@
  * ex. For querying total memory size.
  *
  * ```c
- * uin64_t size;
+ * uint64_t size;
  * size_t len = sizeof(uin64_t);
  * sysctl_wrap(&size, &len, 
  *             CTL_HW,      // Query the hardware domain.

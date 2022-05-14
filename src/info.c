@@ -48,7 +48,7 @@ void title() {          // prints a title in the format user@hostname
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
     if(!pw) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -75,7 +75,7 @@ void user() {           // get the current login
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
     if(!pw) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
     }
     char *username = pw->pw_name;
@@ -107,15 +107,14 @@ static long linux_uptime() {
     return info.uptime;
 }
 #endif
+void uptime() {         // prints the uptime    
+    long uptime;
 
-void uptime() {         // prints the uptime
-    long uptime;  
-
-#ifdef __linux    
+    #ifdef __linux
     uptime = linux_uptime();
-#else
+    #else
     uptime = macos_uptime();
-#endif
+    #endif
 
     long secs = uptime;            // total uptime in seconds
     long days = secs/86400;
@@ -138,6 +137,16 @@ void uptime() {         // prints the uptime
     }
 }
 
+//os
+#ifdef __APPLE__
+void os() {
+    struct utsname name;
+    uname(&name);
+
+    printf("%-16s\e[0m\e[37m", OS_LABEL DASH_COLOR DASH);
+    printf("macOS %s", name.machine);
+}
+#else
 void os() {             // prints the os name + arch
     struct utsname name;
     uname(&name);
@@ -147,7 +156,7 @@ void os() {             // prints the os name + arch
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         printf(" %s", name.machine);
         return;
@@ -188,6 +197,7 @@ void os() {             // prints the os name + arch
         free(str);
         return;
 }
+#endif
 
 void kernel() {         // prints the kernel version
     struct utsname name;
@@ -196,6 +206,8 @@ void kernel() {         // prints the kernel version
     printf("%-16s\e[0m\e[37m%s ", KERNEL_LABEL DASH_COLOR DASH, name.release);
 }
 
+//desktop
+#ifndef __APPLE__
 void desktop() {        // prints the current desktop environment
     printf("%-16s\e[0m\e[37m", DESKTOP_LABEL DASH_COLOR DASH);
     const char *de;
@@ -210,6 +222,12 @@ void desktop() {        // prints the current desktop environment
 
     printf("%s", desktop); 
 }
+#else
+void desktop() {
+    printf("%-16s\e[0m\e[37m", DESKTOP_LABEL DASH_COLOR DASH);
+    printf("Aqua");
+}
+#endif
 
 void shell() {          // prints the user default shell
     printf("%-16s\e[0m\e[37m%s", SHELL_LABEL DASH_COLOR DASH, getenv("SHELL"));        // $SHELL
@@ -229,7 +247,6 @@ void packages() {       // prints the number of installed packages
     bool supported;
 
     #ifdef ARCH_BASED
-    if(!access("/usr/bin/pacman", F_OK)) {
         alpm_errno_t err;
         alpm_handle_t *handle = alpm_initialize("/", "/var/lib/pacman/", &err);
         alpm_db_t *db_local = alpm_get_localdb(handle);
@@ -243,7 +260,6 @@ void packages() {       // prints the number of installed packages
         if(pkgs)
             printf("%ld (pacman) ", pkgs);
         supported = true;
-    }
     #endif
     if(!access("/usr/bin/dpkg-query", F_OK)) {
         pipe(pipes);
@@ -336,13 +352,20 @@ void packages() {
 }
 #endif
 
+// host
+#ifdef __APPLE__
+void host() {
+    printf("%-16s\e[0m\e[37m", HOST_LABEL DASH_COLOR DASH);
+    printf("Apple");
+}
+#else
 void host() {           // prints the current host machine
     printf("%-16s\e[0m\e[37m", HOST_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -357,6 +380,7 @@ void host() {           // prints the current host machine
 
     printf("%s", model);
 }
+#endif
 
 void bios() {           // prints the current host machine
     printf("%-16s\e[0m\e[37m", BIOS_LABEL DASH_COLOR DASH);
@@ -365,7 +389,7 @@ void bios() {           // prints the current host machine
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -382,7 +406,7 @@ void bios() {           // prints the current host machine
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -398,13 +422,15 @@ void bios() {           // prints the current host machine
     fclose(fp);
 }
 
+//cpu
+#ifndef __APPLE__
 void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -461,65 +487,80 @@ void cpu() {            // prints the current CPU
 
     error:
         fflush(stdout);
-        fputs("[Bad Format]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
-        fclose(fp);
         free(str);
         return;
 }
+#else
+void cpu() {
+    printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
+
+    size_t buf_size = 100;
+    char buf[buf_size];
+    sysctlbyname("machdep.cpu.brand_string", &buf, &buf_size, NULL, 0);
+
+    printf("%s", buf);
+}
+#endif
 
 void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
+    if(!access("/usr/bin/lspci", F_OK)) {
+        int pipes[2];
+        char *lspci = malloc(0x2000);
 
-    int pipes[2];
-    char *lspci = malloc(0x2000);
-
-    pipe(pipes);
-    if(!fork()) {
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+            execlp("lspci", "lspci", "-mm", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        lspci[read(pipes[0], lspci, 0x2000)] = 0;
         close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
-        execlp("lspci", "lspci", "-mm", NULL); 
-    }
-    wait(NULL);
-    close(pipes[1]);
-    lspci[read(pipes[0], lspci, 0x2000)] = 0;
-    close(pipes[0]);
 
-    char *gpu = strstr(lspci, "3D");
-    if(!gpu) {
-        gpu = strstr(lspci, "VGA");
-        if(!gpu)
+        char *gpu = strstr(lspci, "3D");
+        if(!gpu) {
+            gpu = strstr(lspci, "VGA");
+            if(!gpu)
+                goto error;
+        }                           
+
+        for(int i = 0; i < 4; i++) {
+            gpu = strchr(gpu, '"');
+            if(!gpu)
+                goto error;
+            gpu++;
+            // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            //  "WhiskeyLake-U GT2 [UHD Graphics 620]"
+            // WhiskeyLake-U GT2 [UHD Graphics 620]"
+        }
+
+        char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
+        if(!end)
             goto error;
-    }                           
+        *end = 0;
 
-    for(int i = 0; i < 4; i++) {
-        gpu = strchr(gpu, '"');
-        if(!gpu)
-            goto error;
-        gpu++;
-        // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        //  "WhiskeyLake-U GT2 [UHD Graphics 620]"
-        // WhiskeyLake-U GT2 [UHD Graphics 620]"
-    }
+        printf("%s", gpu);
 
-    char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
-    if(!end)
-        goto error;
-    *end = 0;
-
-    printf("%s", gpu);
-
-    free(lspci);
-
-    return;
-
-    error:
         free(lspci);
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
+        return;
+
+        error:
+            free(lspci);
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+    }
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
+    return;
 }
 
 // memory
@@ -590,7 +631,7 @@ void memory() {
 
     error:
         fflush(stdout);
-        fputs("[Not Found]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
 }
