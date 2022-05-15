@@ -495,6 +495,23 @@ void cpu() {
 }
 #endif
 
+#ifdef __APPLE__
+void gpu() {
+
+    printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
+
+    const char *gpu_string = get_gpu_string();
+    if (!gpu_string) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+    } else {
+        printf("%s", gpu_string);
+    }
+
+    return;
+}
+#else
 void gpu() {            // prints the current GPU
     printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
     if(!access("/usr/bin/lspci", F_OK)) {
@@ -553,6 +570,7 @@ void gpu() {            // prints the current GPU
     fflush(stderr);
     return;
 }
+#endif
 
 // memory
 #ifdef __APPLE__ 

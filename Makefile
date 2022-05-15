@@ -28,9 +28,12 @@ macos_infos.o: src/macos_infos.c
 queue.o: src/queue.c
 	$(CC) -c src/queue.c
 
+macos_gpu_string.o: src/macos_gpu_string.m
+	-$(CC) -c src/macos_gpu_string.m -framework Foundation -framework IOKit
+
 osx: $(OBJ) $(OBJ_OSX)
 	mkdir -p build
-	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_OSX) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_OSX) $(CFLAGS) -framework Foundation -framework IOKit
 
 run: build/$(TARGET)
 	build/$(TARGET)
