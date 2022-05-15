@@ -5,7 +5,7 @@ CC := gcc
 CFLAGS := -Wall
 TARGET := albafetch
 OBJ := info.o main.o queue.o
-OBJ_OSX := macos_infos.o bsdwrap.o
+OBJ_OSX := macos_infos.o bsdwrap.o macos_gpu_string.o
 SRC := src/info.c src/main.c src/queue.c
 SRC_OSX := macos_infos.c bsdwrap.c
 
