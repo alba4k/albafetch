@@ -424,7 +424,7 @@ void cpu() {            // prints the current CPU
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if (!fp) {
         fflush(stdout);
-        fputs("[Could not open `/proc/info`]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -489,6 +489,7 @@ void cpu() {
 }
 #endif
 
+// gpu
 #ifdef __APPLE__
 void gpu() {
 
@@ -499,11 +500,9 @@ void gpu() {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
-    } else {
-        printf("%s", gpu_string);
+        return;
     }
-
-    return;
+    printf("%s", gpu_string);
 }
 #else
 void gpu() {            // prints the current GPU
