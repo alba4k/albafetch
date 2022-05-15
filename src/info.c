@@ -428,9 +428,8 @@ void cpu() {            // prints the current CPU
         fflush(stderr);
         return;
     }
-
-    const size_t cpu_info_len = 256;
-    char buf[cpu_info_len];
+    
+    char buf[256];
     char *cpu_info = &buf[0];
 
     read_after_sequence(fp, "model name", buf, cpu_info_len);
@@ -593,11 +592,10 @@ void memory() {
         return;
     }
 
-    const size_t cachedram_len = 256;
-    char buf[cachedram_len];
+    char buf[256];
     char *cachedram = &buf[0]; 
 
-    read_after_sequence(fp, "Cached:", buf, cachedram_len);
+    read_after_sequence(fp, "Cached:", buf, 256);
     cachedram += 2;
 
     char *end;
