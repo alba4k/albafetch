@@ -165,10 +165,9 @@ void os() {             // prints the os name + arch
 
     const size_t os_name_len = 256;
     char buf[os_name_len];
-    char *os_name = &buf[0];
+    char *os_name = buf;
 
-    read_after_sequence(fp, "PRETTY_NAME", (int *) buf, os_name_len);
-    ++os_name; 
+    read_after_sequence(fp, "PRETTY_NAME=", buf, os_name_len);
 
     char *end = strchr(os_name, '"');
     if(!end) {
@@ -417,6 +416,7 @@ void bios() {           // prints the current host machine
     fclose(fp);
 }
 
+// cpu
 #ifndef __APPLE__
 void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
@@ -432,18 +432,12 @@ void cpu() {            // prints the current CPU
     char buf[256];
     char *cpu_info = &buf[0];
 
-    read_after_sequence(fp, "model name", buf, cpu_info_len);
+    read_after_sequence(fp, "model name", buf, 256);
     cpu_info += 2;
 
     char *end;
 
-    if (!PRINT_CPU_FREQ && cpu_info[0] == 'I') {
-        end = strchr(cpu_info, '@');
-        if (!end) {
-            goto error;
-        }
-        end--;
-    } else {
+    if (!(end = strchr(cpu_info, '@')-1)) {
         end = strchr(cpu_info, '\n');
         if (!end) {
             goto error;
