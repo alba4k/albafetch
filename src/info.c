@@ -168,7 +168,7 @@ void os() {             // prints the os name + arch
 
     read_after_sequence(fp, "PRETTY_NAME", buf, 128);
     if(os_name[0] == '"' || os_name[0] == '\'')
-        os_name++;
+        ++os_name;
 
     char *end = strchr(os_name, '"');
     if(!end) {
@@ -251,7 +251,7 @@ void packages() {       // prints the number of installed packages
         size_t pkgs = 0;
 
         for(alpm_list_t *entry = alpm_db_get_pkgcache(db_local); entry; entry = alpm_list_next(entry))
-            pkgs++;
+            ++pkgs;
 
         alpm_release(handle);
 
@@ -533,11 +533,11 @@ void gpu() {            // prints the current GPU
                 goto error;
         }                           
 
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 4; ++i) {
             gpu = strchr(gpu, '"');
             if(!gpu)
                 goto error;
-            gpu++;
+            ++gpu;
             // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
             //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
             // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"

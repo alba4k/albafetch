@@ -23,7 +23,7 @@ int main(const int argc, const char **argv) {
     // rtfm and stfu
     bool user_is_an_idiot = false;
     
-    for(int i = 0; i < argc; i++) {
+    for(int i = 0; i < argc; ++i) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
@@ -71,7 +71,7 @@ int main(const int argc, const char **argv) {
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
             if(argv[i+1]) {
-                for(int j = 0; j < sizeof(logos)/sizeof(logos[0]); j++)
+                for(int j = 0; j < sizeof(logos)/sizeof(logos[0]); ++j)
                     if(!strcmp(logos[j][0], argv[i+1])) {
                         logo = (char**)logos[j];
                         goto logo_arg_found;
@@ -90,7 +90,7 @@ int main(const int argc, const char **argv) {
 
     if(!logo) {
         if(DEFAULT_LOGO[0])
-            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
+            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], DEFAULT_LOGO)) {
                     logo = (char**)logos[i];
                     goto logo_found;
@@ -133,7 +133,7 @@ int main(const int argc, const char **argv) {
             }
             *end = 0;
 
-            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
+            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], os_id)) {
                     free(str);
                     logo = (char**)logos[i];
@@ -201,7 +201,7 @@ int main(const int argc, const char **argv) {
     // so sizeof returns it's real size and not the size of a pointer.
     size_t info_lines = sizeof(infos) / sizeof(infos[0]);
 
-    for (size_t i = 0; i < info_lines; i++) {
+    for (size_t i = 0; i < info_lines; ++i) {
         line = printLogo(line);
         infos[i]();
         printf("\n");
