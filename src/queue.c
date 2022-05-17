@@ -81,10 +81,8 @@ void destroy_queue(Queue *q)
     free(q);
 }
 
-void read_after_sequence(FILE *fp, const char *seq, 
-    char *buffer, size_t buffer_size) 
+void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size) 
 {
-
     size_t seq_size = strlen(seq);
     Queue *q = queue_with_size(3 * seq_size); 
     int ch, error;

@@ -163,17 +163,21 @@ void os() {             // prints the os name + arch
         return;
     }
 
-    const size_t os_name_len = 256;
-    char buf[os_name_len];
+    char buf[128];
     char *os_name = buf;
 
-    read_after_sequence(fp, "PRETTY_NAME=", buf, os_name_len);
+    read_after_sequence(fp, "PRETTY_NAME", buf, 128);
+    if(os_name[0] == '"' || os_name[0] == '\'')
+        os_name++;
 
     char *end = strchr(os_name, '"');
     if(!end) {
         end = strchr(os_name, '\'');
-        if(!end)
-            goto error;
+        if(!end) {
+            end = strchr(os_name, '\n');
+            if(!end)
+                goto error;
+        }
     }
     *end = 0;
 
