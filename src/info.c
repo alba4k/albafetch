@@ -425,7 +425,7 @@ void bios() {           // prints the current host machine
 void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
 
-    FILE *fp = fopen("/proc/cpuinfo", "r");
+    FILE *fp = fopen("/home/alba4k/.config/dunstrc", "r");
     if (!fp) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
@@ -439,13 +439,15 @@ void cpu() {            // prints the current CPU
     read_after_sequence(fp, "model name", buf, 256);
     cpu_info += 2;
 
-    char *end;
+    char *end = strchr(cpu_info, '@');
 
-    if (!(end = strchr(cpu_info, '@')-1)) {
+    if (!end) {
         end = strchr(cpu_info, '\n');
         if (!end) {
             goto error;
         }
+    } else {
+        --end;
     }
     
     (*end) = 0;
