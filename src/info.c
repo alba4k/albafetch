@@ -382,34 +382,37 @@ void host() {           // prints the current host machine
 
 void bios() {           // prints the current host machine
     printf("%-16s\e[0m\e[37m", BIOS_LABEL DASH_COLOR DASH);
-
+    bool errors = false;
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
     if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
+        errors = true;
+    } else {
+        fseek(fp, 0, SEEK_END);
+        size_t len = ftell(fp);
+        rewind(fp);
+
+        char vendor[len];
+        vendor[fread(vendor, 1, len, fp) - 1] = 0;
+
+        printf("%s", vendor);
+        fclose(fp);
     }
-    fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
-    rewind(fp);
 
-    char vendor[len];
-    vendor[fread(vendor, 1, len, fp) - 1] = 0;
-
-    printf("%s", vendor);
-
-    fclose(fp);
     fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
     if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
+        if(errors) {
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+        } else {
+            return;
+        }
     }
+
     fseek(fp, 0, SEEK_END);
-    len = ftell(fp);
+    size_t len = ftell(fp);
     rewind(fp);
 
     char version[len];
@@ -418,6 +421,8 @@ void bios() {           // prints the current host machine
     printf(" %s", version);
 
     fclose(fp);
+
+    return;        
 }
 
 // cpu

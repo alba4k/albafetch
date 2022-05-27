@@ -168,7 +168,7 @@ int main(const int argc, const char **argv) {
                color, bold, color, bold, DEFAULT_BOLD[0] ? "\e[1mon" : "off");
         
         printf("\t%s%s-l\e[0m\e[37m,%s%s --logo\e[0m\e[37m:\t Changes the logo that will be displayed (%s)\n"
-               "\t\t\t [linux, apple, arch, arch_small, debian, mint, endeavouros, ubuntu]\n"
+               "\t\t\t [linux, apple, arch, arch_small, debian, linuxmint, endeavouros, ubuntu]\n"
                "\t\t\t [parrot, manjaro, fedora, neon, pop, gentoo, windows]\n",
                color, bold, color, bold, DEFAULT_LOGO[0] ? DEFAULT_LOGO : "OS default");
 
