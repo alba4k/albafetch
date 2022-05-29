@@ -6,18 +6,19 @@ CFLAGS := -Wall
 TARGET := albafetch
 
 OS := $(shell uname -s)
+PACMAN := $(shell ls /bin/pacman)
 
 ifeq ($(OS),Linux)
 	OBJ := info.o main.o queue.o
-	ifeq ($(shell ls /bin/pacman),/bin/pacman)
-		CFLAGS := -Wall -lalpm
+	ifeq ($(PACMAN),/bin/pacman)
+		INCLUDE := -l alpm
 		ARCH_BASED := -D ARCH_BASED
 	endif
 endif
 
 ifeq ($(OS),Darwin)
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o
-	CFLAGS := -Wall -framework Foundation -framework IOKit
+	INCLUDE := -framework Foundation -framework IOKit
 endif
 
 build/$(TARGET): $(OBJ)
@@ -40,7 +41,7 @@ queue.o: src/queue.c
 	$(CC) -c src/queue.c
 
 macos_gpu_string.o: src/macos_gpu_string.m
-	$(CC) -c src/macos_gpu_string.m -framework Foundation -framework IOKit
+	$(CC) -c src/macos_gpu_string.m $(INCLUDE)
 
 run: build/$(TARGET)
 	build/$(TARGET)
