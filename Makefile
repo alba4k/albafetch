@@ -16,7 +16,7 @@ ifeq ($(OS),Linux)
 endif
 
 ifeq ($(OS),Darwin)
-	OBJ := macos_infos.o bsdwrap.o macos_gpu_string.o
+	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o
 	CFLAGS := -Wall -framework Foundation -framework IOKit
 endif
 
@@ -41,10 +41,6 @@ queue.o: src/queue.c
 
 macos_gpu_string.o: src/macos_gpu_string.m
 	$(CC) -c src/macos_gpu_string.m -framework Foundation -framework IOKit
-
-osx: $(OBJ) $(OBJ_OSX)
-	mkdir -p build
-	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_OSX) $(CFLAGS) -framework Foundation -framework IOKit
 
 run: build/$(TARGET)
 	build/$(TARGET)
