@@ -4,9 +4,8 @@
 | 0             | Correct execution     |
 | 1             | Bad argument usage    |
 | -1            | Bad `/etc/os-release` |
-| 1             | Couldn't parse config |
 
-Note: error -1 can be "fixed" by working on the mentioned file or setting a value for `DEFAULT_LOGO` in `src/config.h`
+Note: error -1 can be "fixed" by working on the mentioned file or setting a value for `default_logo` in your configuration file
 
 # Adding new modules
 `src/main.c`, in function main():

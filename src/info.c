@@ -21,7 +21,6 @@
 #include <string.h> 
 
 #include "info.h"
-#include "config.h"
 
 void separator() {      // prints a separator
     printf("%s", config.separator);
@@ -37,31 +36,36 @@ void title() {          // prints a title in the format user@hostname
     pw = uid == -1 && 0 ? NULL : getpwuid(uid);
     if(!pw) {
         fflush(stdout);
-        fputs("[Unsupported]", stderr);
+        fprintf(stderr, "%s%s[Unsupported]", config.color, config.bold);
         fflush(stderr);
+        printf("\e[0m\e[37m@%s%s%s\e[0m\e[37m", config.color, config.bold, hostname);
         return;
     }
     char *username = pw->pw_name;
 
-    printf("%s\e[0m\e[37m@%s%s%s\e[0m\e[37m", username, color, bold, hostname);
+    printf("%s\e[0m\e[37m@%s%s%s\e[0m\e[37m", username, config.color, config.bold, hostname);
 }
 
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.hostname_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%-16s\e[0m\e[37m %s", HOSTNAME_LABEL DASH_COLOR DASH, hostname);
+    printf("%s", hostname);
 }
 
 void user() {           // get the current login
-    // imagine stealing code from whoami, couldn't be me
-
-    printf("%-16s\e[0m\e[37m", USER_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.user_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     struct passwd *pw;
     uid_t uid = geteuid();
 
-    pw = uid == -1 && 0 ? NULL : getpwuid(uid);
+    pw = uid == -1 ? NULL : getpwuid(uid);
     if(!pw) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
@@ -96,7 +100,11 @@ static long linux_uptime() {
     return info.uptime;
 }
 #endif
-void uptime() {         // prints the uptime    
+void uptime() {         // prints the uptime
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.uptime_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     long uptime;
     
     #ifdef __linux
@@ -111,7 +119,6 @@ void uptime() {         // prints the uptime
     char mins = secs/60 - days*1440 - hours*60;
     char sec = secs - days*86400 - hours*3600 - mins*60;
 
-    printf("%-16s\e[0m\e[37m", UPTIME_LABEL DASH_COLOR DASH);
     if(days) {
         printf("%ldd ", days);     // print the number of days passed if more than 0
     }
@@ -129,18 +136,23 @@ void uptime() {         // prints the uptime
 //os
 #ifdef __APPLE__
 void os() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.os_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     struct utsname name;
     uname(&name);
 
-    printf("%-16s\e[0m\e[37m", OS_LABEL DASH_COLOR DASH);
     printf("macOS %s", name.machine);
 }
 #else
 void os() {             // prints the os name + arch
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.os_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     struct utsname name;
     uname(&name);
-
-    printf("%-16s\e[0m\e[37m", OS_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/etc/os-release", "r");
     if(!fp) {
@@ -186,16 +198,23 @@ void os() {             // prints the os name + arch
 #endif
 
 void kernel() {         // prints the kernel version
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.kernel_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     struct utsname name;
     uname(&name);
 
-    printf("%-16s\e[0m\e[37m%s ", KERNEL_LABEL DASH_COLOR DASH, name.release);
+    printf("%s ", name.release);
 }
 
 //desktop
 #ifndef __APPLE__
 void desktop() {        // prints the current desktop environment
-    printf("%-16s\e[0m\e[37m", DESKTOP_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     const char *de;
     const char *desktop = (de = getenv("XDG_CURRENT_DESKTOP")) ? de :
                           (de = getenv("DESKTOP_SESSION")) ? de :
@@ -210,23 +229,36 @@ void desktop() {        // prints the current desktop environment
 }
 #else
 void desktop() {
-    printf("%-16s\e[0m\e[37m", DESKTOP_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     printf("Aqua");
 }
 #endif
 
 void shell() {          // prints the user default shell
-    printf("%-16s\e[0m\e[37m%s", SHELL_LABEL DASH_COLOR DASH, getenv("SHELL"));        // $SHELL
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.shell_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
+    printf("%s", getenv("SHELL"));          // $SHELL
 }
 
 void term() {           // prints the current terminal
-    printf("%-16s\e[0m\e[37m%s", TERM_LABEL DASH_COLOR DASH, getenv("TERM"));     // $TERM
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.term_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
+    printf("%s", getenv("TERM"));           // $TERM
 }
 
 // packages
 #ifndef __APPLE__
 void packages() {       // prints the number of installed packages
-    printf("%-16s\e[0m\e[37m", PACKAGES_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     int pipes[2];
     char packages[10];
@@ -331,7 +363,10 @@ void packages() {       // prints the number of installed packages
 }
 #else
 void packages() {
-    printf("%-16s\e[0m\e[37m", PACKAGES_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     fflush(stdout);
     fputs("[Unsupported]", stderr);
     fflush(stderr);
@@ -341,12 +376,17 @@ void packages() {
 // host
 #ifdef __APPLE__
 void host() {
-    printf("%-16s\e[0m\e[37m", HOST_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.host_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     printf("Apple");
 }
 #else
 void host() {           // prints the current host machine
-    printf("%-16s\e[0m\e[37m", HOST_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.host_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
@@ -368,8 +408,13 @@ void host() {           // prints the current host machine
 }
 #endif
 
+// bios
+#ifndef __APPLE__
 void bios() {           // prints the current host machine
-    printf("%-16s\e[0m\e[37m", BIOS_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     bool errors = false;
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
@@ -412,11 +457,24 @@ void bios() {           // prints the current host machine
 
     return;        
 }
+#else
+void packages() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
+}
+#endif
 
 // cpu
 #ifndef __APPLE__
 void cpu() {            // prints the current CPU
-    printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
@@ -430,6 +488,13 @@ void cpu() {            // prints the current CPU
     char *cpu_info = &buf[0];
 
     read_after_sequence(fp, "model name", buf, 256);
+    fclose(fp);
+    if(!buf) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+        return;
+    }
     cpu_info += 2;
 
     char *end = strchr(cpu_info, '@');
@@ -447,7 +512,7 @@ void cpu() {            // prints the current CPU
 
     printf("%s", cpu_info);
 
-    if(PRINT_CPU_FREQ) {
+    if(config.print_cpu_freq) {
         *end = ' ';
 
         char *cpu_freq = strstr(cpu_info, "cpu MHz");
@@ -478,7 +543,9 @@ void cpu() {            // prints the current CPU
 }
 #else
 void cpu() {
-    printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     size_t buf_size = 100;
     char buf[buf_size];
@@ -491,8 +558,9 @@ void cpu() {
 // gpu
 #ifdef __APPLE__
 void gpu() {
-
-    printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.gpu_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     const char *gpu_string = get_gpu_string();
     if(!gpu_string) {
@@ -505,7 +573,10 @@ void gpu() {
 }
 #else
 void gpu() {            // prints the current GPU
-    printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.gpu_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     if(!access("/usr/bin/lspci", F_OK)) {
         int pipes[2];
         char *lspci = malloc(0x2000);
@@ -567,14 +638,16 @@ void gpu() {            // prints the current GPU
 // memory
 #ifdef __APPLE__ 
 void memory() {
-    printf("%-16s\e[0m\e[37m", MEM_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.mem_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     bytes_t usedram = used_mem_size();
     bytes_t totalram = system_mem_size();
 
     if(usedram == 0 || totalram == 0) {
         fflush(stdout);
-        fputs("[Bad Format]", stderr);
+        fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
@@ -584,10 +657,12 @@ void memory() {
 }
 #else
 void memory() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.mem_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
     struct sysinfo info;
     sysinfo(&info);
-
-    printf("%-16s\e[0m\e[37m", MEM_LABEL DASH_COLOR DASH);
 
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
@@ -603,9 +678,17 @@ void memory() {
     }
 
     char buf[256];
-    char *cachedram = &buf[0]; 
+    char *cachedram = buf; 
 
     read_after_sequence(fp, "Cached:", buf, 256);
+    fclose(fp);
+
+    if(!buf) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+        return;
+    }
     cachedram += 2;
 
     char *end;
@@ -629,7 +712,9 @@ void memory() {
 #endif
 
 void public_ip() {      // get the public IP address
-    printf("%-16s\e[0m\e[37m", PUB_IP_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.pub_ip_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     char public_ip[20];
     int pipes[2];
@@ -652,7 +737,9 @@ void public_ip() {      // get the public IP address
 }
 
 void local_ip() {      // get the local IP address
-    printf("%-16s\e[0m\e[37m", PRIV_IP_LABEL DASH_COLOR DASH);
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.loc_ip_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
 
     struct ifaddrs *ifAddrStruct=NULL;
     struct ifaddrs *ifa=NULL;

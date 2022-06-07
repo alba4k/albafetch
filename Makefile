@@ -23,12 +23,13 @@ endif
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build
+	touch ~/.config/$(TARGET).conf
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
-main.o: src/main.c src/config.h src/vars.h src/logos.h src/info.h
+main.o: src/main.c src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c
 
-info.o: src/info.c src/config.h src/vars.h src/info.h
+info.o: src/info.c src/vars.h src/info.h
 	$(CC) -c src/info.c $(ARCH_BASED)
 
 bsdwrap.o: src/bsdwrap.c
@@ -44,9 +45,11 @@ macos_gpu_string.o: src/macos_gpu_string.m
 	$(CC) -c src/macos_gpu_string.m $(INCLUDE)
 
 run: build/$(TARGET)
+	touch ~/.config/$(TARGET).conf
 	build/$(TARGET)
 
 install: build/$(TARGET)
+	touch ~/.config/$(TARGET).conf
 	cp -f build/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 
 uninstall:

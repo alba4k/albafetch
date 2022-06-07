@@ -39,11 +39,22 @@ $ cd albafetch/
 
 
 # Customizing
-```
-$ git clone https://github.com/alba4k/albafetch
-$ cd albafetch/src/ 
-```
-You can change some settings in `albafetch/src/config.h`, or by directly modifying the entire source code in `albafetch/src/`. You will need to recompile/reinstall after configuring. New logos can be added in `albafetch/src/logos.h` (inside of `const char *logos[][]`) and in `./src/main.c` (to show up in the help message).
+A configuration file can be found in `~/.config/albafetch.conf`
+
+## How to write the config:
+Basic rules:
+* comments start with ; and reach the end of the line
+* values can't be longer than 32 characters
+* only ASCII characters will work
+
+The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword
+
+This repository contains an example config file (`./albafetch.conf`)
+
+## Source code editing:
+If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `albafetch/src/logos.h` (inside of `const char *logos[][]`) and in `./src/main.c` (to make them show up in the help message).
+
+Don't mind doing a pull request if you think some of the changes you made should be in the global version ;)
 
 ---
 

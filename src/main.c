@@ -1,4 +1,3 @@
-#include "config.h"
 #include "info.h"
 #include "logos.h"
 #include "stdlib.h"
@@ -9,107 +8,378 @@ char *dash_color;
 
 bool print_cpu_freq;
 
-char *color;
-char *bold;
-char *default_logo;
-char **logo;
+bool default_bold = true;
+char default_color[33] = "";
+char default_logo_color[33];
+char default_logo[33] = "";
 
-char *host_name_label;
-char *user_label;
-char *uptime_label;
-char *os_label;
-char *kernel_label;
-char *desktop_label;
-char *shell_label;
-char *term_label;
-char *packages_label;
-char *host_label;
-char *bios_label;
-char *cpu_label;
-char *gpu_label;
-char *mem_label;
-char *pub_ip_label;
-char *priv_ip_label;
+char **logo;
 
 char spacing[32] = "    ";
 
+// default config
 Config config = {
     "\e[0m\e[37m------------------",    // separator
     ":",                                // dash
     "\e[37m",                           // dash_color
+    true,                               // print_cpu_freq
+    "",                                 // color
+    "\e[1m",                            // bold
+    // Labels:
+    "Hostname",                         // hostname
+    "User",                             // user
+    "Uptime",                           // uptime
+    "OS",                               // os
+    "Kernel",                           // kernel
+    "Desktop",                          // desktop
+    "Shell",                            // shell
+    "Terminal",                         // terminal
+    "Packages",                         // packages
+    "Host",                             // host
+    "BIOS",                             // bios
+    "CPU",                              // cpu
+    "GPU",                              // gpu
+    "Memory",                           // memory
+    "Publ. IP",                         // public IP
+    "Loc. IP",                          // local IP
 };
 
-int parse_config() {
+void parse_config() {
     // really bad code here, you don't need to look
 
     char path[LOGIN_NAME_MAX + 32];
+    // TODO: restore true config file instead of test
     snprintf(path, LOGIN_NAME_MAX + 32, "albafetch.conf");
     //snprintf(path, LOGIN_NAME_MAX + 33, "%s/.config/albafetch.conf", getenv("HOME"));
 
     FILE *fp = fopen(path, "r");
     if(!fp) {
-        fputs("\e[31m\e[1mERROR\e[0m! Couldn't open the config!\n", stderr);
-        return -1;
+        return;
+    }
+    fseek(fp, 0, SEEK_END);
+    size_t len = ftell(fp);
+    rewind(fp);
+    char *conf = malloc(len+1);
+    conf[fread(conf, 1, len, fp)] = 0;
+    fclose(fp);
+
+    // unescape
+    char *ptr = conf;
+    while(ptr=strchr(ptr, '\\')) {
+        memmove(ptr, ptr+1, strlen(ptr+1));
+        switch(*ptr) {
+            default: case '\\':
+                break;
+            case 'n':
+                *ptr = '\n';
+                break;
+            case 'e':
+                *ptr = 033;
+                break;
+        }
+    ++ptr;
     }
 
-    char *end;
-    char line[64];
-    char *ptr;
-
-    while(fscanf(fp, "%[^\n] ", line) != EOF) {
-        if(line[0] == ';' || line[0] == '#')
-            continue;
-
-        ptr = strstr(line, "spacing=\"");
-        if(ptr) {
-            ptr += 9;
-            end = strchr(ptr, '"');
-            if(!end) {
-                fflush(stdout);
-                fputs("\e[31m\e[1mERROR\e[0m! Couldn't parse the config!\n", stderr);
-                fflush(stderr);
-                return -1;
-            }
-            *end = 0;
+    // remove comments
+    ptr = conf;
+    char *ptr2 = conf;
+    while(ptr = strchr(ptr, ';')) {
+        ptr2 = strchr(ptr, '\n');
+        if(!ptr2) {
+            *ptr = 0;   // end of file, no new lines, terminating string
+            break;
+        }
+        memmove(ptr, ptr2+1, strlen(ptr2+1));
+    }
+    
+    // spacing
+    if(ptr = strstr(conf, "spacing")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
             strcpy(spacing, ptr);
-            continue;
-        }
-
-        ptr = strstr(line, "separator=\"");
-        if(ptr) {
-            ptr += 11;
-            end = strchr(ptr, '"');
-            if(!end) {
-                fflush(stdout);
-                fputs("\e[31m\e[1mERROR\e[0m! Couldn't parse the config!\n", stderr);
-                fflush(stderr);
-                return -1;
-            }
-            *end = 0;
-            strcpy(config.separator, ptr);
-            continue;
+            *ptr2 = '"';
         }
     }
 
-    color = DEFAULT_COLOR;
-    bold = DEFAULT_BOLD;
+    // separator
+    if(ptr = strstr(conf, "separator")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.separator, ptr);
+            *ptr2 = '"';
+        }
+    }
 
-    return 0;
+    // dash
+    if(ptr = strstr(conf, "dash")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.dash, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // dash_color
+    if(ptr = strstr(conf, "dash_color")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.dash_color, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // print_cpu_freq
+    if(ptr = strstr(conf, "print_cpu_freq")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            config.print_cpu_freq = !strcmp(ptr, "true");
+            *ptr2 = '"';
+        }
+    }
+
+    // color
+    if(ptr = strstr(conf, "default_color")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.color, ptr);
+            strcpy(default_color, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // bold
+    if(ptr = strstr(conf, "default_bold")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.bold, strcmp(ptr, "true") ? "" : "\e[1m");
+            default_bold = config.bold;
+            *ptr2 = '"';
+        }
+    }
+
+    // logo
+    if(ptr = strstr(conf, "default_logo")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            if(*ptr) {
+                for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
+                    if(!strcmp(logos[i][0], ptr)) {
+                        logo = (char**)logos[i];
+                        strcpy(default_logo, logo[0]);
+                    }
+                *ptr2 = '"';
+            }
+        }
+    }
+
+    // LABELS
+    // hostname
+    if(ptr = strstr(conf, "hostname_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.hostname_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // user
+    if(ptr = strstr(conf, "user_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.user_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // uptime
+    if(ptr = strstr(conf, "uptime_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.uptime_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // os
+    if(ptr = strstr(conf, "os_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.os_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // kernel
+    if(ptr = strstr(conf, "kernel_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.kernel_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // desktop
+    if(ptr = strstr(conf, "desktop_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.desktop_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // shell
+    if(ptr = strstr(conf, "shell_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.shell_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // terminal
+    if(ptr = strstr(conf, "term_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.term_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // packages
+    if(ptr = strstr(conf, "packages_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.packages_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // host
+    if(ptr = strstr(conf, "host_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.host_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // bios
+    if(ptr = strstr(conf, "bios_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.bios_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // cpu
+    if(ptr = strstr(conf, "cpu_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.cpu_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // gpu
+    if(ptr = strstr(conf, "gpu_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.gpu_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // memory
+    if(ptr = strstr(conf, "mem_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.mem_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // public IP
+    if(ptr = strstr(conf, "pub_ip_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.pub_ip_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // local IP
+    if(ptr = strstr(conf, "loc_ip_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.loc_ip_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    free(conf);
 }
 
 int printLogo(const int line) {
     if(logo[line][0]) {
-        printf("%s%s%s%s", bold, logo[line], spacing, color);
+        printf("%s%s%s%s", config.bold, logo[line], spacing, config.color);
         return line+1;
     } else {
-        printf("%s%s%s%s", bold, logo[2], spacing, color);
+        printf("%s%s%s%s", config.bold, logo[2], spacing, config.color);
         return line;
     }
 }
 
 int main(const int argc, const char **argv) {
-    if(parse_config())
-        return 1;
+    parse_config();
 
     bool help = false;
     int line = 3;
@@ -137,7 +407,7 @@ int main(const int argc, const char **argv) {
 
                 for(int j = 0; j < 9; ++j) {
                     if(!strcmp(argv[i+1], colors[j][0])) {
-                        color = colors[j][1];
+                        strcpy(config.color, colors[j][1]);
                         goto color;
                     }
                 }
@@ -153,9 +423,9 @@ int main(const int argc, const char **argv) {
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
             if(argv[i+1]) {
                 if(!strcmp(argv[i+1], "on"))
-                    bold = "\e[1m";
+                    strcpy(config.bold, "\e[1m");
                 else if(!strcmp(argv[i+1], "off"))
-                    bold = "";
+                    strcpy(config.bold, "");
                 else {
                     fputs("\e[31m\e[1mERROR\e[0m\e[37m: invalid value for --bold! Use --help for more info\n", stderr);
                     user_is_an_idiot = true;
@@ -185,12 +455,6 @@ int main(const int argc, const char **argv) {
 
     // set logo and color if not defined yet
     if(!logo) {
-        if(DEFAULT_LOGO[0])
-            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
-                if(!strcmp(logos[i][0], DEFAULT_LOGO)) {
-                    logo = (char**)logos[i];
-                    goto logo_found;
-                }
         #ifdef __APPLE__
             logo = (char**)logos[1];
             goto logo_found;
@@ -220,34 +484,34 @@ int main(const int argc, const char **argv) {
             logo_found: ;
         #endif
     }
-    if(!color[0])
-        color = logo[1];
+    if(!config.color[0])
+        strcpy(config.color, logo[1]);
 
     if(help) {  // print the help message if --help was used and exit
         printf("%s%salbafetch\e[0m\e[37m - a system fetch utility\n",
-               color, bold);
+               config.color, config.bold);
         printf("\n%s%sFLAGS\e[0m\e[37m:\n",
-               color, bold);
+               config.color, config.bold);
         printf("\t%s%s-h\e[0m\e[37m,%s%s --help\e[0m\e[37m:\t Print this help menu and exit\n",
-               color, bold, color, bold);
+               config.color, config.bold, config.color, config.bold);
 
         printf("\t%s%s-c\e[0m\e[37m,%s%s --color\e[0m\e[37m:\t Change the output color (%s%s\e[0m\e[37m)\n"
                "\t\t\t [\e[30mblack\e[0m\e[37m, \e[31mred\e[0m\e[37m, \e[32mgreen\e[0m\e[37m, \e[33myellow\e[0m\e[37m,"
                " \e[34mblue\e[0m\e[37m, \e[35mpurple\e[0m\e[37m, \e[36mcyan\e[0m\e[37m, \e[90mgray\e[0m\e[37m,"
                " \e[37mwhite\e[0m\e[37m]\n",
-               color, bold, color, bold, DEFAULT_COLOR[0] ? DEFAULT_COLOR : logo[1], DEFAULT_COLOR[0] ? "default" : "logo default");
+               config.color, config.bold, config.color, config.bold, default_color[0] ? default_color : logo[1], default_color[0] ? "default" : "logo default");
 
         printf("\t%s%s-b\e[0m\e[37m,%s%s --bold\e[0m\e[37m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
                "\t\t\t [\e[1mon\e[0m\e[37m, off]\n",
-               color, bold, color, bold, DEFAULT_BOLD[0] ? "\e[1mon" : "off");
+               config.color, config.bold, config.color, config.bold, default_bold ? "\e[1mon" : "off");
         
         printf("\t%s%s-l\e[0m\e[37m,%s%s --logo\e[0m\e[37m:\t Changes the logo that will be displayed (%s)\n"
                "\t\t\t [linux, apple, arch, arch_small, debian, linuxmint, endeavouros, ubuntu]\n"
                "\t\t\t [parrot, manjaro, fedora, neon, pop, gentoo, windows]\n",
-               color, bold, color, bold, DEFAULT_LOGO[0] ? DEFAULT_LOGO : "OS default");
+               config.color, config.bold, config.color,config. bold, default_logo[0] ? default_logo : "OS default");
 
         printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\n",
-               color, bold);
+               config.color, config.bold);
 
         return 0;
     }
@@ -255,6 +519,7 @@ int main(const int argc, const char **argv) {
     void (*infos[])() = {
         title,
         separator,
+        user,
         uptime,
         separator, 
         os,
