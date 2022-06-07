@@ -26,7 +26,7 @@ static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
                             (host_info64_t) stat,
                             &count);
 
-    if (error != KERN_SUCCESS)
+    if(error != KERN_SUCCESS)
         return error;
 
     return 0;
@@ -42,7 +42,7 @@ bytes_t system_mem_size() {
 
     // Since no computer should have 0 bytes of memory,
     // 0 indicates failure.
-    if (error < 0)
+    if(error < 0)
         return 0;
 
     return size;
@@ -53,7 +53,7 @@ bytes_t used_mem_size() {
     mach_port_t host = mach_host_self();
 
     struct vm_statistics64 vm_stat;
-    if (get_stats(&vm_stat, host) < 0)
+    if(get_stats(&vm_stat, host) < 0)
         return 0;
 
     internal   = vm_stat.internal_page_count - vm_stat.purgeable_count;

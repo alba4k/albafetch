@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h> 
-#include <unistd.h>
 
 int main() {
-    if(!access("/usr/bin/albafetch", F_OK)) {
-        printf("shit\n");
-    }
-    if(!access("/usr/bin/snap", F_OK)) {
-        printf("SHIT\n");
+    char line[128];
+    FILE *fp = fopen("albafetch.conf", "r");
+
+    while(fscanf(fp, "%[^\n] ", line) != EOF) {
+        if(line[0] == ';' || line[0] == '#')
+            continue;
+        puts(line);
     }
 }

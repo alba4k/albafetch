@@ -1,9 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "vars.h"
-#include <stdlib.h>
-
 // CONFIGURATION OPTIONS:
 #define SPACING "    "                              // defines the distance between the logo and the infos
 #define SEPARATOR "\e[0m\e[37m------------------"   // defines what is used as separator between sections
@@ -11,6 +8,10 @@
 #define DASH ":"                                    // default separator
 
 #define PRINT_CPU_FREQ true
+
+#define DEFAULT_LOGO ""             // use "" for OS default
+#define DEFAULT_COLOR ""            // use "" for logo default
+#define DEFAULT_BOLD "\e[1m"        // use "" to turn off
 
 // Labels:
 #define HOSTNAME_LABEL "Hostname"
@@ -29,16 +30,5 @@
 #define MEM_LABEL "Memory"
 #define PUB_IP_LABEL "Publ. IP"
 #define PRIV_IP_LABEL "Priv. IP"
-
-// add more logos in src/logos.h if you want, I couldn't care less
-
-// example:
-// #define DEFAULT_LOGO "debian"    // set debian as default logo
-// #define DEFAULT_COLOR "\e[32m"   // set green as default text color
-// #define DEFAULT_BOLD "\e[1m"     // use bold 
-
-#define DEFAULT_LOGO ""             // use "" for OS default
-#define DEFAULT_COLOR ""            // use "" for logo default
-#define DEFAULT_BOLD "\e[1m"        // use "" to turn off
 
 #endif

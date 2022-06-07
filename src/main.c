@@ -1,28 +1,123 @@
 #include "config.h"
 #include "info.h"
 #include "logos.h"
+#include "stdlib.h"
 
-char *color = DEFAULT_COLOR;
-char *bold = DEFAULT_BOLD;
+char *separator_string;
+char *dash;
+char *dash_color;
+
+bool print_cpu_freq;
+
+char *color;
+char *bold;
+char *default_logo;
 char **logo;
+
+char *host_name_label;
+char *user_label;
+char *uptime_label;
+char *os_label;
+char *kernel_label;
+char *desktop_label;
+char *shell_label;
+char *term_label;
+char *packages_label;
+char *host_label;
+char *bios_label;
+char *cpu_label;
+char *gpu_label;
+char *mem_label;
+char *pub_ip_label;
+char *priv_ip_label;
+
+char spacing[32] = "    ";
+
+Config config = {
+    "\e[0m\e[37m------------------",    // separator
+    ":",                                // dash
+    "\e[37m",                           // dash_color
+};
+
+int parse_config() {
+    // really bad code here, you don't need to look
+
+    char path[LOGIN_NAME_MAX + 32];
+    snprintf(path, LOGIN_NAME_MAX + 32, "albafetch.conf");
+    //snprintf(path, LOGIN_NAME_MAX + 33, "%s/.config/albafetch.conf", getenv("HOME"));
+
+    FILE *fp = fopen(path, "r");
+    if(!fp) {
+        fputs("\e[31m\e[1mERROR\e[0m! Couldn't open the config!\n", stderr);
+        return -1;
+    }
+
+    char *end;
+    char line[64];
+    char *ptr;
+
+    while(fscanf(fp, "%[^\n] ", line) != EOF) {
+        if(line[0] == ';' || line[0] == '#')
+            continue;
+
+        ptr = strstr(line, "spacing=\"");
+        if(ptr) {
+            ptr += 9;
+            end = strchr(ptr, '"');
+            if(!end) {
+                fflush(stdout);
+                fputs("\e[31m\e[1mERROR\e[0m! Couldn't parse the config!\n", stderr);
+                fflush(stderr);
+                return -1;
+            }
+            *end = 0;
+            strcpy(spacing, ptr);
+            continue;
+        }
+
+        ptr = strstr(line, "separator=\"");
+        if(ptr) {
+            ptr += 11;
+            end = strchr(ptr, '"');
+            if(!end) {
+                fflush(stdout);
+                fputs("\e[31m\e[1mERROR\e[0m! Couldn't parse the config!\n", stderr);
+                fflush(stderr);
+                return -1;
+            }
+            *end = 0;
+            strcpy(config.separator, ptr);
+            continue;
+        }
+    }
+
+    color = DEFAULT_COLOR;
+    bold = DEFAULT_BOLD;
+
+    return 0;
+}
 
 int printLogo(const int line) {
     if(logo[line][0]) {
-        printf("%s%s%s" SPACING, bold, logo[line], color);
+        printf("%s%s%s%s", bold, logo[line], spacing, color);
         return line+1;
     } else {
-        printf("%s%s%s" SPACING, bold, logo[2], color);
+        printf("%s%s%s%s", bold, logo[2], spacing, color);
         return line;
     }
 }
 
 int main(const int argc, const char **argv) {
-    bool help = 0;
+    if(parse_config())
+        return 1;
+
+    bool help = false;
     int line = 3;
 
     // rtfm and stfu
     bool user_is_an_idiot = false;
     
+    // command line arguments
     for(int i = 0; i < argc; ++i) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             help = 1;
@@ -40,8 +135,8 @@ int main(const int argc, const char **argv) {
                     {"white", "\e[37m"},
                 };
 
-                for (int j = 0; j < 9; ++j) {
-                    if (!strcmp(argv[i+1], colors[j][0])) {
+                for(int j = 0; j < 9; ++j) {
+                    if(!strcmp(argv[i+1], colors[j][0])) {
                         color = colors[j][1];
                         goto color;
                     }
@@ -88,6 +183,7 @@ int main(const int argc, const char **argv) {
     if(user_is_an_idiot)
         return 1;
 
+    // set logo and color if not defined yet
     if(!logo) {
         if(DEFAULT_LOGO[0])
             for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
@@ -104,47 +200,25 @@ int main(const int argc, const char **argv) {
                 logo = (char**)logos[0];
                 goto logo_found;
             }
-            fseek(fp, 0, SEEK_END);
-            size_t len = ftell(fp);
-            rewind(fp);
-            char *raw = malloc(len+1);
-            raw[fread(raw, 1, len, fp)] = 0;
+            
+            char os_id[32];
+            read_after_sequence(fp, "ID", os_id, 32);
             fclose(fp);
 
-            char *str = malloc(len+2);
-            strcpy(str, "\n");
-            strcat(str, raw);
-            free(raw);
-
-            const char *field = "\nID=";
-            char *os_id = strstr(str, field);
-            if(!os_id) {
-                free(str);
-                logo = (char**)logos[0];
-                goto logo_found;
-            }
-            os_id += strlen(field);
-
             char *end = strchr(os_id, '\n');
-            if(!end) {
-                free(str);
-                logo = (char**)logos[0];
-                goto logo_found;
-            }
+            if(!end)
+                return -1;
             *end = 0;
 
             for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], os_id)) {
-                    free(str);
                     logo = (char**)logos[i];
                     goto logo_found;
                 }
             logo = (char**)logos[0];
 
-            free(str);
+            logo_found: ;
         #endif
-
-        logo_found: ;
     }
     if(!color[0])
         color = logo[1];
@@ -180,7 +254,6 @@ int main(const int argc, const char **argv) {
 
     void (*infos[])() = {
         title,
-        
         separator,
         uptime,
         separator, 
@@ -201,7 +274,7 @@ int main(const int argc, const char **argv) {
     // so sizeof returns it's real size and not the size of a pointer.
     size_t info_lines = sizeof(infos) / sizeof(infos[0]);
 
-    for (size_t i = 0; i < info_lines; ++i) {
+    for(size_t i = 0; i < info_lines; ++i) {
         line = printLogo(line);
         infos[i]();
         printf("\n");

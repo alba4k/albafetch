@@ -3,6 +3,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <limits.h>
+
+#include "queue.h"
+#include "vars.h"
+
+#ifndef HOST_NAME_MAX
+#ifdef _POSIX_HOST_NAME_MAX
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#else
+#define HOST_NAME_MAX 128
+#endif
+#endif
+
+// Not sure if this 
+#ifndef LOGIN_NAME_MAX
+#define LOGIN_NAME_MAX HOST_NAME_MAX
+#endif
 
 void separator();   // prints a separator
 

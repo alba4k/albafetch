@@ -1,3 +1,6 @@
+#ifndef LOGOS_H
+#define LOGOS_H
+
 static const char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to OSX
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
@@ -65,7 +68,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m .`                                 `/",
         ""
     },
-    {
+    {   // Arch Linux (small version)
         "arch_small",
         "\e[36m",
         "\e[36m              ",
@@ -271,7 +274,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[32m             `..---+/---..`             ",
         ""
     },
-    {
+    {   // Pop!_OS
         "pop",
         "\e[36m",
         "                                       ",
@@ -297,7 +300,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m             /////////////             ",
         ""
     },
-    {
+    {   // Gentoo
         "gentoo",
         "\e[35m",
         "                                ",
@@ -321,7 +324,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[35m  `-//////:--.                      ",
         ""
     },
-    {
+    {   // Windows
         "windows",
         "\e[34m",
         "                                     ",
@@ -343,7 +346,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[33m                 \"VEzjt:;;z>*`       ",
         ""
     },
-    {
+    {   // ElementaryOS
         "elementary",
         "\e[34m",
         "                                    ",
@@ -367,3 +370,5 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         ""
     },
 };
+
+#endif

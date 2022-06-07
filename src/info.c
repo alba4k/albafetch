@@ -1,4 +1,3 @@
-#include <limits.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -23,20 +22,9 @@
 
 #include "info.h"
 #include "config.h"
-#include "queue.h"
-
-#ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
-#endif
-
-// Not sure if this 
-#ifndef LOGIN_NAME_MAX
-#define LOGIN_NAME_MAX HOST_NAME_MAX
-#endif
-
 
 void separator() {      // prints a separator
-    fputs(SEPARATOR, stdout);
+    printf("%s", config.separator);
 }
 
 void title() {          // prints a title in the format user@hostname
@@ -91,13 +79,13 @@ static long macos_uptime() {
     int error;
     error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
-    if (error < 0)
+    if(error < 0)
         return 0;
 
     time_t boot_seconds = boottime.tv_sec;
     time_t current_seconds = time(NULL);
 
-    return (long) difftime(current_seconds, boot_seconds);
+    return (long)difftime(current_seconds, boot_seconds);
 }
 #endif
 #ifdef __linux__
@@ -110,7 +98,7 @@ static long linux_uptime() {
 #endif
 void uptime() {         // prints the uptime    
     long uptime;
-
+    
     #ifdef __linux
     uptime = linux_uptime();
     #else
@@ -431,7 +419,7 @@ void cpu() {            // prints the current CPU
     printf("%-16s\e[0m\e[37m", CPU_LABEL DASH_COLOR DASH);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
-    if (!fp) {
+    if(!fp) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -446,9 +434,9 @@ void cpu() {            // prints the current CPU
 
     char *end = strchr(cpu_info, '@');
 
-    if (!end) {
+    if(!end) {
         end = strchr(cpu_info, '\n');
-        if (!end) {
+        if(!end) {
             goto error;
         }
     } else {
@@ -459,7 +447,7 @@ void cpu() {            // prints the current CPU
 
     printf("%s", cpu_info);
 
-    if (PRINT_CPU_FREQ) {
+    if(PRINT_CPU_FREQ) {
         *end = ' ';
 
         char *cpu_freq = strstr(cpu_info, "cpu MHz");
@@ -507,7 +495,7 @@ void gpu() {
     printf("%-16s\e[0m\e[37m", GPU_LABEL DASH_COLOR DASH);
 
     const char *gpu_string = get_gpu_string();
-    if (!gpu_string) {
+    if(!gpu_string) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -584,7 +572,7 @@ void memory() {
     bytes_t usedram = used_mem_size();
     bytes_t totalram = system_mem_size();
 
-    if (usedram == 0 || totalram == 0) {
+    if(usedram == 0 || totalram == 0) {
         fflush(stdout);
         fputs("[Bad Format]", stderr);
         fflush(stderr);
@@ -607,7 +595,7 @@ void memory() {
 
     FILE *fp = fopen("/proc/meminfo", "r");
 
-    if (!fp) {
+    if(!fp) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -623,7 +611,7 @@ void memory() {
     char *end;
     end = strstr(cachedram, " kB");
     
-    if (!end) {
+    if(!end) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -673,11 +661,11 @@ void local_ip() {      // get the local IP address
 
     getifaddrs(&ifAddrStruct);
 
-    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
-        if (!ifa->ifa_addr) {
+    for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+        if(!ifa->ifa_addr) {
             continue;
         }
-        if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
+        if(ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
             // is a valid IP4 Address
             tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
             char addressBuffer[INET_ADDRSTRLEN];
