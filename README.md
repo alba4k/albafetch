@@ -10,10 +10,9 @@ Here is a time comparison (exact execution times change between machines and run
 ![albafetch](images/time_albafetch.png)
 
 ## Dependencies:
-* sh (packages)
-* wc (packages)
 
-All of those will be present by default on a normal GNU/Linux installation.
+Everything the program could need will be installed on your distribution out of te box (`sh`, `wc`, `lspci`).
+I would reccoment double checking libalpm on archlinux-based systems (it's also a dependency of pacman, so that should already be there).
 
 # Compiling:
 ```shell
