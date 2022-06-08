@@ -45,6 +45,7 @@ Basic rules:
 * comments start with ; and reach the end of the line
 * values can't be longer than 32 characters
 * only ASCII characters will work
+* ending the file with a newline is reccomended
 
 The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword.
 
@@ -78,6 +79,8 @@ loc_ip_label = "Priv. IP"
 
 Unset values will use the defaults
 Quotes in the config are **not** optional.
+
+If a key is defined more than one the first one is the only oen that will get considered.
 
 This repository contains an example config file (`albafetch.conf`) with the default values.
 
