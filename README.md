@@ -20,7 +20,7 @@ $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
 $ make
 ```
-An executable file will appear in `build/`
+An executable file should appear in `build/` if the compilation succedes.
 
 # Installation
 ### FForor Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
@@ -38,7 +38,7 @@ $ cd albafetch
 
 
 # Customizing
-A configuration file can be found in `~/.config/albafetch.conf`
+A configuration file can be found in `~/.config/albafetch.conf`.
 
 ## How to write the config:
 Basic rules:
@@ -46,14 +46,45 @@ Basic rules:
 * values can't be longer than 32 characters
 * only ASCII characters will work
 
-The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword
+The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword.
 
-This repository contains an example config file (`albafetch.conf`)
+### Options and default values:
+``` C
+spacing = "    "
+separator = "\e[0m\e[37m------------------"
+dash = ":"
+dash_color = "\e[37m"
+print_cpu_freq = "true"
+default_color = ""
+default_bold = "true"
+default_logo = ""
+hostname_label = "Hostname"
+user_label = "User"
+uptime_label = "Uptime"
+os_label = "OS"
+kernel_label = "Kernel"
+desktop_label = "Desktop"
+shell_label = "Shell"
+term_label = "Terminal"
+packages_label = "Packages"
+host_label = "Host"
+bios_label = "BIOS"
+cpu_label = "CPU"
+gpu_label = "GPU"
+mem_label = "Memory"
+pub_ip_label = "Publ. IP"
+loc_ip_label = "Priv. IP"
+```
+
+Unset values will use the defaults
+Quotes in the config are **not** optional.
+
+This repository contains an example config file (`albafetch.conf`) with the default values.
 
 ## Source code editing:
 If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `src/logos.h` (inside of `const char *logos[][]`) and in `src/main.c` (to make them show up in the help message).
 
-Don't mind doing a pull request if you think some of the changes you made should be in the global version ;)
+Don't mind doing a pull request if you think some of the changes you made should be in the global version ;)§
 
 ---
 
