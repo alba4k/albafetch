@@ -45,11 +45,9 @@ macos_gpu_string.o: src/macos_gpu_string.m
 	$(CC) -c src/macos_gpu_string.m $(INCLUDE)
 
 run: build/$(TARGET)
-	touch ~/.config/$(TARGET).conf
 	build/$(TARGET)
 
 install: build/$(TARGET)
-	touch ~/.config/$(TARGET).conf
 	cp -f build/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 
 uninstall:

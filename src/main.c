@@ -48,9 +48,7 @@ void parse_config() {
     // really bad code here, you don't need to look
 
     char path[LOGIN_NAME_MAX + 32];
-    // TODO: restore true config file instead of test
-    snprintf(path, LOGIN_NAME_MAX + 32, "albafetch.conf");
-    //snprintf(path, LOGIN_NAME_MAX + 33, "%s/.config/albafetch.conf", getenv("HOME"));
+    snprintf(path, LOGIN_NAME_MAX + 33, "%s/.config/albafetch.conf", getenv("HOME"));
 
     FILE *fp = fopen(path, "r");
     if(!fp) {
@@ -146,7 +144,7 @@ void parse_config() {
             *ptr2 = '"';
         }
     }
-
+    
     // color
     if(ptr = strstr(conf, "default_color")) {
         if(ptr = strchr(ptr, '"')) {
@@ -183,8 +181,8 @@ void parse_config() {
                         logo = (char**)logos[i];
                         strcpy(default_logo, logo[0]);
                     }
-                *ptr2 = '"';
             }
+            *ptr2 = '"';
         }
     }
 
@@ -331,7 +329,7 @@ void parse_config() {
             *ptr2 = '"';
         }
     }
-
+    puts(conf);
     // memory
     if(ptr = strstr(conf, "mem_label")) {
         if(ptr = strchr(ptr, '"')) {
