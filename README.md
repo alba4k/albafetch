@@ -18,10 +18,10 @@ All of those will be present by default on a normal GNU/Linux installation.
 # Compiling:
 ```shell
 $ git clone https://github.com/alba4k/albafetch
-$ cd albafetch/
+$ cd albafetch
 $ make
 ```
-An executable file will appear in `albafetch/`
+An executable file will appear in `build/`
 
 # Installation
 ### FForor Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
@@ -30,11 +30,11 @@ Manual installation:
 
 ```
 $ git clone https://github.com/alba4k/albafetch
-$ cd albafetch/
+$ cd albafetch
 # make install
 ```
 
-`make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to acces `/usr/bin/`. It will compile `albafetch/src/main.c` to this directory.
+`make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to acces `/usr/bin/`. It will copy the executable from `build/` to there.
 
 
 
@@ -49,10 +49,10 @@ Basic rules:
 
 The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword
 
-This repository contains an example config file (`./albafetch.conf`)
+This repository contains an example config file (`albafetch.conf`)
 
 ## Source code editing:
-If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `albafetch/src/logos.h` (inside of `const char *logos[][]`) and in `./src/main.c` (to make them show up in the help message).
+If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `src/logos.h` (inside of `const char *logos[][]`) and in `src/main.c` (to make them show up in the help message).
 
 Don't mind doing a pull request if you think some of the changes you made should be in the global version ;)
 
