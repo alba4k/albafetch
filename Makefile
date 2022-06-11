@@ -53,8 +53,5 @@ install: build/$(TARGET)
 uninstall:
 	rm /usr/bin/$(TARGET)
 
-test: test.c
-	$(CC) -o build/test test.c && build/test
-
 clean:
 	-rm -rf build test *.o
