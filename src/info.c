@@ -163,23 +163,24 @@ void os() {             // prints the os name + arch
         return;
     }
 
-    char buf[128];
-    char *os_name = buf;
+    char buf[64];
+    char *os_name = buf, *end;
 
-    read_after_sequence(fp, "PRETTY_NAME", buf, 128);
+    read_after_sequence(fp, "PRETTY_NAME", buf, 64);
     if(os_name[0] == '"' || os_name[0] == '\'')
         ++os_name;
+    
+    end = strchr(buf, '\n');
+    if(!end) 
+        goto error;
 
-    char *end = strchr(os_name, '"');
-    if(!end) {
-        end = strchr(os_name, '\'');
-        if(!end) {
-            end = strchr(os_name, '\n');
-            if(!end)
-                goto error;
-        }
-    }
     *end = 0;
+
+    end = strchr(buf, '"');
+    if(!end) 
+        end = strchr(buf, '\'');
+    if(end)
+        *end = 0;
 
     printf("%s %s", os_name, name.machine);
 

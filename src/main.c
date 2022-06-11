@@ -329,7 +329,7 @@ void parse_config() {
             *ptr2 = '"';
         }
     }
-    puts(conf);
+    
     // memory
     if(ptr = strstr(conf, "mem_label")) {
         if(ptr = strchr(ptr, '"')) {
