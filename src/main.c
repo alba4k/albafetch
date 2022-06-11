@@ -79,9 +79,17 @@ void parse_config() {
     }
 
     // remove comments
-    ptr = conf;
-    char *ptr2 = conf;
+    char *ptr2 = ptr = conf;
     while(ptr = strchr(ptr, ';')) {
+        ptr2 = strchr(ptr, '\n');
+        if(!ptr2) {
+            *ptr = 0;   // end of file, no new lines, terminating string
+            break;
+        }
+        memmove(ptr, ptr2+1, strlen(ptr2+1));
+    }
+    ptr = ptr2 = conf;
+    while(ptr = strchr(ptr, '#')) {
         ptr2 = strchr(ptr, '\n');
         if(!ptr2) {
             *ptr = 0;   // end of file, no new lines, terminating string

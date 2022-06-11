@@ -1,3 +1,4 @@
 *.o
 .vscode
 build/
+albafetch.conf.link

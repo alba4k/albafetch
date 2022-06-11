@@ -22,10 +22,12 @@
 
 #include "info.h"
 
+// separator
 void separator() {      // prints a separator
     printf("%s", config.separator);
 }
 
+// title
 void title() {          // prints a title in the format user@hostname
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX);
@@ -46,6 +48,7 @@ void title() {          // prints a title in the format user@hostname
     printf("%s\e[0m\e[37m@%s%s%s\e[0m\e[37m", username, config.color, config.bold, hostname);
 }
 
+// hostname
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     char format[100];
     snprintf(format, 100, "%s%s%s", config.hostname_label, config.dash_color, config.dash);
@@ -57,6 +60,7 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
     printf("%s", hostname);
 }
 
+// user
 void user() {           // get the current login
     char format[100];
     snprintf(format, 100, "%s%s%s", config.user_label, config.dash_color, config.dash);
@@ -76,60 +80,47 @@ void user() {           // get the current login
 }
 
 // uptime
-#ifdef __APPLE__
-static long macos_uptime() {
-
-    struct timeval boottime;
-    int error;
-    error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
-
-    if(error < 0)
-        return 0;
-
-    time_t boot_seconds = boottime.tv_sec;
-    time_t current_seconds = time(NULL);
-
-    return (long)difftime(current_seconds, boot_seconds);
-}
-#endif
-#ifdef __linux__
-static long linux_uptime() {
-    struct sysinfo info;
-    sysinfo(&info);
-
-    return info.uptime;
-}
-#endif
 void uptime() {         // prints the uptime
     char format[100];
+    long uptime;
+
     snprintf(format, 100, "%s%s%s", config.uptime_label, config.dash_color, config.dash);
     printf("%-16s\e[0m\e[37m", format);
-
-    long uptime;
     
-    #ifdef __linux
-    uptime = linux_uptime();
+    #ifdef __APPLE__
+        struct timeval boottime;
+        int error;
+        error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
+
+        if(error < 0)
+            uptime = 0;
+
+        time_t boot_seconds = boottime.tv_sec;
+        time_t current_seconds = time(NULL);
+
+        uptime = (long)difftime(current_seconds, boot_seconds);
     #else
-    uptime = macos_uptime();
+        struct sysinfo info;
+        sysinfo(&info);
+
+        uptime = info.uptime;
     #endif
 
-    long secs = uptime;            // total uptime in seconds
-    long days = secs/86400;
-    char hours = secs/3600 - days*24;
-    char mins = secs/60 - days*1440 - hours*60;
-    char sec = secs - days*86400 - hours*3600 - mins*60;
+    long days = uptime/86400;
+    char hours = uptime/3600 - days*24;
+    char mins = uptime/60 - days*1440 - hours*60;
 
     if(days) {
-        printf("%ldd ", days);     // print the number of days passed if more than 0
+        printf("%ldd ", days);      // print the number of days passed if more than 0
     }
     if(hours) {
-        printf("%dh ", hours);       // print the number of days passed if more than 0
+        printf("%dh ", hours);      // print the number of days passed if more than 0
     }
     if(mins) {
-        printf("%dm ", mins);        // print the number of minutes passed if more than 0
+        printf("%dm ", mins);       // print the number of minutes passed if more than 0
     }
-    else if(secs < 60) {
-        printf("%ds", sec);         // print the number of seconds passed if more than 0
+    else if(uptime < 60) {
+        printf("%ds", uptime);       // print the number of seconds passed if less than 60
     }
 }
 
@@ -712,6 +703,7 @@ void memory() {
 }
 #endif
 
+// public IP adress
 void public_ip() {      // get the public IP address
     char format[100];
     snprintf(format, 100, "%s%s%s", config.pub_ip_label, config.dash_color, config.dash);
@@ -737,6 +729,7 @@ void public_ip() {      // get the public IP address
     printf("%s", public_ip);
 }
 
+// local IP adress
 void local_ip() {      // get the local IP address
     char format[100];
     snprintf(format, 100, "%s%s%s", config.loc_ip_label, config.dash_color, config.dash);
