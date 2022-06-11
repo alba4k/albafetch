@@ -158,24 +158,24 @@ void os() {             // prints the os name + arch
     char *os_name = buf, *end;
 
     read_after_sequence(fp, "PRETTY_NAME", buf, 64);
+    fclose(fp);
     if(os_name[0] == '"' || os_name[0] == '\'')
         ++os_name;
     
-    end = strchr(buf, '\n');
+    end = strchr(os_name, '\n');
     if(!end) 
         goto error;
-
     *end = 0;
 
-    end = strchr(buf, '"');
-    if(!end) 
-        end = strchr(buf, '\'');
-    if(end)
-        *end = 0;
+    end = strchr(os_name, '"');
+    if(!end) {
+        end = strchr(os_name, '\'');
+        if(!end)
+            goto error;
+    }
+    *end = 0;
 
     printf("%s %s", os_name, name.machine);
-
-    fclose(fp);
 
     return;
 
@@ -201,14 +201,23 @@ void kernel() {         // prints the kernel version
 }
 
 //desktop
-#ifndef __APPLE__
+#ifdef __APPLE__
+void desktop() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
+    printf("Aqua");
+}
+#else
 void desktop() {        // prints the current desktop environment
     char format[100];
     snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
     printf("%-16s\e[0m\e[37m", format);
 
     const char *de;
-    const char *desktop = (de = getenv("XDG_CURRENT_DESKTOP")) ? de :
+    const char *desktop = getenv("SWAYSOCK") ? "Sway" :
+                          (de = getenv("XDG_CURRENT_DESKTOP")) ? de :
                           (de = getenv("DESKTOP_SESSION")) ? de :
                           getenv("KDE_SESSION_VERSION") ? "KDE" :
                           getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
@@ -219,16 +228,10 @@ void desktop() {        // prints the current desktop environment
 
     printf("%s", desktop); 
 }
-#else
-void desktop() {
-    char format[100];
-    snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
-    printf("%-16s\e[0m\e[37m", format);
 
-    printf("Aqua");
-}
 #endif
 
+// shell
 void shell() {          // prints the user default shell
     char format[100];
     snprintf(format, 100, "%s%s%s", config.shell_label, config.dash_color, config.dash);
@@ -236,7 +239,7 @@ void shell() {          // prints the user default shell
 
     printf("%s", getenv("SHELL"));          // $SHELL
 }
-
+// terminal
 void term() {           // prints the current terminal
     char format[100];
     snprintf(format, 100, "%s%s%s", config.term_label, config.dash_color, config.dash);
