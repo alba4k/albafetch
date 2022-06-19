@@ -22,9 +22,8 @@ ifeq ($(OS),Darwin)
 endif
 
 build/$(TARGET): $(OBJ)
-	mkdir -p build
-	mkdir -p ~/.config
-	touch ~/.config/$(TARGET).conf
+	mkdir -p build ~/.config
+	ls ~/.config/$(TARGET).conf >/dev/null 2>/dev/null || cp $(TARGET).conf ~/.config/$(TARGET).conf
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
 main.o: src/main.c src/vars.h src/logos.h src/info.h
