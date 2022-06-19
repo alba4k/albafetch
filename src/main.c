@@ -23,6 +23,7 @@ Config config = {
     ":",                                // dash
     "\e[37m",                           // dash_color
     true,                               // print_cpu_freq
+    true,                              // print_gpu_arch
     "",                                 // color
     "\e[1m",                            // bold
     // Labels:
@@ -149,6 +150,17 @@ void parse_config() {
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             config.print_cpu_freq = !strcmp(ptr, "true");
+            *ptr2 = '"';
+        }
+    }
+
+    // print_gpu_arch
+    if(ptr = strstr(conf, "print_gpu_arch")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            config.print_gpu_arch = !strcmp(ptr, "true");
             *ptr2 = '"';
         }
     }

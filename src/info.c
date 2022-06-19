@@ -611,8 +611,20 @@ void gpu() {            // prints the current GPU
             goto error;
         *end = 0;
 
-        printf("%s", gpu);
+        char *ptr = strchr(gpu, '[');
+        if(ptr && !config.print_gpu_arch) {
+            end = strchr(ptr, ']');
+            if(!end) {
+                printf("%s", gpu);
+                free(lspci);
+                return;
+            }
+            *end = 0;
 
+            gpu = ptr + 1;
+        }
+
+        printf("%s", gpu);
         free(lspci);
         return;
 
