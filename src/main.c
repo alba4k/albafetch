@@ -568,7 +568,6 @@ int main(const int argc, const char **argv) {
     void (*infos[])() = {
         title,
         separator,
-        user,
         uptime,
         separator, 
         os,
