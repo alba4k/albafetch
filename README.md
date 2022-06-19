@@ -50,15 +50,20 @@ Basic rules:
 The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword.
 
 ### Options and default values:
-``` C
+``` python
 spacing = "    "
 separator = "\e[0m\e[37m------------------"
 dash = ":"
 dash_color = "\e[37m"
+
 print_cpu_freq = "true"
+print_gpu_freq = "true"
+align_infos = "true"
+
 default_color = ""
 default_bold = "true"
 default_logo = ""
+
 hostname_label = "Hostname"
 user_label = "User"
 uptime_label = "Uptime"

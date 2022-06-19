@@ -12,6 +12,7 @@ typedef struct {
     char dash_color[33];
     bool print_cpu_freq;
     bool print_gpu_arch;
+    bool align_infos;
     char color[33];
     char bold[33];
     // Labels:
