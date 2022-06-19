@@ -16,6 +16,8 @@ char default_logo[33] = "";
 char **logo;
 
 char spacing[32] = "    ";
+char spacing_first[32] = "";
+char spacing_last[32] = "";
 
 // default config
 Config config = {
@@ -107,6 +109,28 @@ void parse_config() {
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             strcpy(spacing, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // spacing_first
+    if(ptr = strstr(conf, "spacing_first")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(spacing_first, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // spacing_last
+    if(ptr = strstr(conf, "spacing_last")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(spacing_last, ptr);
             *ptr2 = '"';
         }
     }
@@ -400,16 +424,18 @@ void parse_config() {
 
 int printLogo(const int line) {
     if(logo[line][0]) {
-        printf("%s%s%s%s", config.bold, logo[line], spacing, config.color);
+        printf("%s%s%s", config.bold, logo[line], config.color);
         return line+1;
     } else {
-        printf("%s%s%s%s", config.bold, logo[2], spacing, config.color);
+        printf("%s%s%s", config.bold, logo[2], config.color);
         return line;
     }
 }
 
 int main(const int argc, const char **argv) {
     parse_config();
+    if(!spacing_first[0]) strcpy(spacing_first, spacing);
+    if(!spacing_last[0]) strcpy(spacing_last, spacing);
 
     bool help = false;
     int line = 3;
@@ -418,7 +444,7 @@ int main(const int argc, const char **argv) {
     bool user_is_an_idiot = false;
     
     // command line arguments
-    for(int i = 0; i < argc; ++i) {
+    for(int i = 1; i < argc; ++i) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
@@ -585,10 +611,13 @@ int main(const int argc, const char **argv) {
 
     // The following line works because infos is declared on the stack,
     // so sizeof returns it's real size and not the size of a pointer.
-    size_t info_lines = sizeof(infos) / sizeof(infos[0]);
-
-    for(size_t i = 0; i < info_lines; ++i) {
+    const size_t info_lines = sizeof(infos) / sizeof(infos[0]) - 1;
+    
+    for(size_t i = 0; i <= info_lines; ++i) {
         line = printLogo(line);
+        if(line == 4) printf("%s", spacing_first);
+        else if(i == info_lines) printf("%s", spacing_last);
+        else printf("%s", spacing);
         infos[i]();
         printf("\n");
     }

@@ -7,7 +7,7 @@ extern char *dash;              // color of the dash
 extern char *dash_color;        // default separator
 
 typedef struct {
-    char separator[49];
+    char separator[65];
     char dash[33];
     char dash_color[33];
     bool print_cpu_freq;
