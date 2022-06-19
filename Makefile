@@ -49,7 +49,7 @@ run: build/$(TARGET)
 	build/$(TARGET)
 
 install: build/$(TARGET)
-	install -Dm644 build/$(TARGET) "$(DESTDIR)/usr/bin/$(TARGET)"
+	cp -f build/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
 
 uninstall:
 	rm /usr/bin/$(TARGET)
