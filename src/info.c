@@ -404,7 +404,17 @@ void host() {           // prints the current host machine
 #endif
 
 // bios
-#ifndef __APPLE__
+#ifdef __APPLE__
+void packages() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
+}
+#else
 void bios() {           // prints the current host machine
     char format[100];
     snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
@@ -452,20 +462,22 @@ void bios() {           // prints the current host machine
 
     return;        
 }
-#else
-void packages() {
-    char format[100];
-    snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
-    printf("%-16s\e[0m\e[37m", format);
-
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
-}
 #endif
 
 // cpu
-#ifndef __APPLE__
+#ifdef __APPLE__
+void cpu() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
+    printf("%-16s\e[0m\e[37m", format);
+
+    size_t buf_size = 100;
+    char buf[buf_size];
+    sysctlbyname("machdep.cpu.brand_string", &buf, &buf_size, NULL, 0);
+
+    printf("%s", buf);
+}
+#else
 void cpu() {            // prints the current CPU
     char format[100];
     snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
@@ -535,18 +547,6 @@ void cpu() {            // prints the current CPU
         fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
-}
-#else
-void cpu() {
-    char format[100];
-    snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
-    printf("%-16s\e[0m\e[37m", format);
-
-    size_t buf_size = 100;
-    char buf[buf_size];
-    sysctlbyname("machdep.cpu.brand_string", &buf, &buf_size, NULL, 0);
-
-    printf("%s", buf);
 }
 #endif
 

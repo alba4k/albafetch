@@ -23,6 +23,7 @@ endif
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build
+	mkdir -p ~/.config
 	touch ~/.config/$(TARGET).conf
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
