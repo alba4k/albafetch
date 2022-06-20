@@ -246,7 +246,13 @@ void shell() {          // prints the user default shell
     if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
     else printf("%s\e[0m\e[37m ", format);
 
-    printf("%s", getenv("SHELL"));          // $SHELL
+    char *shell = getenv("SHELL");
+    char *ptr = strstr(shell, "/bin/");
+    if(ptr) {
+        shell = ptr + 5;
+    }
+
+    printf("%s", shell);
 }
 // terminal
 void term() {           // prints the current terminal
@@ -255,7 +261,11 @@ void term() {           // prints the current terminal
     if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
     else printf("%s\e[0m\e[37m ", format);
 
-    printf("%s", getenv("TERM"));           // $TERM
+    char *terminal = getenv("TERM");
+    terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
+    
+
+    printf("%s", terminal);
 }
 
 // packages
