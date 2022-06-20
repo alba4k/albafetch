@@ -45,7 +45,7 @@ void title() {          // prints a title in the format user@hostname
     }
     char *username = pw->pw_name;
 
-    printf("%s\e[0m\e[37m@%s%s%s\e[0m\e[37m", username, config.color, config.bold, hostname);
+    printf("%s%s\e[0m\e[37m@%s%s%s\e[0m\e[37m", config.title_prefix, username, config.color, config.bold, hostname);
 }
 
 // hostname

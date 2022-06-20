@@ -16,6 +16,7 @@ typedef struct {
     char color[33];
     char bold[33];
     // Labels:
+    char title_prefix[33];
     char hostname_label[33];
     char user_label[33];
     char uptime_label[33];

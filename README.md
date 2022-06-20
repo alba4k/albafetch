@@ -66,6 +66,7 @@ default_color = ""
 default_bold = "true"
 default_logo = ""
 
+title_prefix = ""
 hostname_label = "Hostname"
 user_label = "User"
 uptime_label = "Uptime"

@@ -30,6 +30,7 @@ Config config = {
     "",                                 // color
     "\e[1m",                            // bold
     // Labels:
+    "",                                 // title_prefix
     "Hostname",                         // hostname
     "User",                             // user
     "Uptime",                           // uptime
@@ -243,6 +244,17 @@ void parse_config() {
     }
 
     // LABELS
+    // title_prefix
+    if(ptr = strstr(conf, "title_prefix")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.title_prefix, ptr);
+            *ptr2 = '"';
+        }
+    }
+
     // hostname
     if(ptr = strstr(conf, "hostname_label")) {
         if(ptr = strchr(ptr, '"')) {
