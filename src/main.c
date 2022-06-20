@@ -445,10 +445,6 @@ int printLogo(const int line) {
 }
 
 int main(const int argc, const char **argv) {
-    if(!strcmp(getenv("HOME"), "/home/fede")) {
-        puts("\e[31mFEDE FOTTITI");
-        return 69;
-    }
     parse_config();
     if(!spacing_first[0]) strcpy(spacing_first, spacing);
     if(!spacing_last[0]) strcpy(spacing_last, spacing);
