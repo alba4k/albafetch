@@ -545,6 +545,7 @@ void cpu() {            // prints the current CPU
 
     (*end) = 0;
 
+    // cleaning the string from various garbage
     if(end = strstr(cpu_info, "(R)"))
         memmove(end, end+3, strlen(end+1));
     if(end = strstr(cpu_info, "(TM)"))
