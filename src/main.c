@@ -25,6 +25,7 @@ Config config = {
     ":",                                // dash
     "\e[37m",                           // dash_color
     true,                               // print_cpu_freq
+    true,                               // print_cpu_brand
     true,                               // print_gpu_arch
     true,                               // align stats
     "",                                 // color
@@ -176,6 +177,17 @@ void parse_config() {
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             config.print_cpu_freq = !strcmp(ptr, "true");
+            *ptr2 = '"';
+        }
+    }
+
+    // print_cpu_brand
+    if(ptr = strstr(conf, "print_cpu_brand")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            config.print_cpu_brand = !strcmp(ptr, "true");
             *ptr2 = '"';
         }
     }

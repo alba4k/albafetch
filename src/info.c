@@ -542,8 +542,27 @@ void cpu() {            // prints the current CPU
     } else {
         --end;
     }
-    
+
     (*end) = 0;
+
+    if(end = strstr(cpu_info, "(R)"))
+        memmove(end, end+3, strlen(end+1));
+    if(end = strstr(cpu_info, "(TM)"))
+        memmove(end, end+4, strlen(end+1));
+    if(end = strstr(cpu_info, "CPU"))
+        memmove(end, end+3, strlen(end+1));
+    if(end = strstr(cpu_info, "-Core Processor")) {
+        end -= 4;
+        end = strchr(end, ' ');
+        *end = 0;
+    }
+
+    if(!config.print_cpu_brand) {
+        if(end = strstr(cpu_info, "Intel Core"))
+            memmove(end, end+11, strlen(end+1));
+        if(end = strstr(cpu_info, "AMD Ryzen"))
+            memmove(end, end+10, strlen(end+1));
+    }
 
     printf("%s", cpu_info);
 

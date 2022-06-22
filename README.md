@@ -59,6 +59,7 @@ dash = ":"
 dash_color = "\e[37m"
 
 print_cpu_freq = "true"
+print_cpu_brand = "true"
 print_gpu_freq = "true"
 align_infos = "true"
 
