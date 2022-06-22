@@ -514,10 +514,10 @@ void cpu() {            // prints the current CPU
         return;
     }
     
-    char buf[256];
-    char *cpu_info = &buf[0];
+    char buf[512];
+    char *cpu_info = buf;
 
-    read_after_sequence(fp, "model name", buf, 256);
+    read_after_sequence(fp, "model name", buf, 512);
     fclose(fp);
     if(!buf) {
         fflush(stdout);
@@ -567,16 +567,16 @@ void cpu() {            // prints the current CPU
 
         char *cpu_freq = strstr(cpu_info, "cpu MHz");
         if(!cpu_freq)
-            goto error;
+            return;
 
         cpu_freq = strchr(cpu_freq, ':');
         if(!cpu_freq)
-            goto error;
+            return;
         cpu_freq += 2;
 
         end = strchr(cpu_freq, '\n');
         if(!end)
-            goto error;
+            return;
 
         *end = 0;
 
