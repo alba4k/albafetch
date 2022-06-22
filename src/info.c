@@ -40,20 +40,20 @@ void title() {          // prints a title in the format user@hostname
         fflush(stdout);
         fprintf(stderr, "%s%s[Unsupported]", config.color, config.bold);
         fflush(stderr);
-        printf("\e[0m\e[37m@%s%s%s\e[0m\e[37m", config.color, config.bold, hostname);
+        printf("\e[0m@%s%s%s\e[0m", config.color, config.bold, hostname);
         return;
     }
     char *username = pw->pw_name;
 
-    printf("%s%s\e[0m\e[37m@%s%s%s\e[0m\e[37m", config.title_prefix, username, config.color, config.bold, hostname);
+    printf("%s%s\e[0m@%s%s%s\e[0m", config.title_prefix, username, config.color, config.bold, hostname);
 }
 
 // hostname
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     char format[100];
     snprintf(format, 100, "%s%s%s", config.hostname_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
@@ -65,8 +65,8 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 void user() {           // get the current login
     char format[100];
     snprintf(format, 100, "%s%s%s", config.user_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     struct passwd *pw;
     uid_t uid = geteuid();
@@ -87,8 +87,8 @@ void uptime() {         // prints the uptime
     long uptime;
 
     snprintf(format, 100, "%s%s%s", config.uptime_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
     
     #ifdef __APPLE__
         struct timeval boottime;
@@ -132,8 +132,8 @@ void uptime() {         // prints the uptime
 void os() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.os_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     struct utsname name;
     uname(&name);
@@ -144,8 +144,8 @@ void os() {
 void os() {             // prints the os name + arch
     char format[100];
     snprintf(format, 100, "%s%s%s", config.os_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     struct utsname name;
     uname(&name);
@@ -172,9 +172,9 @@ void os() {             // prints the os name + arch
         goto error;
     *end = 0;
 
-    end = strchr(os_name, '"');
-    if(!(end = strchr(os_name, '"')))
-        if(!(end = strchr(os_name, '\'')))
+    if((end = strchr(os_name, '"'))) *end = 0;
+    else if(!(end = strchr(os_name, '\''))) *end = 0;
+
 
     printf("%s %s", os_name, name.machine);
 
@@ -192,8 +192,8 @@ void os() {             // prints the os name + arch
 void kernel() {         // prints the kernel version
     char format[100];
     snprintf(format, 100, "%s%s%s", config.kernel_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     struct utsname name;
     uname(&name);
@@ -206,8 +206,8 @@ void kernel() {         // prints the kernel version
 void desktop() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     printf("Aqua");
 }
@@ -215,8 +215,8 @@ void desktop() {
 void desktop() {        // prints the current desktop environment
     char format[100];
     snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     const char *de;
     const char *desktop = getenv("SWAYSOCK") ? "Sway" :
@@ -238,8 +238,8 @@ void desktop() {        // prints the current desktop environment
 void shell() {          // prints the user default shell
     char format[100];
     snprintf(format, 100, "%s%s%s", config.shell_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     char *shell = getenv("SHELL");
     char *ptr = strstr(shell, "/bin/");
@@ -253,8 +253,8 @@ void shell() {          // prints the user default shell
 void term() {           // prints the current terminal
     char format[100];
     snprintf(format, 100, "%s%s%s", config.term_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     char *terminal = getenv("TERM");
     terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
@@ -268,8 +268,8 @@ void term() {           // prints the current terminal
 void packages() {       // prints the number of installed packages
     char format[100];
     snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     int pipes[2];
     char packages[10];
@@ -376,8 +376,8 @@ void packages() {       // prints the number of installed packages
 void packages() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     fflush(stdout);
     fputs("[Unsupported]", stderr);
@@ -390,8 +390,8 @@ void packages() {
 void host() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.host_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     printf("Apple");
 }
@@ -399,8 +399,8 @@ void host() {
 void host() {           // prints the current host machine
     char format[100];
     snprintf(format, 100, "%s%s%s", config.host_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
     if(!fp) {
@@ -427,8 +427,8 @@ void host() {           // prints the current host machine
 void packages() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     fflush(stdout);
     fputs("[Unsupported]", stderr);
@@ -438,8 +438,8 @@ void packages() {
 void bios() {           // prints the current host machine
     char format[100];
     snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     bool errors = false;
 
@@ -490,8 +490,8 @@ void bios() {           // prints the current host machine
 void cpu() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     size_t buf_size = 100;
     char buf[buf_size];
@@ -503,8 +503,8 @@ void cpu() {
 void cpu() {            // prints the current CPU
     char format[100];
     snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp) {
@@ -598,8 +598,8 @@ void cpu() {            // prints the current CPU
 void gpu() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.gpu_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     const char *gpu_string = get_gpu_string();
     if(!gpu_string) {
@@ -614,8 +614,8 @@ void gpu() {
 void gpu() {            // prints the current GPU
     char format[100];
     snprintf(format, 100, "%s%s%s", config.gpu_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     if(!access("/usr/bin/lspci", F_OK)) {
         int pipes[2];
@@ -692,8 +692,8 @@ void gpu() {            // prints the current GPU
 void memory() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.mem_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     bytes_t usedram = used_mem_size();
     bytes_t totalram = system_mem_size();
@@ -712,8 +712,8 @@ void memory() {
 void memory() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.mem_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     struct sysinfo info;
     sysinfo(&info);
@@ -769,8 +769,8 @@ void memory() {
 void public_ip() {      // get the public IP address
     char format[100];
     snprintf(format, 100, "%s%s%s", config.pub_ip_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     char public_ip[20];
     int pipes[2];
@@ -796,8 +796,8 @@ void public_ip() {      // get the public IP address
 void local_ip() {      // get the local IP address
     char format[100];
     snprintf(format, 100, "%s%s%s", config.loc_ip_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m\e[37m", format);
-    else printf("%s\e[0m\e[37m ", format);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
 
     struct ifaddrs *ifAddrStruct=NULL;
     struct ifaddrs *ifa=NULL;

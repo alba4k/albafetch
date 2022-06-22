@@ -21,9 +21,9 @@ char spacing_last[32] = "";
 
 // default config
 Config config = {
-    "\e[0m\e[37m------------------",    // separator
+    "\e[0m------------------",    // separator
     ":",                                // dash
-    "\e[37m",                           // dash_color
+    "\e[0m\e[1m",                       // dash_color
     true,                               // print_cpu_freq
     true,                               // print_cpu_brand
     true,                               // print_gpu_arch
@@ -492,12 +492,12 @@ int main(const int argc, const char **argv) {
                     }
                 }
 
-                fputs("\e[31m\e[1mERROR\e[0m\e[37m: invalid color! Use --help for more info\n", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
 
                 color: ;
             } else {
-                fputs("\e[31m\e[1mERROR\e[0m\e[37m: --color requires a color! Use --help for more info\n", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
             }
         } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
@@ -507,11 +507,11 @@ int main(const int argc, const char **argv) {
                 else if(!strcmp(argv[i+1], "off"))
                     strcpy(config.bold, "");
                 else {
-                    fputs("\e[31m\e[1mERROR\e[0m\e[37m: invalid value for --bold! Use --help for more info\n", stderr);
+                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --bold! Use --help for more info\n", stderr);
                     user_is_an_idiot = true;
                 }
             } else {
-                fputs("\e[31m\e[1mERROR\e[0m\e[37m: --bold requires a value! Use --help for more info\n", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --bold requires a value! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
@@ -524,7 +524,7 @@ int main(const int argc, const char **argv) {
                 logo = (char**)logos[0];
                 logo_arg_found: ;
             } else {
-                fputs("\e[31m\e[1mERROR\e[0m\e[37m: --logo requires a value! Use --help for more info\n", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --logo requires a value! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
             }
         } else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a")) {
@@ -534,11 +534,11 @@ int main(const int argc, const char **argv) {
                 else if(!strcmp(argv[i+1], "off"))
                     config.align_infos = false;
                 else {
-                    fputs("\e[31m\e[1mERROR\e[0m\e[37m: invalid value for --align! Use --help for more info\n", stderr);
+                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --align! Use --help for more info\n", stderr);
                     user_is_an_idiot = true;
                 }
             } else {
-                fputs("\e[31m\e[1mERROR\e[0m\e[37m: --align requires a value! Use --help for more info\n", stderr);
+                fputs("\e[31m\e[1mERROR\e[0m: --align requires a value! Use --help for more info\n", stderr);
                 user_is_an_idiot = true;
             }
         }
@@ -582,31 +582,31 @@ int main(const int argc, const char **argv) {
         strcpy(config.color, logo[1]);
 
     if(help) {  // print the help message if --help was used and exit
-        printf("%s%salbafetch\e[0m\e[37m - a system fetch utility\n",
+        printf("%s%salbafetch\e[0m - a system fetch utility\n",
                config.color, config.bold);
 
-        printf("\n%s%sFLAGS\e[0m\e[37m:\n",
+        printf("\n%s%sFLAGS\e[0m:\n",
                config.color, config.bold);
 
-        printf("\t%s%s-h\e[0m\e[37m,%s%s --help\e[0m\e[37m:\t Print this help menu and exit\n",
+        printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n",
                config.color, config.bold, config.color, config.bold);
 
-        printf("\t%s%s-c\e[0m\e[37m,%s%s --color\e[0m\e[37m:\t Change the output color (%s%s\e[0m\e[37m)\n"
-               "\t\t\t   [\e[30mblack\e[0m\e[37m, \e[31mred\e[0m\e[37m, \e[32mgreen\e[0m\e[37m, \e[33myellow\e[0m\e[37m,"
-               " \e[34mblue\e[0m\e[37m, \e[35mpurple\e[0m\e[37m, \e[36mcyan\e[0m\e[37m, \e[90mgray\e[0m\e[37m,"
-               " \e[37mwhite\e[0m\e[37m]\n",
+        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (%s%s\e[0m)\n"
+               "\t\t\t   [\e[30mblack\e[0m, \e[31mred\e[0m, \e[32mgreen\e[0m, \e[33myellow\e[0m,"
+               " \e[34mblue\e[0m, \e[35mpurple\e[0m, \e[36mcyan\e[0m, \e[90mgray\e[0m,"
+               " \e[37mwhite\e[0m]\n",
                config.color, config.bold, config.color, config.bold, default_color[0] ? default_color : logo[1], default_color[0] ? "default" : "logo default");
 
-        printf("\t%s%s-b\e[0m\e[37m,%s%s --bold\e[0m\e[37m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
-               "\t\t\t   [\e[1mon\e[0m\e[37m, off]\n",
+        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
+               "\t\t\t   [\e[1mon\e[0m, off]\n",
                config.color, config.bold, config.color, config.bold, default_bold ? "\e[1mon" : "off");
         
-        printf("\t%s%s-l\e[0m\e[37m,%s%s --logo\e[0m\e[37m:\t Changes the logo that will be displayed (%s)\n"
+        printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (%s)\n"
                "\t\t\t   [linux, apple, arch, arch_small, debian, linuxmint, endeavouros, ubuntu]\n"
                "\t\t\t   [parrot, manjaro, fedora, neon, pop, gentoo, windows]\n",
                config.color, config.bold, config.color,config. bold, default_logo[0] ? default_logo : "OS default");
 
-        printf("\t%s%s-a\e[0m\e[37m, %s%s--align\e[0m\e[37m:\t Alignes the infos if set (default: %s\e[0m)\n"
+        printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s\e[0m)\n"
                "\t\t\t   [on, off]\n", config.color, config.bold, config.color, config.bold, config.align_infos ? "on" : "off");
 
         printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\n",

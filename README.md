@@ -52,9 +52,9 @@ The config should be written in a key "value" format you can put something in be
 ### Options and default values:
 ``` python
 spacing = "    "
-separator = "\e[0m\e[37m------------------"
-separator_first = "\e[0m\e[37m------------------"
-separator_last = "\e[0m\e[37m------------------"
+separator = "\e[0m------------------"
+separator_first = "\e[0m------------------"
+separator_last = "\e[0m------------------"
 dash = ":"
 dash_color = "\e[37m"
 
