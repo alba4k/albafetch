@@ -635,9 +635,9 @@ int main(const int argc, const char **argv) {
 
     // The following line works because infos is declared on the stack,
     // so sizeof returns it's real size and not the size of a pointer.
-    const size_t info_lines = sizeof(infos) / sizeof(infos[0]) - 1;
+    const int info_lines = (int)(sizeof(infos) / sizeof(infos[0])) - 1;
     
-    for(size_t i = 0; i <= info_lines; ++i) {
+    for(int i = 0; i <= info_lines; ++i) {
         line = printLogo(line);
         if(line == 4) printf("%s", spacing_first);
         else if(i == info_lines) printf("%s", spacing_last);

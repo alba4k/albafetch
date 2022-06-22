@@ -2,7 +2,7 @@
 
 SHELL := /bin/bash
 CC := gcc
-CFLAGS := -Wall
+CFLAGS := -Wall -Ofast
 TARGET := albafetch
 
 OS := $(shell uname -s)

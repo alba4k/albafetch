@@ -173,12 +173,8 @@ void os() {             // prints the os name + arch
     *end = 0;
 
     end = strchr(os_name, '"');
-    if(!end) {
-        end = strchr(os_name, '\'');
-        if(!end)
-            goto error;
-    }
-    *end = 0;
+    if(!(end = strchr(os_name, '"')))
+        if(!(end = strchr(os_name, '\'')))
 
     printf("%s %s", os_name, name.machine);
 
@@ -189,7 +185,6 @@ void os() {             // prints the os name + arch
         fputs("[Bad Format]", stderr);
         fflush(stderr);
         printf(" %s", name.machine);
-        fclose(fp);
         return;
 }
 #endif
