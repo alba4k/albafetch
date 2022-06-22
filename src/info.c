@@ -557,8 +557,8 @@ void cpu() {            // prints the current CPU
     if(!config.print_cpu_brand) {
         if(end = strstr(cpu_info, "Intel Core"))
             memmove(end, end+11, strlen(end+1));
-        if(end = strstr(cpu_info, "AMD Ryzen"))
-            memmove(end, end+10, strlen(end+1));
+        if(end = strstr(cpu_info, "AMD"))
+            memmove(end, end+4, strlen(end+1));
     }
 
     printf("%s", cpu_info);
@@ -579,7 +579,7 @@ void cpu() {            // prints the current CPU
 
         *end = 0;
 
-        printf("@ %g GHz", (float)(atoi(cpu_freq)/100)/10);
+        printf("@ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
     }
 
     return;

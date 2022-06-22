@@ -70,7 +70,7 @@ void parse_config() {
     // unescape
     char *ptr = conf;
     while(ptr=strchr(ptr, '\\')) {
-        memmove(ptr, ptr+1, strlen(ptr+1));
+        memmove(ptr, ptr+1, strlen(ptr+1)+1);
         switch(*ptr) {
             default: case '\\':
                 break;
@@ -88,20 +88,12 @@ void parse_config() {
     char *ptr2 = ptr = conf;
     while(ptr = strchr(ptr, ';')) {
         ptr2 = strchr(ptr, '\n');
-        if(!ptr2) {
-            *ptr = 0;   // end of file, no new lines, terminating string
-            break;
-        }
-        memmove(ptr, ptr2+1, strlen(ptr2+1));
+        memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
     }
     ptr = ptr2 = conf;
     while(ptr = strchr(ptr, '#')) {
         ptr2 = strchr(ptr, '\n');
-        if(!ptr2) {
-            *ptr = 0;   // end of file, no new lines, terminating string
-            break;
-        }
-        memmove(ptr, ptr2+1, strlen(ptr2+1));
+        memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
     }
     
     // spacing
