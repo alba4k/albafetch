@@ -172,8 +172,8 @@ void os() {             // prints the os name + arch
         goto error;
     *end = 0;
 
-    if((end = strchr(os_name, '"'))) *end = 0;
-    else if(!(end = strchr(os_name, '\''))) *end = 0;
+    if(end = strchr(os_name, '"')) *end = 0;
+    else if(end = strchr(os_name, '\'')) *end = 0;
 
 
     printf("%s %s", os_name, name.machine);
