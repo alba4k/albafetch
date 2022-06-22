@@ -514,10 +514,10 @@ void cpu() {            // prints the current CPU
         return;
     }
     
-    char buf[512];
+    char buf[256];
     char *cpu_info = buf;
 
-    read_after_sequence(fp, "model name", buf, 512);
+    read_after_sequence(fp, "model name", buf, 256);
     fclose(fp);
     if(!buf) {
         fflush(stdout);
@@ -538,6 +538,7 @@ void cpu() {            // prints the current CPU
         --end;
     }
 
+    char *ptr = end;
     (*end) = 0;
 
     // cleaning the string from various garbage
@@ -561,11 +562,9 @@ void cpu() {            // prints the current CPU
     }
 
     printf("%s", cpu_info);
-
+    
     if(config.print_cpu_freq) {
-        *end = ' ';
-
-        char *cpu_freq = strstr(cpu_info, "cpu MHz");
+        char *cpu_freq = strstr(ptr+1, "cpu MHz");
         if(!cpu_freq)
             return;
 
@@ -580,7 +579,7 @@ void cpu() {            // prints the current CPU
 
         *end = 0;
 
-        printf(" @ %g GHz", (float)(atoi(cpu_freq)/100)/10);
+        printf("@ %g GHz", (float)(atoi(cpu_freq)/100)/10);
     }
 
     return;
