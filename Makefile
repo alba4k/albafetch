@@ -5,8 +5,8 @@ CC := gcc
 CFLAGS := -Wall -Ofast
 TARGET := albafetch
 
-OS := $(shell uname -s)
-PACMAN := $(shell ls /bin/pacman)
+OS := $(shell uname -s 2> /dev/null)
+PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
 ifeq ($(OS),Linux)
 	OBJ := info.o main.o queue.o
