@@ -553,7 +553,7 @@ int main(const int argc, const char **argv) {
 
             char os_id[32];
             read_after_sequence(fp, "\nID", os_id, 32);
-            if(!os_id)
+            if(!os_id[0])
                 read_after_sequence(fp, "ID", os_id, 32);
             fclose(fp);
 
