@@ -546,8 +546,8 @@ void cpu() {            // prints the current CPU
         memmove(end, end+3, strlen(end+1));
     if(end = strstr(cpu_info, "(TM)"))
         memmove(end, end+4, strlen(end+1));
-    if(end = strstr(cpu_info, "CPU"))
-        memmove(end, end+3, strlen(end+1));
+    if(end = strstr(cpu_info, " CPU"))
+        memmove(end, end+4, strlen(end+1));
     if(end = strstr(cpu_info, "-Core Processor")) {
         end -= 4;
         end = strchr(end, ' ');
@@ -562,25 +562,27 @@ void cpu() {            // prints the current CPU
     }
 
     printf("%s", cpu_info);
-    
-    if(config.print_cpu_freq) {
-        char *cpu_freq = strstr(ptr+1, "cpu MHz");
-        if(!cpu_freq)
-            return;
 
-        cpu_freq = strchr(cpu_freq, ':');
-        if(!cpu_freq)
-            return;
-        cpu_freq += 2;
+    // Printing the clock frequency the cpu is currently running at
+    if(!config.print_cpu_freq)
+        return;
+        
+    char *cpu_freq = strstr(ptr+1, "cpu MHz");
+    if(!cpu_freq)
+        return;
 
-        end = strchr(cpu_freq, '\n');
-        if(!end)
-            return;
+    cpu_freq = strchr(cpu_freq, ':');
+    if(!cpu_freq)
+        return;
+    cpu_freq += 2;
 
-        *end = 0;
+    end = strchr(cpu_freq, '\n');
+    if(!end)
+        return;
 
-        printf("@ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
-    }
+    *end = 0;
+
+    printf(" @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
 
     return;
 
