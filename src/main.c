@@ -27,6 +27,7 @@ Config config = {
     true,                               // print_cpu_freq
     true,                               // print_cpu_brand
     true,                               // print_gpu_arch
+    true,                               // print_mem_perc
     true,                               // align stats
     "",                                 // color
     "\e[1m",                            // bold
@@ -191,6 +192,17 @@ void parse_config() {
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             config.print_gpu_arch = !strcmp(ptr, "true");
+            *ptr2 = '"';
+        }
+    }
+
+    // print_mem_perc
+    if(ptr = strstr(conf, "print_mem_perc")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            config.print_mem_perc = !strcmp(ptr, "true");
             *ptr2 = '"';
         }
     }
@@ -646,6 +658,7 @@ int main(const int argc, const char **argv) {
         printf("\n");
     }
     printf("\e[0m");
+    fflush(stdout);
 
     return 0;
 }

@@ -760,8 +760,10 @@ void memory() {
 
     unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
 
-    printf("%lu MiB / %lu MiB (%lu%%)", usedram/1024, totalram/1024, (usedram * 100) / totalram);
+    printf("%lu MiB / %lu MiB", usedram/1024, totalram/1024);
 
+    if(config.print_mem_perc)
+         printf(" (%lu%%)", (usedram * 100) / totalram);
     return;
 }
 #endif

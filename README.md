@@ -38,7 +38,7 @@ $ cd albafetch
 
 
 # Customizing
-A configuration file can be found in `~/.config/albafetch.conf`.
+A configuration should be in `~/.config/albafetch.conf`.
 
 ## How to write the config:
 Basic rules:
@@ -61,6 +61,7 @@ dash_color = "\e[37m"
 print_cpu_freq = "true"
 print_cpu_brand = "true"
 print_gpu_freq = "true"
+print_mem_perc = "true"
 align_infos = "true"
 
 default_color = ""
@@ -91,7 +92,7 @@ Quotes in the config are **not** optional.
 
 If a key is defined more than one the first one is the only oen that will get considered.
 
-This repository contains an example config file (`albafetch.conf`) with the default values.
+This repository contains a commented example config file (`albafetch.conf`) with the default values.
 
 ## Source code editing:
 If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `src/logos.h` (inside of `const char *logos[][]`) and in `src/main.c` (to make them show up in the help message).
