@@ -49,6 +49,7 @@ Config config = {
     "Memory",                           // memory
     "Publ. IP",                         // public IP
     "Loc. IP",                          // local IP
+    "Directory"                         // pwd
 };
 
 void parse_config() {
@@ -249,10 +250,10 @@ void parse_config() {
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             if(*ptr) {
-                for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
+                for(int i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], ptr)) {
                         logo = (char**)logos[i];
-                        strcpy(default_logo, logo[0]);
+                        strcpy(default_logo, *logo);
                     }
             }
             *ptr2 = '"';
@@ -447,11 +448,22 @@ void parse_config() {
         }
     }
 
+    // pwd
+    if(ptr = strstr(conf, "pwd_label")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.pwd_label, ptr);
+            *ptr2 = '"';
+        }
+    }
+
     free(conf);
 }
 
 int printLogo(const int line) {
-    if(logo[line][0]) {
+    if(*logo[line]) {
         printf("%s%s%s", config.bold, logo[line], config.color);
         return line+1;
     } else {
@@ -462,8 +474,8 @@ int printLogo(const int line) {
 
 int main(const int argc, const char **argv) {
     parse_config();
-    if(!spacing_first[0]) strcpy(spacing_first, spacing);
-    if(!spacing_last[0]) strcpy(spacing_last, spacing);
+    if(!(*spacing_first)) strcpy(spacing_first, spacing);
+    if(!(*spacing_last)) strcpy(spacing_last, spacing);
 
     bool help = false;
     int line = 3;
@@ -490,7 +502,7 @@ int main(const int argc, const char **argv) {
                 };
 
                 for(int j = 0; j < 9; ++j) {
-                    if(!strcmp(argv[i+1], colors[j][0])) {
+                    if(!strcmp(argv[i+1], *colors[j])) {
                         strcpy(config.color, colors[j][1]);
                         goto color;
                     }
@@ -520,7 +532,7 @@ int main(const int argc, const char **argv) {
             }
         } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
             if(argv[i+1]) {
-                for(int j = 0; j < sizeof(logos)/sizeof(logos[0]); ++j)
+                for(int j = 0; j < sizeof(logos)/sizeof(*logos); ++j)
                     if(!strcmp(logos[j][0], argv[i+1])) {
                         logo = (char**)logos[j];
                         goto logo_arg_found;
@@ -565,7 +577,7 @@ int main(const int argc, const char **argv) {
 
             char os_id[32];
             read_after_sequence(fp, "\nID", os_id, 32);
-            if(!os_id[0])
+            if(!(*os_id))
                 read_after_sequence(fp, "ID", os_id, 32);
             fclose(fp);
 
@@ -574,7 +586,7 @@ int main(const int argc, const char **argv) {
                 return -1;
             *end = 0;
 
-            for(int i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
+            for(int i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                 if(!strcmp(logos[i][0], os_id)) {
                     logo = (char**)logos[i];
                     goto logo_found;
@@ -584,7 +596,7 @@ int main(const int argc, const char **argv) {
             logo_found: ;
         #endif
     }
-    if(!config.color[0])
+    if(!(*config.color))
         strcpy(config.color, logo[1]);
 
     if(help) {  // print the help message if --help was used and exit
@@ -641,7 +653,7 @@ int main(const int argc, const char **argv) {
 
     // The following line works because infos is declared on the stack,
     // so sizeof returns it's real size and not the size of a pointer.
-    const int info_lines = (int)(sizeof(infos) / sizeof(infos[0])) - 1;
+    const int info_lines = (int)(sizeof(infos) / sizeof(*infos)) - 1;
     
     for(int i = 0; i <= info_lines; ++i) {
         line = printLogo(line);
@@ -653,7 +665,7 @@ int main(const int argc, const char **argv) {
     }
 
     // ******** remaining lines of the logo ********
-    while(logo[line][0]) {
+    while(*logo[line]) {
         line = printLogo(line);
         printf("\n");
     }

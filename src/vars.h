@@ -35,6 +35,7 @@ typedef struct {
     char mem_label[33];
     char pub_ip_label[33];
     char loc_ip_label[33];
+    char pwd_label[33];
 } Config;
 
 extern Config config;

@@ -22,6 +22,15 @@
 
 #include "info.h"
 
+/* __APPLE__ only exists on macOS
+ * _WIN32 only exists on Windows (I think-)
+ * __linux__ only exists on linux
+ * 
+ * Those can be used to determine the
+ * platform the code is being compiled
+ * on and act consequently
+ */
+
 // separator
 void separator() {      // prints a separator
     printf("%s", config.separator);
@@ -249,6 +258,7 @@ void shell() {          // prints the user default shell
 
     printf("%s", shell);
 }
+
 // terminal
 void term() {           // prints the current terminal
     char format[100];
@@ -264,7 +274,18 @@ void term() {           // prints the current terminal
 }
 
 // packages
-#ifndef __APPLE__
+#ifdef __APPLE__
+void packages() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
+
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
+}
+#else
 void packages() {       // prints the number of installed packages
     char format[100];
     snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
@@ -294,7 +315,7 @@ void packages() {       // prints the number of installed packages
         pipe(pipes);
 
         if(!fork()) {
-            close(pipes[0]);
+            close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("sh", "sh", "-c", "dpkg-query -f '.\n' -W | wc -l", NULL); 
@@ -302,7 +323,7 @@ void packages() {       // prints the number of installed packages
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(pipes[0]);
+        close(*pipes);
 
         if(packages[0] != '0')
             printf("%s (dpkg) ", packages);
@@ -313,7 +334,7 @@ void packages() {       // prints the number of installed packages
         pipe(pipes);
 
         if(!fork()) {
-            close(pipes[0]);
+            close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("sh", "sh", "-c", "rpm -qa | wc -l", NULL); 
@@ -321,7 +342,7 @@ void packages() {       // prints the number of installed packages
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(pipes[0]);
+        close(*pipes);
 
         if(packages[0] != '0')
             printf("%s (rpm) ", packages);
@@ -332,7 +353,7 @@ void packages() {       // prints the number of installed packages
         pipe(pipes);
 
         if(!fork()) {
-            close(pipes[0]);
+            close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("sh", "sh", "-c", "flatpak list | wc -l", NULL); 
@@ -340,7 +361,7 @@ void packages() {       // prints the number of installed packages
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(pipes[0]);
+        close(*pipes);
 
         if(packages[0] != '0')
             printf("%s (flatpak) ", packages);
@@ -351,7 +372,7 @@ void packages() {       // prints the number of installed packages
         pipe(pipes);
 
         if(!fork()) {
-            close(pipes[0]);
+            close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("sh", "sh", "-c", "snap list 2> /dev/null | wc -l", NULL);   // sending stderr to null to avoid snap printing shit when installed with 0 pacakges
@@ -359,7 +380,7 @@ void packages() {       // prints the number of installed packages
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(pipes[0]);
+        close(*pipes);
 
         if(packages[0] != '0')
             printf("%d (snap) ", atoi(packages) - 1);
@@ -371,17 +392,6 @@ void packages() {       // prints the number of installed packages
         fputs("[Unsupported]", stderr);
         fflush(stderr);
     }
-}
-#else
-void packages() {
-    char format[100];
-    snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
 }
 #endif
 
@@ -415,10 +425,26 @@ void host() {           // prints the current host machine
 
     char model[len];
     model[fread(model, 1, len, fp) - 1] = 0;
-    
+    fclose(fp);
+
+    fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r");
+    if(!fp) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+        return;
+    }
+    fseek(fp, 0, SEEK_END);
+    len = ftell(fp);
+    rewind(fp);
+
+    char model_ver[len];
+    model_ver[fread(model_ver, 1, len, fp) - 1] = 0;
     fclose(fp);
 
     printf("%s", model);
+    if(*model_ver)
+        printf(" %s", model_ver);
 }
 #endif
 
@@ -624,14 +650,14 @@ void gpu() {            // prints the current GPU
 
         pipe(pipes);
         if(!fork()) {
-            close(pipes[0]);
+            close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
             execlp("lspci", "lspci", "-mm", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
         lspci[read(pipes[0], lspci, 0x2000)] = 0;
-        close(pipes[0]);
+        close(*pipes);
 
         char *gpu = strstr(lspci, "3D");
         if(!gpu) {
@@ -780,7 +806,7 @@ void public_ip() {      // get the public IP address
 
     pipe(pipes);
     if(!fork()) {
-        close(pipes[0]);
+        close(*pipes);
         dup2(pipes[1], STDOUT_FILENO);
 
         execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
@@ -791,7 +817,7 @@ void public_ip() {      // get the public IP address
     
     public_ip[read(pipes[0], public_ip, 20)] = 0;
 
-    close(pipes[0]);
+    close(*pipes);
     printf("%s", public_ip);
 }
 
@@ -822,4 +848,21 @@ void local_ip() {      // get the local IP address
                 printf("%s", addressBuffer);
         }
     } 
+}
+
+void pwd() {
+    char format[100];
+    snprintf(format, 100, "%s%s%s", config.pwd_label, config.dash_color, config.dash);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
+
+    char *pwd = getenv("PWD");
+    if(pwd) {
+        printf("%s", pwd);
+        return;
+    }
+    
+    fflush(stdout);
+    fputs("[Unknown]", stderr);
+    fflush(stderr);
 }

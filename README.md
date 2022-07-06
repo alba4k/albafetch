@@ -85,6 +85,7 @@ gpu_label = "GPU"
 mem_label = "Memory"
 pub_ip_label = "Publ. IP"
 loc_ip_label = "Priv. IP"
+pwd_label = "Directory"
 ```
 
 Unset values will use the defaults
