@@ -2,26 +2,21 @@
 #include "logos.h"
 #include "stdlib.h"
 
-char *separator_string;
-char *dash;
-char *dash_color;
+/*TODO:
+ * remove dash_color and make it part of dash
+ * use strlen() to determine how far to --align
+ * option to choose what order the infos are printed in
+ */
 
-bool print_cpu_freq;
-
-bool default_bold = true;
-char default_color[33] = "";
-char default_logo_color[33];
-char default_logo[33] = "";
-
-char **logo;
-
-char spacing[32] = "    ";
-char spacing_first[32] = "";
-char spacing_last[32] = "";
+// CONFIGURATION OPTIONS:
+char *separator_string; // what is used as separator between sections
+char *dash; // default separator
+char *dash_color;   // color of the dash
 
 // default config
 Config config = {
-    "\e[0m------------------",    // separator
+    "\e[0m------------------",          // separator
+    "",                                 // separator2
     ":",                                // dash
     "\e[0m\e[1m",                       // dash_color
     true,                               // print_cpu_freq
@@ -33,6 +28,8 @@ Config config = {
     "\e[1m",                            // bold
     // Labels:
     "",                                 // title_prefix
+    "",                                 // col_prefix
+    "███",                              // col_block
     "Hostname",                         // hostname
     "User",                             // user
     "Uptime",                           // uptime
@@ -51,6 +48,19 @@ Config config = {
     "Loc. IP",                          // local IP
     "Directory"                         // pwd
 };
+
+bool print_cpu_freq;
+
+bool default_bold = true;
+char default_color[33] = "";
+char default_logo_color[33];
+char default_logo[33] = "";
+
+char **logo;
+
+char spacing[32] = "    ";
+char spacing_first[32] = "";
+char spacing_last[32] = "";
 
 void parse_config() {
     // really bad code here, you don't need to look
@@ -131,13 +141,22 @@ void parse_config() {
         }
     }
 
-    // separator
+    // separators
     if(ptr = strstr(conf, "separator")) {
         if(ptr = strchr(ptr, '"')) {
             ++ptr;
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             strcpy(config.separator, ptr);
+            *ptr2 = '"';
+        }
+    }
+    if(ptr = strstr(conf, "separator2")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.separator2, ptr);
             *ptr2 = '"';
         }
     }
@@ -260,6 +279,17 @@ void parse_config() {
         }
     }
 
+    // col_block
+    if(ptr = strstr(conf, "col_block")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.col_block, ptr);
+            *ptr2 = '"';
+        }
+    }
+
     // LABELS
     // title_prefix
     if(ptr = strstr(conf, "title_prefix")) {
@@ -268,6 +298,17 @@ void parse_config() {
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
             strcpy(config.title_prefix, ptr);
+            *ptr2 = '"';
+        }
+    }
+
+    // col_prefix
+    if(ptr = strstr(conf, "col_prefix")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            ptr2 = strchr(ptr, '"');
+            *ptr2 = 0;
+            strcpy(config.col_prefix, ptr);
             *ptr2 = '"';
         }
     }
@@ -649,6 +690,9 @@ int main(const int argc, const char **argv) {
         cpu,
         gpu,
         memory,
+        separator2,
+        colors,
+        light_colors
     };
 
     // The following line works because infos is declared on the stack,

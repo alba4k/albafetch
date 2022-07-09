@@ -23,7 +23,7 @@
 #include "info.h"
 
 /* __APPLE__ only exists on macOS
- * _WIN32 only exists on Windows (I think-)
+ * _WIN32 only exists on Windows (ew)
  * __linux__ only exists on linux
  * 
  * Those can be used to determine the
@@ -31,9 +31,12 @@
  * on and act consequently
  */
 
-// separator
+// separators
 void separator() {      // prints a separator
     printf("%s", config.separator);
+}
+void separator2() {      // prints a separator
+    printf("%s", config.separator2);
 }
 
 // title
@@ -850,6 +853,7 @@ void local_ip() {      // get the local IP address
     } 
 }
 
+// working directory
 void pwd() {
     char format[100];
     snprintf(format, 100, "%s%s%s", config.pwd_label, config.dash_color, config.dash);
@@ -865,4 +869,17 @@ void pwd() {
     fflush(stdout);
     fputs("[Unknown]", stderr);
     fflush(stderr);
+}
+
+// terminal colors
+void colors() {
+    printf("%s", config.col_prefix);
+    for(int i = 30; i < 38; ++i)
+        printf("\e[%dm%s", i, config.col_block);
+}
+// terminal colors (light version)
+void light_colors() {
+    printf("%s", config.col_prefix);
+    for(int i = 90; i < 98; ++i)
+        printf("\e[%dm%s", i, config.col_block);
 }

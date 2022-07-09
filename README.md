@@ -43,7 +43,7 @@ A configuration should be in `~/.config/albafetch.conf`.
 ## How to write the config:
 Basic rules:
 * comments start with ; and reach the end of the line
-* values can't be big than 32B ($separator can get as long as 64B)
+* values can't be big than 32B (separators can get as long as 64B)
 * only ASCII characters will work
 * ending the file with a newline is reccomended
 
@@ -53,6 +53,7 @@ The config should be written in a key "value" format you can put something in be
 ``` python
 spacing = "    "
 separator = "\e[0m------------------"
+separator2 = ""
 separator_first = "\e[0m------------------"
 separator_last = "\e[0m------------------"
 dash = ":"
@@ -68,7 +69,10 @@ default_color = ""
 default_bold = "true"
 default_logo = ""
 
+col_block = "███"
+
 title_prefix = ""
+col_prefix = ""
 hostname_label = "Hostname"
 user_label = "User"
 uptime_label = "Uptime"

@@ -23,6 +23,8 @@
 
 void separator();   // prints a separator
 
+void separator2();  // prints a different separator
+
 void title();       // prints a title in the format user@hostname
 
 void hostname();    // getting the computer hostname
@@ -58,5 +60,8 @@ void public_ip();   // get the public IP adress
 void local_ip();    // get the local IP adress - WORK IN PROGRESS
 
 void pwd();
+
+void colors();
+void light_colors();
 
 #endif

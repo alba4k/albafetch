@@ -1,13 +1,9 @@
 #ifndef VARS_H
 #define VARS_H
 
-// CONFIGURATION OPTIONS:
-extern char *separator_string;  // what is used as separator between sections
-extern char *dash;              // color of the dash
-extern char *dash_color;        // default separator
-
 typedef struct {
     char separator[65];
+    char separator2[65];
     char dash[33];
     char dash_color[33];
     bool print_cpu_freq;
@@ -19,6 +15,8 @@ typedef struct {
     char bold[33];
     // Labels:
     char title_prefix[33];
+    char col_prefix[33];
+    char col_block[33];
     char hostname_label[33];
     char user_label[33];
     char uptime_label[33];
