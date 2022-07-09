@@ -3,22 +3,20 @@
 #include "stdlib.h"
 
 /*TODO:
- * remove dash_color and make it part of dash
- * use strlen() to determine how far to --align
- * option to choose what order the infos are printed in
+ * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2)
+ * option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
+ * 
  */
 
 // CONFIGURATION OPTIONS:
 char *separator_string; // what is used as separator between sections
 char *dash; // default separator
-char *dash_color;   // color of the dash
 
 // default config
 Config config = {
     "\e[0m------------------",          // separator
     "",                                 // separator2
     ":",                                // dash
-    "\e[0m\e[1m",                       // dash_color
     true,                               // print_cpu_freq
     true,                               // print_cpu_brand
     true,                               // print_gpu_arch
@@ -53,7 +51,6 @@ bool print_cpu_freq;
 
 bool default_bold = true;
 char default_color[33] = "";
-char default_logo_color[33];
 char default_logo[33] = "";
 
 char **logo;
@@ -61,6 +58,55 @@ char **logo;
 char spacing[32] = "    ";
 char spacing_first[32] = "";
 char spacing_last[32] = "";
+
+void unescape(char *str) {
+    while(str=strchr(str, '\\')) {
+        memmove(str, str+1, strlen(str+1)+1);
+        switch(*str) {
+            default: case '\\':
+                break;
+            case 'n':
+                *str = '\n';
+                break;
+            case 'e':
+                *str = 033;
+                break;
+        }
+    ++str;
+    }
+}
+
+bool parse_config_option(char* source, char *dest, char *field) {
+    char *ptr, *ptr2;
+    if(ptr = strstr(source, field)) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            if((ptr2 = strchr(ptr, '"')) && ptr) {
+                *ptr2 = 0;
+                strcpy(dest, ptr);
+                *ptr2 = '"';
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+bool parse_config_bool(char *source, bool *dest, char *field) {
+    char *ptr, *ptr2;
+    if(ptr = strstr(source, "print_cpu_freq")) {
+        if(ptr = strchr(ptr, '"')) {
+            ++ptr;
+            if((ptr2 = strchr(ptr, '"')) && ptr) {
+                *ptr2 = 0;
+                *dest = !strcmp(ptr, "true");
+                *ptr2 = '"';
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 void parse_config() {
     // really bad code here, you don't need to look
@@ -79,25 +125,11 @@ void parse_config() {
     conf[fread(conf, 1, len, fp)] = 0;
     fclose(fp);
 
-    // unescape
-    char *ptr = conf;
-    while(ptr=strchr(ptr, '\\')) {
-        memmove(ptr, ptr+1, strlen(ptr+1)+1);
-        switch(*ptr) {
-            default: case '\\':
-                break;
-            case 'n':
-                *ptr = '\n';
-                break;
-            case 'e':
-                *ptr = 033;
-                break;
-        }
-    ++ptr;
-    }
+    unescape(conf);
 
     // remove comments
-    char *ptr2 = ptr = conf;
+    char *ptr = conf;
+    char *ptr2 = conf;
     while(ptr = strchr(ptr, ';')) {
         ptr2 = strchr(ptr, '\n');
         memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
@@ -109,173 +141,57 @@ void parse_config() {
     }
     
     // spacing
-    if(ptr = strstr(conf, "spacing")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(spacing, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, spacing, "spacing");
 
     // spacing_first
-    if(ptr = strstr(conf, "spacing_first")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(spacing_first, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, spacing_first, "spacing_first");
 
     // spacing_last
-    if(ptr = strstr(conf, "spacing_last")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(spacing_last, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, spacing_last, "spacing_last");
+
 
     // separators
-    if(ptr = strstr(conf, "separator")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.separator, ptr);
-            *ptr2 = '"';
-        }
-    }
-    if(ptr = strstr(conf, "separator2")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.separator2, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.separator, "separator");
+    parse_config_option(conf, config.separator2, "separator2");
 
     // dash
-    if(ptr = strstr(conf, "dash")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.dash, ptr);
-            *ptr2 = '"';
-        }
-    }
-
-    // dash_color
-    if(ptr = strstr(conf, "dash_color")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.dash_color, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.dash, "dash");
 
     // print_cpu_freq
-    if(ptr = strstr(conf, "print_cpu_freq")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            config.print_cpu_freq = !strcmp(ptr, "true");
-            *ptr2 = '"';
-        }
-    }
+    parse_config_bool(conf, &config.print_cpu_freq, "print_cpu_freq");
 
     // print_cpu_brand
-    if(ptr = strstr(conf, "print_cpu_brand")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            config.print_cpu_brand = !strcmp(ptr, "true");
-            *ptr2 = '"';
-        }
-    }
+    parse_config_bool(conf, &config.print_cpu_brand, "print_cpu_brand");
 
     // print_gpu_arch
-    if(ptr = strstr(conf, "print_gpu_arch")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            config.print_gpu_arch = !strcmp(ptr, "true");
-            *ptr2 = '"';
-        }
-    }
+    parse_config_bool(conf, &config.print_gpu_arch, "print_gpu_arch");
 
     // print_mem_perc
-    if(ptr = strstr(conf, "print_mem_perc")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            config.print_mem_perc = !strcmp(ptr, "true");
-            *ptr2 = '"';
-        }
-    }
+    parse_config_bool(conf, &config.print_mem_perc, "print_mem_perc");
 
     // align_infos
-    if(ptr = strstr(conf, "align_infos")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            config.align_infos = !strcmp(ptr, "true");
-            *ptr2 = '"';
-        }
-    }
+    parse_config_bool(conf, &config.align_infos, "align_infos");
     
     // color
-    if(ptr = strstr(conf, "default_color")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.color, ptr);
-            strcpy(default_color, ptr);
-            *ptr2 = '"';
-        }
-    }
+    if(parse_config_option(conf, config.color, "default_color"))
+        strcpy(default_color, config.color);
 
     // bold
-    if(ptr = strstr(conf, "default_bold")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.bold, strcmp(ptr, "true") ? "" : "\e[1m");
-            default_bold = config.bold;
-            *ptr2 = '"';
-        }
-    }
+    default_bold = parse_config_option(conf, config.bold, "default_bold");
 
     // logo
     if(ptr = strstr(conf, "default_logo")) {
         if(ptr = strchr(ptr, '"')) {
             ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            if(*ptr) {
+            if((ptr2 = strchr(ptr, '"')) && ptr) {
+                *ptr2 = 0;
                 for(int i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], ptr)) {
                         logo = (char**)logos[i];
                         strcpy(default_logo, *logo);
                     }
+                *ptr2 = '"';
             }
-            *ptr2 = '"';
         }
     }
 
@@ -291,214 +207,62 @@ void parse_config() {
     }
 
     // LABELS
-    // title_prefix
-    if(ptr = strstr(conf, "title_prefix")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.title_prefix, ptr);
-            *ptr2 = '"';
-        }
-    }
+    // title
+    parse_config_option(conf, config.title_prefix, "title_prefix");
 
-    // col_prefix
-    if(ptr = strstr(conf, "col_prefix")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.col_prefix, ptr);
-            *ptr2 = '"';
-        }
-    }
+    // colors
+    parse_config_option(conf, config.col_prefix, "col_prefix");
 
     // hostname
-    if(ptr = strstr(conf, "hostname_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.hostname_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.hostname_label, "hostname_label");
 
     // user
-    if(ptr = strstr(conf, "user_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.user_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.user_label, "user_label");
 
     // uptime
-    if(ptr = strstr(conf, "uptime_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.uptime_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.uptime_label, "uptime_label");
 
     // os
-    if(ptr = strstr(conf, "os_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.os_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.os_label, "os_label");
 
     // kernel
-    if(ptr = strstr(conf, "kernel_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.kernel_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.kernel_label, "kernel_label");
 
     // desktop
-    if(ptr = strstr(conf, "desktop_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.desktop_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.desktop_label, "desktop_label");
 
     // shell
-    if(ptr = strstr(conf, "shell_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.shell_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.shell_label, "shell_label");
 
     // terminal
-    if(ptr = strstr(conf, "term_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.term_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.term_label, "term_label");
 
     // packages
-    if(ptr = strstr(conf, "packages_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.packages_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.packages_label, "packages_label");
 
     // host
-    if(ptr = strstr(conf, "host_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.host_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.host_label, "host_label");
 
     // bios
-    if(ptr = strstr(conf, "bios_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.bios_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.bios_label, "bios_label");
 
     // cpu
-    if(ptr = strstr(conf, "cpu_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.cpu_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.cpu_label, "cpu_label");
 
     // gpu
-    if(ptr = strstr(conf, "gpu_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.gpu_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.gpu_label, "gpu_label");
     
     // memory
-    if(ptr = strstr(conf, "mem_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.mem_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.mem_label, "mem_label");
 
     // public IP
-    if(ptr = strstr(conf, "pub_ip_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.pub_ip_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.pub_ip_label, "pub_ip_label");
 
     // local IP
-    if(ptr = strstr(conf, "loc_ip_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.loc_ip_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.loc_ip_label, "loc_ip_label");
 
     // pwd
-    if(ptr = strstr(conf, "pwd_label")) {
-        if(ptr = strchr(ptr, '"')) {
-            ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.pwd_label, ptr);
-            *ptr2 = '"';
-        }
-    }
+    parse_config_option(conf, config.pwd_label, "pwd_label");
 
     free(conf);
 }

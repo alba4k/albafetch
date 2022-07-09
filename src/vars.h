@@ -5,7 +5,6 @@ typedef struct {
     char separator[65];
     char separator2[65];
     char dash[33];
-    char dash_color[33];
     bool print_cpu_freq;
     bool print_cpu_brand;
     bool print_gpu_arch;

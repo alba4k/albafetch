@@ -63,7 +63,7 @@ void title() {          // prints a title in the format user@hostname
 // hostname
 void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.hostname_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.hostname_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -76,7 +76,7 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
 // user
 void user() {           // get the current login
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.user_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.user_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -98,7 +98,7 @@ void uptime() {         // prints the uptime
     char format[100];
     long uptime;
 
-    snprintf(format, 100, "%s%s%s", config.uptime_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.uptime_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
     
@@ -143,7 +143,7 @@ void uptime() {         // prints the uptime
 #ifdef __APPLE__
 void os() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.os_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.os_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -155,7 +155,7 @@ void os() {
 #else
 void os() {             // prints the os name + arch
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.os_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.os_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -203,7 +203,7 @@ void os() {             // prints the os name + arch
 
 void kernel() {         // prints the kernel version
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.kernel_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.kernel_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -217,7 +217,7 @@ void kernel() {         // prints the kernel version
 #ifdef __APPLE__
 void desktop() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.desktop_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -226,7 +226,7 @@ void desktop() {
 #else
 void desktop() {        // prints the current desktop environment
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.desktop_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.desktop_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -249,7 +249,7 @@ void desktop() {        // prints the current desktop environment
 // shell
 void shell() {          // prints the user default shell
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.shell_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.shell_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -265,7 +265,7 @@ void shell() {          // prints the user default shell
 // terminal
 void term() {           // prints the current terminal
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.term_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.term_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -280,7 +280,7 @@ void term() {           // prints the current terminal
 #ifdef __APPLE__
 void packages() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.packages_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -291,7 +291,7 @@ void packages() {
 #else
 void packages() {       // prints the number of installed packages
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.packages_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.packages_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -402,7 +402,7 @@ void packages() {       // prints the number of installed packages
 #ifdef __APPLE__
 void host() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.host_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.host_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -411,7 +411,7 @@ void host() {
 #else
 void host() {           // prints the current host machine
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.host_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.host_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -455,7 +455,7 @@ void host() {           // prints the current host machine
 #ifdef __APPLE__
 void packages() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.bios_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -466,7 +466,7 @@ void packages() {
 #else
 void bios() {           // prints the current host machine
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.bios_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.bios_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -518,7 +518,7 @@ void bios() {           // prints the current host machine
 #ifdef __APPLE__
 void cpu() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.cpu_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -531,7 +531,7 @@ void cpu() {
 #else
 void cpu() {            // prints the current CPU
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.cpu_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.cpu_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -627,7 +627,7 @@ void cpu() {            // prints the current CPU
 #ifdef __APPLE__
 void gpu() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.gpu_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.gpu_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -643,7 +643,7 @@ void gpu() {
 #else
 void gpu() {            // prints the current GPU
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.gpu_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.gpu_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -721,7 +721,7 @@ void gpu() {            // prints the current GPU
 #ifdef __APPLE__ 
 void memory() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.mem_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.mem_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -741,7 +741,7 @@ void memory() {
 #else
 void memory() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.mem_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.mem_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -800,7 +800,7 @@ void memory() {
 // public IP adress
 void public_ip() {      // get the public IP address
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.pub_ip_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.pub_ip_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -827,7 +827,7 @@ void public_ip() {      // get the public IP address
 // local IP adress
 void local_ip() {      // get the local IP address
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.loc_ip_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.loc_ip_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
@@ -856,7 +856,7 @@ void local_ip() {      // get the local IP address
 // working directory
 void pwd() {
     char format[100];
-    snprintf(format, 100, "%s%s%s", config.pwd_label, config.dash_color, config.dash);
+    snprintf(format, 100, "%s%s", config.pwd_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 

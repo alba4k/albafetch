@@ -52,12 +52,11 @@ The config should be written in a key "value" format you can put something in be
 ### Options and default values:
 ``` python
 spacing = "    "
-separator = "\e[0m------------------"
+separator1 = "\e[0m------------------"
 separator2 = ""
 separator_first = "\e[0m------------------"
 separator_last = "\e[0m------------------"
-dash = ":"
-dash_color = "\e[37m"
+dash_str = "\e[0m:"
 
 print_cpu_freq = "true"
 print_cpu_brand = "true"
