@@ -2,10 +2,11 @@
 #include "logos.h"
 #include "stdlib.h"
 
-/*TODO:
+/* TODO:
  * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2)
  * option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
- * 
+ * --ascii for custom ascii art (conflicts with --logo)
+ * --conf for custom config file (needs to somehow move the argv check before the conf check - even tho argv is meant to override it)
  */
 
 // CONFIGURATION OPTIONS:
