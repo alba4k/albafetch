@@ -1,8 +1,8 @@
 .PHONY: build/albafetch
 
 SHELL := /bin/bash
-CC := gcc
-CFLAGS := -Wall -Ofast
+CC := clang
+CFLAGS := -Wall -Wextra -Ofast
 TARGET := albafetch
 
 OS := $(shell uname -s 2> /dev/null)

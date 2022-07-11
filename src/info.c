@@ -96,8 +96,6 @@ void user() {           // get the current login
 // uptime
 void uptime() {         // prints the uptime
     char format[100];
-    long uptime;
-
     snprintf(format, 100, "%s%s", config.uptime_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
@@ -105,6 +103,7 @@ void uptime() {         // prints the uptime
     #ifdef __APPLE__
         struct timeval boottime;
         int error;
+        long uptime;
         error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
         if(error < 0)
@@ -118,7 +117,7 @@ void uptime() {         // prints the uptime
         struct sysinfo info;
         sysinfo(&info);
 
-        uptime = info.uptime;
+        const long uptime = info.uptime;
     #endif
 
     long days = uptime/86400;
@@ -135,7 +134,7 @@ void uptime() {         // prints the uptime
         printf("%dm ", mins);       // print the number of minutes passed if more than 0
     }
     else if(uptime < 60) {
-        printf("%ds", uptime);       // print the number of seconds passed if less than 60
+        printf("%lds", uptime);       // print the number of seconds passed if less than 60
     }
 }
 
@@ -184,8 +183,8 @@ void os() {             // prints the os name + arch
         goto error;
     *end = 0;
 
-    if(end = strchr(os_name, '"')) *end = 0;
-    else if(end = strchr(os_name, '\'')) *end = 0;
+    if((end = strchr(os_name, '"'))) *end = 0;
+    else if((end = strchr(os_name, '\''))) *end = 0;
 
 
     printf("%s %s", os_name, name.machine);
@@ -548,7 +547,7 @@ void cpu() {            // prints the current CPU
 
     read_after_sequence(fp, "model name", buf, 256);
     fclose(fp);
-    if(!buf) {
+    if(!(*buf)) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -571,22 +570,22 @@ void cpu() {            // prints the current CPU
     (*end) = 0;
 
     // cleaning the string from various garbage
-    if(end = strstr(cpu_info, "(R)"))
+    if((end = strstr(cpu_info, "(R)")))
         memmove(end, end+3, strlen(end+1));
-    if(end = strstr(cpu_info, "(TM)"))
+    if((end = strstr(cpu_info, "(TM)")))
         memmove(end, end+4, strlen(end+1));
-    if(end = strstr(cpu_info, " CPU"))
+    if((end = strstr(cpu_info, " CPU")))
         memmove(end, end+4, strlen(end+1));
-    if(end = strstr(cpu_info, "-Core Processor")) {
+    if((end = strstr(cpu_info, "-Core Processor"))) {
         end -= 4;
         end = strchr(end, ' ');
         *end = 0;
     }
 
     if(!config.print_cpu_brand) {
-        if(end = strstr(cpu_info, "Intel Core"))
+        if((end = strstr(cpu_info, "Intel Core")))
             memmove(end, end+11, strlen(end+1));
-        if(end = strstr(cpu_info, "AMD"))
+        if((end = strstr(cpu_info, "AMD")))
             memmove(end, end+4, strlen(end+1));
     }
 
@@ -767,7 +766,7 @@ void memory() {
     read_after_sequence(fp, "Cached:", buf, 256);
     fclose(fp);
 
-    if(!buf) {
+    if(!(*buf)) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);

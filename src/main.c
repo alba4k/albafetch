@@ -7,6 +7,7 @@
  * option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo)
  * --conf for custom config file (needs to somehow move the argv check before the conf check - even tho argv is meant to override it)
+ * remove the lspci dependency for gpu()
  */
 
 // CONFIGURATION OPTIONS:
@@ -61,7 +62,7 @@ char spacing_first[32] = "";
 char spacing_last[32] = "";
 
 void unescape(char *str) {
-    while(str=strchr(str, '\\')) {
+    while((str=strchr(str, '\\'))) {
         memmove(str, str+1, strlen(str+1)+1);
         switch(*str) {
             default: case '\\':
@@ -78,42 +79,48 @@ void unescape(char *str) {
 }
 
 bool parse_config_option(char* source, char *dest, char *field) {
-    char *ptr, *ptr2;
-    if(ptr = strstr(source, field)) {
-        if(ptr = strchr(ptr, '"')) {
+    char *ptr;
+
+    if((ptr = strstr(source, field))) {
+        if((ptr = strchr(ptr, '"'))) {
             ++ptr;
-            if((ptr2 = strchr(ptr, '"')) && ptr) {
-                *ptr2 = 0;
+
+            if(((field = strchr(ptr, '"'))) && ptr) {
+                *field = 0;
                 strcpy(dest, ptr);
-                *ptr2 = '"';
+                *field = '"';
                 return 1;
             }
         }
     }
+
     return 0;
 }
 
 bool parse_config_bool(char *source, bool *dest, char *field) {
-    char *ptr, *ptr2;
-    if(ptr = strstr(source, "print_cpu_freq")) {
-        if(ptr = strchr(ptr, '"')) {
+    char *ptr;
+
+    if((ptr = strstr(source, "print_cpu_freq"))) {
+        if((ptr = strchr(ptr, '"'))) {
             ++ptr;
-            if((ptr2 = strchr(ptr, '"')) && ptr) {
-                *ptr2 = 0;
+
+            if(((field = strchr(ptr, '"'))) && ptr) {
+                *field = 0;
                 *dest = !strcmp(ptr, "true");
-                *ptr2 = '"';
+                *field = '"';
                 return 1;
             }
         }
     }
+
     return 0;
 }
 
 void parse_config() {
     // really bad code here, you don't need to look
 
-    char path[LOGIN_NAME_MAX + 32];
-    snprintf(path, LOGIN_NAME_MAX + 33, "%s/.config/albafetch.conf", getenv("HOME"));
+    char path[LOGIN_NAME_MAX + 33];
+    snprintf(path, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
 
     FILE *fp = fopen(path, "r");
     if(!fp) {
@@ -131,12 +138,12 @@ void parse_config() {
     // remove comments
     char *ptr = conf;
     char *ptr2 = conf;
-    while(ptr = strchr(ptr, ';')) {
+    while((ptr = strchr(ptr, ';'))) {
         ptr2 = strchr(ptr, '\n');
         memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
     }
     ptr = ptr2 = conf;
-    while(ptr = strchr(ptr, '#')) {
+    while((ptr = strchr(ptr, '#'))) {
         ptr2 = strchr(ptr, '\n');
         memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
     }
@@ -181,10 +188,10 @@ void parse_config() {
     default_bold = parse_config_option(conf, config.bold, "default_bold");
 
     // logo
-    if(ptr = strstr(conf, "default_logo")) {
-        if(ptr = strchr(ptr, '"')) {
+    if((ptr = strstr(conf, "default_logo"))) {
+        if((ptr = strchr(ptr, '"'))) {
             ++ptr;
-            if((ptr2 = strchr(ptr, '"')) && ptr) {
+            if(((ptr2 = strchr(ptr, '"'))) && ptr) {
                 *ptr2 = 0;
                 for(int i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], ptr)) {
@@ -197,8 +204,8 @@ void parse_config() {
     }
 
     // col_block
-    if(ptr = strstr(conf, "col_block")) {
-        if(ptr = strchr(ptr, '"')) {
+    if((ptr = strstr(conf, "col_block"))) {
+        if((ptr = strchr(ptr, '"'))) {
             ++ptr;
             ptr2 = strchr(ptr, '"');
             *ptr2 = 0;
