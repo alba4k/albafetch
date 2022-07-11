@@ -23,7 +23,7 @@ $ make
 An executable file should appear in `build/` if the compilation succedes.
 
 # Installation
-### FForor Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
+### For Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
 
 Manual installation:
 
