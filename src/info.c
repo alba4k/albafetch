@@ -649,7 +649,7 @@ void gpu() {            // prints the current GPU
     if(!access("/usr/bin/lspci", F_OK)) {
         int pipes[2];
         char *lspci = malloc(0x2000);
-
+        
         pipe(pipes);
         if(!fork()) {
             close(*pipes);
@@ -660,24 +660,25 @@ void gpu() {            // prints the current GPU
         close(pipes[1]);
         lspci[read(pipes[0], lspci, 0x2000)] = 0;
         close(*pipes);
-
         char *gpu = strstr(lspci, "3D");
         if(!gpu) {
             gpu = strstr(lspci, "VGA");
-            if(!gpu)
+            if(!gpu) {
                 goto error;
-        }                           
+            }
+        }
 
         for(int i = 0; i < 4; ++i) {
             gpu = strchr(gpu, '"');
             if(!gpu)
                 goto error;
             ++gpu;
-            // VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-            //  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-            // Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-            //  "WhiskeyLake-U GT2 [UHD Graphics 620]"
-            // WhiskeyLake-U GT2 [UHD Graphics 620]"
+            /* VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+             *  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+             * Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
+             *  "WhiskeyLake-U GT2 [UHD Graphics 620]"
+             * WhiskeyLake-U GT2 [UHD Graphics 620]"
+             */
         }
 
         char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
@@ -685,17 +686,20 @@ void gpu() {            // prints the current GPU
             goto error;
         *end = 0;
 
-        char *ptr = strchr(gpu, '[');
-        if(ptr && !config.print_gpu_arch) {
-            end = strchr(ptr, ']');
-            if(!end) {
-                printf("%s", gpu);
-                free(lspci);
-                return;
+        char *ptr;
+        if(!config.print_gpu_arch) {
+            if((ptr = strchr(gpu, '['))) {
+                end = strchr(ptr, ']');
+                if(end) {
+                    *end = 0;
+                    gpu = ptr + 1;
+                }
             }
-            *end = 0;
-
-            gpu = ptr + 1;
+            if((ptr = strchr(gpu, '('))) {
+                if(ptr > lspci + 1) {
+                    *(ptr-1) = 0;
+                }
+            }
         }
 
         printf("%s", gpu);
