@@ -11,10 +11,11 @@ Here is a time comparison (exact execution times change between machines and run
 
 ## Dependencies:
 
-Everything the program could need will be installed on your distribution out of te box (`sh`, `wc`, `lspci`).
+Everything the program could need will be installed on your distribution out of te box (`sh`, `lspci`).
 I would reccoment double checking libalpm on archlinux-based systems (it's also a dependency of pacman, so that should already be there).
 
 # Compiling:
+this will need clang (use `$ make CC=gcc` for gcc), bash and make
 ```shell
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch

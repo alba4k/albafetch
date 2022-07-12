@@ -62,6 +62,7 @@ char spacing_first[32] = "";
 char spacing_last[32] = "";
 
 void unescape(char *str) {
+    // check every \ in the given string and unescape \n and \e
     while((str=strchr(str, '\\'))) {
         memmove(str, str+1, strlen(str+1)+1);
         switch(*str) {
@@ -80,6 +81,8 @@ void unescape(char *str) {
 
 bool parse_config_option(char* source, char *dest, char *field) {
     char *ptr;
+
+    // looks for the keyword, checks the string between the following " "
 
     if((ptr = strstr(source, field))) {
         if((ptr = strchr(ptr, '"'))) {
@@ -100,9 +103,11 @@ bool parse_config_option(char* source, char *dest, char *field) {
 bool parse_config_bool(char *source, bool *dest, char *field) {
     char *ptr;
 
-    if((ptr = strstr(source, "print_cpu_freq"))) {
+    // looks for the keyword, checks the string between the following " "
+
+    if((ptr = strstr(source, field))) {
         if((ptr = strchr(ptr, '"'))) {
-            ++ptr;
+            ++ptr; 
 
             if(((field = strchr(ptr, '"'))) && ptr) {
                 *field = 0;
@@ -185,7 +190,12 @@ void parse_config() {
         strcpy(default_color, config.color);
 
     // bold
-    default_bold = parse_config_option(conf, config.bold, "default_bold");
+    bool useless_trash;
+    default_bold = parse_config_bool(conf, &useless_trash, "default_bold");
+    if(useless_trash)
+        strcpy(config.bold, "\e[1m");
+    else
+        strcpy(config.bold, "");
 
     // logo
     if((ptr = strstr(conf, "default_logo"))) {
