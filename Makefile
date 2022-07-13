@@ -16,7 +16,7 @@ ifeq ($(OS),Linux)
 	endif
 endif
 
-ifeq ($(shell whoami),alba4k) # idk don't ask why this is here - idk clang gives useful extra info
+ifeq ($(shell whoami),alba4k) # idk don't ask why this is here - I'm too lazy to type CC=clang
 	CC := clang
 endif
 
