@@ -245,10 +245,39 @@ void desktop() {        // prints the current desktop environment
 
 #endif
 
-// shell
-void shell() {          // prints the user default shell
+// shell (current)
+void shell() {
     char format[100];
     snprintf(format, 100, "%s%s", config.shell_label, config.dash);
+    if(config.align_infos) printf("%-16s\e[0m", format);
+    else printf("%s\e[0m ", format);
+
+    char path[32];
+    sprintf(path, "/proc/%d/cmdline", getppid());
+
+    FILE *fp = fopen(path, "r");
+    if(!fp) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+        return;
+    }
+    
+    char shell[256];
+    shell[fread(shell, 1, 255, fp)] = 0;
+
+    char *ptr = strstr(shell, "/bin/");
+    if(ptr) {
+        memmove(shell, ptr+5, strlen(ptr+5)+1);
+    }
+
+    printf("%s", shell);
+}
+
+// shell (default)
+void user_shell() {          // prints the user default shell
+    char format[100];
+    snprintf(format, 100, "%s%s", config.default_shell_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 

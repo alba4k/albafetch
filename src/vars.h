@@ -23,6 +23,7 @@ typedef struct {
     char kernel_label[33];
     char desktop_label[33];
     char shell_label[33];
+    char default_shell_label[33];
     char term_label[33];
     char packages_label[33];
     char host_label[33];

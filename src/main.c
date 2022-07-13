@@ -37,6 +37,7 @@ Config config = {
     "Kernel",                           // kernel
     "Desktop",                          // desktop
     "Shell",                            // shell
+    "Shell"                             // default_shell_label
     "Terminal",                         // terminal
     "Packages",                         // packages
     "Host",                             // host
@@ -51,7 +52,7 @@ Config config = {
 
 bool print_cpu_freq;
 
-bool default_bold = true;
+bool default_bold = false;
 char default_color[33] = "";
 char default_logo[33] = "";
 
@@ -72,7 +73,7 @@ void unescape(char *str) {
                 *str = '\n';
                 break;
             case 'e':
-                *str = 033;
+                *str = '\e';
                 break;
         }
     ++str;
@@ -190,12 +191,13 @@ void parse_config() {
         strcpy(default_color, config.color);
 
     // bold
-    bool useless_trash;
-    default_bold = parse_config_bool(conf, &useless_trash, "default_bold");
-    if(useless_trash)
-        strcpy(config.bold, "\e[1m");
-    else
-        strcpy(config.bold, "");
+    bool bold;
+    if((default_bold = parse_config_bool(conf, &bold, "default_bold"))) {
+        if(bold)
+            strcpy(config.bold, "\e[1m");
+        else
+            strcpy(config.bold, "");
+    }
 
     // logo
     if((ptr = strstr(conf, "default_logo"))) {
@@ -249,8 +251,11 @@ void parse_config() {
     // desktop
     parse_config_option(conf, config.desktop_label, "desktop_label");
 
-    // shell
+    // shell (current)
     parse_config_option(conf, config.shell_label, "shell_label");
+
+    // shell(default)
+    parse_config_option(conf, config.default_shell_label, "def_shell_label");
 
     // terminal
     parse_config_option(conf, config.term_label, "term_label");
