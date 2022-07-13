@@ -43,7 +43,7 @@ void desktop();     // prints the current desktop environment
 
 void shell();       // prints the shell that called albafetch
 
-void user_shell();  // prints the user default shell
+void login_shell(); // prints the user default shell
 
 void term();        // prints the current terminal
 
@@ -61,9 +61,9 @@ void public_ip();   // get the public IP adress
 
 void local_ip();    // get the local IP adress - WORK IN PROGRESS
 
-void pwd();
+void pwd();         // prints the current working directory
 
-void colors();
-void light_colors();
+void colors();      // prints the terminal colors
+void light_colors();// prints the light version of the terminal colors
 
 #endif

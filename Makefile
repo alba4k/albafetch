@@ -1,7 +1,7 @@
 .PHONY: build/albafetch
 
 SHELL := /bin/bash
-CC := clang
+CC := gcc
 CFLAGS := -Wall -Wextra -Ofast
 TARGET := albafetch
 
@@ -14,6 +14,10 @@ ifeq ($(OS),Linux)
 		INCLUDE := -l alpm
 		ARCH_BASED := -D ARCH_BASED
 	endif
+endif
+
+ifeq ($(shell whoami),alba4k) # idk don't ask why this is here - idk clang gives useful extra info
+	CC := clang
 endif
 
 ifeq ($(OS),Darwin)

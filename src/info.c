@@ -275,7 +275,7 @@ void shell() {
 }
 
 // shell (default)
-void user_shell() {          // prints the user default shell
+void login_shell() {          // prints the user default shell
     char format[100];
     snprintf(format, 100, "%s%s", config.default_shell_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
