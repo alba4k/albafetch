@@ -420,9 +420,9 @@ int main(const int argc, const char **argv) {
                     goto logo_found;
                 }
             logo = (char**)logos[0];
-
-            logo_found: ;
         #endif
+        
+        logo_found: ;
     }
     if(!(*config.color))
         strcpy(config.color, logo[1]);

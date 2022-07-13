@@ -259,18 +259,25 @@ void shell() {
     else printf("%s\e[0m ", format);
 
     char path[32];
+
     sprintf(path, "/proc/%d/cmdline", getppid());
 
     FILE *fp = fopen(path, "r");
-    if(!fp) {
+    if(fp) {
+        char shell[128];
+        shell[fread(shell, 1, 255, fp)] = 0;
+
+        printf("%s", basename(shell));
+        return;
+    }
+
+    const char *shell =  getenv("SHELL");
+    if(!shell) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
-    
-    char shell[256];
-    shell[fread(shell, 1, 255, fp)] = 0;
 
     printf("%s", basename(shell));
 }
@@ -492,7 +499,7 @@ void host() {           // prints the current host machine
 
 // bios
 #ifdef __APPLE__
-void packages() {
+void bios() {
     char format[100];
     snprintf(format, 100, "%s%s", config.bios_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
