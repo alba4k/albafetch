@@ -20,7 +20,8 @@ Those are all the currently supported modules:
         os,
         kernel,
         desktop,
-        shell,
+        current_shell,
+        default_shell,
         term,
         packages,
         host,
@@ -30,6 +31,9 @@ Those are all the currently supported modules:
         memory,
         public_ip,
         local_ip,
+        pwd,
+        colors,
+        light_colors
     };
 ```
 Change the order the infos is printed in or add/remove some in your main.c file

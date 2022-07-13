@@ -41,7 +41,9 @@ void kernel();      // prints the kernel version
 
 void desktop();     // prints the current desktop environment
 
-void shell();       // prints the user default shell
+void shell();       // prints the shell that called albafetch
+
+void user_shell();  // prints the user default shell
 
 void term();        // prints the current terminal
 
