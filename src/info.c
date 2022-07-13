@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
+#include <libgen.h>
 
 #ifdef __APPLE__
 #include "bsdwrap.h"
@@ -229,18 +230,23 @@ void desktop() {        // prints the current desktop environment
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    const char *de;
     const char *desktop = getenv("SWAYSOCK") ? "Sway" :
-                          (de = getenv("XDG_CURRENT_DESKTOP")) ? de :
-                          (de = getenv("DESKTOP_SESSION")) ? de :
+                          (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
+                          (desktop = getenv("DESKTOP_SESSION")) ? desktop :
                           getenv("KDE_SESSION_VERSION") ? "KDE" :
                           getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
                           getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
                           getenv("TDE_FULL_SESSION") ? "Trinity" :
                           !strcmp("linux", getenv("TERM")) ? "none" :
-                          "[Unsupported]";
-
-    printf("%s", desktop); 
+                          NULL;
+    if(desktop) {
+        printf("%s", desktop);
+        return;
+    }
+    
+    fflush(stdout);
+    fputs("[Unsupported]", stderr);
+    fflush(stderr);
 }
 
 #endif
@@ -266,12 +272,7 @@ void shell() {
     char shell[256];
     shell[fread(shell, 1, 255, fp)] = 0;
 
-    char *ptr = strstr(shell, "/bin/");
-    if(ptr) {
-        memmove(shell, ptr+5, strlen(ptr+5)+1);
-    }
-
-    printf("%s", shell);
+    printf("%s", basename(shell));
 }
 
 // shell (default)
@@ -282,12 +283,16 @@ void login_shell() {          // prints the user default shell
     else printf("%s\e[0m ", format);
 
     char *shell = getenv("SHELL");
-    char *ptr = strstr(shell, "/bin/");
-    if(ptr) {
-        shell = ptr + 5;
-    }
 
-    printf("%s", shell);
+    if(shell) {
+        printf("%s", basename(shell));
+        return;
+    }
+        
+    fflush(stdout);
+    fputs("[Unknown]", stderr);
+    fflush(stderr);
+
 }
 
 // terminal
@@ -298,10 +303,16 @@ void term() {           // prints the current terminal
     else printf("%s\e[0m ", format);
 
     char *terminal = getenv("TERM");
+    if(terminal) {
     terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
     
-
     printf("%s", terminal);
+    return;
+    }
+
+    fflush(stdout);
+    fputs("[Unknown]", stderr);
+    fflush(stderr);
 }
 
 // packages
