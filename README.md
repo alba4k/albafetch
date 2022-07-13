@@ -15,7 +15,7 @@ Everything the program could need will be installed on your distribution out of 
 I would reccoment double checking libalpm on archlinux-based systems (it's also a dependency of pacman, so that should already be there).
 
 # Compiling:
-this will need clang (use `$ make CC=gcc` for gcc), bash and make
+this will need gcc (`make CC=[compiler]` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
 ```shell
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
@@ -25,8 +25,9 @@ An executable file should appear in `build/` if the compilation succedes.
 
 # Installation
 ### For Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
+## Manual installation:
 
-Manual installation:
+this will need gcc (`make CC=[compiler] install` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
 
 ```
 $ git clone https://github.com/alba4k/albafetch
