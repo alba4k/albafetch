@@ -265,13 +265,13 @@ void shell() {
     FILE *fp = fopen(path, "r");
     if(fp) {
         char shell[128];
-        shell[fread(shell, 1, 255, fp)] = 0;
+        shell[fread(shell, 1, 127, fp)] = 0;
 
         printf("%s", basename(shell));
         return;
     }
 
-    const char *shell =  getenv("SHELL");
+    char *shell =  getenv("SHELL");
     if(!shell) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
@@ -687,6 +687,7 @@ void gpu() {
     printf("%s", gpu_string);
 }
 #else
+
 void gpu() {            // prints the current GPU
     char format[100];
     snprintf(format, 100, "%s%s", config.gpu_label, config.dash);

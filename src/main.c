@@ -317,7 +317,7 @@ int main(const int argc, const char **argv) {
             help = 1;
         } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
             if(argv[i+1]) {
-                char * colors[9][2] = {
+                char *colors[9][2] = {
                     {"black", "\e[30m"},
                     {"red", "\e[31m"},
                     {"green", "\e[32m"},
