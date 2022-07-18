@@ -122,14 +122,12 @@ bool parse_config_bool(char *source, bool *dest, char *field) {
     return 0;
 }
 
-void parse_config() {
+void parse_config(const char *path) {
     // really bad code here, you don't need to look
-
-    char path[LOGIN_NAME_MAX + 33];
-    snprintf(path, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
 
     FILE *fp = fopen(path, "r");
     if(!fp) {
+        fputs("\e[91mWARNING: couldn't open the config, using defaults.");
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -301,95 +299,90 @@ int printLogo(const int line) {
 }
 
 int main(const int argc, const char **argv) {
-    parse_config();
-    if(!(*spacing_first)) strcpy(spacing_first, spacing);
-    if(!(*spacing_last)) strcpy(spacing_last, spacing);
+    bool user_is_an_idiot = false; // rtfm and stfu
 
-    bool help = false;
-    int line = 3;
+    // are the following command line args used?
+    bool asking_help = false;
+    short asking_color = 0;
+    short asking_bold = 0;
+    short asking_logo = 0;
+    short asking_align = 0;
 
-    // rtfm and stfu
-    bool user_is_an_idiot = false;
-    
-    // command line arguments
+    // the config that's used if not differently specified is ~/.config/albafetch.conf
+    char config_file[LOGIN_NAME_MAX + 33];
+    snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
+
+    // parsing the command args
     for(int i = 1; i < argc; ++i) {
-        if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-            help = 1;
-        } else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color")) {
-            if(argv[i+1]) {
-                char *colors[9][2] = {
-                    {"black", "\e[30m"},
-                    {"red", "\e[31m"},
-                    {"green", "\e[32m"},
-                    {"yellow", "\e[33m"},
-                    {"blue", "\e[34m"},
-                    {"purple", "\e[35m"},
-                    {"cyan", "\e[36m"},
-                    {"gray", "\e[90m"},
-                    {"white", "\e[37m"},
-                };
-
-                for(int j = 0; j < 9; ++j) {
-                    if(!strcmp(argv[i+1], *colors[j])) {
-                        strcpy(config.color, colors[j][1]);
-                        goto color;
-                    }
-                }
-
-                fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
-                user_is_an_idiot = true;
-
-                color: ;
-            } else {
-                fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
-                user_is_an_idiot = true;
+        if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
+            asking_help = true;
+        else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color"))
+            asking_color = i+1;
+        else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold"))
+            asking_bold = i+1;
+        else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo"))
+            asking_logo = i+1;
+        else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
+            asking_align = i+1;
+        else if(!strcmp(argv[i], "--config")) {
+            if(i+1 < argc) {
+                strcpy(config_file, argv[i+1]);
+                continue;
             }
-        } else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold")) {
-            if(argv[i+1]) {
-                if(!strcmp(argv[i+1], "on"))
-                    strcpy(config.bold, "\e[1m");
-                else if(!strcmp(argv[i+1], "off"))
-                    strcpy(config.bold, "");
-                else {
-                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --bold! Use --help for more info\n", stderr);
-                    user_is_an_idiot = true;
-                }
-            } else {
-                fputs("\e[31m\e[1mERROR\e[0m: --bold requires a value! Use --help for more info\n", stderr);
-                user_is_an_idiot = true;
-            }
-        } else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo")) {
-            if(argv[i+1]) {
-                for(int j = 0; j < sizeof(logos)/sizeof(*logos); ++j)
-                    if(!strcmp(logos[j][0], argv[i+1])) {
-                        logo = (char**)logos[j];
-                        goto logo_arg_found;
-                    }
-                logo = (char**)logos[0];
-                logo_arg_found: ;
-            } else {
-                fputs("\e[31m\e[1mERROR\e[0m: --logo requires a value! Use --help for more info\n", stderr);
-                user_is_an_idiot = true;
-            }
-        } else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a")) {
-            if(argv[i+1]) {
-                if(!strcmp(argv[i+1], "on"))
-                    config.align_infos = true;
-                else if(!strcmp(argv[i+1], "off"))
-                    config.align_infos = false;
-                else {
-                    fputs("\e[31m\e[1mERROR\e[0m: invalid value for --align! Use --help for more info\n", stderr);
-                    user_is_an_idiot = true;
-                }
-            } else {
-                fputs("\e[31m\e[1mERROR\e[0m: --align requires a value! Use --help for more info\n", stderr);
-                user_is_an_idiot = true;
-            }
+            fputs("\e[31m\e[1mERROR\e[0m: --config requires a extra argument! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
         }
     }
 
-    if(user_is_an_idiot)
-        return 1;
+    parse_config(config_file);
+    if(!(*spacing_first)) strcpy(spacing_first, spacing);
+    if(!(*spacing_last)) strcpy(spacing_last, spacing);
+
+    if(asking_color) {
+        if(asking_color < argc) {
+            char *colors[9][2] = {
+                {"black", "\e[30m"},
+                {"red", "\e[31m"},
+                {"green", "\e[32m"},
+                {"yellow", "\e[33m"},
+                {"blue", "\e[34m"},
+                {"purple", "\e[35m"},
+                {"cyan", "\e[36m"},
+                {"gray", "\e[90m"},
+                {"white", "\e[37m"},
+            };
+
+            for(int j = 0; j < 9; ++j) {
+                if(!strcmp(argv[asking_color], *colors[j])) {
+                    strcpy(config.color, colors[j][1]);
+                    goto color;
+                }
+            }
+
+            fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
+
+            color: ;
+        } else {
+            fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
+
+    if(asking_logo) {
+        if(asking_logo < argc) {
+            for(int j = 0; j < sizeof(logos)/sizeof(*logos); ++j)
+                if(!strcmp(logos[j][0], argv[asking_logo])) {
+                    logo = (char**)logos[j];
+                    goto logo_arg_found;
+                }
+            logo = (char**)logos[0];
+            logo_arg_found: ;
+        } else {
+            fputs("\e[31m\e[1mERROR\e[0m: --logo requires a extra argument! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
 
     // set logo and color if not defined yet
     if(!logo) {
@@ -427,7 +420,7 @@ int main(const int argc, const char **argv) {
     if(!(*config.color))
         strcpy(config.color, logo[1]);
 
-    if(help) {  // print the help message if --help was used and exit
+    if(asking_help) {
         printf("%s%salbafetch\e[0m - a system fetch utility\n",
                config.color, config.bold);
 
@@ -452,14 +445,53 @@ int main(const int argc, const char **argv) {
                "\t\t\t   [parrot, manjaro, fedora, neon, pop, gentoo, windows]\n",
                config.color, config.bold, config.color,config. bold, default_logo[0] ? default_logo : "OS default");
 
-        printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s\e[0m)\n"
+        printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s)\n"
                "\t\t\t   [on, off]\n", config.color, config.bold, config.color, config.bold, config.align_infos ? "on" : "off");
+
+        printf("\t%s%s--config\e[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
+               "\t\t\t   [path]\n", config.color, config.bold);
 
         printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\n",
                config.color, config.bold);
 
         return 0;
     }
+
+    if(asking_align) {
+        if(asking_logo < argc) {
+                if(!strcmp(argv[asking_align], "on"))
+                    config.align_infos = true;
+                else if(!strcmp(argv[asking_align], "off"))
+                    config.align_infos = false;
+                else {
+                    fputs("\e[31m\e[1mERROR\e[0m: invalid extra argument for --align! Use --help for more info\n", stderr);
+                    user_is_an_idiot = true;
+                }
+        } else {
+            fputs("\e[31m\e[1mERROR\e[0m: --align requires a extra argument! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
+
+    if(asking_bold) {
+        if(asking_bold < argc) {
+            if(!strcmp(argv[asking_bold], "on"))
+                strcpy(config.bold, "\e[1m");
+            else if(!strcmp(argv[asking_bold], "off"))
+                strcpy(config.bold, "");
+            else {
+                fputs("\e[31m\e[1mERROR\e[0m: invalid extra argument for --bold! Use --help for more info\n", stderr);
+                user_is_an_idiot = true;
+            }
+        } else {
+            fputs("\e[31m\e[1mERROR\e[0m: --bold requires a extra argument! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
+
+    // die if the user is a fucking moron
+    if(user_is_an_idiot)
+        return 1;
 
     void (*infos[])() = {
         title,
@@ -485,7 +517,10 @@ int main(const int argc, const char **argv) {
     // The following line works because infos is declared on the stack,
     // so sizeof returns it's real size and not the size of a pointer.
     const int info_lines = (int)(sizeof(infos) / sizeof(*infos)) - 1;
+
+    int line = 3;   // keeps track of the line that's currently printing 
     
+    // logo and infos
     for(int i = 0; i <= info_lines; ++i) {
         line = printLogo(line);
         if(line == 4) printf("%s", spacing_first);
