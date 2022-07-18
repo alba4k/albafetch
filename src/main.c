@@ -127,7 +127,7 @@ void parse_config(const char *path) {
 
     FILE *fp = fopen(path, "r");
     if(!fp) {
-        fputs("\e[91mWARNING: couldn't open the config, using defaults.", stderr);
+        fputs("\e[91m\e[1mWARNING\e[0m: couldn't open the config, using defaults.\n", stderr);
         return;
     }
     fseek(fp, 0, SEEK_END);
