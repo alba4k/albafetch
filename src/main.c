@@ -421,8 +421,8 @@ int main(const int argc, const char **argv) {
                 }
             logo = (char**)logos[0];
 
-            logo_found: ;
         #endif
+        logo_found: ;
     }
     if(!(*config.color))
         strcpy(config.color, logo[1]);
