@@ -492,7 +492,7 @@ void host() {           // prints the current host machine
 
 // bios
 #ifdef __APPLE__
-void packages() {
+void bios() {
     char format[100];
     snprintf(format, 100, "%s%s", config.bios_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
