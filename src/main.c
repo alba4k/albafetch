@@ -3,9 +3,9 @@
 #include "stdlib.h"
 
 /* TODO:
- * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2)
+ * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2 <-- NOT actual code)
  * option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
- * --ascii for custom ascii art (conflicts with --logo)
+ * --ascii for custom ascii art (conflicts with --logo) - work in progress (lines [64; 76]U[318; 356])
  * remove the lspci dependency for gpu()
  */
 
@@ -36,7 +36,7 @@ Config config = {
     "Kernel",                           // kernel
     "Desktop",                          // desktop
     "Shell",                            // shell
-    "Shell"                             // default_shell_label
+    "Shell",                            // default_shell_label
     "Terminal",                         // terminal
     "Packages",                         // packages
     "Host",                             // host
@@ -61,6 +61,7 @@ char spacing[32] = "    ";
 char spacing_first[32] = "";
 char spacing_last[32] = "";
 
+/* Check what I wrote about logo_from_string - should be around line 318
 int max(const int *nums, unsigned const int lenght) {
     if(!lenght) return 0;
     int current_max = *nums;
@@ -72,6 +73,7 @@ int max(const int *nums, unsigned const int lenght) {
 
     return current_max;
 }
+*/
 
 void unescape(char *str) {
     // check every \ in the given string and unescape \n and \e
@@ -139,6 +141,8 @@ void parse_config(const char *path) {
     // really bad code here, you don't need to look
 
     FILE *fp = fopen(path, "r");
+    fclose(fp);
+    fp = NULL;
     if(!fp) {
         fputs("\e[91m\e[1mWARNING\e[0m: couldn't open the config, using defaults.\n", stderr);
         return;
@@ -311,6 +315,7 @@ int printLogo(const int line) {
     }
 }
 
+/*  // I'm working on this part - I swear - I'm trying to implement getting a custom logo from a string (line per line)
 void logo_from_string(char *str, char **dest) {
     unescape(str);
 
@@ -348,10 +353,12 @@ void logo_from_string(char *str, char **dest) {
 
     dest = temp_logo;
 }
+*/
 
 int main(const int argc, const char **argv) {
     bool user_is_an_idiot = false; // rtfm and stfu
 
+    printf(config.term_label);
     // are the following command line args used?
     bool asking_help = false;
     short asking_color = 0;
@@ -573,6 +580,7 @@ int main(const int argc, const char **argv) {
 
     int line = 3;   // keeps track of the line that's currently printing 
     
+
     // logo and infos
     for(int i = 0; i <= info_lines; ++i) {
         line = printLogo(line);
