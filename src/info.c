@@ -696,18 +696,24 @@ void gpu() {            // prints the current GPU
 
     if(!access("/usr/bin/lspci", F_OK)) {
         int pipes[2];
+        int pipes2[2];
         char *lspci = malloc(0x2000);
         
         pipe(pipes);
+        pipe(pipes2);
         if(!fork()) {
-            close(*pipes);
+            close(pipes[0]);
+            close(pipes2[0]);
             dup2(pipes[1], STDOUT_FILENO);
+            dup2(pipes2[1], STDERR_FILENO);
             execlp("lspci", "lspci", "-mm", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
+        close(pipes2[1]);
         lspci[read(pipes[0], lspci, 0x2000)] = 0;
-        close(*pipes);
+        close(pipes[0]);
+        close(pipes2[0]);
         char *gpu = strstr(lspci, "3D");
         if(!gpu) {
             gpu = strstr(lspci, "VGA");

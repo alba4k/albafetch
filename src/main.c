@@ -6,7 +6,6 @@
  * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2)
  * option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo)
- * --conf for custom config file (needs to somehow move the argv check before the conf check - even tho argv is meant to override it)
  * remove the lspci dependency for gpu()
  */
 
@@ -62,6 +61,18 @@ char spacing[32] = "    ";
 char spacing_first[32] = "";
 char spacing_last[32] = "";
 
+int max(const int *nums, unsigned const int lenght) {
+    if(!lenght) return 0;
+    int current_max = *nums;
+
+    for(int i = 1; i < lenght; ++i) {
+        if(nums[i] > current_max)
+            current_max = nums[i];
+    }
+
+    return current_max;
+}
+
 void unescape(char *str) {
     // check every \ in the given string and unescape \n and \e
     while((str=strchr(str, '\\'))) {
@@ -80,6 +91,7 @@ void unescape(char *str) {
     }
 }
 
+// in the following, a return code of 1 means success
 bool parse_config_option(char* source, char *dest, char *field) {
     char *ptr;
 
@@ -101,6 +113,7 @@ bool parse_config_option(char* source, char *dest, char *field) {
     return 0;
 }
 
+// in the following, a return code of 1 means success
 bool parse_config_bool(char *source, bool *dest, char *field) {
     char *ptr;
 
@@ -298,6 +311,44 @@ int printLogo(const int line) {
     }
 }
 
+void logo_from_string(char *str, char **dest) {
+    unescape(str);
+
+    char *ptr;
+    int string_lengths[28];
+    memset(string_lengths, 0, sizeof(string_lengths)/sizeof(string_lengths[0]));
+    int line_count = 3;
+    char placeholder_line[64] = "";
+    char *temp_logo[32] = {
+        "custom",
+        "",
+    };
+
+    // place the lines in the array
+    // TODO fix this loop, it's broken AF, it just works as a segfault farm, lol
+    while((ptr = strchr(str, '\n'))) {
+        if(line_count > 31) // prevent buffer overflow
+            break;
+
+        *ptr = 0;
+        temp_logo[line_count++] = str;
+        string_lengths[line_count-4] = (int)strlen(str);
+        *ptr = '\n';
+
+        str = ptr+1;
+    }
+
+    for(int i = 0; i < max(string_lengths, sizeof(string_lengths)/sizeof(string_lengths[0])); ++i)
+        strcat(placeholder_line, " ");
+
+    temp_logo[2] = placeholder_line;
+    temp_logo[line_count] = "";
+
+    puts("HELLO");
+
+    dest = temp_logo;
+}
+
 int main(const int argc, const char **argv) {
     bool user_is_an_idiot = false; // rtfm and stfu
 
@@ -337,6 +388,8 @@ int main(const int argc, const char **argv) {
     parse_config(config_file);
     if(!(*spacing_first)) strcpy(spacing_first, spacing);
     if(!(*spacing_last)) strcpy(spacing_last, spacing);
+
+    //logo_from_string("line1\nline2\nline3\nline4\nline5\nline6\n", logo);
 
     if(asking_color) {
         if(asking_color < argc) {
