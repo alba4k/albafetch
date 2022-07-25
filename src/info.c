@@ -268,6 +268,7 @@ void shell() {
         shell[fread(shell, 1, 127, fp)] = 0;
 
         printf("%s", basename(shell));
+        fclose(fp);
         return;
     }
 
@@ -687,7 +688,6 @@ void gpu() {
     printf("%s", gpu_string);
 }
 #else
-
 void gpu() {            // prints the current GPU
     char format[100];
     snprintf(format, 100, "%s%s", config.gpu_label, config.dash);
