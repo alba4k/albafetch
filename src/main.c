@@ -141,8 +141,6 @@ void parse_config(const char *path) {
     // really bad code here, you don't need to look
 
     FILE *fp = fopen(path, "r");
-    fclose(fp);
-    fp = NULL;
     if(!fp) {
         fputs("\e[91m\e[1mWARNING\e[0m: couldn't open the config, using defaults.\n", stderr);
         return;
@@ -358,7 +356,6 @@ void logo_from_string(char *str, char **dest) {
 int main(const int argc, const char **argv) {
     bool user_is_an_idiot = false; // rtfm and stfu
 
-    printf(config.term_label);
     // are the following command line args used?
     bool asking_help = false;
     short asking_color = 0;
