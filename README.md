@@ -70,7 +70,7 @@ default_color = ""
 default_bold = "true"
 default_logo = ""
 
-col_block = "███"
+col_block_len = "3"
 
 title_prefix = ""
 col_prefix = ""

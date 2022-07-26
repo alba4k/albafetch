@@ -28,7 +28,7 @@ Config config = {
     // Labels:
     "",                                 // title_prefix
     "",                                 // col_prefix
-    "███",                              // col_block
+    3,                                  // col_block_len
     "Hostname",                         // hostname
     "User",                             // user
     "Uptime",                           // uptime
@@ -228,14 +228,15 @@ void parse_config(const char *path) {
         }
     }
 
-    // col_block
-    if((ptr = strstr(conf, "col_block"))) {
+    // col_block_len
+    if((ptr = strstr(conf, "col_block_len"))) {
         if((ptr = strchr(ptr, '"'))) {
             ++ptr;
-            ptr2 = strchr(ptr, '"');
-            *ptr2 = 0;
-            strcpy(config.col_block, ptr);
-            *ptr2 = '"';
+            if((ptr2 = strchr(ptr, '"'))) {
+                *ptr2 = 0;
+                config.col_block_len = atoi(ptr);
+                *ptr2 = '"';
+            }
         }
     }
 

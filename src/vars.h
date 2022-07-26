@@ -15,7 +15,7 @@ typedef struct {
     // Labels:
     char title_prefix[33];
     char col_prefix[33];
-    char col_block[33];
+    int col_block_len;
     char hostname_label[33];
     char user_label[33];
     char uptime_label[33];

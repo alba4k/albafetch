@@ -931,12 +931,22 @@ void pwd() {
 // terminal colors
 void colors() {
     printf("%s", config.col_prefix);
-    for(int i = 30; i < 38; ++i)
-        printf("\e[%dm%s", i, config.col_block);
+    for(int i = 0; i < 8; ++i) {
+        printf("\e[4%dm", i);
+        for(int j = 0; j < config.col_block_len; ++j)
+            printf(" ");
+    }
+    printf("\e[0m");
+    fflush(stdout);
 }
 // terminal colors (light version)
 void light_colors() {
     printf("%s", config.col_prefix);
-    for(int i = 90; i < 98; ++i)
-        printf("\e[%dm%s", i, config.col_block);
+    for(int i = 0; i < 8; ++i) {
+        printf("\e[10%dm", i);
+        for(int j = 0; j < config.col_block_len; ++j)
+            printf(" ");
+    }
+    printf("\e[0m");
+    fflush(stdout);
 }
