@@ -22,7 +22,7 @@ Config config = {
     true,                               // print_cpu_brand
     true,                               // print_gpu_arch
     true,                               // print_mem_perc
-    true,                               // align stats
+    false,                               // align stats
     "",                                 // color
     "\e[1m",                            // bold
     // Labels:
