@@ -331,6 +331,28 @@ void packages() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
+    if(!access("/usr/local/bin/brew", F_OK)) {
+        int pipes[2];
+        char packages[10];
+        pipe(pipes);
+
+        if(!fork()) {
+            close(*pipes);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
+        }
+        wait(NULL);
+        close(pipes[1]);
+        packages[read(pipes[0], packages, 10) - 1] = 0;
+        close(pipes[0]);
+
+        if(packages[0] != '0') {
+            printf("%d (brew) ", atoi(packages));
+            return;
+        }
+    }
+
     fflush(stdout);
     fputs("[Unsupported]", stderr);
     fflush(stderr);
@@ -453,7 +475,11 @@ void host() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    printf("Apple");
+    const size_t BUF_SIZE = 128;
+    char buf[BUF_SIZE];
+    sysctlbyname("hw.model", &buf, &BUF_SIZE, NULL, 0);
+
+    printf("%s", buf);
 }
 #else
 void host() {           // prints the current host machine
@@ -569,9 +595,19 @@ void cpu() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    size_t buf_size = 100;
-    char buf[buf_size];
-    sysctlbyname("machdep.cpu.brand_string", &buf, &buf_size, NULL, 0);
+    size_t BUF_SIZE = 128;
+    char buf[BUF_SIZE];
+    sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
+
+    char *ptr;
+
+    // cleaning the string from various garbage
+    if((ptr = strstr(buf, "(R)")))
+        memmove(ptr, ptr+3, strlen(ptr+1));
+    if((ptr = strstr(buf, "(TM)")))
+        memmove(ptr, ptr+4, strlen(ptr+1));
+    if((ptr = strstr(buf, " CPU")))
+        memmove(ptr, ptr+4, strlen(ptr+1));
 
     printf("%s", buf);
 }
