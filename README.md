@@ -40,7 +40,7 @@ $ cd albafetch
 
 
 # Customizing
-A configuration should be in `~/.config/albafetch.conf`.
+A configuration should be placed in `~/.config/albafetch.conf`. An example config, with comments, is found in this repository.
 
 ## How to write the config:
 Basic rules:
@@ -64,7 +64,7 @@ print_cpu_freq = "true"
 print_cpu_brand = "true"
 print_gpu_freq = "true"
 print_mem_perc = "true"
-align_infos = "true"
+align_infos = "false"
 
 default_color = ""
 default_bold = "true"
