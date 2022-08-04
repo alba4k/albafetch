@@ -40,7 +40,7 @@ $ cd albafetch
 
 
 # Customizing
-A configuration should be in `~/.config/albafetch.conf`.
+A configuration should be placed in `~/.config/albafetch.conf`. An example config, with comments, is found in this repository.
 
 ## How to write the config:
 Basic rules:

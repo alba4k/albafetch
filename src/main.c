@@ -137,12 +137,14 @@ bool parse_config_bool(char *source, bool *dest, char *field) {
     return 0;
 }
 
-void parse_config(const char *path) {
+// parsing the file provided in path for config options
+void parse_config(const char *path, const bool using_custom_config) {
     // really bad code here, you don't need to look
 
     FILE *fp = fopen(path, "r");
     if(!fp) {
-        fputs("\e[91m\e[1mWARNING\e[0m: couldn't open the config, using defaults.\n", stderr);
+        if(using_custom_config)
+            fputs("\e[91m\e[1mWARNING\e[0m: failed to open the file specified using --config, using defaults.\n", stderr);
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -359,14 +361,15 @@ int main(const int argc, const char **argv) {
 
     // are the following command line args used?
     bool asking_help = false;
-    short asking_color = 0;
-    short asking_bold = 0;
-    short asking_logo = 0;
-    short asking_align = 0;
+    int asking_color = 0;
+    int asking_bold = 0;
+    int asking_logo = 0;
+    int asking_align = 0;
 
-    // the config that's used if not differently specified is ~/.config/albafetch.conf
-    char config_file[LOGIN_NAME_MAX + 33];
-    snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
+    bool using_custom_config = false;
+
+    // the config that's normally used is ~/.config/albafetch.conf
+    char config_file[LOGIN_NAME_MAX + 32] = "";
 
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
@@ -384,13 +387,22 @@ int main(const int argc, const char **argv) {
             if(i+1 < argc) {
                 strcpy(config_file, argv[i+1]);
                 continue;
+                using_custom_config = true;
             }
             fputs("\e[31m\e[1mERROR\e[0m: --config requires a extra argument! Use --help for more info\n", stderr);
             user_is_an_idiot = true;
         }
     }
 
-    parse_config(config_file);
+    if(!using_custom_config) {
+        char *config_home = getenv("XDG_CONFIG_HOME");
+        if(!config_home && config_home[0])
+            snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+        else
+            snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
+    }
+
+    parse_config(config_file, using_custom_config);
     if(!(*spacing_first)) strcpy(spacing_first, spacing);
     if(!(*spacing_last)) strcpy(spacing_last, spacing);
 
