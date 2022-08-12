@@ -248,7 +248,6 @@ void desktop() {        // prints the current desktop environment
     fputs("[Unsupported]", stderr);
     fflush(stderr);
 }
-
 #endif
 
 // shell (current)
@@ -258,6 +257,7 @@ void shell() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
+    #ifdef __linux__
     char path[32];
 
     sprintf(path, "/proc/%d/cmdline", getppid());
@@ -271,6 +271,7 @@ void shell() {
         fclose(fp);
         return;
     }
+    #endif
 
     char *shell =  getenv("SHELL");
     if(!shell) {
@@ -337,14 +338,14 @@ void packages() {
         pipe(pipes);
 
         if(!fork()) {
-            close(*pipes);
+            close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
-        packages[read(pipes[0], packages, 10) - 1] = 0;
+        packages[read(pipes[0], packages, 9) - 1] = 0;
         close(pipes[0]);
 
         if(packages[0] != '0') {
@@ -477,7 +478,7 @@ void host() {
 
     const size_t BUF_SIZE = 128;
     char buf[BUF_SIZE];
-    sysctlbyname("hw.model", &buf, &BUF_SIZE, NULL, 0);
+    sysctlbyname("hw.model", &buf, (size_t*)&BUF_SIZE, NULL, 0);
 
     printf("%s", buf);
 }

@@ -10,6 +10,7 @@ PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
 ifeq ($(OS),Linux)
 	OBJ := info.o main.o queue.o
+	INSTALLPATH := /usr/bin
 	ifeq ($(PACMAN),/bin/pacman)
 		INCLUDE := -l alpm
 		ARCH_BASED := -D ARCH_BASED
@@ -21,11 +22,15 @@ ifeq ($(shell whoami),alba4k) # idk don't ask why this is here - I'm too lazy to
 endif
 
 ifeq ($(OS),Darwin)
+	INSTALLPATH := /usr/local/bin
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o
 	INCLUDE := -framework Foundation -framework IOKit
 endif
 
+
+
 build/$(TARGET): $(OBJ)
+	mkdir -p build/
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
 main.o: src/main.c src/vars.h src/logos.h src/info.h
@@ -50,10 +55,10 @@ run: build/$(TARGET)
 	build/$(TARGET)
 
 install: build/$(TARGET)
-	cp -f build/$(TARGET) $(DESTDIR)/usr/bin/$(TARGET)
+	cp -f build/$(TARGET) $(DESTDIR)$(INSTALLPATH)/$(TARGET)
 
 uninstall:
-	rm /usr/bin/$(TARGET)
+	rm $(INSTALLPATH)/$(TARGET)
 
 clean:
 	-rm -rf build test *.o
