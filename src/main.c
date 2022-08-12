@@ -4,7 +4,7 @@
 
 /* TODO:
  * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2 <-- NOT actual code)
- * option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
+ * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress (lines [64; 76]U[318; 356])
  * remove the lspci dependency for gpu()
  */
@@ -61,7 +61,8 @@ char spacing[32] = "    ";
 char spacing_first[32] = "";
 char spacing_last[32] = "";
 
-/* Check what I wrote about logo_from_string - should be around line 318
+/* Check what I wrote about logo_from_string - should be around line 320
+ * also, this will be useful for determining how far to --align (to do comment at line 6)
 int max(const int *nums, unsigned const int lenght) {
     if(!lenght) return 0;
     int current_max = *nums;
@@ -144,7 +145,7 @@ void parse_config(const char *path, const bool using_custom_config) {
     FILE *fp = fopen(path, "r");
     if(!fp) {
         if(using_custom_config)
-            fputs("\e[91m\e[1mWARNING\e[0m: failed to open the file specified using --config, using defaults.\n", stderr);
+            fprintf(stderr, "\e[91m\e[1mWARNING\e[0m: failed to open the file specified using --config (%s), using defaults.\n", path);
         return;
     }
     fseek(fp, 0, SEEK_END);
@@ -369,7 +370,7 @@ int main(const int argc, const char **argv) {
     bool using_custom_config = false;
 
     // the config that's normally used is ~/.config/albafetch.conf
-    char config_file[LOGIN_NAME_MAX + 32] = "";
+    char config_file[LOGIN_NAME_MAX + 33] = "";
 
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
@@ -385,9 +386,9 @@ int main(const int argc, const char **argv) {
             asking_align = i+1;
         else if(!strcmp(argv[i], "--config")) {
             if(i+1 < argc) {
+                using_custom_config = true;
                 strcpy(config_file, argv[i+1]);
                 continue;
-                using_custom_config = true;
             }
             fputs("\e[31m\e[1mERROR\e[0m: --config requires a extra argument! Use --help for more info\n", stderr);
             user_is_an_idiot = true;
@@ -396,8 +397,12 @@ int main(const int argc, const char **argv) {
 
     if(!using_custom_config) {
         char *config_home = getenv("XDG_CONFIG_HOME");
-        if(!config_home && config_home[0])
-            snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+        if(config_home) { // is XDG_CONFIG_HOME set?
+            if(config_home[0]) // is XDG_CONFIG_HOME empty?
+                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+            else
+                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
+        }
         else
             snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
     }
@@ -589,7 +594,6 @@ int main(const int argc, const char **argv) {
     const int info_lines = (int)(sizeof(infos) / sizeof(*infos)) - 1;
 
     int line = 3;   // keeps track of the line that's currently printing 
-    
 
     // logo and infos
     for(int i = 0; i <= info_lines; ++i) {

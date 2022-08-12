@@ -40,7 +40,7 @@ $ cd albafetch
 
 
 # Customizing
-A configuration should be placed in `~/.config/albafetch.conf`. An example config, with comments, is found in this repository.
+A configuration should be placed in `~/.config/albafetch.conf` (`~/.config` can be overwritten using the `XDG_CONFIG_HOME` environnment variable). An example config, with comments, is found in this repository.
 
 ## How to write the config:
 Basic rules:

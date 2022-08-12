@@ -9,7 +9,7 @@ const char *get_gpu_string()
     int success;
     const char *result;
 
-    mach_port_t port = kIOMasterPortDefault;
+    mach_port_t port = kIOMainPortDefault; // maybe kIOMasterPortDefault but it's apparently deprecated since macOS Montereyq
     success = IOServiceGetMatchingServices(port, dict, &iter);
     if(success != kIOReturnSuccess)
         return NULL;
