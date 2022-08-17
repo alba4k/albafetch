@@ -632,7 +632,7 @@ void cpu() {            // prints the current CPU
 
     read_after_sequence(fp, "model name", buf, 256);
     fclose(fp);
-    if(!(*buf)) {
+    if(!(buf[0])) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -640,27 +640,33 @@ void cpu() {            // prints the current CPU
     }
     cpu_info += 2;
 
-    char *end = strchr(cpu_info, '@');
+    char *end;
+    if((end = strstr(cpu_info, " @"))) {
+        *end = 0;
+    }
 
     if(!end) {
         end = strchr(cpu_info, '\n');
-        if(!end) {
-            goto error;
+        if(!end) { 
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
         }
-    } else {
-        --end;
+        *end = 0;
     }
 
     char *ptr = end;
-    (*end) = 0;
 
     // cleaning the string from various garbage
     if((end = strstr(cpu_info, "(R)")))
-        memmove(end, end+3, strlen(end+1));
+        memmove(end, end+3, strlen(end+3)+1);
     if((end = strstr(cpu_info, "(TM)")))
-        memmove(end, end+4, strlen(end+1));
+        memmove(end, end+4, strlen(end+4)+1);
     if((end = strstr(cpu_info, " CPU")))
-        memmove(end, end+4, strlen(end+1));
+        memmove(end, end+4, strlen(end+4)+1);
+    if((end = strstr(cpu_info, "th Gen ")))
+        memmove(end-2, end+7, strlen(end+7)+1);
     if((end = strstr(cpu_info, "-Core Processor"))) {
         end -= 4;
         end = strchr(end, ' ');
@@ -696,14 +702,6 @@ void cpu() {            // prints the current CPU
     *end = 0;
 
     printf(" @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
-
-    return;
-
-    error:
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
 }
 #endif
 
@@ -793,6 +791,8 @@ void gpu() {            // prints the current GPU
             }
         }
 
+        if((end = strstr(gpu, " Integrated Graphics Controller")))
+            *end = 0;
         printf("%s", gpu);
         free(lspci);
         return;
