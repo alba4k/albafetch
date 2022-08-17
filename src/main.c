@@ -372,6 +372,23 @@ int main(const int argc, const char **argv) {
     // the config that's normally used is ~/.config/albafetch.conf
     char config_file[LOGIN_NAME_MAX + 33] = "";
 
+    char *home = getenv("HOME");
+    // I really hope this part will never need to run
+    if(!home) {
+        fflush(stdout);
+        fputs("\e[31m\e[1mERROR\e[0m:$HOME is not set, interrupting!\n", stderr);
+        fflush(stderr);
+
+        return 1;
+    }
+    if(!home[0]) {
+        fflush(stdout);
+        fputs("\e[31m\e[1mERROR\e[0m:$HOME is empty, interrupting!\n", stderr);
+        fflush(stderr);
+
+        return 1;
+    }
+
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
         if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
@@ -401,10 +418,10 @@ int main(const int argc, const char **argv) {
             if(config_home[0]) // is XDG_CONFIG_HOME empty?
                 snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
             else
-                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
+                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
         }
         else
-            snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", getenv("HOME"));
+            snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
     }
 
     parse_config(config_file, using_custom_config);
