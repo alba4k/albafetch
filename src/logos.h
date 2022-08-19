@@ -233,7 +233,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[34m          /:-------------:\\       ",
         "\e[34m       :-------------------::     ",
         "\e[34m     :-----------\e[39m/shhOHbmp\e[34m---:\\   ",
-        "\e[34m   /-----------\e[39momMMMNNNMMD\e[34m]  ---:  ",
+        "\e[34m   /-----------\e[39momMMMNNNMMD\e[34m]  ---: ",
         "\e[34m  :-----------\e[39msMMMMNMNMP\e[34m.    ---: ",
         "\e[34m :-----------\e[39m:MMMdP\e[34m-------    ---\\",
         "\e[34m,------------\e[39m:MMMd\e[34m--------    ---:",

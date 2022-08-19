@@ -14,7 +14,7 @@
 typedef uint64_t bytes_t;
 typedef uint64_t pages_t;
 
-const char *get_gpu_string();
+char *get_gpu_string();
 
 /*
  * Gets the used memory int

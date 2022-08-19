@@ -2,14 +2,14 @@
 
 #import <Foundation/Foundation.h>
 
-const char *get_gpu_string() 
+char *get_gpu_string() 
 {
     CFMutableDictionaryRef dict = IOServiceMatching("IOPCIDevice");
     io_iterator_t iter;
     int success;
     const char *result;
 
-    mach_port_t port = kIOMainPortDefault; // maybe kIOMasterPortDefault but it's apparently deprecated since macOS Montereyq
+    mach_port_t port = kIOMainPortDefault; // maybe kIOMasterPortDefault but it's apparently deprecated since macOS Monterey
     success = IOServiceGetMatchingServices(port, dict, &iter);
     if(success != kIOReturnSuccess)
         return NULL;
@@ -44,5 +44,5 @@ const char *get_gpu_string()
 
     IOObjectRelease(iter);
 
-    return result;
+    return (char*)result;
 }
