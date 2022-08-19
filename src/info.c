@@ -613,6 +613,18 @@ void cpu() {
     if((ptr = strstr(buf, " CPU")))
         memmove(ptr, ptr+4, strlen(ptr+1));
 
+    if(!config.print_cpu_brand) {
+        if((ptr = strstr(buf, "Intel Core ")))
+            memmove(ptr, ptr+11, strlen(ptr+11)+1);
+        else if((ptr = strstr(buf, "Apple ")))
+            memmove(ptr, ptr+6, strlen(ptr+6)+1);
+    }
+
+    if(!config.print_cpu_freq) {
+        if((ptr = strstr(buf, " @")))
+            *ptr = 0;
+    }
+
     printf("%s", buf);
 }
 #else
@@ -765,6 +777,14 @@ void gpu() {
             goto error;
         *end = 0;
     }
+
+    char *ptr;
+    if((ptr = strstr(gpu_string, "Intel ")))
+        gpu_string += 6;
+    else if((ptr = strstr(gpu_string, "AMD ")))
+        gpu_string += 4;
+    //else if((ptr = strstr(gpu_string, "Apple ")))
+    //    gpu_string += 6;
 
     printf("%s", gpu_string);
     
