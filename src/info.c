@@ -723,25 +723,31 @@ void gpu() {
 
     if(strcmp(name.machine, "arm64")) {
         gpu_string = get_gpu_string();
+        if(!gpu_string)
+            goto error;
     }
     else{
-
-        int pipes[2];
         char buf[1024];
+        int pipes[2];
+        int pipes2[2];
         pipe(pipes);
+        pipe(pipes2);
 
         if(!fork()) {
-            dup2(pipes[1], 1);
+            dup2(pipes[1], STDOUT_FILENO);
+            dup2(pipes[1], STDERR_FILENO);
             close(pipes[0]);
             close(pipes[1]);
+            close(pipes2[0]);
+            close(pipes2[1]);
             execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
-            exit(0);
         }
-
+        close(pipes2[0]);
+        close(pipes2[1]);
         close(pipes[1]);
+        wait(NULL);
         int bytes = read(pipes[0], buf, 1024);
         close(pipes[0]);
-        wait(NULL);
 
         if(bytes < 1) {
             fflush(stdout);
@@ -751,21 +757,26 @@ void gpu() {
         }
 
         gpu_string = strstr(buf, "Chipset Model: ");
+        if(!gpu_string)
+            goto error;
         gpu_string += 15;
         char *end = strchr(gpu_string, '\n');
         if(!end)
-            return;
+            goto error;
         *end = 0;
     }
 
-    if(!gpu_string) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-
     printf("%s", gpu_string);
+    
+    return;
+    
+    error:
+        if(!gpu_string) {
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+        }
 }
 #else
 void gpu() {            // prints the current GPU
