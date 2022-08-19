@@ -332,18 +332,21 @@ void packages() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    if(!access("/usr/local/bin/brew", F_OK)) {
-        int pipes[2];
-        char packages[10];
-        pipe(pipes);
+    int pipes[2];
+    char packages[10];
+    pipe(pipes);
 
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
-        }
-        wait(NULL);
+        execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
+    }
+
+    int status;
+    wait(&status);
+
+    if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
         close(pipes[1]);
         packages[read(pipes[0], packages, 9) - 1] = 0;
         close(pipes[0]);
