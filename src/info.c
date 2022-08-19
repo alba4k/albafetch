@@ -716,13 +716,55 @@ void gpu() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    const char *gpu_string = get_gpu_string();
+    struct utsname name;
+    uname(&name);
+
+    char *gpu_string;
+
+    if(strcmp(name.machine, "arm64")) {
+        gpu_string = get_gpu_string();
+    }
+    else{
+
+        int pipes[2];
+        char buf[1024];
+        pipe(pipes);
+
+        if(!fork()) {
+            dup2(pipes[1], 1);
+            close(pipes[0]);
+            close(pipes[1]);
+            execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
+            exit(0);
+        }
+
+        close(pipes[1]);
+        int bytes = read(pipes[0], buf, 1024);
+        close(pipes[0]);
+        wait(NULL);
+
+        if(bytes < 1) {
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+        }
+
+        gpu_string = strstr(buf, "Chipset Model: ");
+        gpu_string += 15;
+        char *end = strchr(gpu_string, '\n');
+        if(!end)
+            return;
+        *end = 0;
+    }
+
     if(!gpu_string) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
         return;
     }
+
     printf("%s", gpu_string);
 }
 #else
