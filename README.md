@@ -103,7 +103,7 @@ This repository contains a commented example config file (`albafetch.conf`) with
 ## Source code editing:
 If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `src/logos.h` (inside of `const char *logos[][]`) and in `src/main.c` (to make them show up in the help message).
 
-Don't mind doing a pull request if you think some of the changes you made should be in the global version ;)§
+Don't mind doing a pull request if you think some of the changes you made should be in the global version, just try to follow the formatting that's used in the rest of the file :)
 
 ---
 

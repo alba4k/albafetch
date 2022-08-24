@@ -14,34 +14,37 @@
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 
+// defined by the makefile if pacman exists
+// compile in the makefile using `make PACMAN=/bin/pacman <options>`
 #ifdef ARCH_BASED
 #include <alpm.h>
 #include <alpm_list.h>
 #endif
+
 #include <stdio.h>      
 #include <string.h> 
 
 #include "info.h"
 
-/* __APPLE__ only exists on macOS
- * _WIN32 only exists on Windows (ew)
- * __linux__ only exists on linux
+/* __APPLE__ should only be defined on macOS
+ * _WIN32 should only be defined in Windows (I won't support it)
+ * __linux__ should only be defined on linux
  * 
  * Those can be used to determine the
  * platform the code is being compiled
- * on and act consequently
+ * in and act consequently
  */
 
-// separators
-void separator() {      // prints a separator
+// separators - prints a separator
+void separator() {
     printf("%s", config.separator);
 }
-void separator2() {      // prints a separator
+void separator2() {
     printf("%s", config.separator2);
 }
 
-// title
-void title() {          // prints a title in the format user@hostname
+// title - prints a title in the format user@hostname
+void title() {
     static char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX);
     
@@ -61,8 +64,8 @@ void title() {          // prints a title in the format user@hostname
     printf("%s%s\e[0m@%s%s%s\e[0m", config.title_prefix, username, config.color, config.bold, hostname);
 }
 
-// hostname
-void hostname() {       // getting the computer hostname (defined in /etc/hostname and /etc/hosts)
+// hostname - getting the computer hostname (defined in /etc/hostname)
+void hostname() {
     char format[100];
     snprintf(format, 100, "%s%s", config.hostname_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -74,8 +77,8 @@ void hostname() {       // getting the computer hostname (defined in /etc/hostna
     printf("%s", hostname);
 }
 
-// user
-void user() {           // get the current login
+// user - get the current login
+void user() {
     char format[100];
     snprintf(format, 100, "%s%s", config.user_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -94,8 +97,8 @@ void user() {           // get the current login
     fputs(username, stdout);
 }
 
-// uptime
-void uptime() {         // prints the uptime
+// uptime - prints the uptime
+void uptime() {
     char format[100];
     snprintf(format, 100, "%s%s", config.uptime_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -139,7 +142,7 @@ void uptime() {         // prints the uptime
     }
 }
 
-//os
+//os - prints the os name + arch
 #ifdef __APPLE__
 void os() {
     char format[100];
@@ -153,7 +156,7 @@ void os() {
     printf("macOS %s", name.machine);
 }
 #else
-void os() {             // prints the os name + arch
+void os() {
     char format[100];
     snprintf(format, 100, "%s%s", config.os_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -201,7 +204,8 @@ void os() {             // prints the os name + arch
 }
 #endif
 
-void kernel() {         // prints the kernel version
+// prints the kernel version
+void kernel() {
     char format[100];
     snprintf(format, 100, "%s%s", config.kernel_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -213,7 +217,7 @@ void kernel() {         // prints the kernel version
     printf("%s ", name.release);
 }
 
-//desktop
+// desktop -  prints the current desktop environment
 #ifdef __APPLE__
 void desktop() {
     char format[100];
@@ -224,7 +228,7 @@ void desktop() {
     printf("Aqua");
 }
 #else
-void desktop() {        // prints the current desktop environment
+void desktop() {
     char format[100];
     snprintf(format, 100, "%s%s", config.desktop_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -250,7 +254,7 @@ void desktop() {        // prints the current desktop environment
 }
 #endif
 
-// shell (current)
+// shell (current) - prints the name of the parent process
 void shell() {
     char format[100];
     snprintf(format, 100, "%s%s", config.shell_label, config.dash);
@@ -284,8 +288,8 @@ void shell() {
     printf("%s", basename(shell));
 }
 
-// shell (default)
-void login_shell() {          // prints the user default shell
+// shell (default) - prints the user default shell
+void login_shell() {
     char format[100];
     snprintf(format, 100, "%s%s", config.default_shell_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -304,8 +308,8 @@ void login_shell() {          // prints the user default shell
 
 }
 
-// terminal
-void term() {           // prints the current terminal
+// terminal - prints the current terminal
+void term() {
     char format[100];
     snprintf(format, 100, "%s%s", config.term_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -324,7 +328,7 @@ void term() {           // prints the current terminal
     fflush(stderr);
 }
 
-// packages
+// packages - prints the number of installed packages
 #ifdef __APPLE__
 void packages() {
     char format[100];
@@ -332,18 +336,27 @@ void packages() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    if(!access("/usr/local/bin/brew", F_OK)) {
-        int pipes[2];
-        char packages[10];
-        pipe(pipes);
+    if(access("/usr/local/bin/brew", F_OK) && access("/opt/homebrew/bin/brew", F_OK)) {
+        fflush(stdout);
+        fputs("[Unsupported]", stderr);
+        fflush(stderr);
+    }
 
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    int pipes[2];
+    char packages[10];
+    pipe(pipes);
 
-            execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
-        }
-        wait(NULL);
+    if(!fork()) {
+        close(pipes[0]);
+        dup2(pipes[1], STDOUT_FILENO);
+
+        execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
+    }
+
+    int status;
+    wait(&status);
+
+    if(WIFEXITED(status) && WEXITSTATUS(status) == 0) {
         close(pipes[1]);
         packages[read(pipes[0], packages, 9) - 1] = 0;
         close(pipes[0]);
@@ -359,7 +372,7 @@ void packages() {
     fflush(stderr);
 }
 #else
-void packages() {       // prints the number of installed packages
+void packages() {
     char format[100];
     snprintf(format, 100, "%s%s", config.packages_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -468,7 +481,7 @@ void packages() {       // prints the number of installed packages
 }
 #endif
 
-// host
+// host - prints the current host machine
 #ifdef __APPLE__
 void host() {
     char format[100];
@@ -483,7 +496,7 @@ void host() {
     printf("%s", buf);
 }
 #else
-void host() {           // prints the current host machine
+void host() {
     char format[100];
     snprintf(format, 100, "%s%s", config.host_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -525,7 +538,7 @@ void host() {           // prints the current host machine
 }
 #endif
 
-// bios
+// bios - prints the current host machine
 #ifdef __APPLE__
 void bios() {
     char format[100];
@@ -538,7 +551,7 @@ void bios() {
     fflush(stderr);
 }
 #else
-void bios() {           // prints the current host machine
+void bios() {
     char format[100];
     snprintf(format, 100, "%s%s", config.bios_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -588,7 +601,7 @@ void bios() {           // prints the current host machine
 }
 #endif
 
-// cpu
+// cpu - prints the current CPU
 #ifdef __APPLE__
 void cpu() {
     char format[100];
@@ -610,10 +623,22 @@ void cpu() {
     if((ptr = strstr(buf, " CPU")))
         memmove(ptr, ptr+4, strlen(ptr+1));
 
+    if(!config.print_cpu_brand) {
+        if((ptr = strstr(buf, "Intel Core ")))
+            memmove(ptr, ptr+11, strlen(ptr+11)+1);
+        else if((ptr = strstr(buf, "Apple ")))
+            memmove(ptr, ptr+6, strlen(ptr+6)+1);
+    }
+
+    if(!config.print_cpu_freq) {
+        if((ptr = strstr(buf, " @")))
+            *ptr = 0;
+    }
+
     printf("%s", buf);
 }
 #else
-void cpu() {            // prints the current CPU
+void cpu() {
     char format[100];
     snprintf(format, 100, "%s%s", config.cpu_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -632,7 +657,7 @@ void cpu() {            // prints the current CPU
 
     read_after_sequence(fp, "model name", buf, 256);
     fclose(fp);
-    if(!(*buf)) {
+    if(!(buf[0])) {
         fflush(stdout);
         fputs("[Unsupported]", stderr);
         fflush(stderr);
@@ -640,27 +665,33 @@ void cpu() {            // prints the current CPU
     }
     cpu_info += 2;
 
-    char *end = strchr(cpu_info, '@');
+    char *end;
+    if((end = strstr(cpu_info, " @"))) {
+        *end = 0;
+    }
 
     if(!end) {
         end = strchr(cpu_info, '\n');
-        if(!end) {
-            goto error;
+        if(!end) { 
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
         }
-    } else {
-        --end;
+        *end = 0;
     }
 
     char *ptr = end;
-    (*end) = 0;
 
     // cleaning the string from various garbage
     if((end = strstr(cpu_info, "(R)")))
-        memmove(end, end+3, strlen(end+1));
+        memmove(end, end+3, strlen(end+3)+1);
     if((end = strstr(cpu_info, "(TM)")))
-        memmove(end, end+4, strlen(end+1));
+        memmove(end, end+4, strlen(end+4)+1);
     if((end = strstr(cpu_info, " CPU")))
-        memmove(end, end+4, strlen(end+1));
+        memmove(end, end+4, strlen(end+4)+1);
+    if((end = strstr(cpu_info, "th Gen ")))
+        memmove(end-2, end+7, strlen(end+7)+1);
     if((end = strstr(cpu_info, "-Core Processor"))) {
         end -= 4;
         end = strchr(end, ' ');
@@ -696,18 +727,10 @@ void cpu() {            // prints the current CPU
     *end = 0;
 
     printf(" @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
-
-    return;
-
-    error:
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
 }
 #endif
 
-// gpu
+// gpu - prints the current GPU
 #ifdef __APPLE__
 void gpu() {
     char format[100];
@@ -715,17 +738,78 @@ void gpu() {
     if(config.align_infos) printf("%-16s\e[0m", format);
     else printf("%s\e[0m ", format);
 
-    const char *gpu_string = get_gpu_string();
-    if(!gpu_string) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
+    struct utsname name;
+    uname(&name);
+
+    char *gpu_string;
+
+    if(strcmp(name.machine, "arm64")) {
+        gpu_string = get_gpu_string();
+        if(!gpu_string)
+            goto error;
     }
+    else{
+        char buf[1024];
+        int pipes[2];
+        int pipes2[2];
+        pipe(pipes);
+        pipe(pipes2);
+
+        if(!fork()) {
+            dup2(pipes[1], STDOUT_FILENO);
+            dup2(pipes[1], STDERR_FILENO);
+            close(pipes[0]);
+            close(pipes[1]);
+            close(pipes2[0]);
+            close(pipes2[1]);
+            execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
+        }
+        close(pipes2[0]);
+        close(pipes2[1]);
+        close(pipes[1]);
+        wait(NULL);
+        int bytes = read(pipes[0], buf, 1024);
+        close(pipes[0]);
+
+        if(bytes < 1) {
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+        }
+
+        gpu_string = strstr(buf, "Chipset Model: ");
+        if(!gpu_string)
+            goto error;
+        gpu_string += 15;
+        char *end = strchr(gpu_string, '\n');
+        if(!end)
+            goto error;
+        *end = 0;
+    }
+
+    char *ptr;
+    if((ptr = strstr(gpu_string, "Intel ")))
+        gpu_string += 6;
+    else if((ptr = strstr(gpu_string, "AMD ")))
+        gpu_string += 4;
+    //else if((ptr = strstr(gpu_string, "Apple ")))
+    //    gpu_string += 6;
+
     printf("%s", gpu_string);
+    
+    return;
+    
+    error:
+        if(!gpu_string) {
+            fflush(stdout);
+            fputs("[Unsupported]", stderr);
+            fflush(stderr);
+            return;
+        }
 }
 #else
-void gpu() {            // prints the current GPU
+void gpu() {
     char format[100];
     snprintf(format, 100, "%s%s", config.gpu_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -793,6 +877,8 @@ void gpu() {            // prints the current GPU
             }
         }
 
+        if((end = strstr(gpu, " Integrated Graphics Controller")))
+            *end = 0;
         printf("%s", gpu);
         free(lspci);
         return;
@@ -811,7 +897,7 @@ void gpu() {            // prints the current GPU
 }
 #endif
 
-// memory
+// memory - prints the amount of memory that's currently in use
 #ifdef __APPLE__ 
 void memory() {
     char format[100];
@@ -891,8 +977,8 @@ void memory() {
 }
 #endif
 
-// public IP adress
-void public_ip() {      // get the public IP address
+// public IP adress - get the public IP address
+void public_ip() {
     char format[100];
     snprintf(format, 100, "%s%s", config.pub_ip_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -918,8 +1004,8 @@ void public_ip() {      // get the public IP address
     printf("%s", public_ip);
 }
 
-// local IP adress
-void local_ip() {      // get the local IP address
+// local IP adress - get the local IP address
+void local_ip() {
     char format[100];
     snprintf(format, 100, "%s%s", config.loc_ip_label, config.dash);
     if(config.align_infos) printf("%-16s\e[0m", format);
@@ -947,7 +1033,7 @@ void local_ip() {      // get the local IP address
     } 
 }
 
-// working directory
+// pwd - prints the current working directory
 void pwd() {
     char format[100];
     snprintf(format, 100, "%s%s", config.pwd_label, config.dash);
