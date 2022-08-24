@@ -395,7 +395,7 @@ void packages() {
 
         if(pkgs) {
             printf("%ld (pacman) ", pkgs);
-            supported = true;$
+            supported = true;
         }
     #endif
     if(!access("/usr/bin/dpkg-query", F_OK)) {
