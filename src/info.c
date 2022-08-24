@@ -350,7 +350,7 @@ void packages() {
         close(pipes[0]);
         dup2(pipes[1], STDOUT_FILENO);
 
-        execlp("sh", "sh", "-c", "ls $(brew --cellar) | wc -l", NULL); 
+        execlp("sh", "sh", "-c", "ls $(brew --cellar 2>/dev/null)| wc -l", NULL); 
     }
 
     int status;
@@ -361,7 +361,7 @@ void packages() {
         packages[read(pipes[0], packages, 9) - 1] = 0;
         close(pipes[0]);
 
-        if(packages[0] != '0') {
+        if(packages[0] != '0' && packages[0]) {
             printf("%d (brew) ", atoi(packages));
             return;
         }
@@ -393,9 +393,10 @@ void packages() {
 
         alpm_release(handle);
 
-        if(pkgs)
+        if(pkgs) {
             printf("%ld (pacman) ", pkgs);
-        supported = true;
+            supported = true;$
+        }
     #endif
     if(!access("/usr/bin/dpkg-query", F_OK)) {
         pipe(pipes);
@@ -404,14 +405,14 @@ void packages() {
             close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "dpkg-query -f '.\n' -W | wc -l", NULL); 
+            execlp("sh", "sh", "-c", "dpkg-query -f '.\n' -W 2>/dev/null | wc -l", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
         close(*pipes);
 
-        if(packages[0] != '0')
+        if(packages[0] != '0' && packages[0])
             printf("%s (dpkg) ", packages);
         supported = true;
     }
@@ -423,16 +424,17 @@ void packages() {
             close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "rpm -qa | wc -l", NULL); 
+            execlp("sh", "sh", "-c", "rpm -qa 2>/dev/null | wc -l", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
         close(*pipes);
 
-        if(packages[0] != '0')
+        if(packages[0] != '0' && packages[0]) {
             printf("%s (rpm) ", packages);
-        supported = true;
+            supported = true;
+        }
     }
 
     if(!access("/usr/bin/flatpak", F_OK)) {
@@ -442,16 +444,17 @@ void packages() {
             close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "flatpak list | wc -l", NULL); 
+            execlp("sh", "sh", "-c", "flatpak list 2>/dev/nul | wc -l", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
         packages[read(pipes[0], packages, 10) - 1] = 0;
         close(*pipes);
 
-        if(packages[0] != '0')
+        if(packages[0] != '0' && packages[0]) {
             printf("%s (flatpak) ", packages);
-        supported = true;
+            supported = true;
+        }
     }
 
     if(!access("/usr/bin/snap", F_OK)) {
@@ -468,9 +471,10 @@ void packages() {
         packages[read(pipes[0], packages, 10) - 1] = 0;
         close(*pipes);
 
-        if(packages[0] != '0')
+        if(packages[0] != '0' && packages[0]) {
             printf("%d (snap) ", atoi(packages) - 1);
-        supported = true;
+            supported = true;
+        }
     }
 
     if(!supported) {
