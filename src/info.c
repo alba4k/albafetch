@@ -444,7 +444,7 @@ void packages() {
             close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "flatpak list 2>/dev/nul | wc -l", NULL); 
+            execlp("sh", "sh", "-c", "flatpak list 2>/dev/null | wc -l", NULL); 
         }
         wait(NULL);
         close(pipes[1]);
