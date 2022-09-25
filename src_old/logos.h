@@ -1,13 +1,11 @@
-#pragma once
-
 #ifndef LOGOS_H
 #define LOGOS_H
 
-static const char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to macOS
+static const char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to OSX
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
         "\e[90m",                                               // default color for the printed text
-        "                     ",                                // numbers of spaces to use when ran out of lines
+        "                     ",                                // numbers of spaces to use when ran out of logo space
         "\e[90m        #####        ",                          // just the logo
         "\e[90m       #######       ",
         "\e[90m       ##\e[37mO\e[90m#\e[37mO\e[90m##       ",
@@ -20,7 +18,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[33m######\e[90m#\e[37m#######\e[90m#\e[33m######",
         "\e[33m#######\e[90m#\e[37m#####\e[90m#\e[33m#######",
         "\e[33m  #####\e[90m#######\e[33m#####  ",
-        NULL                                                    // the logo is terminated by NULL
+        ""                                                      // an empty string concludes the logo, to know when it should stop printing
     },
     {   // MacOS X
         "apple",
@@ -43,7 +41,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[34m    kMMMMMMMMMMMMMMMMMMMMMMd  ",
         "\e[34m     ;KMMMMMMMWXXWMMMMMMMk.   ",
         "\e[34m       .cooc,.    .,coo:.     ",
-        NULL
+        ""
     },
     {   // Arch Linux
         "arch",
@@ -68,7 +66,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m `+sso+:-`                 `.-/+oso: ",
         "\e[36m`++:.                           `-/+/",
         "\e[36m.`                                 `/",
-        NULL
+        ""
     },
     {   // Arch Linux (small version)
         "arch_small",
@@ -81,7 +79,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m  /   ,,   \\  ",
         "\e[36m /   |  |  -\\ ",
         "\e[36m/_-''    ''-_\\",
-        NULL
+        ""
     },
     {   // Debian
         "debian",
@@ -104,7 +102,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[31m       `Y$$b.               ",
         "\e[31m          `\"Y$b._           ", 
         "\e[31m              `\"\"\"          ",
-        NULL
+        ""
     },
     {   // Linux Mint
         "linuxmint",
@@ -129,7 +127,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[37m       '.-MMMM\e[32m``--:::::--``\e[37mMMMM-.'      ",
         "\e[37m            '-MMMMMMMMMMMMM-'           ",
         "\e[37m               ``-:::::-``              ",
-        NULL
+        ""
     },
     {   // Endeavour OS
         "endeavouros",
@@ -150,7 +148,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[31m `..-+\e[35moosssssssssssssssssssssssso\e[34m+++++/`",
         "\e[34m   ./++++++++++++++++++++++++++++++/:.  ",
         "\e[34m  `:::::::::::::::::::::::::------``    ",
-        NULL
+        ""
     },
     {   // Ubuntu
         "ubuntu",
@@ -176,7 +174,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[31m      -+sssssssssssssssss\e[37myyy\e[31mssss+-      ",
         "\e[31m        `:+ssssssssssssssssss+:`        ",
         "\e[31m            .-/+oossssoo+/-.            ",
-        NULL
+        ""
     },
     {   // Parrot OS
         "parrot",
@@ -206,7 +204,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m                           d:          ",
         "\e[36m                           -+          ",
         "\e[36m                            -          ",
-        NULL
+        ""
     },
     {   // Manjaro Linux
         "manjaro",
@@ -226,7 +224,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[32m████████  ████████  ████████",
         "\e[32m████████  ████████  ████████",
         "\e[32m████████  ████████  ████████",
-        NULL
+        ""
     },
     {   // Fedora
         "fedora",
@@ -249,7 +247,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[34m:---\e[39m:sdNMMMMNds:\e[34m------------:     ",
         "\e[34m:------\e[39m:://:\e[34m-------------::       ",
         "\e[34m:---------------------://         ",
-        NULL
+        ""
     },
     {   // KDE Neon
         "neon",
@@ -274,7 +272,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[32m      .-:.`        ``        `-:-.      ",
         "\e[32m         `---.``   ``   `.---.`         ",
         "\e[32m             `..---+/---..`             ",
-        NULL
+        ""
     },
     {   // Pop!_OS
         "pop",
@@ -300,7 +298,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[36m      ///////////////////////////      ",
         "\e[36m         /////////////////////         ",
         "\e[36m             /////////////             ",
-        NULL
+        ""
     },
     {   // Gentoo
         "gentoo",
@@ -324,7 +322,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[35m/h\e[97mMMNNNNNNNNMNdhs++/\e[35m-`             ",
         "\e[35m `/\e[97mohdmmddhys+++/:\e[35m.`               ",
         "\e[35m  `-//////:--.                     ",
-        NULL
+        ""
     },
     {   // Windows
         "windows",
@@ -346,7 +344,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[34m{3=*^```\"*4E3) \e[33m;EEEtttt:::::tZ`      ",
         "\e[34m             `\e[33m \e[33m:EEEEtttt::::z7       ",
         "\e[33m                 \"VEzjt:;;z>*`       ",
-        NULL
+        ""
     },
     {   // ElementaryOS
         "elementary",
@@ -369,7 +367,7 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[37m    eeeee                 eeeee     ",
         "\e[37m      eeeeeee         eeeeeee       ",
         "\e[37m         eeeeeeeeeeeeeeeee          ",
-        NULL
+        ""
     },
     {   // Garuda Linux
         "garuda",
@@ -396,8 +394,8 @@ static const char *logos[][32] = {      // please leave logos[0] to Linux and lo
         "\e[0m    ╜╒\"   `╜    `      ╜╙╕  └╣╠╠╠╠╕ ╞╙╖            ",
         "\e[0m                               ╠╠╠                   ",
         "\e[0m                                ╜                    ",
-        NULL
+        ""
     }
 };
 
-#endif // LOGOS_H
+#endif
