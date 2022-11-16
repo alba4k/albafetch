@@ -1,6 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <libgen.h> // basename
 
 #ifdef __APPLE__
 #include "bsdwrap.h"
@@ -15,6 +16,7 @@
 #include "info.h"
 #include "queue.h"
 
+// prints the current user
 int user(char *dest) {
     struct passwd *pw;
 
@@ -31,6 +33,7 @@ int user(char *dest) {
     return 0;
 }
 
+// prints the machine hostname
 int hostname(char *dest) {
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
@@ -40,6 +43,7 @@ int hostname(char *dest) {
     return 0;
 }
 
+// prints the current uptime
 int uptime(char *dest) {
     #ifdef __APPLE__
         struct timeval boottime;
@@ -90,6 +94,7 @@ int uptime(char *dest) {
     return 0;
 }
 
+// prints the operating system name and architechture (uname -m)
 int os(char *dest) {
     struct utsname name;
     uname(&name);
@@ -129,4 +134,81 @@ int os(char *dest) {
 
         return 0;
     #endif // __APPLE__
+}
+
+// prints the running kernel version (uname -r)
+int kernel(char *dest) {
+    struct utsname name;
+    uname(&name);
+
+    snprintf(dest, 256, "%s", name.release);
+
+    return 0;
+}
+
+// get the current desktop environnment
+int desktop(char *dest) {
+    char *desktop;
+
+    #ifdef __APPLE__
+        dekstop = "Aqua"
+    #else
+        desktop = getenv("SWAYSOCK") ? "Sway" :
+                             (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
+                             (desktop = getenv("DESKTOP_SESSION")) ? desktop :
+                             getenv("KDE_SESSION_VERSION") ? "KDE" :
+                             getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
+                             getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
+                             getenv("TDE_FULL_SESSION") ? "Trinity" :
+                             // !strcmp("linux", getenv("TERM")) ? "none" :      // what happens when running in tty
+                             NULL;
+        if(!desktop) {
+            return 1;
+        }
+    #endif
+
+    snprintf(dest, 256, "%s", desktop);
+    return 0;
+}
+
+// get the parent process (normally the shell)
+int shell(char *dest) {
+    #ifdef __linux__
+        char path[32];
+
+        sprintf(path, "/proc/%d/cmdline", getppid());
+
+        FILE *fp = fopen(path, "r");
+        if(fp) {
+            char shell[256];
+            shell[fread(shell, 1, 255, fp)] = 0;
+
+            if(shell[0] == '-') // cmdline is "-bash" when login shell
+                memcpy(shell, shell+1, strlen(shell+1)+1);
+
+            snprintf(dest, 256, "%s", config.print_shell_path ? shell : basename(shell));
+            fclose(fp);
+            return 0;
+        }
+    #endif
+
+    char *shell =  getenv("SHELL");
+    if(shell && shell[0]) {
+        snprintf(dest, 256, "%s", shell);
+        return 0;
+    }
+
+    return 1;
+}
+
+// get the current login shell
+int login_shell(char *dest) {
+    char *shell = getenv("SHELL");
+
+    if(shell && shell[0]) {
+        snprintf(dest, 256, "%s", shell);
+        return 0;
+    }
+
+    return 1;
 }

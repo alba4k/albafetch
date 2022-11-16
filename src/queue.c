@@ -91,7 +91,7 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
 
         assert(q->size == seq_size);   // Window is of correct width
 
-        if(!strncmp((char *) q->data + q->offset, seq, seq_size)) {
+        if(!strncmp((char *)q->data + q->offset, seq, seq_size)) {
             found = 1;
             break;
         }

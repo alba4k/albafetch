@@ -1,6 +1,5 @@
 .PHONY: build/albafetch
 
-SHELL := /bin/bash
 CC := gcc
 CFLAGS := -Wall -Wextra -Ofast
 TARGET := albafetch
@@ -28,25 +27,25 @@ build/$(TARGET): $(OBJ)
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
 
 main.o: src/main.c src/vars.h src/logos.h src/info.h
-	$(CC) -c src/main.c
+	$(CC) -c src/main.c $(CFLAGS)
 
 info.o: src/info.c src/vars.h src/info.h
-	$(CC) -c src/info.c $(ARCH_BASED)
+	$(CC) -c src/info.c $(CFLAGS) $(ARCH_BASED)
 
 utils.o: src/utils.c
-	$(CC) -c src/utils.c
+	$(CC) -c src/utils.c $(CFLAGS)
 
 bsdwrap.o: src/bsdwrap.c
-	$(CC) -c src/bsdwrap.c
+	$(CC) -c src/bsdwrap.c $(CFLAGS)
 
 macos_infos.o: src/macos_infos.c
-	$(CC) -c src/macos_infos.c manually compiled as specified in the package README.md. It should work on both x86_64 ("Intel") and arm64 ("Apple Silicon
+	$(CC) -c src/macos_infos.c $(CFLAGS)
 
 queue.o: src/queue.c
-	$(CC) -c src/queue.c
+	$(CC) -c src/queue.c $(CFLAGS)
 
 macos_gpu_string.o: src/macos_gpu_string.m
-	$(CC) -c src/macos_gpu_string.m $(INCLUDE)
+	$(CC) -c src/macos_gpu_string.m $(INCLUDE) $(CFLAGS)
 
 run: build/$(TARGET)
 	build/$(TARGET)
@@ -58,4 +57,4 @@ uninstall:
 	rm $(INSTALLPATH)/$(TARGET)
 
 clean:
-	-rm -rf build test *.o
+	-rm -rf build *.o

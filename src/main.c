@@ -13,7 +13,12 @@
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress (lines [64; 76]U[318; 356])
  * remove the lspci dependency for gpu()
+ * more config options (e.g. complete login shell path)
  */
+
+Config config = {
+    false,                      // bool print_shell_path
+};
 
 int main(int argc, char **argv) {
     bool user_is_an_idiot = false; // rtfm and stfu
@@ -98,6 +103,18 @@ int main(int argc, char **argv) {
         printf("%s\n", data);
 
     if(!os(data))
+        printf("%s\n", data);
+
+    if(!kernel(data))
+        printf("%s\n", data);
+
+    if(!desktop(data))
+        printf("%s\n", data);
+
+    if(!shell(data))
+        printf("%s\n", data);
+
+    if(!login_shell(data))
         printf("%s\n", data);
     // END
 
