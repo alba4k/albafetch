@@ -11,7 +11,7 @@ ifeq ($(OS),Linux)
 	OBJ := info.o main.o queue.o utils.o
 	INSTALLPATH := /usr/bin
 	ifeq ($(PACMAN),/bin/pacman)
-		INCLUDE := -l alpm
+		INCLUDE := -l alpm -l curl
 		ARCH_BASED := -D ARCH_BASED
 	endif
 endif
@@ -19,7 +19,7 @@ endif
 ifeq ($(OS),Darwin)
 	INSTALLPATH := /usr/local/bin
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
-	INCLUDE := -framework Foundation -framework IOKit
+	INCLUDE := -framework Foundation -framework IOKit -l curl
 endif
 
 build/$(TARGET): $(OBJ)

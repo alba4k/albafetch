@@ -41,4 +41,20 @@ int shell(char *dest);
 
 int login_shell(char *dest);
 
+int term(char *dest);
+
+int host(char *dest);
+
+int bios(char *dest);
+
+int local_ip(char *dest);
+
+int pwd(char *dest);
+
+int date(char *dest);
+
+int colors(char *dest);
+
+int light_colors(char *dest);
+
 #endif // INFO_H

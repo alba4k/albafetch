@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <sys/mman.h>
 
@@ -7,6 +6,10 @@
 #include "utils.h"
 #include "logos.h"
 #include "queue.h"
+
+#ifndef MAP_ANONYMOUS   // https://github.com/microsoft/vscode-cpptools/issues/4268
+#define MAP_ANONYMOUS 0x20
+#endif
 
 /* TODO:
  * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2 <-- NOT actual code)
@@ -116,6 +119,34 @@ int main(int argc, char **argv) {
 
     if(!login_shell(data))
         printf("%s\n", data);
+
+    if(!term(data))
+        printf("%s\n", data);
+
+    if(!host(data))
+        printf("%s\n", data);
+
+    if(!bios(data))
+        printf("%s\n", data);
+
+    if(!public_ip(data))
+        printf("%s\n", data);
+
+    if(!local_ip(data))
+        printf("%s\n", data);
+
+    if(!pwd(data))
+        printf("%s\n", data);
+
+    if(!date(data))
+        printf("%s\n", data);
+
+    if(!colors(data))
+        printf("%s\n", data);
+
+    if(!light_colors(data))
+        printf("%s\n", data);
+
     // END
 
     return 0;

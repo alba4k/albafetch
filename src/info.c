@@ -1,7 +1,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <libgen.h> // basename
+#include <libgen.h>     // basename
 
 #ifdef __APPLE__
 #include "bsdwrap.h"
@@ -11,12 +11,17 @@
 #endif // __APPLE__
 
 #include <sys/utsname.h> // uname
-#include <pwd.h> // username
+#include <pwd.h>        // username
+#include <ifaddrs.h>    // local ip
+#include <arpa/inet.h>  // local ip
+#include <time.h>       // date
+#include <curl/curl.h>  // public ip
 
 #include "info.h"
 #include "queue.h"
+#include "utils.h"
 
-// prints the current user
+// print the current user
 int user(char *dest) {
     struct passwd *pw;
 
@@ -33,7 +38,7 @@ int user(char *dest) {
     return 0;
 }
 
-// prints the machine hostname
+// print the machine hostname
 int hostname(char *dest) {
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
@@ -43,7 +48,7 @@ int hostname(char *dest) {
     return 0;
 }
 
-// prints the current uptime
+// print the current uptime
 int uptime(char *dest) {
     #ifdef __APPLE__
         struct timeval boottime;
@@ -94,7 +99,7 @@ int uptime(char *dest) {
     return 0;
 }
 
-// prints the operating system name and architechture (uname -m)
+// print the operating system name and architechture (uname -m)
 int os(char *dest) {
     struct utsname name;
     uname(&name);
@@ -136,7 +141,7 @@ int os(char *dest) {
     #endif // __APPLE__
 }
 
-// prints the running kernel version (uname -r)
+// print the running kernel version (uname -r)
 int kernel(char *dest) {
     struct utsname name;
     uname(&name);
@@ -211,4 +216,214 @@ int login_shell(char *dest) {
     }
 
     return 1;
+}
+
+// print the current terminal
+int term(char *dest) {
+    char *terminal = getenv("TERM");
+    if(terminal) {
+        terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
+
+        snprintf(dest, 256, "%s", terminal);
+        return 0;
+    }
+
+    return 1;
+}
+
+// TODO: packages
+
+// gets the machine name and eventually model version
+int host(char *dest) {
+    #ifdef __APPLE__
+        const size_t BUF_SIZE = 256;
+        sysctlbyname("hw.model", dest, (size_t*)&BUF_SIZE, NULL, 0);
+        return 0;
+    #else
+        
+    char *name = NULL;
+    char *version = NULL;
+    FILE *fp = NULL;
+    size_t len = 0;
+
+    if((fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r"))) {
+        fseek(fp, 0, SEEK_END);
+        len = ftell(fp);
+        rewind(fp);
+
+        name = malloc(len);
+        name[fread(name, 1, len, fp) - 1] = 0;
+
+        fclose(fp);
+    }
+
+    if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
+        fseek(fp, 0, SEEK_END);
+        len = ftell(fp);
+        rewind(fp);
+
+        version = malloc(len);
+        version[fread(version, 1, len, fp) - 1] = 0;
+
+        fclose(fp);
+    }
+
+    if(name && version)
+        snprintf(dest, 256, "%s %s", name, version);
+    else if(name)
+        snprintf(dest, 256, "%s", name);
+    else if(version)
+        snprintf(dest, 256, "%s", version);
+    else
+        return 1;
+    
+    return 0;
+    #endif
+}
+
+// gets the current BIOS vendor and version
+int bios(char *dest) {
+    #ifdef __APPLE__
+    return 1;
+    #else
+    char *vendor = NULL;
+    char *version = NULL;
+    FILE *fp = NULL;
+    size_t len = 0;
+
+    if((fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r"))) {
+        fseek(fp, 0, SEEK_END);
+        len = ftell(fp);
+        rewind(fp);
+
+        vendor = malloc(len);
+        vendor[fread(vendor, 1, len, fp) - 1] = 0;
+
+        fclose(fp);
+    }
+
+    if((fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r"))) {
+        fseek(fp, 0, SEEK_END);
+        len = ftell(fp);
+        rewind(fp);
+
+        version = malloc(len);
+        version[fread(version, 1, len, fp) - 1] = 0;
+
+        fclose(fp);
+    }
+
+    if(vendor && version)
+        snprintf(dest, 256, "%s %s", vendor, version);
+    else if(vendor)
+        snprintf(dest, 256, "%s", vendor);
+    else if(version)
+        snprintf(dest, 256, "%s", version);
+    else
+        return 1;
+    
+    return 0;
+    #endif
+}
+
+// TODO: cpu
+
+// TODO: gpu
+
+// TODO: memory
+
+// gets the current public ip
+int public_ip(char *dest) {
+    CURL *curl_handle = curl_easy_init();
+    CURLcode res;
+
+    struct MemoryStruct chunk;
+    chunk.memory = malloc(1);
+    chunk.size = 0;
+
+    if(curl_handle) {
+        curl_easy_setopt(curl_handle, CURLOPT_URL, "ident.me");
+        curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+        curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
+        curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+
+        res = curl_easy_perform(curl_handle);
+
+        if(res == CURLE_OK) {
+            strncpy(dest, chunk.memory, 256);
+
+            curl_easy_cleanup(curl_handle);
+            free(chunk.memory);
+
+            return 0;
+        }
+
+        curl_easy_cleanup(curl_handle);
+        free(chunk.memory);
+    }
+    return 1;
+}
+
+// gets all local ips
+int local_ip(char *dest) {
+    struct ifaddrs *addrs=NULL;
+    bool done = false;
+    int buf_size = 256;
+
+    // will be moved to config
+    bool show_localdomain = false;
+    
+    getifaddrs(&addrs);
+
+    while(addrs) {
+       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET && (strcmp(addrs->ifa_name, "lo") || show_localdomain)) {  // checking if the ip is valid
+            struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
+            
+            snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
+            dest += strlen(dest);
+            buf_size -= strlen(dest);
+            done = true;
+        }
+
+        addrs = addrs->ifa_next;
+    }
+
+    freeifaddrs(addrs);
+    if(done)
+        return 0;
+    return 1;
+}
+
+// gets the current working directory
+int pwd(char *dest) {
+    getcwd(dest, 256);
+    return 0;
+}
+
+// gets the current date and time
+int date(char *dest) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    snprintf(dest, 256, "%02d/%02d/%d %02d:%02d:%02d\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    return 0;
+}
+
+// show the terminal color configuration
+int colors(char *dest) {
+    for(int i = 0; i < 8; ++i)
+        sprintf(dest+8*i, "\e[4%dm   ", i);
+
+    strcpy(dest+64, "\e[0m");
+
+    return 0;
+}
+// show the terminal color configuration (light version)
+int light_colors(char *dest) {
+    for(int i = 0; i < 8; ++i)
+        sprintf(dest+9*i, "\e[10%dm   ", i);
+
+    strcpy(dest+72, "\e[0m");
+
+    return 0;
 }
