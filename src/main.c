@@ -20,7 +20,8 @@
  */
 
 Config config = {
-    false,                      // bool print_shell_path
+    true,  // print_shell_path
+    false, // show_localdomain
 };
 
 int main(int argc, char **argv) {
@@ -127,6 +128,9 @@ int main(int argc, char **argv) {
         printf("%s\n", data);
 
     if(!bios(data))
+        printf("%s\n", data);
+
+    if(!gpu(data))
         printf("%s\n", data);
 
     if(!public_ip(data))

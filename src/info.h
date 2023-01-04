@@ -21,6 +21,7 @@
 
 typedef struct {
     bool print_shell_path;
+    bool show_localdomain;
 } Config;
 
 extern Config config;
@@ -46,6 +47,8 @@ int term(char *dest);
 int host(char *dest);
 
 int bios(char *dest);
+
+int gpu(char *dest);
 
 int local_ip(char *dest);
 

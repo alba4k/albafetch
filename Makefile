@@ -10,8 +10,9 @@ PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 ifeq ($(OS),Linux)
 	OBJ := info.o main.o queue.o utils.o
 	INSTALLPATH := /usr/bin
+	INCLUDE := -l curl -l pci
 	ifeq ($(PACMAN),/bin/pacman)
-		INCLUDE := -l alpm -l curl
+		INCLUDE := -l curl -l pci -l alpm
 		ARCH_BASED := -D ARCH_BASED
 	endif
 endif
@@ -19,7 +20,7 @@ endif
 ifeq ($(OS),Darwin)
 	INSTALLPATH := /usr/local/bin
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
-	INCLUDE := -framework Foundation -framework IOKit -l curl
+	INCLUDE := -framework Foundation -framework IOKit -l curl -l pci
 endif
 
 build/$(TARGET): $(OBJ)

@@ -1,11 +1,9 @@
 #include <stdlib.h>
 #include <sys/sysctl.h>
 
-
 /* 
  * Header for BSD standard system-querying 
- * functions (also applicable to macos and
- * possibly linux).
+ * functions (also applicable to macos).
  */
 
 /*

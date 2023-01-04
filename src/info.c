@@ -16,6 +16,7 @@
 #include <arpa/inet.h>  // local ip
 #include <time.h>       // date
 #include <curl/curl.h>  // public ip
+#include <pci/pci.h>    // gpu
 
 #include "info.h"
 #include "queue.h"
@@ -191,15 +192,15 @@ int shell(char *dest) {
             if(shell[0] == '-') // cmdline is "-bash" when login shell
                 memcpy(shell, shell+1, strlen(shell+1)+1);
 
-            snprintf(dest, 256, "%s", config.print_shell_path ? shell : basename(shell));
+            strncpy(dest, config.print_shell_path ? shell : basename(shell), 256);
             fclose(fp);
             return 0;
         }
     #endif
 
-    char *shell =  getenv("SHELL");
+    char *shell = getenv("SHELL");
     if(shell && shell[0]) {
-        snprintf(dest, 256, "%s", shell);
+        strncpy(dest, config.print_shell_path ? shell : basename(shell), 256);
         return 0;
     }
 
@@ -211,7 +212,7 @@ int login_shell(char *dest) {
     char *shell = getenv("SHELL");
 
     if(shell && shell[0]) {
-        snprintf(dest, 256, "%s", shell);
+        strncpy(dest, config.print_shell_path ? shell : basename(shell), 256);
         return 0;
     }
 
@@ -264,7 +265,6 @@ int host(char *dest) {
 
         version = malloc(len);
         version[fread(version, 1, len, fp) - 1] = 0;
-
         fclose(fp);
     }
 
@@ -329,6 +329,91 @@ int bios(char *dest) {
 // TODO: cpu
 
 // TODO: gpu
+int gpu(char *dest) {
+    char *gpu_string = NULL;
+    char *end;
+
+    #ifdef __APPLE
+        struct utsname name;
+        uname(&name);
+
+        if(strcmp(name.machine, "arm64")) {
+            gpu_string = get_gpu_string();
+            if(!gpu_string)
+                return 1;
+        }
+        else{
+            char buf[1024];
+            int pipes[2];
+            pipe(pipes);
+
+            if(!fork()) {
+                dup2(pipes[1], STDOUT_FILENO);
+                close(pipes[0]);
+                close(pipes[1]);
+                execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
+            }
+            close(pipes[1]);
+            wait(NULL);
+            size_t bytes = read(pipes[0], buf, 1024);
+            close(pipes[0]);
+
+            if(bytes < 1) {
+                return 1;
+            }
+
+            gpu_string = strstr(buf, "Chipset Model: ");
+            if(!gpu_string)
+                return 1;
+            gpu_string += 15;
+            char *end = strchr(gpu_string, '\n');
+            if(!end)
+                return 1;
+            *end = 0;
+        }
+
+        char *ptr;
+        if((ptr = strstr(gpu_string, "Intel ")))
+            gpu_string += 6;
+        else if((ptr = strstr(gpu_string, "AMD ")))
+            gpu_string += 4;
+        else if((ptr = strstr(gpu_string, "Apple ")))
+            gpu_string += 6;
+    #else
+        // based on https://github.com/pciutils/pciutils/blob/master/example.c
+
+        char device_class[256], namebuf[256];
+        struct pci_access *pacc;
+        struct pci_dev *dev;
+
+        pacc = pci_alloc();		// get the pci_access structure
+        pci_init(pacc);		// initialize the PCI library
+        pci_scan_bus(pacc);		// we want to get the list of devices
+
+        for (dev=pacc->devices; dev; dev=dev->next)	{ // iterates over all devices
+            pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	// fill in header info
+
+            pci_lookup_name(pacc, device_class, 256, PCI_LOOKUP_CLASS, dev->device_class);
+            if(!strcmp(device_class, "VGA compatible controller") || !strcmp(device_class, "3D controller")) {
+                // look up the full name of the device
+                gpu_string = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
+                break;
+            }
+        }
+
+        pci_cleanup(pacc);  // close everything
+    #endif
+
+    if((end = strstr(gpu_string, " Integrated Graphics Controller")))
+        *end = 0;
+
+    if(gpu_string) {
+        strncpy(dest, gpu_string, 256);
+        return 0;
+    }
+
+    return 1;
+}
 
 // TODO: memory
 
@@ -370,14 +455,11 @@ int local_ip(char *dest) {
     struct ifaddrs *addrs=NULL;
     bool done = false;
     int buf_size = 256;
-
-    // will be moved to config
-    bool show_localdomain = false;
     
     getifaddrs(&addrs);
 
     while(addrs) {
-       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET && (strcmp(addrs->ifa_name, "lo") || show_localdomain)) {  // checking if the ip is valid
+       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET && (strcmp(addrs->ifa_name, "lo") || config.show_localdomain)) {  // checking if the ip is valid
             struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
             
             snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);

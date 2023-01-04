@@ -9,6 +9,7 @@ typedef struct {
     bool print_cpu_brand;
     bool print_gpu_arch;
     bool print_mem_perc;
+    bool print_shell_path;
     bool align_infos;
     char color[33];
     char bold[33];
@@ -38,4 +39,4 @@ typedef struct {
 
 extern Config config;
 
-#endif
+#endif // VARS_H
