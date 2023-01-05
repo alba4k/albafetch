@@ -8,7 +8,7 @@
 #include "bsdwrap.h"
 #include "macos_infos.h"
 #else
-#include <sys/sysinfo.h> // uptime, memory
+#include <sys/sysinfo.h>// uptime, memory
 #include <pci/pci.h>    // gpu
 #endif // __APPLE__
 

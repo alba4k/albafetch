@@ -16,7 +16,7 @@ endif
 ifeq ($(OS),Darwin)
 	INSTALLPATH := /usr/local/bin
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
-	INCLUDE := -framework Foundation -framework IOKit -l curl -l pci
+	INCLUDE := -framework Foundation -framework IOKit -l curl
 endif
 
 build/$(TARGET): $(OBJ)
