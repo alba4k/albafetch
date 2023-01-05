@@ -171,7 +171,7 @@ int kernel(char *dest) {
 // get the current desktop environnment
 int desktop(char *dest) {
     #ifdef __APPLE__
-        strcpy("Aqua", dest);
+        strcpy(dest, "Aqua");
     #else
         char *desktop = getenv("SWAYSOCK") ? "Sway" :
                              (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
