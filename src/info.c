@@ -180,9 +180,10 @@ int desktop(char *dest) {
                              NULL;
         if(!desktop)
             return 1;
+
+        strcpy(dest, desktop);
     #endif
 
-    strcpy(dest, desktop);
     return 0;
 }
 
