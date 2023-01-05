@@ -446,11 +446,11 @@ int host(char *dest) {
         fclose(fp);
     }
 
-    if(name && version) {
+    if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") ) {
         snprintf(dest, 256, "%s %s", name, version);
-    } else if(name) {
+    } else if(name && strcmp(name, "System Product Name") ) {
         strncpy(dest, name, 256);
-    } else if(version) {
+    } else if(version && strcmp(version, "System Version") ) {
         strncpy(dest, version, 256);
     } else
         return 1;
