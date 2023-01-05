@@ -20,8 +20,19 @@
 #endif
 
 typedef struct {
-    bool print_shell_path;
+    bool shell_path;
     bool show_localdomain;
+    bool cpu_brand;
+    bool cpu_freq;
+    bool mem_perc;
+    bool pkg_mgr;
+    bool pkg_pacman;
+    bool pkg_dpkg;
+    bool pkg_rpm;
+    bool pkg_flatpak;
+    bool pkg_snap;
+    bool pkg_pip;
+    bool pkg_brew;
 } Config;
 
 extern Config config;
@@ -44,11 +55,19 @@ int login_shell(char *dest);
 
 int term(char *dest);
 
+int packages(char *dest);
+
 int host(char *dest);
 
 int bios(char *dest);
 
+int cpu(char *dest);
+
 int gpu(char *dest);
+
+int memory(char *dest);
+
+int public_ip(char *dest);
 
 int local_ip(char *dest);
 

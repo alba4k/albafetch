@@ -11,10 +11,6 @@ ifeq ($(OS),Linux)
 	OBJ := info.o main.o queue.o utils.o
 	INSTALLPATH := /usr/bin
 	INCLUDE := -l curl -l pci
-	ifeq ($(PACMAN),/bin/pacman)
-		INCLUDE := -l curl -l pci -l alpm
-		ARCH_BASED := -D ARCH_BASED
-	endif
 endif
 
 ifeq ($(OS),Darwin)
@@ -31,7 +27,7 @@ main.o: src/main.c src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c $(CFLAGS)
 
 info.o: src/info.c src/vars.h src/info.h
-	$(CC) -c src/info.c $(CFLAGS) $(ARCH_BASED)
+	$(CC) -c src/info.c $(CFLAGS)
 
 utils.o: src/utils.c
 	$(CC) -c src/utils.c $(CFLAGS)

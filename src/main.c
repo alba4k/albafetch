@@ -7,7 +7,7 @@
 #include "logos.h"
 #include "queue.h"
 
-#ifndef MAP_ANONYMOUS   // https://github.com/microsoft/vscode-cpptools/issues/4268
+#ifndef MAP_ANONYMOUS   // https://github.com/microsoft/vscode-cpptools/issues/4268 vscode being annoying
 #define MAP_ANONYMOUS 0x20
 #endif
 
@@ -20,8 +20,19 @@
  */
 
 Config config = {
-    true,  // print_shell_path
-    false, // show_localdomain
+    true,   // shell_path
+    true,   // show_localdomain
+    true,   // cpu_brand
+    true,   // cpu_freq
+    true,   // mem_perc
+    true,   // pkg_mgr
+    true,   // pkg_pacman
+    true,   // pkg_dpkg
+    true,   // pkg_rpm
+    true,   // pkg_flatpak
+    true,   // pkg_snap
+    true,   // pkg_pip
+    true,   // pkg_brew
 };
 
 int main(int argc, char **argv) {
@@ -36,7 +47,7 @@ int main(int argc, char **argv) {
 
     bool using_custom_config = false;
 
-    char *memory = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
+    char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     // the config that's normally used is ~/.config/albafetch.conf
@@ -95,7 +106,7 @@ int main(int argc, char **argv) {
     }
 
     // DEBUG FOR SINGLE FUNCTIONS
-    char *data = memory + 1024;
+    char *data = mem + 1024;
 
     if(!user(data))
         printf("%s\n", data);
@@ -124,13 +135,22 @@ int main(int argc, char **argv) {
     if(!term(data))
         printf("%s\n", data);
 
+    if(!packages(data))
+        printf("%s\n", data);
+
     if(!host(data))
         printf("%s\n", data);
 
     if(!bios(data))
         printf("%s\n", data);
 
+    if(!cpu(data))
+        printf("%s\n", data);
+
     if(!gpu(data))
+        printf("%s\n", data);
+
+    if(!memory(data))
         printf("%s\n", data);
 
     if(!public_ip(data))
