@@ -55,6 +55,10 @@ int hostname(char *dest) {
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
+    char *ptr = strstr(hostname, ".local");
+    if(ptr)
+        *ptr = 0;
+
     strncpy(dest, hostname, 256);
 
     return 0;
