@@ -9,6 +9,7 @@
 #include "macos_infos.h"
 #else
 #include <sys/sysinfo.h> // uptime, memory
+#include <pci/pci.h>    // gpu
 #endif // __APPLE__
 
 #include <sys/utsname.h> // uname
@@ -17,7 +18,6 @@
 #include <arpa/inet.h>  // local ip
 #include <time.h>       // date
 #include <curl/curl.h>  // public ip
-#include <pci/pci.h>    // gpu
 #include <dirent.h>     // packages
 
 #include "info.h"
@@ -166,12 +166,10 @@ int kernel(char *dest) {
 
 // get the current desktop environnment
 int desktop(char *dest) {
-    char *desktop;
-
     #ifdef __APPLE__
-        dekstop = "Aqua"
+        strcpy("Aqua", dest);
     #else
-        desktop = getenv("SWAYSOCK") ? "Sway" :
+        char *desktop = getenv("SWAYSOCK") ? "Sway" :
                              (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
                              (desktop = getenv("DESKTOP_SESSION")) ? desktop :
                              getenv("KDE_SESSION_VERSION") ? "KDE" :
@@ -180,12 +178,11 @@ int desktop(char *dest) {
                              getenv("TDE_FULL_SESSION") ? "Trinity" :
                              // !strcmp("linux", getenv("TERM")) ? "none" :      // what happens when running in tty
                              NULL;
-        if(!desktop) {
+        if(!desktop)
             return 1;
-        }
     #endif
 
-    snprintf(dest, 256, "%s", desktop);
+    strcpy(dest, desktop);
     return 0;
 }
 
@@ -351,7 +348,7 @@ int packages(char *dest) {
         }
     #endif
 
-    if(!config.pkg_brew && access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK)) {
+    if(!config.pkg_brew && (access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
         pipe(pipes);
 
         if(!fork()) {
@@ -515,10 +512,11 @@ int cpu(char *dest) {
     char *end;
 
     #ifdef __APPLE__
+    size_t BUF_SIZE = 256;
     sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
     if(!buf[0])
-        return 1
+        return 1;
 
     if(!config.cpu_freq) {
         if((end = strstr(buf, " @")))
@@ -605,7 +603,7 @@ int gpu(char *dest) {
     char *gpu_string = NULL;
     char *end;
 
-    #ifdef __APPLE
+    #ifdef __APPLE__
         struct utsname name;
         uname(&name);
 
