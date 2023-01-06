@@ -285,8 +285,10 @@ int packages(char *dest) {
             count = 0;
             // this will be wrong if some package does not have "\nInstalled-Size: "
             // or if some package (for some reason) has it in the package description
-            while(strstr(dpkg_list, "\nInstalled-Size: "))
+            while((dpkg_list = strstr(dpkg_list, "\nInstalled-Size: "))) {
                 ++count;
+                ++dpkg_list;
+            }
             free(dpkg_list);
 
             if(count) {
@@ -517,27 +519,27 @@ int cpu(char *dest) {
     char *end;
 
     #ifdef __APPLE__
-    size_t BUF_SIZE = 256;
-    sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
+        size_t BUF_SIZE = 256;
+        sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
-    if(!buf[0])
-        return 1;
+        if(!buf[0])
+            return 1;
 
-    if(!config.cpu_freq) {
-        if((end = strstr(buf, " @")))
-            *end = 0;
-    }
+        if(!config.cpu_freq)
+            if((end = strstr(buf, " @")))
+                *end = 0;
+            else if((end = strchr(buf, '@')))
+                *end = 0;
     #else
     FILE *fp = fopen("/proc/cpuinfo", "r");
-    if(!fp) {
+    if(!fp)
         return 1;
-    }
 
     read_after_sequence(fp, "model name", buf, 256);
     fclose(fp);
-    if(!(buf[0])) {
+    if(!(buf[0]))
         return 1;
-    }
+        
     cpu_info += 2;
 
     if((end = strstr(cpu_info, " @"))) {
@@ -581,7 +583,7 @@ int cpu(char *dest) {
         memmove(end, end+4, strlen(end+4)+1);
     if((end = strstr(cpu_info, "th Gen ")))
         memmove(end-2, end+7, strlen(end+7)+1);
-    if((end = strstr(cpu_info, "with Radeon Graphics")))
+    if((end = strstr(cpu_info, " with Radeon Graphics")))
         *end = 0;
     if((end = strstr(cpu_info, "-Core Processor"))) {
         end -= 4;
