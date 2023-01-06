@@ -616,11 +616,9 @@ int gpu(char *dest) {
         struct utsname name;
         uname(&name);
 
-        if(strcmp(name.machine, "arm64")) {
-            gpu_string = get_gpu_string();
-            if(!gpu_string)
-                return 1;
-        } else {
+        if(!strcmp(name.machine, "x86_64"))
+            gpu_string = get_gpu_string();  // only works on x64
+        if(!gpu_string || strcmp(name.machine, "x86_64")) {     // fallback
             char buf[1024];
             int pipes[2];
             pipe(pipes);
