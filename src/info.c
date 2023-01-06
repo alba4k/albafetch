@@ -513,7 +513,7 @@ int bios(char *dest) {
 // get the cpu name and frequency
 int cpu(char *dest) {
     char buf[256] = "";
-    char *cpu_info;
+    char *cpu_info = buf;
     char *end;
 
     #ifdef __APPLE__
@@ -538,7 +538,7 @@ int cpu(char *dest) {
     if(!(buf[0])) {
         return 1;
     }
-    cpu_info = buf + 2;
+    cpu_info += 2;
 
     if((end = strstr(cpu_info, " @"))) {
         *end = 0;
@@ -581,6 +581,8 @@ int cpu(char *dest) {
         memmove(end, end+4, strlen(end+4)+1);
     if((end = strstr(cpu_info, "th Gen ")))
         memmove(end-2, end+7, strlen(end+7)+1);
+    if((end = strstr(cpu_info, "with Radeon Graphics")))
+        *end = 0;
     if((end = strstr(cpu_info, "-Core Processor"))) {
         end -= 4;
         end = strchr(end, ' ');
