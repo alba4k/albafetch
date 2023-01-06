@@ -653,14 +653,13 @@ int gpu(char *dest) {
         // based on https://github.com/pciutils/pciutils/blob/master/example.c
 
         char device_class[256], namebuf[256];
-        struct pci_access *pacc;
         struct pci_dev *dev;
+        struct pci_access *pacc = pci_alloc();		// get the pci_access structure;
 
-        pacc = pci_alloc();		// get the pci_access structure
         pci_init(pacc);		// initialize the PCI library
         pci_scan_bus(pacc);		// we want to get the list of devices
 
-        for (dev=pacc->devices; dev; dev=dev->next)	{ // iterates over all devices
+        for(dev=pacc->devices; dev; dev=dev->next)	{ // iterates over all devices
             pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	// fill in header info
 
             pci_lookup_name(pacc, device_class, 256, PCI_LOOKUP_CLASS, dev->device_class);
@@ -674,6 +673,10 @@ int gpu(char *dest) {
         pci_cleanup(pacc);  // close everything
     #endif
 
+    if(!gpu_string)
+        return 1;
+
+
     if((end = strstr(gpu_string, "Intel ")))
         gpu_string += 6;
     else if((end = strstr(gpu_string, "AMD ")))
@@ -684,12 +687,8 @@ int gpu(char *dest) {
     if((end = strstr(gpu_string, " Integrated Graphics Controller")))
         *end = 0;
 
-    if(gpu_string) {
-        strncpy(dest, gpu_string, 256);
-        return 0;
-    }
-
-    return 1;
+    strncpy(dest, gpu_string, 256);
+    return 0;
 }
 
 // get used and total memory
