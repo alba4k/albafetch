@@ -9,6 +9,7 @@ void unescape(char *str);
 
 int max(const int *nums, unsigned const int lenght);
 
+// needed for 
 struct MemoryStruct {
   char *memory;
   size_t size;

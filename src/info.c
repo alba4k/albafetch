@@ -33,6 +33,22 @@
 #endif
 #endif
 
+int separator(char *dest) {
+    // I'm considering 4 characters less of what actually got printed because of the "\e[0m"
+    size_t len = strlen(dest) - (config.align ? 0 : 4);
+
+    if(len > 255 || len == 0)   // was probably uninitialized
+        return 1;
+    
+    dest[0] = 0;
+
+    for(size_t i = 0; i < len; ++i) {
+        strcat(dest, "-");
+    }
+
+    return 0;
+}
+
 // print the current user
 int user(char *dest) {
     struct passwd *pw;
@@ -45,7 +61,7 @@ int user(char *dest) {
 
     pw = getpwuid(uid);
 
-    strncpy(dest, pw->pw_name, LOGIN_NAME_MAX);
+    strncpy(dest, pw->pw_name, 255);
 
     return 0;
 }
@@ -60,6 +76,24 @@ int hostname(char *dest) {
         *ptr = 0;
 
     strncpy(dest, hostname, 256);
+
+    return 0;
+}
+
+// print a title formatted as name@host
+int title(char *dest) {
+    char name[256];
+    char host[256];
+
+    if(user(name) || hostname(host))
+        return 1;
+
+    if(strlen(name) + strlen(host) > 254)
+        return 1;
+
+    // not checking the lenght because of compiler
+    // warnings and since it has already been checked
+    sprintf(dest, "%s@%s", name, host);
 
     return 0;
 }
@@ -95,15 +129,15 @@ int uptime(char *dest) {
     char str[24] = "";
 
     if(days) {
-        snprintf(str, 24, "%ldd ", days);     // print the number of days passed if more than 0
+        snprintf(str, 24, "%ldd%c", days, hours || mins ? ' ' : 0);     // print the number of days passed if more than 0
         strcat(result, str);
     }
     if(hours) {
-        snprintf(str, 24, "%dh ", hours);      // print the number of days passed if more than 0
+        snprintf(str, 24, "%dh%c", hours, mins ? ' ' : 0);      // print the number of days passed if more than 0
         strcat(result, str);
     }
     if(mins) {
-        snprintf(str, 24, "%dm ", mins);       // print the number of minutes passed if more than 0
+        snprintf(str, 24, "%dm", mins);       // print the number of minutes passed if more than 0
         strcat(result, str);
     }
     else if(uptime < 60) {
@@ -249,7 +283,7 @@ int term(char *dest) {
 // TODO: packages (pacman - dpkg - flatpak - snap - rpm)
 int packages(char *dest) {
     dest[0] = 0;
-    char buf[256], str[64];
+    char buf[256] = "", str[64];
     DIR *dir;
     struct dirent *entry;
     unsigned count = 0;
@@ -448,13 +482,13 @@ int host(char *dest) {
         fclose(fp);
     }
 
-    if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") ) {
+    if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") )
         snprintf(dest, 256, "%s %s", name, version);
-    } else if(name && strcmp(name, "System Product Name") ) {
+    else if(name && strcmp(name, "System Product Name"))
         strncpy(dest, name, 256);
-    } else if(version && strcmp(version, "System Version") ) {
+    else if(version && strcmp(version, "System Version"))
         strncpy(dest, version, 256);
-    } else
+    else
         return 1;
 
     free(name);
@@ -496,13 +530,13 @@ int bios(char *dest) {
         fclose(fp);
     }
 
-    if(vendor && version) {
+    if(vendor && version)
         snprintf(dest, 256, "%s %s", vendor, version);
-    } else if(vendor) {
+    else if(vendor)
         strncpy(dest, vendor, 256);
-    } else if(version) {
+    else if(version)
         strncpy(dest, version, 256);
-    } else
+    else
         return 1;
 
     free(vendor);
@@ -542,15 +576,13 @@ int cpu(char *dest) {
         
     cpu_info += 2;
 
-    if((end = strstr(cpu_info, " @"))) {
+    if((end = strstr(cpu_info, " @")))
         *end = 0;
-    }
-
-    if(!end) {
+    else {
         end = strchr(cpu_info, '\n');
-        if(!end) { 
+        if(!end)
             return 1;
-        }
+            
         *end = 0;
     }
 
@@ -684,6 +716,14 @@ int gpu(char *dest) {
 
     if((end = strstr(gpu_string, " Integrated Graphics Controller")))
         *end = 0;
+
+    if((end = strchr(gpu_string, '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
+        char *ptr = strchr(end, ']');
+        if(ptr) {
+            gpu_string = end;
+            *ptr = 0;
+        }
+    }
 
     strncpy(dest, gpu_string, 256);
     return 0;

@@ -42,7 +42,7 @@ queue.o: src/queue.c
 	$(CC) -c src/queue.c $(CFLAGS)
 
 macos_gpu_string.o: src/macos_gpu_string.m
-	$(CC) -c src/macos_gpu_string.m $(INCLUDE) $(CFLAGS)
+	$(CC) -c src/macos_gpu_string.m $(CFLAGS)
 
 run: build/$(TARGET)
 	build/$(TARGET)

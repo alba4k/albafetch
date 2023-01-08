@@ -31,9 +31,9 @@ char *get_gpu_string() {
                 
                 result = [modelName cStringUsingEncoding:NSUTF8StringEncoding];
             }
-        } else {
-            return NULL;
         }
+        else
+            return NULL;
 
         CFRelease(services);
         IOObjectRelease(entry);

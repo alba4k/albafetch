@@ -19,7 +19,8 @@
  * more config options (e.g. complete login shell path)
  */
 
-Config config = {
+// various configurations for stuff
+struct Config config = {
     true,   // shell_path
     true,   // show_localdomain
     true,   // cpu_brand
@@ -31,11 +32,45 @@ Config config = {
     true,   // pkg_rpm
     true,   // pkg_flatpak
     true,   // pkg_snap
-    true,   // pkg_pip
+    false,  // pkg_pip
     true,   // pkg_brew
+
+    false,  // align
 };
 
 int main(int argc, char **argv) {
+    // using a linked list for this is horrible, but here we go
+    struct Info infos[64] = {
+    //  {"Label", fptr, next}
+        {NULL, NULL, infos+3},              // 00
+        {"User", user, NULL},               // 01
+        {"Hostname", hostname, NULL},       // 02
+        {"", title, infos+23},              // 03
+        {"Uptime", uptime, infos+24},       // 04
+        {"OS", os, infos+6},                // 05
+        {"Kernel", kernel, infos+7},        // 06
+        {"Desktop", desktop, infos+8},      // 07
+        {"Shell", shell, infos+10},         // 08
+        {"Login", login_shell, NULL},       // 09
+        {"Terminal", term, infos+11},       // 10
+        {"Packages", packages, infos+25},   // 11
+        {"Host", host, infos+14},           // 12
+        {"BIOS", bios, NULL},               // 13
+        {"CPU", cpu, infos+15},             // 14
+        {"GPU", gpu, infos+16},             // 15
+        {"Memory", memory, infos+26},       // 16
+        {"Public IP", public_ip, NULL},     // 17
+        {"Local IP", local_ip, NULL},       // 18
+        {"Directory", pwd, NULL},           // 19
+        {"Date", date, NULL},               // 20
+        {"", colors, infos+22},             // 21
+        {"", light_colors, NULL},           // 22
+        {"", separator, infos+4},           // 23
+        {"", separator, infos+5},           // 24
+        {"", separator, infos+12},          // 25
+        {"", separator, infos+21},          // 26
+    };
+
     bool user_is_an_idiot = false; // rtfm and stfu
 
     // are the following command line args used?
@@ -51,7 +86,7 @@ int main(int argc, char **argv) {
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 
     // the config that's normally used is ~/.config/albafetch.conf
-    char config_file[LOGIN_NAME_MAX + 33] = "";
+    char config_file[LOGIN_NAME_MAX + 32] = "";
 
     char *home = getenv("HOME");
     // I really hope this part will never need to run
@@ -105,6 +140,20 @@ int main(int argc, char **argv) {
             snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
     }
 
+    if(asking_align) {
+        if(argc > asking_align) {
+            if(!strcmp(argv[asking_align], "on"))
+                config.align = true;
+            else if(!strcmp(argv[asking_align], "off"))
+                config.align = false;
+        }
+        else {
+            // TODO: error message or warning
+            return 1;
+        }
+    }
+
+/*
     // DEBUG FOR SINGLE FUNCTIONS
     char *data = mem + 1024;
 
@@ -172,6 +221,48 @@ int main(int argc, char **argv) {
         printf("%s\n", data);
 
     // END
+*/
+
+    // I am deeply sorry for the code you're about to see - I hope you like spaghettis
+    char *data = mem + 1024;
+    char *printed = mem+512;
+    char format[32] = "%s\e[0m%s";
+
+    if(config.align) {
+        int nums[64];
+        int i = 0;
+        for(struct Info *current = (infos)->next; current; current = current->next) {
+            nums[i] = strlen(current->label);
+            ++i;
+        }
+
+        asking_align = max(nums, i) + strlen(": ");
+
+        snprintf(format, 32, "%%-%ds\e[0m%%s", asking_align);
+    }
+
+    for(struct Info *current = infos->next; current; current = current->next) {
+        if(current->func == separator && config.align) {    // the separators should not get aligned
+            for(int i = 0; i < asking_align; ++i)           // the separators should cover the aligment gap
+                strcat(data, "#");
+                
+            separator(data);
+            printf("%s\n", data);
+        }
+        else if(!((current->func)(data))) {
+            size_t len = strlen(current->label) + strlen(": ");
+            char label[len];
+
+            strcpy(label, current->label);
+            if(current->label[0])
+                strcat(label, ": ");
+
+            snprintf(printed, 512, format, label, data);
+            if(!config.align)
+                strncpy(data, printed, 256);
+            printf("%s\n", printed);
+        }
+    }
 
     return 0;
 }

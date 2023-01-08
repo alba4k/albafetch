@@ -19,7 +19,7 @@
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
 
-typedef struct {
+struct Config {
     bool shell_path;
     bool show_localdomain;
     bool cpu_brand;
@@ -33,13 +33,25 @@ typedef struct {
     bool pkg_snap;
     bool pkg_pip;
     bool pkg_brew;
-} Config;
 
-extern Config config;
+    bool align;
+};
+
+extern struct Config config;
+
+struct Info {
+    char *label;            // module label
+    int (*func)(char *);    // pointer to the function that gets the info
+    struct Info *next;      // next module
+};
+
+int separator(char *dest);
 
 int user(char *dest);
 
 int hostname(char *dest);
+
+int title(char *dest);
 
 int uptime(char *dest);
 
