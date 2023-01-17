@@ -297,8 +297,11 @@ int packages(char *dest) {
 
     #ifndef __APPLE__   // package managers that won't run on macOS
         FILE *fp;
+        char path[256] = "";
 
-        if(config.pkg_pacman && (dir = opendir("/var/lib/pacman/local"))) {
+        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        strncat(path, "/var/lib/pacman/local", 256-strlen(path));
+        if(config.pkg_pacman && (dir = opendir(path))) {
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
                     ++count;
@@ -311,7 +314,9 @@ int packages(char *dest) {
             closedir(dir);
         }
 
-        if(config.pkg_dpkg && (fp = fopen("/var/lib/dpkg/status", "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
+        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
+        if(config.pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
             fseek(fp, 0, SEEK_END);
             size_t len = ftell(fp);
             rewind(fp);
@@ -336,7 +341,9 @@ int packages(char *dest) {
             }
         }
 
-        if(config.pkg_rpm && !access("/bin/rpm", F_OK)) {
+        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        strncat(path, "/bin/rpm", 256-strlen(path));
+        if(config.pkg_rpm && !access(path, F_OK)) {
             pipe(pipes);
 
             if(!fork()) {
@@ -357,7 +364,9 @@ int packages(char *dest) {
             }
         }
 
-        if(config.pkg_flatpak && (dir = opendir("/var/lib/flatpak/runtime"))) {
+        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
+        if(config.pkg_flatpak && (dir = opendir(path))) {
             count = 0;
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
@@ -371,7 +380,9 @@ int packages(char *dest) {
             closedir(dir);
         }
 
-        if(config.pkg_snap && !access("/bin/snap", F_OK)) {
+        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        strncat(path, "/bin/snap", 256-strlen(path));
+        if(config.pkg_snap && !access(path, F_OK)) {
             pipe(pipes);
 
             if(!fork()) {
@@ -393,7 +404,6 @@ int packages(char *dest) {
             }
         }
     #endif
-
     if(!config.pkg_brew && (access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
         pipe(pipes);
 
@@ -426,7 +436,10 @@ int packages(char *dest) {
         }
     }
 
-    if(config.pkg_pip && !access("/bin/pip", F_OK)) {
+
+    getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+    strncat(path, "/bin/pip", 256-strlen(path));
+    if(config.pkg_pip && !access(path, F_OK)) {
         pipe(pipes);
 
         if(!fork()) {
