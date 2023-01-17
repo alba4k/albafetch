@@ -4,16 +4,23 @@ CC := gcc
 CFLAGS := -Wall -Wextra -Ofast
 TARGET := albafetch
 
-OS := $(shell uname -s 2> /dev/null)
+KERNEL := $(shell uname -s 2> /dev/null)
+OS := $(shell uname -o 2> /dev/null)
 PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
-ifeq ($(OS),Linux)
+ifeq ($(OS),GNU/Linux)
 	OBJ := info.o main.o queue.o utils.o
 	INSTALLPATH := /usr/bin
 	INCLUDE := -l curl -l pci
 endif
 
-ifeq ($(OS),Darwin)
+ifeq ($(OS),Android)
+	OBJ := info.o main.o queue.o utils.o
+	INSTALLPATH := $(PREFIX)/bin
+	INCLUDE := -l curl
+endif
+
+ifeq ($(KERNEL),Darwin)
 	INSTALLPATH := /usr/local/bin
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
 	INCLUDE := -framework Foundation -framework IOKit -l curl
@@ -46,6 +53,12 @@ macos_gpu_string.o: src/macos_gpu_string.m
 
 run: build/$(TARGET)
 	build/$(TARGET)
+
+debug:
+	mkdir -p build/
+	$(CC) src/main.c src/info.c src/queue.c src/utils.c $(CFLAGS) $(INCLUDE) -D_DEBUG -o build/debug
+
+	build/debug
 
 install: build/$(TARGET)
 	cp -f build/$(TARGET) $(DESTDIR)$(INSTALLPATH)/$(TARGET)

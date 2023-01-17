@@ -9,7 +9,9 @@
 #include "macos_infos.h"
 #else
 #include <sys/sysinfo.h>// uptime, memory
+#ifndef __ANDROID__
 #include <pci/pci.h>    // gpu
+#endif // __linux__
 #endif // __APPLE__
 
 #include <sys/utsname.h> // uname
@@ -157,7 +159,9 @@ int os(char *dest) {
 
     #ifdef __APPLE__
         snprintf(dest, 256, "macOS %s", name.machine);
-        return 0;
+    #else
+    #ifdef __ANDROID__
+        snprintf(dest, 256, "Android %s", name.machine);
     #else
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
@@ -187,9 +191,10 @@ int os(char *dest) {
             *end = 0;
 
         snprintf(dest, 256, "%s %s", os_name, name.machine);
-
-        return 0;
+    #endif // __ANDROID__
     #endif // __APPLE__
+
+    return 0;
 }
 
 // print the running kernel version (uname -r)
@@ -680,6 +685,9 @@ int gpu(char *dest) {
             *end = 0;
         }
     #else
+    #ifdef __ANDROID__
+        return 1;
+    #else
         // based on https://github.com/pciutils/pciutils/blob/master/example.c
 
         char device_class[256], namebuf[256];
@@ -701,7 +709,8 @@ int gpu(char *dest) {
         }
 
         pci_cleanup(pacc);  // close everything
-    #endif
+    #endif // __ANDROID__
+    #endif // __APPLE__
 
     if(!gpu_string)
         return 1;

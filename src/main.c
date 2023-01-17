@@ -153,7 +153,8 @@ int main(int argc, char **argv) {
         }
     }
 
-/*
+
+#ifdef _DEBUG
     // DEBUG FOR SINGLE FUNCTIONS
     char *data = mem + 1024;
 
@@ -221,7 +222,8 @@ int main(int argc, char **argv) {
         printf("%s\n", data);
 
     // END
-*/
+    return 0;
+#else
 
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis
     char *data = mem + 1024;
@@ -263,6 +265,7 @@ int main(int argc, char **argv) {
             printf("%s\n", printed);
         }
     }
+#endif // _DEBUG
 
     return 0;
 }
