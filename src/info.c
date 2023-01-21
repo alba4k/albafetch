@@ -161,7 +161,23 @@ int os(char *dest) {
         snprintf(dest, 256, "macOS %s", name.machine);
     #else
     #ifdef __ANDROID__
-        snprintf(dest, 256, "Android %s", name.machine);
+        int pipes[2];
+        char version[16];
+
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("getprop", "getprop", "ro.build.version.release", NULL); 
+        }
+
+        wait(0);
+        close(pipes[1]);
+        version[read(pipes[0], version, 16) - 1] = 0;
+        close(pipes[0]);
+
+        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", name.machine);
     #else
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
@@ -288,7 +304,7 @@ int term(char *dest) {
 // TODO: packages (pacman - dpkg - flatpak - snap - rpm)
 int packages(char *dest) {
     dest[0] = 0;
-    char buf[256] = "", str[64];
+    char buf[256] = "", str[64], path[256];
     DIR *dir;
     struct dirent *entry;
     unsigned count = 0;
@@ -297,9 +313,10 @@ int packages(char *dest) {
 
     #ifndef __APPLE__   // package managers that won't run on macOS
         FILE *fp;
-        char path[256] = "";
 
-        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/pacman/local", 256-strlen(path));
         if(config.pkg_pacman && (dir = opendir(path))) {
             while((entry = readdir(dir)) != NULL)
@@ -314,7 +331,9 @@ int packages(char *dest) {
             closedir(dir);
         }
 
-        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
         if(config.pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
             fseek(fp, 0, SEEK_END);
@@ -341,7 +360,9 @@ int packages(char *dest) {
             }
         }
 
-        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/rpm", 256-strlen(path));
         if(config.pkg_rpm && !access(path, F_OK)) {
             pipe(pipes);
@@ -364,7 +385,9 @@ int packages(char *dest) {
             }
         }
 
-        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
         if(config.pkg_flatpak && (dir = opendir(path))) {
             count = 0;
@@ -380,7 +403,9 @@ int packages(char *dest) {
             closedir(dir);
         }
 
-        getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/snap", 256-strlen(path));
         if(config.pkg_snap && !access(path, F_OK)) {
             pipe(pipes);
@@ -437,7 +462,9 @@ int packages(char *dest) {
     }
 
 
-    getenv("PREFIX") ? strncpy(path, getenv("PREFIX"), 256) : 1;
+    path[0] = 0;
+    if(getenv("PREFIX"))
+        strncpy(path, getenv("PREFIX"), 255);
     strncat(path, "/bin/pip", 256-strlen(path));
     if(config.pkg_pip && !access(path, F_OK)) {
         pipe(pipes);
@@ -471,50 +498,83 @@ int host(char *dest) {
     #ifdef __APPLE__
         size_t BUF_SIZE = 256;
         sysctlbyname("hw.model", dest, &BUF_SIZE, NULL, 0);
-        return 0;
     #else
-        
-    char *name = NULL, *version = NULL;
-    FILE *fp = NULL;
-    size_t len = 0;
+    #ifdef __ANDROID__
+        int pipes[2];
+        char brand[64], model[64];
 
-    if((fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r"))) {
-        fseek(fp, 0, SEEK_END);
-        len = ftell(fp);
-        rewind(fp);
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
 
-        name = malloc(len);
-        name[fread(name, 1, len, fp) - 1] = 0;
+            execlp("getprop", "getprop", "ro.product.brand", NULL); 
+        }
 
-        fclose(fp);
-    }
+        wait(0);
+        close(pipes[1]);
+        brand[read(pipes[0], brand, 64) - 1] = 0;
+        close(pipes[0]);
 
-    if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
-        fseek(fp, 0, SEEK_END);
-        len = ftell(fp);
-        rewind(fp);
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
 
-        version = malloc(len);
-        version[fread(version, 1, len, fp) - 1] = 0;
+            execlp("getprop", "getprop", "ro.product.model", NULL); 
+        }
 
-        fclose(fp);
-    }
+        wait(0);
+        close(pipes[1]);
+        model[read(pipes[0], model, 64) - 1] = 0;
+        close(pipes[0]);
 
-    if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") )
-        snprintf(dest, 256, "%s %s", name, version);
-    else if(name && strcmp(name, "System Product Name"))
-        strncpy(dest, name, 256);
-    else if(version && strcmp(version, "System Version"))
-        strncpy(dest, version, 256);
-    else
-        return 1;
+        if(!(brand[0] || model[0]))
+            return 1;
 
-    free(name);
-    free(version);
-    
-    
+        snprintf(dest, 256, "%s%s%s", brand, brand[0] ? " ": "", model);
+    #else
+        char *name = NULL, *version = NULL;
+        FILE *fp = NULL;
+        size_t len = 0;
+
+        if((fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r"))) {
+            fseek(fp, 0, SEEK_END);
+            len = ftell(fp);
+            rewind(fp);
+
+            name = malloc(len);
+            name[fread(name, 1, len, fp) - 1] = 0;
+
+            fclose(fp);
+        }
+
+        if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
+            fseek(fp, 0, SEEK_END);
+            len = ftell(fp);
+            rewind(fp);
+
+            version = malloc(len);
+            version[fread(version, 1, len, fp) - 1] = 0;
+
+            fclose(fp);
+        }
+
+        if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") )
+            snprintf(dest, 256, "%s %s", name, version);
+        else if(name && strcmp(name, "System Product Name"))
+            strncpy(dest, name, 256);
+        else if(version && strcmp(version, "System Version"))
+            strncpy(dest, version, 256);
+        else
+            return 1;
+
+        free(name);
+        free(version);
+    #endif // __ANDROID__
+    #endif // __APPLE__
+
     return 0;
-    #endif
 }
 
 // gets the current BIOS vendor and version (Linux only!)
