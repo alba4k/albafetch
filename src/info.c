@@ -626,12 +626,14 @@ int bios(char *dest) {
 
 // get the cpu name and frequency
 int cpu(char *dest) {
-    char buf[256] = "";
-    char *cpu_info = buf;
+    char *cpu_info;
     char *end;
+    int count = 0;
+    char freq[24] = "";
 
     #ifdef __APPLE__
         size_t BUF_SIZE = 256;
+        char buf[BUF_SIZE] = "";
         sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
         if(!buf[0])
@@ -642,17 +644,33 @@ int cpu(char *dest) {
                 *end = 0;
             else if((end = strchr(buf, '@')))
                 *end = 0;
+
+        cpu_info = buf;
     #else
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(!fp)
         return 1;
 
-    read_after_sequence(fp, "model name", buf, 256);
+    char *buf = malloc(0x10001);
+    buf[fread(buf, 1, 0x10000, fp)] = 0;
     fclose(fp);
-    if(!(buf[0]))
+
+    cpu_info = buf;
+    if(config.cpu_count) {
+        end = cpu_info;
+        while((end = strstr(end, "processor"))) {
+            count += 1;
+            end += 1;
+        }
+    }
+
+    cpu_info = strstr(cpu_info, "model name");
+    if(!cpu_info) {
         return 1;
-        
-    cpu_info += 2;
+        free(cpu_info);
+    }
+
+    cpu_info += 13;
 
     // I have no clue why valgrind complains about this part
     end = strstr(cpu_info, " @");
@@ -660,15 +678,17 @@ int cpu(char *dest) {
         *end = 0;
     else {
         end = strchr(cpu_info, '\n');
-        if(!end)
+        if(!end) {
             return 1;
+            free(cpu_info);
+        }
             
         *end = 0;
     }
 
     // Printing the clock frequency the first thread is currently running at
-    char freq[24], *cpu_freq = strstr(end, "cpu MHz");
     end += 1;
+    char *cpu_freq = strstr(end, "cpu MHz");
     if(cpu_freq && config.cpu_freq) {
         cpu_freq = strchr(cpu_freq, ':');
         if(cpu_freq) {
@@ -679,7 +699,6 @@ int cpu(char *dest) {
                 *end = 0;
 
                 snprintf(freq, 24, " @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
-                strcat(cpu_info, freq);
             }
         }
     }
@@ -712,6 +731,22 @@ int cpu(char *dest) {
     }
 
     strncpy(dest, cpu_info, 256);
+    #ifdef __linux__
+        free(buf);
+    #endif
+
+    if(count && config.cpu_count) {
+        char core_count[16];
+        snprintf(core_count, 16, " (%d) ", count);
+        strncat(dest, core_count, 255-strlen(dest));
+    }
+
+    if(freq[0])
+        strncat(dest, freq, 255-strlen(dest));
+
+    // final cleanup ("Intel Core i5         650" lol)
+    while((end = strstr(dest, "  ")))
+        memmove(end, end+1, strlen(end+1)+1);
 
     return 0;
 }
@@ -787,13 +822,14 @@ int gpu(char *dest) {
     if(!gpu_string)
         return 1;
 
-
-    if((end = strstr(gpu_string, "Intel ")))
-        gpu_string += 6;
-    else if((end = strstr(gpu_string, "AMD ")))
-        gpu_string += 4;
-    else if((end = strstr(gpu_string, "Apple ")))
-        gpu_string += 6;
+    if(!config.gpu_brand) {
+        if((end = strstr(gpu_string, "Intel ")))
+            gpu_string += 6;
+        else if((end = strstr(gpu_string, "AMD ")))
+            gpu_string += 4;
+        else if((end = strstr(gpu_string, "Apple ")))
+            gpu_string += 6;
+    }
 
     if((end = strstr(gpu_string, " Integrated Graphics Controller")))
         *end = 0;
@@ -917,7 +953,7 @@ int local_ip(char *dest) {
     getifaddrs(&addrs);
 
     while(addrs) {
-       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET && (strcmp(addrs->ifa_name, "lo") || config.show_localdomain)) {  // checking if the ip is valid
+       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET && (strcmp(addrs->ifa_name, "lo") || config.loc_localdomain)) {  // checking if the ip is valid
             struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
             
             snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);

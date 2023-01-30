@@ -24,6 +24,8 @@ struct Config {
     bool shell_path;
     bool cpu_brand;
     bool cpu_freq;
+    bool cpu_count;
+    bool gpu_brand;
     bool mem_perc;
     bool pkg_mgr;
     bool pkg_pacman;
@@ -33,7 +35,7 @@ struct Config {
     bool pkg_snap;
     bool pkg_pip;
     bool pkg_brew;
-    bool show_localdomain;
+    bool loc_localdomain;
 
     bool align;
 };

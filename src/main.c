@@ -25,6 +25,8 @@ struct Config config = {
     false,  // shell_path
     true,   // cpu_brand
     true,   // cpu_freq
+    true,   // cpu_count
+    false,  // gpu_brand
     true,   // mem_perc
     true,   // pkg_mgr
     true,   // pkg_pacman
@@ -34,7 +36,7 @@ struct Config config = {
     true,   // pkg_snap
     false,  // pkg_pip
     true,   // pkg_brew
-    true,   // show_localdomain
+    true,   // loc_localdomain
 
     false,  // align
 };
@@ -158,6 +160,25 @@ int main(int argc, char **argv) {
 #ifdef _DEBUG
     // DEBUG FOR SINGLE FUNCTIONS
     char *data = mem + 1024;
+
+    // Is there a smarter way to do this? Probably, but I'm too lazy
+    // Feel free to let me know or just open a PR if you know one <3
+    config.os_arch = 1;
+    config.shell_path = 1;
+    config.cpu_brand = 1;
+    config.cpu_freq = 1;
+    config.cpu_count = 1;
+    config.gpu_brand = 1;
+    config.mem_perc = 1;
+    config.pkg_mgr = 1;
+    config.pkg_pacman = 1;
+    config.pkg_dpkg = 1;
+    config.pkg_rpm = 1;
+    config.pkg_flatpak = 1;
+    config.pkg_snap = 1;
+    config.pkg_pip = 1;
+    config.pkg_brew = 1;
+    config.loc_localdomain = 1;
 
     int (*arr[])(char *) = {
         user,
