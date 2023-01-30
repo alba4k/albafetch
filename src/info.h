@@ -20,8 +20,8 @@
 #endif
 
 struct Config {
+    bool os_arch;
     bool shell_path;
-    bool show_localdomain;
     bool cpu_brand;
     bool cpu_freq;
     bool mem_perc;
@@ -33,6 +33,7 @@ struct Config {
     bool pkg_snap;
     bool pkg_pip;
     bool pkg_brew;
+    bool show_localdomain;
 
     bool align;
 };

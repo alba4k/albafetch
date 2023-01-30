@@ -158,7 +158,7 @@ int os(char *dest) {
     uname(&name);
 
     #ifdef __APPLE__
-        snprintf(dest, 256, "macOS %s", name.machine);
+        snprintf(dest, 256, "macOS %s", config.os_arch ? name.machine : "");
     #else
     #ifdef __ANDROID__
         int pipes[2];
@@ -177,7 +177,7 @@ int os(char *dest) {
         version[read(pipes[0], version, 16) - 1] = 0;
         close(pipes[0]);
 
-        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", name.machine);
+        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", config.os_arch ? name.machine : "");
     #else
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
@@ -206,7 +206,7 @@ int os(char *dest) {
         else if((end = strchr(os_name, '\'')))
             *end = 0;
 
-        snprintf(dest, 256, "%s %s", os_name, name.machine);
+        snprintf(dest, 256, "%s %s", os_name, config.os_arch ? name.machine : "");
     #endif // __ANDROID__
     #endif // __APPLE__
 
@@ -654,7 +654,9 @@ int cpu(char *dest) {
         
     cpu_info += 2;
 
-    if((end = strstr(cpu_info, " @")))
+    // I have no clue why valgrind complains about this part
+    end = strstr(cpu_info, " @");
+    if(end)
         *end = 0;
     else {
         end = strchr(cpu_info, '\n');
@@ -665,10 +667,9 @@ int cpu(char *dest) {
     }
 
     // Printing the clock frequency the first thread is currently running at
-    char *cpu_freq, freq[24];
+    char freq[24], *cpu_freq = strstr(end, "cpu MHz");
     end += 1;
-    if((cpu_freq = strstr(end, "cpu MHz")) && config.cpu_freq) {
-
+    if(cpu_freq && config.cpu_freq) {
         cpu_freq = strchr(cpu_freq, ':');
         if(cpu_freq) {
             cpu_freq += 2;
@@ -704,10 +705,8 @@ int cpu(char *dest) {
     if(!config.cpu_brand) {
         if((end = strstr(cpu_info, "Intel Core ")))
             memmove(end, end+11, strlen(end+1));
-        #ifdef __APPLE
         else if((end = strstr(cpu_info, "Apple ")))
             memmove(end, end+6, strlen(end+6)+1);
-        #endif
         else if((end = strstr(cpu_info, "AMD ")))
             memmove(end, end+4, strlen(end+1));
     }
@@ -947,7 +946,7 @@ int pwd(char *dest) {
 int date(char *dest) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    snprintf(dest, 256, "%02d/%02d/%d %02d:%02d:%02d\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    snprintf(dest, 256, "%02d/%02d/%d %02d:%02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
     return 0;
 }
 

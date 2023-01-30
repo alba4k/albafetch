@@ -21,8 +21,8 @@
 
 // various configurations for stuff
 struct Config config = {
-    true,   // shell_path
-    true,   // show_localdomain
+    true,   // os_arch
+    false,  // shell_path
     true,   // cpu_brand
     true,   // cpu_freq
     true,   // mem_perc
@@ -34,6 +34,7 @@ struct Config config = {
     true,   // pkg_snap
     false,  // pkg_pip
     true,   // pkg_brew
+    true,   // show_localdomain
 
     false,  // align
 };
@@ -158,70 +159,36 @@ int main(int argc, char **argv) {
     // DEBUG FOR SINGLE FUNCTIONS
     char *data = mem + 1024;
 
-    if(!user(data))
-        printf("%s\n", data);
+    int (*arr[])(char *) = {
+        user,
+        hostname,
+        uptime,
+        os,
+        kernel,
+        desktop,
+        shell,
+        login_shell,
+        term,
+        packages,
+        host,
+        bios,
+        cpu,
+        gpu,
+        memory,
+        public_ip,
+        local_ip,
+        pwd,
+        date,
+        colors,
+        light_colors
+    };
 
-    if(!hostname(data))
-        printf("%s\n", data);
-
-    if(!uptime(data))
-        printf("%s\n", data);
-
-    if(!os(data))
-        printf("%s\n", data);
-
-    if(!kernel(data))
-        printf("%s\n", data);
-
-    if(!desktop(data))
-        printf("%s\n", data);
-
-    if(!shell(data))
-        printf("%s\n", data);
-
-    if(!login_shell(data))
-        printf("%s\n", data);
-
-    if(!term(data))
-        printf("%s\n", data);
-
-    if(!packages(data))
-        printf("%s\n", data);
-
-    if(!host(data))
-        printf("%s\n", data);
-
-    if(!bios(data))
-        printf("%s\n", data);
-
-    if(!cpu(data))
-        printf("%s\n", data);
-
-    if(!gpu(data))
-        printf("%s\n", data);
-
-    if(!memory(data))
-        printf("%s\n", data);
-
-    if(!public_ip(data))
-        printf("%s\n", data);
-
-    if(!local_ip(data))
-        printf("%s\n", data);
-
-    if(!pwd(data))
-        printf("%s\n", data);
-
-    if(!date(data))
-        printf("%s\n", data);
-
-    if(!colors(data))
-        printf("%s\n", data);
-
-    if(!light_colors(data))
-        printf("%s\n", data);
-
-    // END
+    for(int i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
+        if(!arr[i](data))
+            printf("%s\n", data);
+        else
+            printf("%d returned %d\n", i, arr[i](data));
+    }
     return 0;
 #else
 
