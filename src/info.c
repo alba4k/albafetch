@@ -229,14 +229,14 @@ int desktop(char *dest) {
         strcpy(dest, "Aqua");
     #else
         char *desktop = getenv("SWAYSOCK") ? "Sway" :
-                             (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
-                             (desktop = getenv("DESKTOP_SESSION")) ? desktop :
-                             getenv("KDE_SESSION_VERSION") ? "KDE" :
-                             getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
-                             getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
-                             getenv("TDE_FULL_SESSION") ? "Trinity" :
-                             // !strcmp("linux", getenv("TERM")) ? "none" :      // what happens when running in tty
-                             NULL;
+                            (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
+                            (desktop = getenv("DESKTOP_SESSION")) ? desktop :
+                            getenv("KDE_SESSION_VERSION") ? "KDE" :
+                            getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
+                            getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
+                            getenv("TDE_FULL_SESSION") ? "Trinity" :
+                            // !strcmp("linux", getenv("TERM")) ? "none" :      // what happens when running in tty
+                            NULL;
         if(!desktop)
             return 1;
 
@@ -580,7 +580,8 @@ int host(char *dest) {
 // gets the current BIOS vendor and version (Linux only!)
 int bios(char *dest) {
     #ifdef __APPLE__
-    return 1;
+        (void)dest; // avoid unused parameter warning - lmao
+        return 1;
     #else
     char *vendor = NULL, *version = NULL;
     FILE *fp = NULL;
@@ -640,11 +641,12 @@ int cpu(char *dest) {
         if(!buf[0])
             return 1;
 
-        if(!config.cpu_freq)
+        if(!config.cpu_freq) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))
                 *end = 0;
+        }
 
         cpu_info = buf;
     #else
