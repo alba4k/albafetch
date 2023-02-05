@@ -12,11 +12,9 @@
 #endif
 
 /* TODO:
- * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2 <-- NOT actual code)
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress (lines [64; 76]U[318; 356])
- * remove the lspci dependency for gpu()
- * more config options (e.g. complete login shell path)
+ * more config options (for the single functions)
  */
 
 // various configurations for stuff
@@ -41,8 +39,10 @@ struct Config config = {
     false,  // align
 };
 
+char **logo = NULL;
+
 int main(int argc, char **argv) {
-    // using a linked list for this is horrible, but here we go
+    // using a linked list for this is quite horrible, but here we go
     struct Info infos[64] = {
     //  {"Label", fptr, next}
         {NULL, NULL, infos+3},              // 00
@@ -204,11 +204,11 @@ int main(int argc, char **argv) {
         light_colors
     };
 
-    for(int i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
+    for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
         if(!arr[i](data))
             printf("%s\n", data);
         else
-            printf("%d returned %d\n", i, arr[i](data));
+            printf("%lu returned %d\n", i, arr[i](data));
     }
     return 0;
 #else

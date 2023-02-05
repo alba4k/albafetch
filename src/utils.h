@@ -5,6 +5,8 @@
 
 #include <stdlib.h>
 
+void print_line(char **logo, unsigned *line);
+
 void unescape(char *str);
 
 int max(const int *nums, unsigned const int lenght);

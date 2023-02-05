@@ -2,6 +2,19 @@
 #include <stdio.h>
 #include "utils.h"
 
+void print_line(char **logo, unsigned *line) {
+    if(!logo)
+        return;
+
+    if(!logo[*line]) {
+        printf("%s", logo[2]);
+        return;
+    }
+
+    printf("%s", logo[*line]);
+    ++(*line);
+}
+
 // check every '\\' in str and unescape "\\\\" "\\n" "\\e"
 void unescape(char *str) {
     while((str = strchr(str, '\\'))) {
@@ -37,17 +50,17 @@ int max(const int *nums, unsigned const int lenght) {
 
 // stuff needed for libcurl
 size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-  size_t realsize = size * nmemb;
-  struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+    size_t realsize = size * nmemb;
+    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
 
-  char *ptr = realloc(mem->memory, mem->size + realsize + 1);
-  if(ptr == NULL)
-    return 0;
+    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
+    if(ptr == NULL)
+        return 0;
 
-  mem->memory = ptr;
-  memcpy(&(mem->memory[mem->size]), contents, realsize);
-  mem->size += realsize;
-  mem->memory[mem->size] = 0;
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
 
-  return realsize;
+    return realsize;
 }

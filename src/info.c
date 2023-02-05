@@ -633,7 +633,8 @@ int cpu(char *dest) {
 
     #ifdef __APPLE__
         size_t BUF_SIZE = 256;
-        char buf[BUF_SIZE] = "";
+        char buf[BUF_SIZE];
+        buf[0] = 0;
         sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
         if(!buf[0])
@@ -898,7 +899,7 @@ int memory(char *dest) {
 
     if(config.mem_perc) {
         char perc[56];
-        snprintf(perc, 56, " (%lu%%)", (usedram * 100) / totalram);
+        snprintf(perc, 56, " (%lu%%)", (unsigned long)((usedram * 100) / totalram));
         strcat(dest, perc);
     }
 
@@ -911,7 +912,7 @@ int public_ip(char *dest) {
     CURLcode res;
 
     struct MemoryStruct chunk;
-    chunk.memory = malloc(1);
+    chunk.memory = malloc(4096);
     chunk.size = 0;
 
     if(!curl_handle) {
