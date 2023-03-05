@@ -13,13 +13,15 @@
 
 /* TODO:
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
- * --ascii for custom ascii art (conflicts with --logo) - work in progress (lines [64; 76]U[318; 356])
+ * --ascii for custom ascii art (conflicts with --logo) - work in progress
  * more config options (for the single functions)
  */
 
 // various configurations for stuff
 struct Config config = {
+    true,   // title_color
     true,   // os_arch
+    false,  // de_type
     false,  // shell_path
     true,   // cpu_brand
     true,   // cpu_freq
@@ -37,9 +39,8 @@ struct Config config = {
     true,   // loc_localdomain
 
     false,  // align
+    "",     // color
 };
-
-char **logo = NULL;
 
 int main(int argc, char **argv) {
     // using a linked list for this is quite horrible, but here we go
@@ -87,25 +88,39 @@ int main(int argc, char **argv) {
 
     char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memset(mem, 0, 4096);
+    /* this chunk is divided as following (one line is 256B):
+     * 0  
+     * 1   
+     * 2  printed       (saves what should get printed, used for parsing)
+     * 3  printed       (saves what should get printed, used for parsing)
+     * 4  data          (buffer for every function in info.c)
+     * 5  
+     * 6  
+     * 7  
+     * 8  logo          (32 char* to lines (following logo.h))
+     * 9  
+     * 10 
+     * 11 
+     * 12 
+     * 13 
+     * 14 
+     * 15 
+     */
 
     // the config that's normally used is ~/.config/albafetch.conf
     char config_file[LOGIN_NAME_MAX + 32] = "";
 
     char *home = getenv("HOME");
-    // I really hope this part will never need to run
+    // I really hope this part will never run
     if(!home) {
-        fflush(stdout);
-        fputs("\e[31m\e[1mERROR\e[0m:$HOME is not set, interrupting!\n", stderr);
-        fflush(stderr);
+        fputs("\e[31m\e[1mERROR\e[0m: $HOME is not set, interrupting!\n", stderr);
 
-        return 1;
+        return -1;
     }
     if(!home[0]) {
-        fflush(stdout);
-        fputs("\e[31m\e[1mERROR\e[0m:$HOME is empty, interrupting!\n", stderr);
-        fflush(stderr);
-
-        return 1;
+        fputs("\e[31m\e[1mERROR\e[0m: $HOME is empty, interrupting!\n", stderr);
+        return -1;
     }
 
     // parsing the command args
@@ -126,7 +141,7 @@ int main(int argc, char **argv) {
                 strcpy(config_file, argv[i+1]);
                 continue;
             }
-            fputs("\e[31m\e[1mERROR\e[0m: --config requires a extra argument! Use --help for more info\n", stderr);
+            fputs("\e[31m\e[1mERROR\e[0m: --config requires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
@@ -143,19 +158,97 @@ int main(int argc, char **argv) {
             snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
     }
 
+    // TODO: logo
+    if(asking_logo) {
+        if(asking_logo < argc) {
+
+        }
+        else {
+            fputs("\e[31m\e[1mERROR\e[0m: --logo srequires an extra argument!\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
+
+    // TEMP: testing
+    char **logo = logos[2];
+
+    if(asking_color) {
+        if(asking_color < argc) {
+            char *colors[9][2] = {
+                {"black", "\e[30m"},
+                {"red", "\e[31m"},
+                {"green", "\e[32m"},
+                {"yellow", "\e[33m"},
+                {"blue", "\e[34m"},
+                {"purple", "\e[35m"},
+                {"cyan", "\e[36m"},
+                {"gray", "\e[90m"},
+                {"white", "\e[37m"},
+            };
+
+            for(int j = 0; j < 9; ++j) {
+                if(!strcmp(argv[asking_color], *colors[j])) {
+                    strcpy(config.color, colors[j][1]);
+                    goto color;
+                }
+            }
+
+            fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
+            user_is_an_idiot = true;
+
+            color: ;
+        }
+        else {
+            fputs("\e[31m\e[1mERROR\e[0m: --color srequires an extra argument!\n", stderr);
+            user_is_an_idiot = true;
+        } 
+    }
+
+    // TODO: bold
+    if(asking_bold) {
+        if(asking_bold < argc) {
+            if(!strcmp(argv[asking_bold], "on"))
+                ; // PLACEHOLDER
+            else if(!strcmp(argv[asking_bold], "off"))
+                ; // PLACEHOLDER
+            else {
+                fputs("\e[31m\e[1mERROR\e[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
+                user_is_an_idiot = true;
+            }
+        }
+        else {
+            fputs("\e[31m\e[1mERROR\e[0m: --bold srequires an extra argument!\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
+
     if(asking_align) {
-        if(argc > asking_align) {
+        if(asking_align < argc) {
             if(!strcmp(argv[asking_align], "on"))
                 config.align = true;
             else if(!strcmp(argv[asking_align], "off"))
                 config.align = false;
+            else {
+                fputs("\e[31m\e[1mERROR\e[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
+                user_is_an_idiot = true;
+            }
         }
         else {
-            // TODO: error message or warning
-            return 1;
+            fputs("\e[31m\e[1mERROR\e[0m: --align srequires an extra argument!\n", stderr);
+            user_is_an_idiot = true;
         }
     }
 
+    // was it really that hard to type 'albafetch -h'?
+    if(user_is_an_idiot) {
+        fputs("\e[31m\e[1mFATAL\e[0m: One or multiple errors occured! Use --help for more info\n", stderr);
+        return 1;
+    }
+
+    // TODO: help
+    if(asking_help) {
+        
+    }
 
 #ifdef _DEBUG
     // DEBUG FOR SINGLE FUNCTIONS
@@ -164,6 +257,7 @@ int main(int argc, char **argv) {
     // Is there a smarter way to do this? Probably, but I'm too lazy
     // Feel free to let me know or just open a PR if you know one <3
     config.os_arch = 1;
+    config.de_type = 1;
     config.shell_path = 1;
     config.cpu_brand = 1;
     config.cpu_freq = 1;
@@ -221,6 +315,7 @@ int main(int argc, char **argv) {
     if(config.align) {
         int nums[64];
         int i = 0;
+
         for(struct Info *current = (infos)->next; current; current = current->next) {
             nums[i] = strlen(current->label);
             ++i;
@@ -233,11 +328,11 @@ int main(int argc, char **argv) {
 
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator && config.align) {    // the separators should not get aligned
-            for(int i = 0; i < asking_align; ++i)           // the separators should cover the aligment gap
-                strcat(data, "#");
-                
-            separator(data);
-            printf("%s\n", data);
+            if(printed[0]) {
+                for(size_t i = 0; i < strlen(printed) - 4; ++i)           // the separators should cover the aligment gap
+                    fputs("-", stdout);
+                puts("");
+            }
         }
         else if(!((current->func)(data))) {
             size_t len = strlen(current->label) + strlen(": ");

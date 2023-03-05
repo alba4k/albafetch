@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <libgen.h>     // basename
+#include <ctype.h>      // toupper
 #include <sys/wait.h>
 
 #ifdef __APPLE__
@@ -90,12 +91,12 @@ int title(char *dest) {
     if(user(name) || hostname(host))
         return 1;
 
-    if(strlen(name) + strlen(host) > 254)
+    if(strlen(name) + strlen(host) > 244)
         return 1;
 
     // not checking the lenght because of compiler
     // warnings and since it has already been checked
-    sprintf(dest, "%s@%s", name, host);
+    sprintf(dest, "%s%s@%s%s", name, config.title_color ? config.color : "", config.title_color ? "\e[0m" : "", host);
 
     return 0;
 }
@@ -241,6 +242,20 @@ int desktop(char *dest) {
             return 1;
 
         strcpy(dest, desktop);
+
+        if(config.de_type) {
+            if(getenv("WAYLAND_DISPLAY"))
+                strncat(dest, " (Wayland)", 255-strlen(dest));
+            else if((desktop = getenv("XDG_SESSION_TYPE"))) {
+                if(!desktop[0])
+                    return 0;
+                desktop[0] = toupper(desktop[0]);
+                
+                char buf[32];
+                snprintf(buf, 32, " (%s) ", desktop);
+                strncat(dest, buf, 255-strlen(dest));
+            }
+        }
     #endif
 
     return 0;

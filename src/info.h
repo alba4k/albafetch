@@ -20,7 +20,9 @@
 #endif
 
 struct Config {
+    bool title_color;
     bool os_arch;
+    bool de_type;
     bool shell_path;
     bool cpu_brand;
     bool cpu_freq;
@@ -38,6 +40,7 @@ struct Config {
     bool loc_localdomain;
 
     bool align;
+    char color[16];
 };
 
 extern struct Config config;
