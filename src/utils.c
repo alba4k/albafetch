@@ -8,10 +8,12 @@ void print_line(char **logo, unsigned *line) {
 
     if(!logo[*line]) {
         printf("%s", logo[2]);
+        printf("    ");
         return;
     }
 
     printf("%s", logo[*line]);
+    printf("    ");
     ++(*line);
 }
 

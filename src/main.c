@@ -145,6 +145,31 @@ int main(int argc, char **argv) {
             user_is_an_idiot = true;
         }
     }
+    
+    char **logo = (char**)logos[0];
+    #ifdef __APPLE__
+        logo = (char**)logos[1];
+    #else
+        FILE *fp = fopen("/etc/os-release", "r");
+
+        if(fp) {
+            char os_id[48];
+            read_after_sequence(fp, "\nID", os_id, 48);
+            if(!os_id[0])
+                read_after_sequence(fp, "ID", os_id, 48);
+            fclose(fp);
+
+            char *end = strchr(os_id, '\n');
+            if(!end)
+                return -1;
+            *end = 0;
+
+            for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
+                if(!strcmp(logos[i][0], os_id))
+                    logo = (char**)logos[i];
+        }
+    #endif
+    strcpy(config.color, logo[1]);
 
     if(!using_custom_config) {
         char *config_home = getenv("XDG_CONFIG_HOME");
@@ -161,16 +186,25 @@ int main(int argc, char **argv) {
     // TODO: logo
     if(asking_logo) {
         if(asking_logo < argc) {
+            bool done = false;
 
-        }
-        else {
+            for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
+                if(!strcmp(logos[i][0], argv[asking_logo])) {
+                    logo = (char**)logos[i];
+                    done = true;
+                }
+
+            if(!done) {
+                fprintf(stderr, "\e[31m\e[1mERROR\e[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
+                user_is_an_idiot = true;
+            }
+        } else {
             fputs("\e[31m\e[1mERROR\e[0m: --logo srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
-    }
 
-    // TEMP: testing
-    char **logo = logos[2];
+        strcpy(config.color, logo[1]);
+    }
 
     if(asking_color) {
         if(asking_color < argc) {
@@ -186,22 +220,22 @@ int main(int argc, char **argv) {
                 {"white", "\e[37m"},
             };
 
-            for(int j = 0; j < 9; ++j) {
+            bool done = false;
+            for(int j = 0; j < 9; ++j)
                 if(!strcmp(argv[asking_color], *colors[j])) {
                     strcpy(config.color, colors[j][1]);
-                    goto color;
+                    done = true;
                 }
+
+            if(!done) {
+                fprintf(stderr, "\e[31m\e[1mERROR\e[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
+                user_is_an_idiot = true;
             }
-
-            fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
-            user_is_an_idiot = true;
-
-            color: ;
         }
         else {
             fputs("\e[31m\e[1mERROR\e[0m: --color srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
-        } 
+        }
     }
 
     // TODO: bold
@@ -308,6 +342,7 @@ int main(int argc, char **argv) {
 #else
 
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis
+    unsigned line = 3;
     char *data = mem + 1024;
     char *printed = mem+512;
     char format[32] = "%s\e[0m%s";
@@ -329,12 +364,16 @@ int main(int argc, char **argv) {
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator && config.align) {    // the separators should not get aligned
             if(printed[0]) {
+                print_line(logo, &line);
+                
                 for(size_t i = 0; i < strlen(printed) - 4; ++i)           // the separators should cover the aligment gap
                     fputs("-", stdout);
                 puts("");
             }
         }
         else if(!((current->func)(data))) {
+            print_line(logo, &line);
+
             size_t len = strlen(current->label) + strlen(": ");
             char label[len];
 
@@ -348,6 +387,14 @@ int main(int argc, char **argv) {
             printf("%s\n", printed);
         }
     }
+
+    // remaining lines
+    while(logo[line]) {
+        print_line(logo, &line);
+        printf("\n");
+    }
+    printf("\e[0m");
+
 #endif // _DEBUG
 
     return 0;

@@ -234,9 +234,9 @@ int desktop(char *dest) {
                             (desktop = getenv("DESKTOP_SESSION")) ? desktop :
                             getenv("KDE_SESSION_VERSION") ? "KDE" :
                             getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
-                            getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
+                            getenv("MATE_DESKTOP_SESSION_ID") ? "MATE" :
                             getenv("TDE_FULL_SESSION") ? "Trinity" :
-                            // !strcmp("linux", getenv("TERM")) ? "none" :      // what happens when running in tty
+                            // !strcmp("linux", getenv("TERM")) ? "none" :      // running in tty
                             NULL;
         if(!desktop)
             return 1;
@@ -261,7 +261,7 @@ int desktop(char *dest) {
     return 0;
 }
 
-// get the parent process (normally the shell)
+// get the parent process name (usually the shell)
 int shell(char *dest) {
     #ifdef __linux__
         char path[32];
@@ -303,7 +303,7 @@ int login_shell(char *dest) {
     return 1;
 }
 
-// print the current terminal
+// gets the current terminal
 int term(char *dest) {
     char *terminal = getenv("TERM");
     if(terminal) {
@@ -316,7 +316,7 @@ int term(char *dest) {
     return 1;
 }
 
-// TODO: packages (pacman - dpkg - flatpak - snap - rpm)
+// get amount of packages installed
 int packages(char *dest) {
     dest[0] = 0;
     char buf[256] = "", str[64], path[256];
