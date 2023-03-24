@@ -25,13 +25,11 @@ struct Info {
     struct Info *next;      // next module
 };
 
-int separator(char *dest);
+//int separator(char *dest);
 
 int user(char *dest);
 
 int hostname(char *dest);
-
-int title(char *dest);
 
 int uptime(char *dest);
 

@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
         {"", separator, infos+4},           // 23
         {"", separator, infos+5},           // 24
         {"", separator, infos+12},          // 25
-        {"", separator, infos+21},          // 26
+        {"", spacing, infos+21},          // 26
     };
 
     bool user_is_an_idiot = false; // rtfm and stfu
@@ -407,14 +407,42 @@ int main(int argc, char **argv) {
     }
 
     for(struct Info *current = infos->next; current; current = current->next) {
-        if(current->func == separator && config.align) {    // the separators should not get aligned
+        if(current->func == separator) {    // the separators should not get aligned
             if(printed[0]) {
                 print_line(logo, &line);
                 
                 for(size_t i = 0; i < strlen(printed) - 4; ++i)           // the separators should cover the aligment gap
-                    fputs("-", stdout);
-                puts("");
+                    putc('-', stdout);
+                putc('\n', stdout);
             }
+        }
+        else if(current->func == spacing) {
+            print_line(logo, &line);
+
+            putc('\n', stdout);
+        }
+        else if(current->func == title) {
+            print_line(logo, &line);
+
+            char name[256];
+            char host[256];
+
+            if(user(name) || hostname(host))
+                continue;
+
+            size_t len = strlen(name) + strlen(host) + 5;
+
+            memset(printed, 'A', len);
+            printed[len] = 0;
+
+            printf("%s%s%s%s@%s%s%s\n", config.title_color ? config.color : "",
+                                     config.bold ? "\e[1m" : "",
+                                     name,
+                                     config.title_color ? "\e[0m" : "",
+                                     config.bold ? "\e[1m" : "",
+                                     config.title_color ? config.color : "",
+                                     host
+            );
         }
         else if(!((current->func)(data))) {
             print_line(logo, &line);
@@ -439,7 +467,6 @@ int main(int argc, char **argv) {
         printf("\n");
     }
     printf("\e[0m");
-
 #endif // _DEBUG
 
     return 0;

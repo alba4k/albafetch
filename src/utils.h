@@ -48,4 +48,10 @@ struct MemoryStruct {
 
 size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
+// TODO
+// this will be removed once I write a decent logic for the single modules
+int separator(char *dest);
+int spacing(char *dest);
+int title(char *dest);
+
 #endif // UTILS_H

@@ -66,3 +66,9 @@ size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 
     return realsize;
 }
+
+// TODO
+// this will be removed once I write a decent logic for the single modules
+int separator(char *dest){(void)dest;return 1;}
+int spacing(char *dest){(void)dest;return 1;}
+int title(char *dest){(void)dest;return 1;}

@@ -28,10 +28,10 @@
 #include "info.h"
 #include "queue.h"
 #include "utils.h"
-
+/*
 int separator(char *dest) {
     // I'm considering 4 characters less of what actually got printed because of the "\e[0m"
-    size_t len = strlen(dest) - (config.align ? 0 : 4);
+    size_t len = strlen(dest) - 4;
 
     if(len > 255 || len == 0)   // was probably uninitialized
         return 1;
@@ -44,7 +44,7 @@ int separator(char *dest) {
 
     return 0;
 }
-
+*/
 // print the current user
 int user(char *dest) {
     struct passwd *pw;
@@ -72,32 +72,6 @@ int hostname(char *dest) {
         *ptr = 0;
 
     strncpy(dest, hostname, 256);
-
-    return 0;
-}
-
-// print a title formatted as name@host
-int title(char *dest) {
-    char name[256];
-    char host[256];
-
-    if(user(name) || hostname(host))
-        return 1;
-
-    // 256 (buffer) - 2*6 (config.color) - 4 ("\e[0m") - 2*4 (config.bold) - 1 (null char) = 231
-    if(strlen(name) + strlen(host) > 231)
-        return 1;
-
-    // not checking the lenght because of compiler
-    // warnings and since it has already been checked
-    sprintf(dest, "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
-                                     config.bold ? "\e[1m" : "",
-                                     name,
-                                     config.title_color ? "\e[0m" : "",
-                                     config.bold ? "\e[1m" : "",
-                                     config.title_color ? config.color : "",
-                                     host
-    );
 
     return 0;
 }
