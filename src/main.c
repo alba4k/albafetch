@@ -330,9 +330,6 @@ int main(int argc, char **argv) {
     }
 
 #ifdef _DEBUG
-    // DEBUG FOR SINGLE FUNCTIONS
-    char *data = mem + 1024;
-
     // Is there a smarter way to do this? Probably, but I'm too lazy
     // Feel free to let me know or just open a PR if you know one <3
     config.os_arch = 1;
@@ -379,10 +376,10 @@ int main(int argc, char **argv) {
     };
 
     for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
-        if(!arr[i](data))
-            printf("%s\n", data);
+        if(!arr[i](mem))
+            printf("%s\n", mem);
         else
-            printf("%lu returned %d\n", i, arr[i](data));
+            printf("%lu returned %d\n", i, arr[i](mem));
     }
     return 0;
 #else

@@ -29,9 +29,15 @@ ifeq ($(KERNEL),Darwin)
 	INCLUDE := -framework Foundation -framework IOKit -l curl
 endif
 
+all: build/$(TARGET) build/debug
+
 build/$(TARGET): $(OBJ)
 	mkdir -p build/
 	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+
+build/debug:
+	mkdir -p build/
+	$(CC) $(SRC) $(CFLAGS) $(INCLUDE) -D_DEBUG -o build/debug
 
 main.o: src/main.c src/vars.h src/logos.h src/info.h
 	$(CC) -c src/main.c $(CFLAGS)
@@ -57,14 +63,12 @@ macos_gpu_string.o: src/macos_gpu_string.m
 run: build/$(TARGET)
 	build/$(TARGET)
 
-debug:
-	mkdir -p build/
-	$(CC) $(SRC) $(CFLAGS) $(INCLUDE) -D_DEBUG -o build/debug
-
+debug: build/debug
 	build/debug
 
 install: build/$(TARGET)
-	cp -f build/$(TARGET) $(DESTDIR)$(INSTALLPATH)/$(TARGET)
+	install -Dm 755 build/$(TARGET)  $(DESTDIR)$(INSTALLPATH)/$(TARGET) || \
+	bash -c 'echo -e "\e[31m\e[1mERROR\e[0m: Running without root proviliges?"'
 
 uninstall:
 	rm $(INSTALLPATH)/$(TARGET)

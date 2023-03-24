@@ -28,23 +28,6 @@
 #include "info.h"
 #include "queue.h"
 #include "utils.h"
-/*
-int separator(char *dest) {
-    // I'm considering 4 characters less of what actually got printed because of the "\e[0m"
-    size_t len = strlen(dest) - 4;
-
-    if(len > 255 || len == 0)   // was probably uninitialized
-        return 1;
-    
-    dest[0] = 0;
-
-    for(size_t i = 0; i < len; ++i) {
-        strcat(dest, "-");
-    }
-
-    return 0;
-}
-*/
 // print the current user
 int user(char *dest) {
     struct passwd *pw;
@@ -785,9 +768,9 @@ int gpu(char *dest) {
             *end = 0;
         }
     #else
-    #ifdef __ANDROID__
+    # ifdef __ANDROID__
         return 1;
-    #else
+    # else
         // based on https://github.com/pciutils/pciutils/blob/master/example.c
 
         char device_class[256], namebuf[256];
@@ -809,7 +792,65 @@ int gpu(char *dest) {
         }
 
         pci_cleanup(pacc);  // close everything
-    #endif // __ANDROID__
+
+        char gpu[256];
+
+        if(!gpu_string) {
+            int pipes[2];
+
+            if(pipe(pipes))
+                return 1;
+
+            if(!fork()) {
+                close(pipes[0]);
+                dup2(pipes[1], STDOUT_FILENO);
+                execlp("lspci", "lspci", "-mm", NULL);
+            }
+            
+            close(pipes[1]);
+            char *lspci = malloc(0x2000);
+            
+            wait(NULL);
+            lspci[read(pipes[0], lspci, 0x2000)] = 0;
+            close(pipes[0]);
+
+            gpu_string = strstr(lspci, "3D");
+            if(!gpu_string) {
+                gpu_string = strstr(lspci, "VGA");
+                if(!gpu_string) {
+                    free(lspci);
+                    return 1;
+                }
+            }
+
+            for(int i = 0; i < 4; ++i) {
+                gpu_string = strchr(gpu_string, '"');
+                if(!gpu_string) {
+                    free(lspci);
+                    return 1;
+                }
+                ++gpu_string;
+
+                /* class" "manufacturer" "name"
+                 *  "manufacturer" "name"
+                 * manufacturer" "name"
+                 *  "name"
+                 * name"
+                 */
+            }
+
+            char *end = strchr(gpu_string, '"');   // name
+            if(!end) {
+                free(lspci);
+                return 1;
+            }
+            *end = 0;
+            
+            strncpy(gpu, gpu_string, 255);
+            free(lspci);
+            gpu_string = gpu;
+        }
+    # endif // __ANDROID__
     #endif // __APPLE__
 
     if(!gpu_string)
