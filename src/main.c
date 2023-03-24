@@ -7,10 +7,6 @@
 #include "logos.h"
 #include "queue.h"
 
-#ifndef MAP_ANONYMOUS   // https://github.com/microsoft/vscode-cpptools/issues/4268 vscode being annoying
-#define MAP_ANONYMOUS 0x20
-#endif
-
 /* TODO:
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress
@@ -36,9 +32,11 @@ struct Config config = {
     true,   // pkg_snap
     false,  // pkg_pip
     true,   // pkg_brew
-    true,   // loc_localdomain
+    false,  // loc_docker
+    false,  // loc_localdomain
 
     false,  // align
+    true,   // bold
     "",     // color
 };
 
@@ -83,6 +81,12 @@ int main(int argc, char **argv) {
     int asking_bold = 0;
     int asking_logo = 0;
     int asking_align = 0;
+
+    // these store either the default values or the ones defined in the config
+    // they are needed to know what is used if no arguments are given (for --help)
+    bool default_bold = true;
+    char default_color[8] = "";
+    char default_logo[16] = "";
 
     bool using_custom_config = false;
 
@@ -146,30 +150,7 @@ int main(int argc, char **argv) {
         }
     }
     
-    char **logo = (char**)logos[0];
-    #ifdef __APPLE__
-        logo = (char**)logos[1];
-    #else
-        FILE *fp = fopen("/etc/os-release", "r");
-
-        if(fp) {
-            char os_id[48];
-            read_after_sequence(fp, "\nID", os_id, 48);
-            if(!os_id[0])
-                read_after_sequence(fp, "ID", os_id, 48);
-            fclose(fp);
-
-            char *end = strchr(os_id, '\n');
-            if(!end)
-                return -1;
-            *end = 0;
-
-            for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
-                if(!strcmp(logos[i][0], os_id))
-                    logo = (char**)logos[i];
-        }
-    #endif
-    strcpy(config.color, logo[1]);
+    char **logo = NULL;
 
     if(!using_custom_config) {
         char *config_home = getenv("XDG_CONFIG_HOME");
@@ -183,7 +164,8 @@ int main(int argc, char **argv) {
             snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
     }
 
-    // TODO: logo
+    // TODO: config
+
     if(asking_logo) {
         if(asking_logo < argc) {
             bool done = false;
@@ -203,6 +185,38 @@ int main(int argc, char **argv) {
             user_is_an_idiot = true;
         }
 
+        strcpy(config.color, logo[1]);
+    }
+    if(!logo) {
+        #ifdef __APPLE__
+            logo = (char**)logos[1];
+        #else
+        # ifdef __ANDROID__
+            logo = (char**)logos[2];
+        # else
+            logo = (char**)logos[0];
+            FILE *fp = fopen("/etc/os-release", "r");
+
+            if(fp) {
+                char os_id[48];
+                read_after_sequence(fp, "\nID", os_id, 48);
+                if(!os_id[0])
+                    read_after_sequence(fp, "ID", os_id, 48);
+                fclose(fp);
+
+                char *end = strchr(os_id, '\n');
+                if(!end)
+                    return 2;
+                *end = 0;
+
+                for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
+                    if(!strcmp(logos[i][0], os_id))
+                        logo = (char**)logos[i];
+            }
+        # endif // __ANDROID__
+        #endif // __APPLE__
+        
+        strcpy(default_logo, logo[0]);
         strcpy(config.color, logo[1]);
     }
 
@@ -238,13 +252,12 @@ int main(int argc, char **argv) {
         }
     }
 
-    // TODO: bold
     if(asking_bold) {
         if(asking_bold < argc) {
             if(!strcmp(argv[asking_bold], "on"))
-                ; // PLACEHOLDER
+                config.bold = true;
             else if(!strcmp(argv[asking_bold], "off"))
-                ; // PLACEHOLDER
+                config.bold = false;
             else {
                 fputs("\e[31m\e[1mERROR\e[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
@@ -254,6 +267,49 @@ int main(int argc, char **argv) {
             fputs("\e[31m\e[1mERROR\e[0m: --bold srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
+    }
+
+    // was it really that hard to type 'albafetch -h'?
+    if(user_is_an_idiot) {
+        fputs("\e[31m\e[1mFATAL\e[0m: One or multiple errors occured! Use --help for more info\n", stderr);
+        return 1;
+    }
+
+    if(asking_help) {
+        printf("%s%salbafetch\e[0m - a system fetch utility\n",
+               config.color, config.bold ? "\e[1m" : "");
+
+        printf("\n%s%sFLAGS\e[0m:\n",
+               config.color, config.bold ? "\e[1m" : "");
+
+        printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n",
+               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "");
+
+        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (%s%s\e[0m)\n"
+               "\t\t\t   [\e[30mblack\e[0m, \e[31mred\e[0m, \e[32mgreen\e[0m, \e[33myellow\e[0m,"
+               " \e[34mblue\e[0m, \e[35mpurple\e[0m, \e[36mcyan\e[0m, \e[90mgray\e[0m,"
+               " \e[37mwhite\e[0m]\n",
+               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_color[0] ? default_color : logo[1], default_color[0] ? "default" : "logo default");
+
+        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
+               "\t\t\t   [\e[1mon\e[0m, off]\n",
+               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_bold ? "\e[1mon" : "off");
+        
+        printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (default: %s)\n"
+               "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, endeavouros, fedora]\n"
+               "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
+               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_logo[0] ? default_logo : "OS Default");
+
+        printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s)\n"
+               "\t\t\t   [on, off]\n", config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", config.align ? "on" : "off");
+
+        printf("\t%s%s--config\e[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
+               "\t\t\t   [path]\n", config.color, config.bold ? "\e[1m" : "");
+
+        printf("\nReport a bug: %s%s\e[4mhttps://github.com/alba4k/albafetch/issues\e[0m\n",
+               config.color, config.bold ? "\e[1m" : "");
+
+        return 0;
     }
 
     if(asking_align) {
@@ -271,17 +327,6 @@ int main(int argc, char **argv) {
             fputs("\e[31m\e[1mERROR\e[0m: --align srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
-    }
-
-    // was it really that hard to type 'albafetch -h'?
-    if(user_is_an_idiot) {
-        fputs("\e[31m\e[1mFATAL\e[0m: One or multiple errors occured! Use --help for more info\n", stderr);
-        return 1;
-    }
-
-    // TODO: help
-    if(asking_help) {
-        
     }
 
 #ifdef _DEBUG
@@ -307,6 +352,7 @@ int main(int argc, char **argv) {
     config.pkg_pip = 1;
     config.pkg_brew = 1;
     config.loc_localdomain = 1;
+    config.loc_docker = 1;
 
     int (*arr[])(char *) = {
         user,
@@ -340,7 +386,6 @@ int main(int argc, char **argv) {
     }
     return 0;
 #else
-
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis
     unsigned line = 3;
     char *data = mem + 1024;

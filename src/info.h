@@ -19,32 +19,6 @@
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
 
-struct Config {
-    bool title_color;
-    bool os_arch;
-    bool de_type;
-    bool shell_path;
-    bool cpu_brand;
-    bool cpu_freq;
-    bool cpu_count;
-    bool gpu_brand;
-    bool mem_perc;
-    bool pkg_mgr;
-    bool pkg_pacman;
-    bool pkg_dpkg;
-    bool pkg_rpm;
-    bool pkg_flatpak;
-    bool pkg_snap;
-    bool pkg_pip;
-    bool pkg_brew;
-    bool loc_localdomain;
-
-    bool align;
-    char color[16];
-};
-
-extern struct Config config;
-
 struct Info {
     char *label;            // module label
     int (*func)(char *);    // pointer to the function that gets the info

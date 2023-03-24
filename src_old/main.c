@@ -539,7 +539,7 @@ int main(const int argc, const char **argv) {
         printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (%s)\n"
                "\t\t\t   [linux, apple, arch, arch_small, debian, linuxmint, endeavouros, ubuntu]\n"
                "\t\t\t   [parrot, manjaro, fedora, neon, pop, gentoo, windows]\n",
-               config.color, config.bold, config.color,config. bold, default_logo[0] ? default_logo : "OS default");
+               config.color, config.bold, config.color, config.bold, default_logo[0] ? default_logo : "OS default");
 
         printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s)\n"
                "\t\t\t   [on, off]\n", config.color, config.bold, config.color, config.bold, config.align_infos ? "on" : "off");

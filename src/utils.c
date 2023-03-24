@@ -7,12 +7,12 @@ void print_line(char **logo, unsigned *line) {
         return;
 
     if(!logo[*line]) {
-        printf("%s", logo[2]);
+        printf("%s%s", config.bold ? "\e[1m" : "", logo[2]);
         printf("    ");
         return;
     }
 
-    printf("%s", logo[*line]);
+    printf("%s%s", config.bold ? "\e[1m" : "", logo[*line]);
     printf("    ");
     ++(*line);
 }

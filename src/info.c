@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE
+
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -26,15 +28,6 @@
 #include "info.h"
 #include "queue.h"
 #include "utils.h"
-
-// just in case + vscode being annoying
-#ifndef DT_DIR
-#define _BSD_SOURCE
-#define __USE_MISC
-#ifndef DT_DIR
-#define DT_DIR 4
-#endif
-#endif
 
 int separator(char *dest) {
     // I'm considering 4 characters less of what actually got printed because of the "\e[0m"
@@ -91,12 +84,20 @@ int title(char *dest) {
     if(user(name) || hostname(host))
         return 1;
 
-    if(strlen(name) + strlen(host) > 244)
+    // 256 (buffer) - 2*6 (config.color) - 4 ("\e[0m") - 2*4 (config.bold) - 1 (null char) = 231
+    if(strlen(name) + strlen(host) > 231)
         return 1;
 
     // not checking the lenght because of compiler
     // warnings and since it has already been checked
-    sprintf(dest, "%s%s@%s%s", name, config.title_color ? config.color : "", config.title_color ? "\e[0m" : "", host);
+    sprintf(dest, "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
+                                     config.bold ? "\e[1m" : "",
+                                     name,
+                                     config.title_color ? "\e[0m" : "",
+                                     config.bold ? "\e[1m" : "",
+                                     config.title_color ? config.color : "",
+                                     host
+    );
 
     return 0;
 }
@@ -928,6 +929,10 @@ int public_ip(char *dest) {
     CURL *curl_handle = curl_easy_init();
     CURLcode res;
 
+    // fallback
+    char ip_str[32] = "";
+    int pipes[2];
+
     struct MemoryStruct chunk;
     chunk.memory = malloc(4096);
     chunk.size = 0;
@@ -936,7 +941,7 @@ int public_ip(char *dest) {
         curl_easy_cleanup(curl_handle);
         free(chunk.memory);
 
-        return 1;
+        goto fallback;
     }
 
     curl_easy_setopt(curl_handle, CURLOPT_URL, "ident.me");
@@ -951,7 +956,7 @@ int public_ip(char *dest) {
         curl_easy_cleanup(curl_handle);
         free(chunk.memory);
 
-        return 1;
+        goto fallback;
     }
 
     strncpy(dest, chunk.memory, 256);
@@ -959,6 +964,27 @@ int public_ip(char *dest) {
     curl_easy_cleanup(curl_handle);
     free(chunk.memory);
 
+    return 0;
+
+    fallback:
+        pipe(pipes);
+
+        if(!fork()) {
+            close(*pipes);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("curl", "curl", "-s", "ident.me", NULL); 
+        }
+        wait(0);
+        close(pipes[1]);
+        ip_str[read(pipes[0], ip_str, 32) - 1] = 0;
+        close(pipes[0]);
+
+    if(!ip_str[0]) {
+        return 1;
+    }
+
+    strcpy(dest, ip_str);
     return 0;
 }
 
@@ -971,13 +997,16 @@ int local_ip(char *dest) {
     getifaddrs(&addrs);
 
     while(addrs) {
-       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET && (strcmp(addrs->ifa_name, "lo") || config.loc_localdomain)) {  // checking if the ip is valid
-            struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
-            
-            snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
-            dest += strlen(dest);
-            buf_size -= strlen(dest);
-            done = true;
+        // checking if the ip is valid
+       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
+            if((strcmp(addrs->ifa_name, "lo") || config.loc_localdomain) || (strcmp(addrs->ifa_name, "docker0") || config.loc_docker)) {
+                struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
+                
+                snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
+                dest += strlen(dest);
+                buf_size -= strlen(dest);
+                done = true;
+            }
         }
 
         addrs = addrs->ifa_next;
