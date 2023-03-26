@@ -15,22 +15,41 @@
       albafetch = pkgs.callPackage ./nix {inherit version;};
     };
   in
-    eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
+    {
+      overlays.default = final: _: packageFn final;
+    }
+    // eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [self.overlays.default];
+      };
     in {
       devShells = let
-        inherit (pkgs.clangStdenv) mkDerivation;
+        inherit (pkgs.stdenv) mkDerivation;
       in {
         default = mkDerivation {
           name = "albafetch-shell";
-          buildInputs = with pkgs; [curl gnumake pciutils];
+          nativeBuildInputs = with pkgs; [pkg-config];
+          buildInputs = with pkgs; [curl.dev meson ninja pciutils pkg-config];
         };
       };
 
       packages = let
-        packages = packageFn pkgs;
+        packages = with pkgs; {
+          inherit albafetch;
+          albafetch-static = pkgsStatic.albafetch;
+        };
       in
         packages // {default = packages.albafetch;};
     })
-    // {overlays.default = final: _: packageFn final;};
+    // {
+      arm = let
+        pkgs = import nixpkgs {
+          system = "x86_64-linux";
+          overlays = [self.overlays.default];
+        };
+      in {
+        inherit (pkgs.pkgsCross.aarch64-multiplatform.pkgsStatic) albafetch;
+      };
+    };
 }

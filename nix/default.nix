@@ -1,27 +1,23 @@
 {
   lib,
-  clangStdenv,
   curl,
+  meson,
+  ninja,
   pciutils,
+  pkgconfig,
+  stdenv,
   version,
 }: let
-  inherit (lib) licenses maintainers platforms;
+  inherit (lib) cleanSource licenses maintainers platforms;
 in
-  clangStdenv.mkDerivation rec {
+  stdenv.mkDerivation rec {
     name = "albafetch";
     inherit version;
-    src = lib.cleanSource ../.;
+    src = cleanSource ../.;
 
-    stdenv = clangStdenv;
-    makeFlags = ["CC=clang"];
-
-    nativeBuildInputs = [curl pciutils];
-
-    installPhase = ''
-      outdir=$out/bin
-      mkdir -p "$outdir"
-      install -Dm755 build/${name} "$outdir"/${name}
-    '';
+    patches = [./meson.patch];
+    buildInputs = [curl.dev pciutils];
+    nativeBuildInputs = [meson ninja pkgconfig];
 
     meta = {
       description = "Faster neofetch alternative, written in C.";
