@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v20
+
+      - name: build
+        run: nix build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: albafetch-x64-linux
+          path: ${{ github.workspace }}/result/bin/albafetch
+
+      - name: test
+        run: ./result/bin/albafetch
