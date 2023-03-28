@@ -24,13 +24,14 @@ in
       ]
       ++ optionals isLinux [
         curl.dev
-      ]
+      ];
+
+    nativeBuildInputs =
+      [meson ninja pkgconfig]
       ++ optionals isDarwin (with darwin.apple_sdk.frameworks; [
         Foundation
         IOKit
       ]);
-
-    nativeBuildInputs = [meson ninja pkgconfig];
 
     meta = {
       description = "Faster neofetch alternative, written in C.";
