@@ -17,7 +17,6 @@ in
     inherit version;
     src = cleanSource ../.;
 
-    patches = [./meson.patch];
     buildInputs =
       [
         pciutils
