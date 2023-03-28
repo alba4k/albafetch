@@ -5,6 +5,7 @@
 
 #include <limits.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #ifndef HOST_NAME_MAX
     #ifdef _POSIX_HOST_NAME_MAX

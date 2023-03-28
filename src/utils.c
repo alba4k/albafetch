@@ -2,18 +2,54 @@
 #include <stdio.h>
 #include "utils.h"
 
-void print_line(char **logo, unsigned *line) {
+void print_line(char **logo, unsigned *line, size_t maxlen) {
     if(!logo)
         return;
 
-    if(!logo[*line]) {
-        printf("%s%s%s", config.bold ? "\e[1m" : "", logo[2], config.color);
-        printf("    ");
-        return;
-    }
+    int escaping = 0;
 
-    printf("%s%s%s", config.bold ? "\e[1m" : "", logo[*line], config.color);
-    printf("    ");
+    printf("\n\e[0m%s", config.bold ? "\e[1m" : "");
+
+    if(!logo[*line])
+        for(size_t i = 0, len = 0; len < maxlen && i < strlen(logo[2]); ++i) {
+            putc(logo[2][i], stdout);
+
+            if(logo[2][i] != '\e') {
+                // look mom, I just wanted to try to write some branchless code
+
+                // this line is a bit weird
+                // ++len <=> escaping == 0
+                len += 1-escaping;
+
+                /* m is found and escaping => escaping = 0
+                 * m is found and not escaping => escaping = 0
+                 * m is not found and escaping => escaping = 1
+                 * m is found and not escaping => escaping = 0
+                 */
+
+                escaping = (logo[*line][i] != 'm') && escaping;
+            }
+            else
+                escaping = 1;
+        }
+    else
+        for(size_t i = 0, len = 0; len < maxlen && i < strlen(logo[*line]); ++i) {
+            putc(logo[*line][i], stdout);
+
+            if(logo[*line][i] != '\e') {
+                // same as above
+
+                len += 1-escaping;
+
+                escaping = (logo[*line][i] != 'm') && escaping;
+            }
+            else
+                escaping = 1;
+        }
+    fputs(config.color, stdout);
+    for(int i = 0; i < 4 && ((long)(maxlen - strlen(logo[2]) - 4) > 0); ++i)
+        putc(' ', stdout);
+    
     ++(*line);
 }
 
@@ -36,18 +72,6 @@ void unescape(char *str) {
         }
         ++str;
     }
-}
-
-int max(const int *nums, unsigned const int lenght) {
-    if(!lenght) return 0;
-    int max_num = nums[0];
-
-    for(unsigned int i = 1; i < lenght; ++i) {
-        if(nums[i] > max_num)
-            max_num = nums[i];
-    }
-
-    return max_num;
 }
 
 // stuff needed for libcurl

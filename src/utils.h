@@ -34,11 +34,9 @@ struct Config {
 
 extern struct Config config;
 
-void print_line(char **logo, unsigned *line);
+void print_line(char **logo, unsigned *line, size_t maxlen);
 
 void unescape(char *str);
-
-int max(const int *nums, unsigned const int lenght);
 
 // needed for 
 struct MemoryStruct {

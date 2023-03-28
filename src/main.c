@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include <sys/ioctl.h>
 #include <sys/mman.h>
 
 #include "info.h"
@@ -388,51 +388,69 @@ int main(int argc, char **argv) {
     char *data = mem + 1024;
     char *printed = mem+512;
     char format[32] = "%s\e[0m%s";
+    int escaping = 0;
 
     if(config.align) {
-        int nums[64];
-        int i = 0;
+        int current_len;
 
         for(struct Info *current = (infos)->next; current; current = current->next) {
-            nums[i] = strlen(current->label);
-            ++i;
+            asking_align = 0;
+            current_len = strlen(current->label);
+
+            if(current_len > asking_align) {
+                asking_align = current_len;
+            }
         }
 
-        asking_align = max(nums, i) + strlen(": ");
+        asking_align += strlen(": ");
 
         snprintf(format, 32, "%%-%ds\e[0m%%s", asking_align);
     }
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    if(w.ws_col == 0) {                             // redirecting stdout results in ws_col = 0 
+        ioctl(STDERR_FILENO, TIOCGWINSZ, &w);       // I check whether stderr is fine
+        if(w.ws_col == 0) {
+            ioctl(STDIN_FILENO, TIOCGWINSZ, &w);    // stdin too
+            if(w.ws_col == 0)
+                w.ws_col = -1;                      // I just remove the width limit as fallback
+        }
+    }
+
+    int len_remaining = w.ws_col - strlen(logo[2]) - 5;
 
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator) {    // the separators should not get aligned
-            if(printed[0]) {
-                print_line(logo, &line);
+            if(printed[0]) {                // nothing has been printed
+                print_line(logo, &line, w.ws_col);
                 
-                for(size_t i = 0; i < strlen(printed) - 4; ++i)           // the separators should cover the aligment gap
+                for(size_t i = 0; i < strlen(printed) - 4 && (long)i < len_remaining; ++i)           // the separators should cover the aligment gap
                     putc('-', stdout);
-                putc('\n', stdout);
             }
         }
         else if(current->func == spacing) {
-            print_line(logo, &line);
-
-            putc('\n', stdout);
+            print_line(logo, &line, w.ws_col);
         }
         else if(current->func == title) {
-            print_line(logo, &line);
+            print_line(logo, &line, w.ws_col);
 
             char name[256];
             char host[256];
+
+            char buf[1024];
 
             if(user(name) || hostname(host))
                 continue;
 
             size_t len = strlen(name) + strlen(host) + 5;
+            if(len > 511)
+                len = 511;
 
             memset(printed, 'A', len);
             printed[len] = 0;
 
-            printf("%s%s%s%s@%s%s%s\n", config.title_color ? config.color : "",
+            snprintf(buf, 512, "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
                                      config.bold ? "\e[1m" : "",
                                      name,
                                      config.title_color ? "\e[0m" : "",
@@ -440,9 +458,29 @@ int main(int argc, char **argv) {
                                      config.title_color ? config.color : "",
                                      host
             );
+            for(size_t i = 0, len = 0; (long)len < len_remaining && i < strlen(buf); ++i) {
+                putc(buf[i], stdout);
+
+                if(buf[i] != '\e') {
+                    // look mom, I just wanted to try to write some branchless code
+
+                    // this line is a bit weird
+                    // ++len <=> escaping == 0
+                    len += 1-escaping;
+
+                    /* m is found and escaping => escaping = 0
+                    * m is found and not escaping => escaping = 0
+                    * m is not found and escaping => escaping = 1
+                    * m is found and not escaping => escaping = 0
+                    */
+                    escaping = (buf[i] != 'm') && escaping;
+                }
+                else
+                    escaping = 1;
+            }
         }
         else if(!((current->func)(data))) {
-            print_line(logo, &line);
+            print_line(logo, &line, w.ws_col);
 
             size_t len = strlen(current->label) + strlen(": ");
             char label[len];
@@ -454,16 +492,35 @@ int main(int argc, char **argv) {
             snprintf(printed, 512, format, label, data);
             if(!config.align)
                 strncpy(data, printed, 256);
-            printf("%s\n", printed);
+
+            for(size_t i = 0, len = 0; (long)len < len_remaining && i < strlen(printed); ++i) {
+                putc(printed[i], stdout);
+
+                if(printed[i] != '\e') {
+                    // look mom, I just wanted to try to write some branchless code
+
+                    // this line is a bit weird
+                    // ++len <=> escaping == 0
+                    len += 1-escaping;
+
+                    /* m is found and escaping => escaping = 0
+                    * m is found and not escaping => escaping = 0
+                    * m is not found and escaping => escaping = 1
+                    * m is found and not escaping => escaping = 0
+                    */
+                    escaping = (printed[i] != 'm') && escaping;
+                }
+                else
+                    escaping = 1;
+            }
         }
     }
 
     // remaining lines
-    while(logo[line]) {
-        print_line(logo, &line);
-        printf("\n");
-    }
-    printf("\e[0m");
+    while(logo[line])
+        print_line(logo, &line, w.ws_col);
+        
+    printf("\e[0m\n");
 #endif // _DEBUG
 
     return 0;

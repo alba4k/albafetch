@@ -1,7 +1,6 @@
 #define _DEFAULT_SOURCE
 
 #include <string.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <libgen.h>     // basename
 #include <ctype.h>      // toupper
