@@ -1,6 +1,7 @@
 {
   lib,
   curl,
+  darwin,
   meson,
   ninja,
   pciutils,
@@ -8,7 +9,8 @@
   stdenv,
   version,
 }: let
-  inherit (lib) cleanSource licenses maintainers platforms;
+  inherit (lib) cleanSource licenses maintainers optionals platforms;
+  inherit (stdenv) isLinux isDarwin;
 in
   stdenv.mkDerivation rec {
     name = "albafetch";
@@ -16,7 +18,18 @@ in
     src = cleanSource ../.;
 
     patches = [./meson.patch];
-    buildInputs = [curl.dev pciutils];
+    buildInputs =
+      [
+        pciutils
+      ]
+      ++ optionals isLinux [
+        curl.dev
+      ]
+      ++ optionals isDarwin (with darwin.apple_sdk.frameworks; [
+        Foundation
+        IOKit
+      ]);
+
     nativeBuildInputs = [meson ninja pkgconfig];
 
     meta = {
