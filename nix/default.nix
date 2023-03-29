@@ -19,10 +19,10 @@ in
 
     buildInputs =
       [
-        pciutils
+        curl.dev
       ]
       ++ optionals isLinux [
-        curl.dev
+        pciutils
       ];
 
     nativeBuildInputs =
@@ -32,11 +32,16 @@ in
         IOKit
       ]);
 
+    OBJC =
+      if isDarwin
+      then "clang"
+      else "";
+
     meta = {
       description = "Faster neofetch alternative, written in C.";
       homepage = "https://github.com/alba4k/albafetch";
       license = licenses.mit;
       maintainers = with maintainers; [getchoo];
-      platforms = with platforms; lib.flatten [linux darwin];
+      platforms = platforms.unix;
     };
   }

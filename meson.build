@@ -19,7 +19,8 @@ if host_machine.system() == 'linux'
 endif
 
 if host_machine.system() == 'darwin'
-  project_dependencies += dependency('appleframeworks', modules : 'foundation', 'iokit')
+  project_dependencies += dependency('appleframeworks', modules : ['foundation', 'iokit'])
+  add_languages('objc')
   src += [
     'src/macos_infos.c',
     'src/bsdwrap.c',
