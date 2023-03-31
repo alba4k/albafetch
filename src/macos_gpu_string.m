@@ -1,6 +1,7 @@
 #include "macos_infos.h"
 
 #import <Foundation/Foundation.h>
+#import <IOKit/IOKitLib.h>
 
 char *get_gpu_string() {
     CFMutableDictionaryRef dict = IOServiceMatching("IOPCIDevice");
