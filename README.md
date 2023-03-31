@@ -11,48 +11,115 @@ Here is a time comparison (exact execution times change between machines and run
 
 ## Dependencies:
 
-Everything the program could need will be installed on your distribution out of te box (`sh`, `lspci`).
+Everything the program could need will be installed on your distribution out of the box (`sh`, `lspci`).
 I would reccoment double checking libalpm on archlinux-based systems (it's also a dependency of pacman, so that should already be there).
 
 # Compiling:
+
 this will need gcc (`make CC=[compiler]` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
+
 ```shell
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
 $ make
 ```
-An executable file should appear in `build/` if the compilation succedes.
+
+An executable file should appear in `build/` if the compilation succeeds.
+
+## Using meson
+
+If you prefer to build with meson/ninja, you can use these commands:
+
+```sh
+meson setup build
+meson compile -C build
+```
+
+Like `make`, an executable file with appear in `build/` if compilation succeeds
+
+## Using nix
+
+Building with nix can make compiling in some ways much easier, such as when compiling statically
+or cross compilng. A few convenience outputs are included:
+
+```sh
+nix build .#albafetch # regular, dynamically linked build
+nix build .#albafetch-static # statically linked build
+nix build .#arm.<linux/darwin> # cross compilng from x86_64 to arm
+```
 
 # Installation
-### For Arch Linux based systems, an AUR package is avaiable (`albafetch-git`)
+
+### For Arch Linux based systems, an AUR package is available (`albafetch-git`)
+
+### For NixOS users
+
+`nix profile`:
+
+```sh
+nix profile install .#albafetch
+```
+
+`nix shell`:
+
+```sh
+nix shell github:alba4k/albafetch
+```
+
+`nix-env`:
+
+```sh
+nix-env -iA packages.<your platform>.albafetch # platform examples: x86_64-linux, aarch64-linux, aarch64-darwin
+```
+
+As an overlay:
+
+```nix
+{
+	albafetch,
+	pkgs,
+	...
+}: {
+	nixpkgs.overlays = [albafetch.overlays.default];
+	environment.systemPackages = with pkgs; [
+		albafetch
+	];
+}
+```
+
 ## Manual installation:
 
 this will need gcc (`make CC=[compiler] install` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
 
 ```
+
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
+
 # make install
+
 ```
 
-`make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to acces `/usr/bin/`. It will copy the executable from `build/` to there.
-
-
+`make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to access `/usr/bin/`. It will copy the executable from `build/` to there.
 
 # Customizing
+
 A configuration should be placed in `~/.config/albafetch.conf` (`~/.config` can be overwritten using the `XDG_CONFIG_HOME` environnment variable). An example config, with comments, is found in this repository.
 
 ## How to write the config:
+
 Basic rules:
-* comments start with ; and reach the end of the line
-* values can't be big than 32B (separators can get as long as 64B)
-* only ASCII characters will work
-* ending the file with a newline is reccomended
+
+- comments start with ; and reach the end of the line
+- values can't be big than 32B (separators can get as long as 64B)
+- only ASCII characters will work
+- ending the file with a newline is recommended
 
 The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword.
 
 ### Options and default values:
-``` python
+
+```python
 spacing = "    "
 separator1 = "\e[0m------------------"
 separator2 = ""
@@ -96,11 +163,12 @@ pwd_label = "Directory"
 Unset values will use the defaults
 Quotes in the config are **not** optional.
 
-If a key is defined more than one the first one is the only oen that will get considered.
+If a key is defined more than one the first one is the only one that will get considered.
 
 This repository contains a commented example config file (`albafetch.conf`) with the default values.
 
 ## Source code editing:
+
 If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `src/logos.h` (inside of `const char *logos[][]`) and in `src/main.c` (to make them show up in the help message).
 
 Don't mind doing a pull request if you think some of the changes you made should be in the global version, just try to follow the formatting that's used in the rest of the file :)

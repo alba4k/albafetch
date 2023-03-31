@@ -2,3 +2,7 @@
 .vscode
 build/
 albafetch.conf.link
+
+# nix stuff
+.direnv/
+result
