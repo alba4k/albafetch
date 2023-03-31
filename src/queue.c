@@ -1,5 +1,8 @@
 #include "queue.h"
 
+#include <stdio.h>
+#include <string.h>
+
 Queue *queue_with_size(size_t size) {
     Queue *q = malloc(sizeof(Queue));
 

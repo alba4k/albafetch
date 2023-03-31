@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
@@ -14,7 +16,15 @@
  */
 
 // various configurations for stuff
+
+// This contains the default config values
 struct Config config = {
+    false,  // align
+    true,   // bold
+    NULL,   // logo
+    "",     // color
+    ": ",   // dash
+
     true,   // title_color
     true,   // os_arch
     false,  // de_type
@@ -34,43 +44,65 @@ struct Config config = {
     true,   // pkg_brew
     false,  // loc_docker
     false,  // loc_localdomain
+    3,      // col_block_len
 
-    false,  // align
-    true,   // bold
-    "",     // color
+    "",         // separator_prefix
+    "",         // spacing_prefix
+    "",         // title_prefix
+    "User",     // user_prefix
+    "Hostname", // hostname_prefix
+    "Uptime",   // uptime_prefix
+    "OS",       // os_prefix
+    "Kernel",   // kernel_prefix
+    "Desktop",  // desktop_prefix
+    "Shell",    // shell_prefix
+    "Login",    // login_shell_prefixix
+    "Terminal", // term_prefix
+    "Packages", // packages_prefix
+    "Host",     // host_prefix
+    "BIOS",     // bios_prefix
+    "CPU",      // cpu_prefix
+    "GPU",      // gpu_prefix
+    "Memory",   // mem_prefix
+    "Public IP",// public_ip_prefix
+    "Local IP", // loc_prefix
+    "Directory",// pwd_prefix
+    "Date",     // date_prefix
+    "",         // colors_prefix
+    "",         // light_colors_prefix
 };
 
 int main(int argc, char **argv) {
-    // using a linked list for this is quite horrible, but here we go
+    // using a linked list like this is quite horrible, but here we go
     struct Info infos[64] = {
     //  {"Label", fptr, next}
-        {NULL, NULL, infos+3},              // 00
-        {"User", user, NULL},               // 01
-        {"Hostname", hostname, NULL},       // 02
-        {"", title, infos+23},              // 03
-        {"Uptime", uptime, infos+24},       // 04
-        {"OS", os, infos+6},                // 05
-        {"Kernel", kernel, infos+7},        // 06
-        {"Desktop", desktop, infos+8},      // 07
-        {"Shell", shell, infos+10},         // 08
-        {"Login", login_shell, NULL},       // 09
-        {"Terminal", term, infos+11},       // 10
-        {"Packages", packages, infos+25},   // 11
-        {"Host", host, infos+14},           // 12
-        {"BIOS", bios, NULL},               // 13
-        {"CPU", cpu, infos+15},             // 14
-        {"GPU", gpu, infos+16},             // 15
-        {"Memory", memory, infos+26},       // 16
-        {"Public IP", public_ip, NULL},     // 17
-        {"Local IP", local_ip, NULL},       // 18
-        {"Directory", pwd, NULL},           // 19
-        {"Date", date, NULL},               // 20
-        {"", colors, infos+22},             // 21
-        {"", light_colors, NULL},           // 22
-        {"", separator, infos+4},           // 23
-        {"", separator, infos+5},           // 24
-        {"", separator, infos+12},          // 25
-        {"", spacing, infos+21},          // 26
+        {NULL, NULL, infos+3},                              // 00
+        {config.user_prefix, user, NULL},                   // 01
+        {config.hostname_prefix, hostname, NULL},           // 02
+        {config.title_prefix, title, infos+23},             // 03
+        {config.uptime_prefix, uptime, infos+24},           // 04
+        {config.os_prefix, os, infos+6},                    // 05
+        {config.kernel_prefix, kernel, infos+7},            // 06
+        {config.desktop_prefix, desktop, infos+8},          // 07
+        {config.shell_prefix, shell, infos+10},             // 08
+        {config.login_shell_prefixix, login_shell, NULL},   // 09
+        {config.term_prefix, term, infos+11},               // 10
+        {config.packages_prefix, packages, infos+25},       // 11
+        {config.host_prefix, host, infos+14},               // 12
+        {config.bios_prefix, bios, NULL},                   // 13
+        {config.cpu_prefix, cpu, infos+15},                 // 14
+        {config.gpu_prefix, gpu, infos+16},                 // 15
+        {config.mem_prefix, memory, infos+26},              // 16
+        {config.public_ip_prefix, public_ip, NULL},         // 17
+        {config.loc_prefix, local_ip, NULL},                // 18
+        {config.pwd_prefix, pwd, NULL},                     // 19
+        {config.date_prefix, date, NULL},                   // 20
+        {config.colors_prefix, colors, infos+22},           // 21
+        {config.light_colors_prefix, light_colors, NULL},   // 22
+        {config.separator_prefix, separator, infos+4},      // 23
+        {config.separator_prefix, separator, infos+5},      // 24
+        {config.separator_prefix, separator, infos+12},     // 25
+        {config.spacing_prefix, spacing, infos+21},         // 26
     };
 
     bool user_is_an_idiot = false; // rtfm and stfu
@@ -84,11 +116,9 @@ int main(int argc, char **argv) {
 
     // these store either the default values or the ones defined in the config
     // they are needed to know what is used if no arguments are given (for --help)
-    bool default_bold = true;
+    bool default_bold;
     char default_color[8] = "";
     char default_logo[16] = "";
-
-    bool using_custom_config = false;
 
     char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
@@ -119,7 +149,6 @@ int main(int argc, char **argv) {
     // I really hope this part will never run
     if(!home) {
         fputs("\e[31m\e[1mERROR\e[0m: $HOME is not set, interrupting!\n", stderr);
-
         return -1;
     }
     if(!home[0]) {
@@ -140,19 +169,22 @@ int main(int argc, char **argv) {
         else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
             asking_align = i+1;
         else if(!strcmp(argv[i], "--config")) {
-            if(i+1 < argc) {
-                using_custom_config = true;
-                strcpy(config_file, argv[i+1]);
+            if(i+1 >= argc) {   // is there such an arg?
+                fputs("\e[31m\e[1mERROR\e[0m: --config requires an extra argument!\n", stderr);
+                user_is_an_idiot = true;
                 continue;
             }
-            fputs("\e[31m\e[1mERROR\e[0m: --config requires an extra argument!\n", stderr);
-            user_is_an_idiot = true;
+            else if(access(argv[i+1], F_OK)) {  // is it a valid file?
+                fprintf(stderr, "\e[31m\e[1mERROR\e[0m: invalid file \"%s\"! Use --help for more info\n", argv[i+1]);
+                user_is_an_idiot = true;
+                continue;
+            }
+            strcpy(config_file, argv[i+1]);
+            continue;
         }
     }
-    
-    char **logo = NULL;
 
-    if(!using_custom_config) {
+    if(!config_file[0]) {
         char *config_home = getenv("XDG_CONFIG_HOME");
         if(config_home) { // is XDG_CONFIG_HOME set?
             if(config_home[0]) // is XDG_CONFIG_HOME empty?
@@ -164,7 +196,7 @@ int main(int argc, char **argv) {
             snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
     }
 
-    // TODO: config
+    parse_config(config_file, &default_bold, default_color, default_logo);
 
     if(asking_logo) {
         if(asking_logo < argc) {
@@ -172,7 +204,7 @@ int main(int argc, char **argv) {
 
             for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], argv[asking_logo])) {
-                    logo = (char**)logos[i];
+                    config.logo = (char**)logos[i];
                     done = true;
                 }
 
@@ -185,16 +217,16 @@ int main(int argc, char **argv) {
             user_is_an_idiot = true;
         }
 
-        strcpy(config.color, logo[1]);
+        strcpy(config.color, config.logo[1]);
     }
-    if(!logo) {
+    if(!config.logo) {
         #ifdef __APPLE__
-            logo = (char**)logos[1];
+            config.logo = (char**)logos[1];
         #else
         # ifdef __ANDROID__
-            logo = (char**)logos[2];
+            config.logo = (char**)logos[2];
         # else
-            logo = (char**)logos[0];
+            config.logo = (char**)logos[0];
             FILE *fp = fopen("/etc/os-release", "r");
 
             if(fp) {
@@ -211,13 +243,13 @@ int main(int argc, char **argv) {
 
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], os_id))
-                        logo = (char**)logos[i];
+                        config.logo = (char**)logos[i];
             }
         # endif // __ANDROID__
         #endif // __APPLE__
         
-        strcpy(default_logo, logo[0]);
-        strcpy(config.color, logo[1]);
+        strcpy(default_logo, config.logo[0]);
+        strcpy(config.color, config.logo[1]);
     }
 
     if(asking_color) {
@@ -289,7 +321,7 @@ int main(int argc, char **argv) {
                "\t\t\t   [\e[30mblack\e[0m, \e[31mred\e[0m, \e[32mgreen\e[0m, \e[33myellow\e[0m,"
                " \e[34mblue\e[0m, \e[35mpurple\e[0m, \e[36mcyan\e[0m, \e[90mgray\e[0m,"
                " \e[37mwhite\e[0m]\n",
-               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_color[0] ? default_color : logo[1], default_color[0] ? "default" : "logo default");
+               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
 
         printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
                "\t\t\t   [\e[1mon\e[0m, off]\n",
@@ -402,7 +434,7 @@ int main(int argc, char **argv) {
             }
         }
 
-        asking_align += strlen(": ");
+        asking_align += strlen(config.dash);
 
         snprintf(format, 32, "%%-%ds\e[0m%%s", asking_align);
     }
@@ -418,27 +450,54 @@ int main(int argc, char **argv) {
         }
     }
 
-    int len_remaining = w.ws_col - strlen(logo[2]) - 5;
+    int len_remaining = w.ws_col - strlen(config.logo[2]) - 5;
 
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator) {    // the separators should not get aligned
             if(printed[0]) {                // nothing has been printed
-                print_line(logo, &line, w.ws_col);
+                print_line(config.logo, &line, w.ws_col);
                 
-                for(size_t i = 0; i < strlen(printed) - 4 && (long)i < len_remaining; ++i)           // the separators should cover the aligment gap
-                    putc('-', stdout);
+                
+                for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.separator_prefix) && i < strlen(config.separator_prefix); ++i)
+                    putc(config.separator_prefix[i], stdout);
+
+
+                for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.separator_prefix) && i < strlen(printed)-4; ++i) {
+                    if(!escaping)
+                        putc('-', stdout);
+
+                    if(printed[i] != '\e') {
+                        // look mom, I just wanted to try to write some branchless code
+
+                        // this line is a bit weird
+                        // ++len <=> escaping == 0
+                        len += 1-escaping;
+
+                        /* m is found and escaping => escaping = 0
+                        * m is found and not escaping => escaping = 0
+                        * m is not found and escaping => escaping = 1
+                        * m is found and not escaping => escaping = 0
+                        */
+                        escaping = (printed[i] != 'm') && escaping;
+                    }
+                    else
+                        escaping = 1;
+                }
             }
         }
         else if(current->func == spacing) {
-            print_line(logo, &line, w.ws_col);
+            print_line(config.logo, &line, w.ws_col);
         }
         else if(current->func == title) {
-            print_line(logo, &line, w.ws_col);
+            print_line(config.logo, &line, w.ws_col);
+
+            for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.title_prefix) && i < strlen(config.title_prefix); ++i)
+                putc(config.title_prefix[i], stdout);
 
             char name[256];
             char host[256];
 
-            char buf[1024];
+            char buf[512];
 
             if(user(name) || hostname(host))
                 continue;
@@ -458,7 +517,7 @@ int main(int argc, char **argv) {
                                      config.title_color ? config.color : "",
                                      host
             );
-            for(size_t i = 0, len = 0; (long)len < len_remaining && i < strlen(buf); ++i) {
+            for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.title_prefix) && i < strlen(buf); ++i) {
                 putc(buf[i], stdout);
 
                 if(buf[i] != '\e') {
@@ -480,18 +539,16 @@ int main(int argc, char **argv) {
             }
         }
         else if(!((current->func)(data))) {
-            print_line(logo, &line, w.ws_col);
+            print_line(config.logo, &line, w.ws_col);
 
-            size_t len = strlen(current->label) + strlen(": ");
+            size_t len = strlen(current->label) + strlen(config.dash);
             char label[len];
 
             strcpy(label, current->label);
-            if(current->label[0])
-                strcat(label, ": ");
+            if(current->label[0] && current->func != colors && current->func != light_colors)
+                strcat(label, config.dash);
 
             snprintf(printed, 512, format, label, data);
-            if(!config.align)
-                strncpy(data, printed, 256);
 
             for(size_t i = 0, len = 0; (long)len < len_remaining && i < strlen(printed); ++i) {
                 putc(printed[i], stdout);
@@ -517,8 +574,8 @@ int main(int argc, char **argv) {
     }
 
     // remaining lines
-    while(logo[line])
-        print_line(logo, &line, w.ws_col);
+    while(config.logo[line])
+        print_line(config.logo, &line, w.ws_col);
         
     printf("\e[0m\n");
 #endif // _DEBUG

@@ -3,7 +3,7 @@
 #ifndef LOGOS_H
 #define LOGOS_H
 
-char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to macOS
+static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to macOS
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-relase
         "\e[90m",                                               // default color for the printed text
@@ -20,7 +20,7 @@ char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to mac
         "\e[33m######\e[90m#\e[37m#######\e[90m#\e[33m######",
         "\e[33m#######\e[90m#\e[37m#####\e[90m#\e[33m#######",
         "\e[33m  #####\e[90m#######\e[33m#####  ",
-        NULL                                                    // the logo is terminated by NULL
+        NULL                                                 // the logo is terminated by NULL
     },
     {   // MacOS X
         "apple",

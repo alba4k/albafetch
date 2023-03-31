@@ -4,9 +4,8 @@
 #define QUEUE_H
 
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 #define QUEUE_OK     0
 #define QUEUE_EMPTY -1

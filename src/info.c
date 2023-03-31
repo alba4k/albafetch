@@ -1049,19 +1049,33 @@ int date(char *dest) {
 
 // show the terminal color configuration
 int colors(char *dest) {
-    for(int i = 0; i < 8; ++i)
-        sprintf(dest+8*i, "\e[4%dm   ", i);
+    if(config.col_block_len > 16)
+        return 1;
 
-    strcpy(dest+64, "\e[0m");
+    memset(dest, 0, 256);
+    for(int i = 0; i < 8; ++i) {
+        sprintf(dest+(5+config.col_block_len)*i, "\e[4%dm", i);
+        for(int i = 0; i < config.col_block_len; ++i)
+            strcat(dest, " ");
+    }
+
+    strcat(dest, "\e[0m");
 
     return 0;
 }
 // show the terminal color configuration (light version)
 int light_colors(char *dest) {
-    for(int i = 0; i < 8; ++i)
-        sprintf(dest+9*i, "\e[10%dm   ", i);
+    if(config.col_block_len > 16)
+        return 1;
 
-    strcpy(dest+72, "\e[0m");
+    memset(dest, 0, 256);
+    for(int i = 0; i < 8; ++i) {
+        sprintf(dest+(6+config.col_block_len)*i, "\e[10%dm", i);
+        for(int i = 0; i < config.col_block_len; ++i)
+            strcat(dest, " ");
+    }
+
+    strcat(dest, "\e[0m");
 
     return 0;
 }
