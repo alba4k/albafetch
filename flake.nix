@@ -48,7 +48,7 @@
     // {
       arm = let
         linuxPkgs = nixpkgsFor."x86_64-linux".pkgsCross.aarch64-multiplatform.pkgsStatic;
-        darwinPkgs = nixpkgsFor."x86_64-darwin".pkgsCross.aarch64-darwin.pkgsStatic;
+        darwinPkgs = nixpkgsFor."x86_64-darwin".pkgsCross.aarch64-darwin;
       in {
         linux = {inherit (linuxPkgs) albafetch;};
         darwin = {inherit (darwinPkgs) albafetch;};
