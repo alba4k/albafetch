@@ -48,7 +48,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Android
         "android",
         "\e[32m",
-        "\e[32m                                ",
+        "                                ",
         "\e[32m         -o          o-         ",
         "\e[32m          +hydNNNNdyh+          ",
         "\e[32m        +mMMMMMMMMMMMMm+        ",

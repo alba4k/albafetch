@@ -198,10 +198,8 @@ void parse_config(char *file, bool *default_bold, char *default_color, char *def
 
     FILE *fp = fopen(file, "r");
 
-    if(!fp) {
-        fprintf(stderr, "\e[91m\e[1mWARNING\e[0m: Couldn't read %s, using the default configuration instead.\n", file);
+    if(!fp)
         return;
-    }
 
     fseek(fp, 0, SEEK_END);
     size_t len = ftell(fp);
