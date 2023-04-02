@@ -12,6 +12,8 @@ struct Config {
     char **logo;
     char color[8];
     char dash[16];
+    char separator[5];
+    int spacing;
 
     bool title_color;
     bool os_arch;
@@ -61,7 +63,9 @@ struct Config {
 };
 extern struct Config config;
 
-void print_line(char **logo, unsigned *line, size_t maxlen);
+void get_logo_line(char *dest, unsigned *line);
+
+void print_line(char *line, unsigned short maxlen);
 
 void unescape(char *str);
 

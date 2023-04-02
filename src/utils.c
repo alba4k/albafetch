@@ -4,22 +4,35 @@
 #include "logos.h"
 #include "utils.h"
 
-void print_line(char **logo, unsigned *line, size_t maxlen) {
-    if(!logo)
+// print a certain line of the logo
+void get_logo_line(char *dest, unsigned *line) {
+    if(!config.logo || !dest || !line)
         return;
 
-    int escaping = 0;
+    if(config.logo[*line])
+        strcat(dest, config.logo[(*line)++]);
+    else
+        strcat(dest, config.logo[2]);
+}
 
-    if(*line > 3)
-        putc('\n', stdout);
+// print no more than maxlen visible characters of line
+void print_line(char *line, unsigned short maxlen) {
+    if(config.bold)
+        fputs("\e[1m", stdout);
 
-    printf("\e[0m%s", config.bold ? "\e[1m" : "");
+    bool escaping = false;
 
-    if(!logo[*line])
-        for(size_t i = 0, len = 0; len < maxlen && i < strlen(logo[2]); ++i) {
-            putc(logo[2][i], stdout);
+    for(size_t i = 0, len = 0; len < maxlen && i < strlen(line); ++i) {
+            putc(line[i], stdout);
 
-            if(logo[2][i] != '\e') {
+            if(line[i] == '\n')
+                break;
+
+            // unicode continuation byte 0x10xxxxxx
+            if(line[i] & 0x80 && !(line[i] & 0x40))
+                continue;
+                
+            if(line[i] != '\e') {
                 // look mom, I just wanted to try to write some branchless code
 
                 // this line is a bit weird
@@ -31,32 +44,13 @@ void print_line(char **logo, unsigned *line, size_t maxlen) {
                  * m is not found and escaping => escaping = 1
                  * m is found and not escaping => escaping = 0
                  */
-
-                escaping = (logo[2][i] != 'm') && escaping;
+                escaping = (line[i] != 'm') && escaping;
             }
             else
-                escaping = 1;
+                escaping = true;
         }
-    else
-        for(size_t i = 0, len = 0; len < maxlen && i < strlen(logo[*line]); ++i) {
-            putc(logo[*line][i], stdout);
 
-            if(logo[*line][i] != '\e') {
-                // same as above
-
-                len += 1-escaping;
-
-                escaping = (logo[*line][i] != 'm') && escaping;
-            }
-            else
-                escaping = 1;
-        }
-        
-    fputs(config.color, stdout);
-    for(int i = 0; i < 4 && ((long)(maxlen - strlen(logo[2]) - i) > 0); ++i)
-        putc(' ', stdout);
-    
-    ++(*line);
+    fputs("\n\e[0m", stdout);
 }
 
 // check every '\\' in str and unescape "\\\\" "\\n" "\\e"
@@ -128,8 +122,8 @@ int parse_config_str(char* source, char *dest, char *field, size_t maxlen) {
     return 0;
 }
 
-// in the following, a return code of 1 means success
-int parse_config_int(char *source, int *dest, char *field) {
+// a return code of 0 means that the option was parsed successfully
+int parse_config_int(char *source, int *dest, char *field, int max) {
     char *ptr;
 
     // looks for the keyword
@@ -154,13 +148,18 @@ int parse_config_int(char *source, int *dest, char *field) {
 
     // copies the option
     *field = 0;
-    *dest = atoi(ptr);
+    int num = atoi(ptr);
     *field = '"';
+
+    if((unsigned)num > (unsigned)max)
+        return 1;
+
+    *dest =  num;
 
     return 0;
 }
 
-// in the following, a return code of 1 means success
+// a return code of 0 means that the option was parsed successfully
 int parse_config_bool(char *source, bool *dest, char *field) {
     char *ptr;
 
@@ -240,7 +239,7 @@ void parse_config(char *file, bool *default_bold, char *default_color, char *def
 
     // logo
     char logo[32] = "";
-    parse_config_str(conf, logo, "logo", 32);
+    parse_config_str(conf, logo, "logo", sizeof(logo));
     if(logo[0]) {
         for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
             if(!strcmp(logos[i][0], logo)) {
@@ -252,7 +251,7 @@ void parse_config(char *file, bool *default_bold, char *default_color, char *def
 
     // color
     char color[16] = "";
-    parse_config_str(conf, color, "default_color", 16);
+    parse_config_str(conf, color, "default_color", sizeof(color));
     if(color[0]) {
         char *colors[9][2] = {
             {"black", "\e[30m"},
@@ -274,7 +273,13 @@ void parse_config(char *file, bool *default_bold, char *default_color, char *def
     }
 
     // dash
-    parse_config_str(conf, config.dash, "dash", 16);
+    parse_config_str(conf, config.dash, "dash", sizeof(config.dash));
+
+    // spacing
+    parse_config_int(conf, &config.spacing, "spacing", 64);
+
+    // separator
+    parse_config_str(conf, config.separator, "separator", sizeof(config.separator));
 
     // MODULE-SPECIFIC OPTIONS
 
@@ -308,7 +313,7 @@ void parse_config(char *file, bool *default_bold, char *default_color, char *def
     for(size_t i = 0; i < sizeof(options)/sizeof(options[0]); ++i)
         parse_config_bool(conf, options[i].config_option, options[i].config_name);
 
-    parse_config_int(conf, &config.col_block_len, "col_block_len");
+    parse_config_int(conf, &config.col_block_len, "col_block_len", 16);
 
     // LABELS
 
@@ -341,7 +346,7 @@ void parse_config(char *file, bool *default_bold, char *default_color, char *def
     };
 
     for(size_t i = 0; i < sizeof(modules)/sizeof(modules[0]); ++i)
-        parse_config_str(conf, modules[i][0], modules[i][1], 64);
+        parse_config_str(conf, modules[i][0], modules[i][1], sizeof(modules[i][0]));
 
     free(conf);
 }

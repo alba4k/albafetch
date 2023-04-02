@@ -27,6 +27,7 @@
 #include "info.h"
 #include "queue.h"
 #include "utils.h"
+
 // print the current user
 int user(char *dest) {
     struct passwd *pw;
@@ -276,7 +277,7 @@ int term(char *dest) {
 // get amount of packages installed
 int packages(char *dest) {
     dest[0] = 0;
-    char buf[256] = "", str[64], path[256];
+    char buf[256] = "", str[128] = "", path[256] = "";
     DIR *dir;
     struct dirent *entry;
     unsigned count = 0;
@@ -296,9 +297,8 @@ int packages(char *dest) {
                     ++count;
 
             if(count) {
-                snprintf(buf, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (pacman)" : "");
+                snprintf(dest, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (pacman)" : "");
                 done = true;
-                strncat(dest, buf, 256 - strlen(dest));
             }
             closedir(dir);
         }
@@ -327,8 +327,9 @@ int packages(char *dest) {
             free(dpkg_list);
 
             if(count) {
-                snprintf(dest, 256, "%u%s", count, config.pkg_mgr ? " (dpkg)" : "");
+                snprintf(buf, 256, "%u%s", count, config.pkg_mgr ? " (dpkg)" : "");
                 done = true;
+                strncat(dest, buf, 256 - strlen(dest));
             }
         }
 
@@ -401,7 +402,7 @@ int packages(char *dest) {
             }
         }
     #endif
-    if(!config.pkg_brew && (access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
+    if(config.pkg_brew && (access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
         pipe(pipes);
 
         if(!fork()) {
@@ -410,26 +411,29 @@ int packages(char *dest) {
             execlp("brew", "brew", "--cellar", NULL); 
         }
 
-        wait(0);
-            
         close(pipes[1]);
-        str[read(pipes[0], str, 64) - 1] = 0;
+
+        wait(0);
+
+        str[read(pipes[0], str, 128) - 1] = 0;
         close(pipes[0]);
 
-        if((dir = opendir(str))) {
-            count = 0;
+        if(str[0]) {
+            if((dir = opendir(str))) {
+                count = 0;
 
-            while((entry = readdir(dir)) != NULL)
-                if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
-                    ++count;
+                while((entry = readdir(dir)) != NULL)
+                    if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
+                        ++count;
 
-            if(count) {
-                snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (brew)" : "");
-                done = true;
-                strncat(dest, buf, 256 - strlen(dest));
+                if(count) {
+                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (brew)" : "");
+                    done = true;
+                    strncat(dest, buf, 256 - strlen(dest));
+                }
+
+                closedir(dir);
             }
-
-            closedir(dir);
         }
     }
 

@@ -24,6 +24,8 @@ struct Config config = {
     NULL,   // logo
     "",     // color
     ": ",   // dash
+    "-",    // separator
+    5,      // spacing
 
     true,   // title_color
     true,   // os_arch
@@ -127,10 +129,10 @@ int main(int argc, char **argv) {
      * 0  
      * 1   
      * 2  printed       (saves what should get printed, used for parsing)
-     * 3  printed       (saves what should get printed, used for parsing)
-     * 4  data          (buffer for every function in info.c)
+     * 3  printed
+     * 4  printed
      * 5  
-     * 6  
+     * 6  data          (buffer for every function in info.c)
      * 7  
      * 8  logo          (32 char* to lines (following logo.h))
      * 9  
@@ -417,10 +419,9 @@ int main(int argc, char **argv) {
 #else
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis
     unsigned line = 3;
-    char *data = mem + 1024;
+    char *data = mem + 1536;
     char *printed = mem+512;
     char format[32] = "%s\e[0m%s";
-    int escaping = 0;
 
     if(config.align) {
         int current_len;
@@ -438,6 +439,7 @@ int main(int argc, char **argv) {
 
         snprintf(format, 32, "%%-%ds\e[0m%%s", asking_align);
     }
+    
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
@@ -450,66 +452,79 @@ int main(int argc, char **argv) {
         }
     }
 
-    int len_remaining = w.ws_col - strlen(config.logo[2]) - 5;
-
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator) {    // the separators should not get aligned
-            if(printed[0]) {                // nothing has been printed
-                print_line(config.logo, &line, w.ws_col);
-                
-                
-                for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.separator_prefix) && i < strlen(config.separator_prefix); ++i)
-                    putc(config.separator_prefix[i], stdout);
+            if(!(printed[0]))
+                continue;
 
+            size_t prev = strlen(printed);
+            if(prev > 767)
+                continue;
 
-                for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.separator_prefix) && i < strlen(printed)-4; ++i) {
-                    if(!escaping)
-                        putc('-', stdout);
+            size_t len = 0;
 
-                    if(printed[i] != '\e') {
-                        // look mom, I just wanted to try to write some branchless code
+            bool escaping = false;
+            char *ptr = printed
+                        + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
+                        + config.spacing;
 
-                        // this line is a bit weird
-                        // ++len <=> escaping == 0
-                        len += 1-escaping;
+            // determine how long the printed string is (same logic as in print_line, utils.c)
+            for(; *ptr; ++ptr) {
+                if(*ptr == '\n')
+                    break;
 
-                        /* m is found and escaping => escaping = 0
-                        * m is found and not escaping => escaping = 0
-                        * m is not found and escaping => escaping = 1
-                        * m is found and not escaping => escaping = 0
-                        */
-                        escaping = (printed[i] != 'm') && escaping;
-                    }
-                    else
-                        escaping = 1;
+                // unicode continuation byte 0x10xxxxxx
+                if(*ptr & 0x80 && !(*ptr & 0x40))
+                    continue;
+                    
+                if(*ptr != '\e') {
+                    len += 1-escaping;
+
+                    escaping = (*ptr != 'm') && escaping;
                 }
+                else
+                    escaping = true;
             }
+
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+
+            strcat(printed, config.separator_prefix);
+
+            for(size_t i = 0; i < len && strlen(printed) < 764; ++i)
+                strcat(printed, config.separator);
         }
         else if(current->func == spacing) {
-            print_line(config.logo, &line, w.ws_col);
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+            
+            strcat(printed, config.spacing_prefix);
         }
         else if(current->func == title) {
-            print_line(config.logo, &line, w.ws_col);
-
-            for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.title_prefix) && i < strlen(config.title_prefix); ++i)
-                putc(config.title_prefix[i], stdout);
-
             char name[256];
             char host[256];
-
-            char buf[512];
 
             if(user(name) || hostname(host))
                 continue;
 
-            size_t len = strlen(name) + strlen(host) + 5;
-            if(len > 511)
-                len = 511;
+            printed[0] = 0;
 
-            memset(printed, 'A', len);
-            printed[len] = 0;
+            get_logo_line(printed, &line);
 
-            snprintf(buf, 512, "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+             
+            strcat(printed, config.title_prefix);
+
+            snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
                                      config.bold ? "\e[1m" : "",
                                      name,
                                      config.title_color ? "\e[0m" : "",
@@ -517,67 +532,40 @@ int main(int argc, char **argv) {
                                      config.title_color ? config.color : "",
                                      host
             );
-            for(size_t i = 0, len = 0; (long)len < len_remaining-(int)strlen(config.title_prefix) && i < strlen(buf); ++i) {
-                putc(buf[i], stdout);
-
-                if(buf[i] != '\e') {
-                    // look mom, I just wanted to try to write some branchless code
-
-                    // this line is a bit weird
-                    // ++len <=> escaping == 0
-                    len += 1-escaping;
-
-                    /* m is found and escaping => escaping = 0
-                    * m is found and not escaping => escaping = 0
-                    * m is not found and escaping => escaping = 1
-                    * m is found and not escaping => escaping = 0
-                    */
-                    escaping = (buf[i] != 'm') && escaping;
-                }
-                else
-                    escaping = 1;
-            }
         }
-        else if(!((current->func)(data))) {
-            print_line(config.logo, &line, w.ws_col);
+        else {
+            if((current->func)(data))
+                continue;
 
-            size_t len = strlen(current->label) + strlen(config.dash);
-            char label[len];
+            char label[80];
+
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
 
             strcpy(label, current->label);
             if(current->label[0] && current->func != colors && current->func != light_colors)
                 strcat(label, config.dash);
 
-            snprintf(printed, 512, format, label, data);
-
-            for(size_t i = 0, len = 0; (long)len < len_remaining && i < strlen(printed); ++i) {
-                putc(printed[i], stdout);
-
-                if(printed[i] != '\e') {
-                    // look mom, I just wanted to try to write some branchless code
-
-                    // this line is a bit weird
-                    // ++len <=> escaping == 0
-                    len += 1-escaping;
-
-                    /* m is found and escaping => escaping = 0
-                    * m is found and not escaping => escaping = 0
-                    * m is not found and escaping => escaping = 1
-                    * m is found and not escaping => escaping = 0
-                    */
-                    escaping = (printed[i] != 'm') && escaping;
-                }
-                else
-                    escaping = 1;
-            }
+            snprintf(printed+strlen(printed), 768-strlen(printed), format, label, data);
         }
+        
+        print_line(printed, w.ws_col);
     }
 
     // remaining lines
-    while(config.logo[line])
-        print_line(config.logo, &line, w.ws_col);
-        
-    printf("\e[0m\n");
+    while(config.logo[line]) {
+        printed[0] = 0;
+
+        if(config.bold) strcat(printed, "\e[1m");
+        get_logo_line(printed, &line);
+
+        print_line(printed, w.ws_col);
+    }
+
 #endif // _DEBUG
 
     return 0;
