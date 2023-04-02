@@ -18,7 +18,7 @@ void get_logo_line(char *dest, unsigned *line) {
 // print no more than maxlen visible characters of line
 void print_line(char *line, const size_t maxlen) {
     if(config.bold)
-        fputs("\e[1m", stdout);
+        fputs("\033[1m", stdout);
 
     bool escaping = false;
     int unicode = 0;
@@ -28,7 +28,7 @@ void print_line(char *line, const size_t maxlen) {
 
             if(line[i] == '\n')
                 break;
-            else if(line[i] == '\e')
+            else if(line[i] == '\033')
                 escaping = true;
             else if(line[i] < 0) {
                 if(line[i] & 0x40) {
@@ -60,7 +60,7 @@ void print_line(char *line, const size_t maxlen) {
             }
         }
 
-    fputs("\n\e[0m", stdout);
+    fputs("\n\033[0m", stdout);
 }
 
 // a return code of 0 means that the option was parsed successfully
@@ -231,15 +231,15 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
     parse_config_str(conf, "default_color", color, sizeof(color));
     if(color[0]) {
         char *colors[9][2] = {
-            {"black", "\e[30m"},
-            {"red", "\e[31m"},
-            {"green", "\e[32m"},
-            {"yellow", "\e[33m"},
-            {"blue", "\e[34m"},
-            {"purple", "\e[35m"},
-            {"cyan", "\e[36m"},
-            {"gray", "\e[90m"},
-            {"white", "\e[37m"},
+            {"black", "\033[30m"},
+            {"red", "\033[31m"},
+            {"green", "\033[32m"},
+            {"yellow", "\033[33m"},
+            {"blue", "\033[34m"},
+            {"purple", "\033[35m"},
+            {"cyan", "\033[36m"},
+            {"gray", "\033[90m"},
+            {"white", "\033[37m"},
         };
 
         for(int i = 0; i < 9; ++i)
@@ -329,7 +329,7 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
     free(conf);
 }
 
-// check every '\\' in str and unescape "\\\\" "\\n" "\\e"
+// check every '\\' in str and unescape "\\\\" "\\n" "\\033"
 void unescape(char *str) {
     while((str = strchr(str, '\\'))) {
         switch(str[1]) {
@@ -338,7 +338,13 @@ void unescape(char *str) {
                 break;
             case 'e':
                 memmove(str, str+1, strlen(str));
-                *str = '\e';
+                *str = '\033';
+                break;
+            case '0':
+                if(str[2] == '3' && str[3] == '3') {
+                    memmove(str, str+3, strlen(str));
+                    *str = '\033';
+                }
                 break;
             case 'n':
                 memmove(str, str+1, strlen(str));
@@ -382,7 +388,7 @@ size_t strlen_real(const char *str) {
             continue;
         }
 
-        if(*str != '\e') {
+        if(*str != '\033') {
             len += 1-escaping;
 
             escaping = (*str != 'm') && escaping;

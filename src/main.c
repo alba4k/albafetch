@@ -149,11 +149,11 @@ int main(int argc, char **argv) {
     char *home = getenv("HOME");
     // I really hope this part will never run
     if(!home) {
-        fputs("\e[31m\e[1mERROR\e[0m: $HOME is not set, interrupting!\n", stderr);
+        fputs("\033[31m\033[1mERROR\033[0m: $HOME is not set, interrupting!\n", stderr);
         return -1;
     }
     if(!home[0]) {
-        fputs("\e[31m\e[1mERROR\e[0m: $HOME is empty, interrupting!\n", stderr);
+        fputs("\033[31m\033[1mERROR\033[0m: $HOME is empty, interrupting!\n", stderr);
         return -1;
     }
 
@@ -171,12 +171,12 @@ int main(int argc, char **argv) {
             asking_align = i+1;
         else if(!strcmp(argv[i], "--config")) {
             if(i+1 >= argc) {   // is there such an arg?
-                fputs("\e[31m\e[1mERROR\e[0m: --config requires an extra argument!\n", stderr);
+                fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
                 continue;
             }
             else if(access(argv[i+1], F_OK)) {  // is it a valid file?
-                fprintf(stderr, "\e[31m\e[1mERROR\e[0m: invalid file \"%s\"! Use --help for more info\n", argv[i+1]);
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid file \"%s\"! Use --help for more info\n", argv[i+1]);
                 user_is_an_idiot = true;
                 continue;
             }
@@ -210,11 +210,11 @@ int main(int argc, char **argv) {
                 }
 
             if(!done) {
-                fprintf(stderr, "\e[31m\e[1mERROR\e[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
                 user_is_an_idiot = true;
             }
         } else {
-            fputs("\e[31m\e[1mERROR\e[0m: --logo srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --logo srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
 
@@ -256,15 +256,15 @@ int main(int argc, char **argv) {
     if(asking_color) {
         if(asking_color < argc) {
             char *colors[9][2] = {
-                {"black", "\e[30m"},
-                {"red", "\e[31m"},
-                {"green", "\e[32m"},
-                {"yellow", "\e[33m"},
-                {"blue", "\e[34m"},
-                {"purple", "\e[35m"},
-                {"cyan", "\e[36m"},
-                {"gray", "\e[90m"},
-                {"white", "\e[37m"},
+                {"black", "\033[30m"},
+                {"red", "\033[31m"},
+                {"green", "\033[32m"},
+                {"yellow", "\033[33m"},
+                {"blue", "\033[34m"},
+                {"purple", "\033[35m"},
+                {"cyan", "\033[36m"},
+                {"gray", "\033[90m"},
+                {"white", "\033[37m"},
             };
 
             bool done = false;
@@ -275,12 +275,12 @@ int main(int argc, char **argv) {
                 }
 
             if(!done) {
-                fprintf(stderr, "\e[31m\e[1mERROR\e[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
                 user_is_an_idiot = true;
             }
         }
         else {
-            fputs("\e[31m\e[1mERROR\e[0m: --color srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --color srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
@@ -292,55 +292,55 @@ int main(int argc, char **argv) {
             else if(!strcmp(argv[asking_bold], "off"))
                 config.bold = false;
             else {
-                fputs("\e[31m\e[1mERROR\e[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
+                fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
             }
         }
         else {
-            fputs("\e[31m\e[1mERROR\e[0m: --bold srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --bold srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
 
     // was it really that hard to type 'albafetch -h'?
     if(user_is_an_idiot) {
-        fputs("\e[31m\e[1mFATAL\e[0m: One or multiple errors occured! Use --help for more info\n", stderr);
+        fputs("\033[31m\033[1mFATAL\033[0m: One or multiple errors occured! Use --help for more info\n", stderr);
         return 1;
     }
 
     if(asking_help) {
-        printf("%s%salbafetch\e[0m - a system fetch utility\n",
-               config.color, config.bold ? "\e[1m" : "");
+        printf("%s%salbafetch\033[0m - a system fetch utility\n",
+               config.color, config.bold ? "\033[1m" : "");
 
-        printf("\n%s%sFLAGS\e[0m:\n",
-               config.color, config.bold ? "\e[1m" : "");
+        printf("\n%s%sFLAGS\033[0m:\n",
+               config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n",
-               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "");
+        printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (%s%s\e[0m)\n"
-               "\t\t\t   [\e[30mblack\e[0m, \e[31mred\e[0m, \e[32mgreen\e[0m, \e[33myellow\e[0m,"
-               " \e[34mblue\e[0m, \e[35mpurple\e[0m, \e[36mcyan\e[0m, \e[90mgray\e[0m,"
-               " \e[37mwhite\e[0m]\n",
-               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
+        printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
+               "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"
+               " \033[34mblue\033[0m, \033[35mpurple\033[0m, \033[36mcyan\033[0m, \033[90mgray\033[0m,"
+               " \033[37mwhite\033[0m]\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
 
-        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
-               "\t\t\t   [\e[1mon\e[0m, off]\n",
-               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_bold ? "\e[1mon" : "off");
+        printf("\t%s%s-b\033[0m,%s%s --bold\033[0m:\t Specifies if bold should be used in colored parts (default: %s\033[0m)\n"
+               "\t\t\t   [\033[1mon\033[0m, off]\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
         
-        printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (default: %s)\n"
+        printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
                "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, endeavouros, fedora]\n"
                "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
-               config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", default_logo[0] ? default_logo : "OS Default");
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
-        printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s)\n"
-               "\t\t\t   [on, off]\n", config.color, config.bold ? "\e[1m" : "", config.color, config.bold ? "\e[1m" : "", config.align ? "on" : "off");
+        printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Alignes the infos if set (default: %s)\n"
+               "\t\t\t   [on, off]\n", config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", config.align ? "on" : "off");
 
-        printf("\t%s%s--config\e[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
-               "\t\t\t   [path]\n", config.color, config.bold ? "\e[1m" : "");
+        printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
+               "\t\t\t   [path]\n", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\nReport a bug: %s%s\e[4mhttps://github.com/alba4k/albafetch/issues\e[0m\n",
-               config.color, config.bold ? "\e[1m" : "");
+        printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
+               config.color, config.bold ? "\033[1m" : "");
 
         return 0;
     }
@@ -352,12 +352,12 @@ int main(int argc, char **argv) {
             else if(!strcmp(argv[asking_align], "off"))
                 config.align = false;
             else {
-                fputs("\e[31m\e[1mERROR\e[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
+                fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
             }
         }
         else {
-            fputs("\e[31m\e[1mERROR\e[0m: --align srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --align srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
@@ -420,7 +420,7 @@ int main(int argc, char **argv) {
     unsigned line = 3;
     char *data = mem + 1536;
     char *printed = mem+512;
-    char format[32] = "%s\e[0m%s";
+    char format[32] = "%s\033[0m%s";
 
     struct winsize w;
     ioctl(STDIN_FILENO, TIOCGWINSZ, &w);
@@ -439,22 +439,19 @@ int main(int argc, char **argv) {
 
         asking_align += strlen_real(config.dash);
 
-        snprintf(format, 32, "%%-%ds\e[0m%%s", asking_align);
+        snprintf(format, 32, "%%-%ds\033[0m%%s", asking_align);
     }
     
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator) {    // the separators should not get aligned
-            if(!(printed[0]))
+            if(!(printed[0]) || strlen(printed) > 767)
                 continue;
 
-            size_t prev = strlen(printed);
-            if(prev > 767)
-                continue;
-
-            size_t len = strlen_real(printed
+            size_t len = (strlen_real(printed
                                      + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
                                      + config.spacing
-                                    ) - strlen_real(current->label);
+                                    ) - strlen_real(current->label))
+                                    / strlen_real(config.separator);
 
             printed[0] = 0;
 
@@ -463,9 +460,10 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
 
+            strcat(printed, config.color);
             strcat(printed, current->label);
 
-            for(size_t i = 0; i < len && strlen(printed) < 764; ++i)
+            for(size_t i = 0; i < len && strlen(printed) < 767 - strlen(config.separator); ++i)
                 strcat(printed, config.separator);
         }
         else if(current->func == spacing) {
@@ -475,7 +473,8 @@ int main(int argc, char **argv) {
 
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
-            
+
+            strcat(printed, config.color);
             strcat(printed, current->label);
         }
         else if(current->func == title) {
@@ -491,14 +490,15 @@ int main(int argc, char **argv) {
 
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
-             
+
+             strcat(printed, config.color);
             strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
-                                     config.bold ? "\e[1m" : "",
+                                     config.bold ? "\033[1m" : "",
                                      name,
-                                     config.title_color ? "\e[0m" : "",
-                                     config.bold ? "\e[1m" : "",
+                                     config.title_color ? "\033[0m" : "",
+                                     config.bold ? "\033[1m" : "",
                                      config.title_color ? config.color : "",
                                      host
             );
@@ -515,7 +515,8 @@ int main(int argc, char **argv) {
 
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
-
+                
+            strcat(printed, config.color);
             strcpy(label, current->label);
             if(current->label[0] && current->func != colors && current->func != light_colors)
                 strcat(label, config.dash);

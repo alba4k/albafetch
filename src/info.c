@@ -1063,12 +1063,12 @@ int colors(char *dest) {
 
     memset(dest, 0, 256);
     for(int i = 0; i < 8; ++i) {
-        sprintf(dest+(5+config.col_block_len)*i, "\e[4%dm", i);
+        sprintf(dest+(5+config.col_block_len)*i, "\033[4%dm", i);
         for(int i = 0; i < config.col_block_len; ++i)
             strcat(dest, " ");
     }
 
-    strcat(dest, "\e[0m");
+    strcat(dest, "\033[0m");
 
     return 0;
 }
@@ -1079,12 +1079,12 @@ int light_colors(char *dest) {
 
     memset(dest, 0, 256);
     for(int i = 0; i < 8; ++i) {
-        sprintf(dest+(6+config.col_block_len)*i, "\e[10%dm", i);
+        sprintf(dest+(6+config.col_block_len)*i, "\033[10%dm", i);
         for(int i = 0; i < config.col_block_len; ++i)
             strcat(dest, " ");
     }
 
-    strcat(dest, "\e[0m");
+    strcat(dest, "\033[0m");
 
     return 0;
 }

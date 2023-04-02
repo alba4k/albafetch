@@ -12,7 +12,7 @@ struct Config {
     char **logo;
     char color[8];
     char dash[16];
-    char separator[8];
+    char separator[16];
     int spacing;
 
     bool title_color;
