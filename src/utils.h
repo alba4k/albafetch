@@ -12,11 +12,12 @@ struct Config {
     char **logo;
     char color[8];
     char dash[16];
-    char separator[5];
+    char separator[8];
     int spacing;
 
     bool title_color;
     bool os_arch;
+    bool kernel_short;
     bool de_type;
     bool shell_path;
     bool cpu_brand;
@@ -63,21 +64,23 @@ struct Config {
 };
 extern struct Config config;
 
-void get_logo_line(char *dest, unsigned *line);
-
-void print_line(char *line, unsigned short maxlen);
-
-void unescape(char *str);
-
-void parse_config(char *file, bool *default_bold, char *default_color, char *default_logo);
-
 // needed for libcurl
 struct MemoryStruct {
     char *memory;
     size_t size;
 };
 
+void get_logo_line(char *dest, unsigned *line);
+
+void print_line(char *line, const size_t maxlen);
+
+void parse_config(const char *file, bool *default_bold, char *default_color, char *default_logo);
+
+void unescape(char *str);
+
 size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
+
+size_t strlen_real(const char *str);
 
 // TODO
 // this will be removed once I write a decent logic for the single modules

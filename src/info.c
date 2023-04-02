@@ -177,7 +177,12 @@ int kernel(char *dest) {
     struct utsname name;
     uname(&name);
 
-    snprintf(dest, 256, "%s", name.release);
+    if(config.kernel_short) {
+        char *ptr = strchr(name.release, '-');
+        *ptr = 0;
+    }
+
+    strncpy(dest, name.release, 256);
 
     return 0;
 }
@@ -986,7 +991,7 @@ int public_ip(char *dest) {
 
     fallback:
         pipe(pipes);
-
+        
         if(!fork()) {
             close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);

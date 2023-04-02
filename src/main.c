@@ -12,10 +12,8 @@
 /* TODO:
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress
- * more config options (for the single functions)
+ * more config options
  */
-
-// various configurations for stuff
 
 // This contains the default config values
 struct Config config = {
@@ -29,6 +27,7 @@ struct Config config = {
 
     true,   // title_color
     true,   // os_arch
+    false,  // kernel_short
     false,  // de_type
     false,  // shell_path
     true,   // cpu_brand
@@ -423,35 +422,26 @@ int main(int argc, char **argv) {
     char *printed = mem+512;
     char format[32] = "%s\e[0m%s";
 
+    struct winsize w;
+    ioctl(STDIN_FILENO, TIOCGWINSZ, &w);
+
     if(config.align) {
         int current_len;
+        asking_align = 0;
 
         for(struct Info *current = (infos)->next; current; current = current->next) {
-            asking_align = 0;
-            current_len = strlen(current->label);
+            current_len = strlen_real(current->label);
 
             if(current_len > asking_align) {
                 asking_align = current_len;
             }
         }
 
-        asking_align += strlen(config.dash);
+        asking_align += strlen_real(config.dash);
 
         snprintf(format, 32, "%%-%ds\e[0m%%s", asking_align);
     }
     
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-    if(w.ws_col == 0) {                             // redirecting stdout results in ws_col = 0 
-        ioctl(STDERR_FILENO, TIOCGWINSZ, &w);       // I check whether stderr is fine
-        if(w.ws_col == 0) {
-            ioctl(STDIN_FILENO, TIOCGWINSZ, &w);    // stdin too
-            if(w.ws_col == 0)
-                w.ws_col = -1;                      // I just remove the width limit as fallback
-        }
-    }
-
     for(struct Info *current = infos->next; current; current = current->next) {
         if(current->func == separator) {    // the separators should not get aligned
             if(!(printed[0]))
@@ -461,30 +451,10 @@ int main(int argc, char **argv) {
             if(prev > 767)
                 continue;
 
-            size_t len = 0;
-
-            bool escaping = false;
-            char *ptr = printed
-                        + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
-                        + config.spacing;
-
-            // determine how long the printed string is (same logic as in print_line, utils.c)
-            for(; *ptr; ++ptr) {
-                if(*ptr == '\n')
-                    break;
-
-                // unicode continuation byte 0x10xxxxxx
-                if(*ptr & 0x80 && !(*ptr & 0x40))
-                    continue;
-                    
-                if(*ptr != '\e') {
-                    len += 1-escaping;
-
-                    escaping = (*ptr != 'm') && escaping;
-                }
-                else
-                    escaping = true;
-            }
+            size_t len = strlen_real(printed
+                                     + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
+                                     + config.spacing
+                                    ) - strlen_real(current->label);
 
             printed[0] = 0;
 
@@ -493,7 +463,7 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
 
-            strcat(printed, config.separator_prefix);
+            strcat(printed, current->label);
 
             for(size_t i = 0; i < len && strlen(printed) < 764; ++i)
                 strcat(printed, config.separator);
@@ -506,7 +476,7 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
             
-            strcat(printed, config.spacing_prefix);
+            strcat(printed, current->label);
         }
         else if(current->func == title) {
             char name[256];
@@ -522,7 +492,7 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
              
-            strcat(printed, config.title_prefix);
+            strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
                                      config.bold ? "\e[1m" : "",
@@ -560,7 +530,6 @@ int main(int argc, char **argv) {
     while(config.logo[line]) {
         printed[0] = 0;
 
-        if(config.bold) strcat(printed, "\e[1m");
         get_logo_line(printed, &line);
 
         print_line(printed, w.ws_col);
