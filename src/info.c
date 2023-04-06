@@ -1,109 +1,66 @@
-#include <unistd.h>
+#define _DEFAULT_SOURCE
+
+#include <string.h>
+#include <stdio.h>
+#include <libgen.h>     // basename
+#include <ctype.h>      // toupper
 #include <sys/wait.h>
-#include <libgen.h>
 
 #ifdef __APPLE__
 #include "bsdwrap.h"
 #include "macos_infos.h"
 #else
-#include <sys/sysinfo.h>
-#endif
+#include <sys/sysinfo.h>// uptime, memory
+#ifndef __ANDROID__
+#include <pci/pci.h>    // gpu
+#endif // __linux__
+#endif // __APPLE__
 
-#include <sys/utsname.h>
-#include <pwd.h>
-#include <ifaddrs.h>
-#include <arpa/inet.h>
-
-// defined by the makefile if pacman exists
-// compile in the makefile using `make PACMAN=/bin/pacman <options>`
-#ifdef ARCH_BASED
-#include <alpm.h>
-#include <alpm_list.h>
-#endif
-
-#include <stdio.h>      
-#include <string.h> 
+#include <sys/utsname.h> // uname
+#include <pwd.h>        // username
+#include <ifaddrs.h>    // local ip
+#include <arpa/inet.h>  // local ip
+#include <time.h>       // date
+#include <curl/curl.h>  // public ip
+#include <dirent.h>     // packages
 
 #include "info.h"
+#include "queue.h"
+#include "utils.h"
 
-/* __APPLE__ should only be defined on macOS
- * _WIN32 should only be defined in Windows (I won't support it)
- * __linux__ should only be defined on linux
- * 
- * Those can be used to determine the
- * platform the code is being compiled
- * in and act consequently
- */
-
-// separators - prints a separator
-void separator() {
-    printf("%s", config.separator);
-}
-void separator2() {
-    printf("%s", config.separator2);
-}
-
-// title - prints a title in the format user@hostname
-void title() {
-    static char hostname[HOST_NAME_MAX + 1];
-    gethostname(hostname, HOST_NAME_MAX);
-    
+// print the current user
+int user(char *dest) {
     struct passwd *pw;
-    uid_t uid = geteuid();
 
-    pw = uid == -1 && 0 ? NULL : getpwuid(uid);
-    if(!pw) {
-        fflush(stdout);
-        fprintf(stderr, "%s%s[Unsupported]", config.color, config.bold);
-        fflush(stderr);
-        printf("\e[0m@%s%s%s\e[0m", config.color, config.bold, hostname);
-        return;
+    unsigned uid = geteuid();
+    if((int)uid == -1) {
+        // couldn't get UID
+        return 1;
     }
-    char *username = pw->pw_name;
 
-    printf("%s%s\e[0m@%s%s%s\e[0m", config.title_prefix, username, config.color, config.bold, hostname);
+    pw = getpwuid(uid);
+
+    strncpy(dest, pw->pw_name, 255);
+
+    return 0;
 }
 
-// hostname - getting the computer hostname (defined in /etc/hostname)
-void hostname() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.hostname_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
+// print the machine hostname
+int hostname(char *dest) {
     char hostname[HOST_NAME_MAX + 1];
     gethostname(hostname, HOST_NAME_MAX + 1);
 
-    printf("%s", hostname);
+    char *ptr = strstr(hostname, ".local");
+    if(ptr)
+        *ptr = 0;
+
+    strncpy(dest, hostname, 256);
+
+    return 0;
 }
 
-// user - get the current login
-void user() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.user_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    struct passwd *pw;
-    uid_t uid = geteuid();
-
-    pw = uid == -1 ? NULL : getpwuid(uid);
-    if(!pw) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-    }
-    char *username = pw->pw_name;
-    fputs(username, stdout);
-}
-
-// uptime - prints the uptime
-void uptime() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.uptime_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-    
+// print the current uptime
+int uptime(char *dest) {
     #ifdef __APPLE__
         struct timeval boottime;
         int error;
@@ -111,7 +68,7 @@ void uptime() {
         error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
         if(error < 0)
-            uptime = 0;
+            return 1;
 
         time_t boot_seconds = boottime.tv_sec;
         time_t current_seconds = time(NULL);
@@ -119,573 +76,617 @@ void uptime() {
         uptime = (long)difftime(current_seconds, boot_seconds);
     #else
         struct sysinfo info;
-        sysinfo(&info);
+        if(sysinfo(&info))
+            return 1;
 
         const long uptime = info.uptime;
-    #endif
+    #endif // __APPLE__
 
     long days = uptime/86400;
     char hours = uptime/3600 - days*24;
     char mins = uptime/60 - days*1440 - hours*60;
 
+    char result[256] = "";
+    char str[24] = "";
+
     if(days) {
-        printf("%ldd ", days);      // print the number of days passed if more than 0
+        snprintf(str, 24, "%ldd%c", days, hours || mins ? ' ' : 0);     // print the number of days passed if more than 0
+        strcat(result, str);
     }
     if(hours) {
-        printf("%dh ", hours);      // print the number of days passed if more than 0
+        snprintf(str, 24, "%dh%c", hours, mins ? ' ' : 0);      // print the number of days passed if more than 0
+        strcat(result, str);
     }
     if(mins) {
-        printf("%dm ", mins);       // print the number of minutes passed if more than 0
+        snprintf(str, 24, "%dm", mins);       // print the number of minutes passed if more than 0
+        strcat(result, str);
     }
     else if(uptime < 60) {
-        printf("%lds", uptime);       // print the number of seconds passed if less than 60
+        snprintf(str, 24, "%lds", uptime);       // print the number of seconds passed if less than 60
+        strcat(result, str);
     }
+
+    strncpy(dest, result, 256);
+
+    return 0;
 }
 
-//os - prints the os name + arch
-#ifdef __APPLE__
-void os() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.os_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
+// print the operating system name and architechture (uname -m)
+int os(char *dest) {
     struct utsname name;
     uname(&name);
 
-    printf("macOS %s", name.machine);
-}
-#else
-void os() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.os_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+    #ifdef __APPLE__
+        snprintf(dest, 256, "macOS %s", config.os_arch ? name.machine : "");
+    #else
+    #ifdef __ANDROID__
+        int pipes[2];
+        char version[16];
 
-    struct utsname name;
-    uname(&name);
+        pipe(pipes);
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
 
-    FILE *fp = fopen("/etc/os-release", "r");
-    if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        printf(" %s", name.machine);
-        return;
-    }
+            execlp("getprop", "getprop", "ro.build.version.release", NULL); 
+        }
 
-    char buf[64];
-    char *os_name = buf, *end;
+        wait(0);
+        close(pipes[1]);
+        version[read(pipes[0], version, 16) - 1] = 0;
+        close(pipes[0]);
 
-    read_after_sequence(fp, "PRETTY_NAME", buf, 64);
-    fclose(fp);
-    if(os_name[0] == '"' || os_name[0] == '\'')
-        ++os_name;
-    
-    end = strchr(os_name, '\n');
-    if(!end) 
-        goto error;
-    *end = 0;
+        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", config.os_arch ? name.machine : "");
+    #else
+        FILE *fp = fopen("/etc/os-release", "r");
+        if(!fp) {
+            return 1;
+        }
 
-    if((end = strchr(os_name, '"'))) *end = 0;
-    else if((end = strchr(os_name, '\''))) *end = 0;
+        char buf[64];
+        char *os_name = buf;
+        char *end;
 
-
-    printf("%s %s", os_name, name.machine);
-
-    return;
-
-    error:
-        fflush(stdout);
-        fputs("[Bad Format]", stderr);
-        fflush(stderr);
-        printf(" %s", name.machine);
-        return;
-}
-#endif
-
-// prints the kernel version
-void kernel() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.kernel_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    struct utsname name;
-    uname(&name);
-
-    printf("%s ", name.release);
-}
-
-// desktop -  prints the current desktop environment
-#ifdef __APPLE__
-void desktop() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.desktop_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    printf("Aqua");
-}
-#else
-void desktop() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.desktop_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    const char *desktop = getenv("SWAYSOCK") ? "Sway" :
-                          (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
-                          (desktop = getenv("DESKTOP_SESSION")) ? desktop :
-                          getenv("KDE_SESSION_VERSION") ? "KDE" :
-                          getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
-                          getenv("MATE_DESKTOP_SESSION_ID") ? "mate" :
-                          getenv("TDE_FULL_SESSION") ? "Trinity" :
-                          !strcmp("linux", getenv("TERM")) ? "none" :
-                          NULL;
-    if(desktop) {
-        printf("%s", desktop);
-        return;
-    }
-    
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
-}
-#endif
-
-// shell (current) - prints the name of the parent process
-void shell() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.shell_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    #ifdef __linux__
-    char path[32];
-
-    sprintf(path, "/proc/%d/cmdline", getppid());
-
-    FILE *fp = fopen(path, "r");
-    if(fp) {
-        char shell[128];
-        shell[fread(shell, 1, 127, fp)] = 0;
-
-        printf("%s", basename(shell));
+        read_after_sequence(fp, "PRETTY_NAME", buf, 64);
         fclose(fp);
-        return;
+
+        if(!buf[0])
+            return 1;
+
+        if(os_name[0] == '"' || os_name[0] == '\'')
+            ++os_name;
+        
+        if(!(end = strchr(os_name, '\n')))
+            return 1;
+        *end = 0;
+
+        if((end = strchr(os_name, '"')))
+            *end = 0;
+        else if((end = strchr(os_name, '\'')))
+            *end = 0;
+
+        snprintf(dest, 256, "%s %s", os_name, config.os_arch ? name.machine : "");
+    #endif // __ANDROID__
+    #endif // __APPLE__
+
+    return 0;
+}
+
+// print the running kernel version (uname -r)
+int kernel(char *dest) {
+    struct utsname name;
+    uname(&name);
+
+    if(config.kernel_short) {
+        char *ptr = strchr(name.release, '-');
+        *ptr = 0;
     }
+
+    strncpy(dest, name.release, 256);
+
+    return 0;
+}
+
+// get the current desktop environnment
+int desktop(char *dest) {
+    #ifdef __APPLE__
+        strcpy(dest, "Aqua");
+    #else
+        char *desktop = getenv("SWAYSOCK") ? "Sway" :
+                            (desktop = getenv("XDG_CURRENT_DESKTOP")) ? desktop :
+                            (desktop = getenv("DESKTOP_SESSION")) ? desktop :
+                            getenv("KDE_SESSION_VERSION") ? "KDE" :
+                            getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
+                            getenv("MATE_DESKTOP_SESSION_ID") ? "MATE" :
+                            getenv("TDE_FULL_SESSION") ? "Trinity" :
+                            // !strcmp("linux", getenv("TERM")) ? "none" :      // running in tty
+                            NULL;
+        if(!desktop)
+            return 1;
+
+        strcpy(dest, desktop);
+
+        if(config.de_type) {
+            if(getenv("WAYLAND_DISPLAY"))
+                strncat(dest, " (Wayland)", 255-strlen(dest));
+            else if((desktop = getenv("XDG_SESSION_TYPE"))) {
+                if(!desktop[0])
+                    return 0;
+                desktop[0] = toupper(desktop[0]);
+                
+                char buf[32];
+                snprintf(buf, 32, " (%s) ", desktop);
+                strncat(dest, buf, 255-strlen(dest));
+            }
+        }
     #endif
 
-    char *shell =  getenv("SHELL");
-    if(!shell) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-
-    printf("%s", basename(shell));
+    return 0;
 }
 
-// shell (default) - prints the user default shell
-void login_shell() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.default_shell_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+// get the parent process name (usually the shell)
+int shell(char *dest) {
+    #ifdef __linux__
+        char path[32];
+
+        sprintf(path, "/proc/%d/cmdline", getppid());
+
+        FILE *fp = fopen(path, "r");
+        if(fp) {
+            char shell[256];
+            shell[fread(shell, 1, 255, fp)] = 0;
+
+            if(shell[0] == '-') // cmdline is "-bash" when login shell
+                memcpy(shell, shell+1, strlen(shell+1)+1);
+
+            strncpy(dest, config.shell_path ? shell : basename(shell), 256);
+            fclose(fp);
+            return 0;
+        }
+    #endif
 
     char *shell = getenv("SHELL");
-
-    if(shell) {
-        printf("%s", basename(shell));
-        return;
+    if(shell && shell[0]) {
+        strncpy(dest, config.shell_path ? shell : basename(shell), 256);
+        return 0;
     }
-        
-    fflush(stdout);
-    fputs("[Unknown]", stderr);
-    fflush(stderr);
 
+    return 1;
 }
 
-// terminal - prints the current terminal
-void term() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.term_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+// get the current login shell
+int login_shell(char *dest) {
+    char *shell = getenv("SHELL");
 
+    if(shell && shell[0]) {
+        strncpy(dest, config.shell_path ? shell : basename(shell), 256);
+        return 0;
+    }
+
+    return 1;
+}
+
+// gets the current terminal
+int term(char *dest) {
     char *terminal = getenv("TERM");
     if(terminal) {
-    terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
-    
-    printf("%s", terminal);
-    return;
+        terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
+
+        snprintf(dest, 256, "%s", terminal);
+        return 0;
     }
 
-    fflush(stdout);
-    fputs("[Unknown]", stderr);
-    fflush(stderr);
+    return 1;
 }
 
-// packages - prints the number of installed packages
-#ifdef __APPLE__
-void packages() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.packages_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    if(access("/usr/local/bin/brew", F_OK) && access("/opt/homebrew/bin/brew", F_OK)) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-    }
-
+// get amount of packages installed
+int packages(char *dest) {
+    dest[0] = 0;
+    char buf[256] = "", str[128] = "", path[256] = "";
+    DIR *dir;
+    struct dirent *entry;
+    unsigned count = 0;
     int pipes[2];
-    char packages[10];
-    pipe(pipes);
+    bool done = false;
 
-    if(!fork()) {
-        close(pipes[0]);
-        dup2(pipes[1], STDOUT_FILENO);
+    #ifndef __APPLE__   // package managers that won't run on macOS
+        FILE *fp;
 
-        execlp("sh", "sh", "-c", "ls $(brew --cellar 2>/dev/null)| wc -l", NULL); 
-    }
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
+        strncat(path, "/var/lib/pacman/local", 256-strlen(path));
+        if(config.pkg_pacman && (dir = opendir(path))) {
+            while((entry = readdir(dir)) != NULL)
+                if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
+                    ++count;
 
-    int status;
-    wait(&status);
-
-    if(WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-        close(pipes[1]);
-        packages[read(pipes[0], packages, 9) - 1] = 0;
-        close(pipes[0]);
-
-        if(packages[0] != '0' && packages[0]) {
-            printf("%d (brew) ", atoi(packages));
-            return;
+            if(count) {
+                snprintf(dest, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (pacman)" : "");
+                done = true;
+            }
+            closedir(dir);
         }
-    }
 
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
-}
-#else
-void packages() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.packages_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
+        strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
+        if(config.pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
+            fseek(fp, 0, SEEK_END);
+            size_t len = ftell(fp);
+            rewind(fp);
 
-    int pipes[2];
-    char packages[10];
-    bool supported;
+            char *dpkg_list = malloc(len);
+            dpkg_list[fread(dpkg_list, 1, len, fp) - 1] = 0;
 
-    #ifdef ARCH_BASED
-        alpm_errno_t err;
-        alpm_handle_t *handle = alpm_initialize("/", "/var/lib/pacman/", &err);
-        alpm_db_t *db_local = alpm_get_localdb(handle);
-        size_t pkgs = 0;
+            fclose(fp);
 
-        for(alpm_list_t *entry = alpm_db_get_pkgcache(db_local); entry; entry = alpm_list_next(entry))
-            ++pkgs;
+            count = 0;
+            // this will be wrong if some package does not have "\nInstalled-Size: "
+            // or if some package (for some reason) has it in the package description
+            while((dpkg_list = strstr(dpkg_list, "\nInstalled-Size: "))) {
+                ++count;
+                ++dpkg_list;
+            }
+            free(dpkg_list);
 
-        alpm_release(handle);
+            if(count) {
+                snprintf(buf, 256, "%u%s", count, config.pkg_mgr ? " (dpkg)" : "");
+                done = true;
+                strncat(dest, buf, 256 - strlen(dest));
+            }
+        }
 
-        if(pkgs) {
-            printf("%ld (pacman) ", pkgs);
-            supported = true;
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
+        strncat(path, "/bin/rpm", 256-strlen(path));
+        if(config.pkg_rpm && !access(path, F_OK)) {
+            pipe(pipes);
+
+            if(!fork()) {
+                close(*pipes);
+                dup2(pipes[1], STDOUT_FILENO);
+
+                execlp("sh", "sh", "-c", "rpm -qa 2>/dev/null | wc -l", NULL); 
+            }
+            wait(0);
+            close(pipes[1]);
+            str[read(pipes[0], str, 16) - 1] = 0;
+            close(pipes[0]);
+
+            if(str[0] != '0' && str[0]) {
+                snprintf(buf, 256 - strlen(buf), "%s%s%s", done ? ", " : "", str, config.pkg_mgr ? " (rpm)" : "");
+                done = true;
+                strncat(dest, buf, 256 - strlen(dest));
+            }
+        }
+
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
+        strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
+        if(config.pkg_flatpak && (dir = opendir(path))) {
+            count = 0;
+            while((entry = readdir(dir)) != NULL)
+                if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
+                    ++count;
+
+            if(count) {
+                snprintf(buf, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (flatpak)" : "");
+                done = true;
+                strncat(dest, buf, 256 - strlen(dest));
+            }
+            closedir(dir);
+        }
+
+        path[0] = 0;
+        if(getenv("PREFIX"))
+            strncpy(path, getenv("PREFIX"), 255);
+        strncat(path, "/bin/snap", 256-strlen(path));
+        if(config.pkg_snap && !access(path, F_OK)) {
+            pipe(pipes);
+
+            if(!fork()) {
+                close(*pipes);
+                dup2(pipes[1], STDOUT_FILENO);
+
+                execlp("sh", "sh", "-c", "snap list 2>/dev/null | wc -l", NULL); 
+            }
+
+            wait(0);
+            close(pipes[1]);
+            str[read(pipes[0], str, 16) - 1] = 0;
+            close(pipes[0]);
+
+            if(str[0] != '0' && str[0]) {
+                snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, config.pkg_mgr ? " (snap)" : "");
+                done = true;
+                strncat(dest, buf, 256 - strlen(dest));
+            }
         }
     #endif
-    if(!access("/usr/bin/dpkg-query", F_OK)) {
+    if(config.pkg_brew && (access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
+        pipe(pipes);
+
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+            execlp("brew", "brew", "--cellar", NULL); 
+        }
+
+        close(pipes[1]);
+
+        wait(0);
+
+        str[read(pipes[0], str, 128) - 1] = 0;
+        close(pipes[0]);
+
+        if(str[0]) {
+            if((dir = opendir(str))) {
+                count = 0;
+
+                while((entry = readdir(dir)) != NULL)
+                    if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
+                        ++count;
+
+                if(count) {
+                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (brew)" : "");
+                    done = true;
+                    strncat(dest, buf, 256 - strlen(dest));
+                }
+
+                closedir(dir);
+            }
+        }
+    }
+
+
+    path[0] = 0;
+    if(getenv("PREFIX"))
+        strncpy(path, getenv("PREFIX"), 255);
+    strncat(path, "/bin/pip", 256-strlen(path));
+    if(config.pkg_pip && !access(path, F_OK)) {
         pipe(pipes);
 
         if(!fork()) {
             close(*pipes);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "dpkg-query -f '.\n' -W 2>/dev/null | wc -l", NULL); 
+            execlp("sh", "sh", "-c", "pip list 2>/dev/null | wc -l", NULL); 
         }
-        wait(NULL);
-        close(pipes[1]);
-        packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(*pipes);
 
-        if(packages[0] != '0' && packages[0])
-            printf("%s (dpkg) ", packages);
-        supported = true;
+        wait(0);
+        close(pipes[1]);
+        str[read(pipes[0], str, 16) - 1] = 0;
+        close(pipes[0]);
+
+        if(str[0] != '0' && str[0]) {
+            snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, config.pkg_mgr ? " (pip)" : "");
+            done = true;
+            strncat(dest, buf, 256 - strlen(dest));
+        }
     }
 
-    if(!access("/usr/bin/rpm", F_OK)) {
-        pipe(pipes);
+    if(done)
+        return 0;
+    return 1;
+}
 
+// gets the machine name and eventually model version
+int host(char *dest) {
+    #ifdef __APPLE__
+        size_t BUF_SIZE = 256;
+        sysctlbyname("hw.model", dest, &BUF_SIZE, NULL, 0);
+    #else
+    #ifdef __ANDROID__
+        int pipes[2];
+        char brand[64], model[64];
+
+        pipe(pipes);
         if(!fork()) {
-            close(*pipes);
+            close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "rpm -qa 2>/dev/null | wc -l", NULL); 
+            execlp("getprop", "getprop", "ro.product.brand", NULL); 
         }
-        wait(NULL);
+
+        wait(0);
         close(pipes[1]);
-        packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(*pipes);
+        brand[read(pipes[0], brand, 64) - 1] = 0;
+        close(pipes[0]);
 
-        if(packages[0] != '0' && packages[0]) {
-            printf("%s (rpm) ", packages);
-            supported = true;
-        }
-    }
-
-    if(!access("/usr/bin/flatpak", F_OK)) {
         pipe(pipes);
-
         if(!fork()) {
-            close(*pipes);
+            close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("sh", "sh", "-c", "flatpak list 2>/dev/null | wc -l", NULL); 
+            execlp("getprop", "getprop", "ro.product.model", NULL); 
         }
-        wait(NULL);
+
+        wait(0);
         close(pipes[1]);
-        packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(*pipes);
+        model[read(pipes[0], model, 64) - 1] = 0;
+        close(pipes[0]);
 
-        if(packages[0] != '0' && packages[0]) {
-            printf("%s (flatpak) ", packages);
-            supported = true;
+        if(!(brand[0] || model[0]))
+            return 1;
+
+        snprintf(dest, 256, "%s%s%s", brand, brand[0] ? " ": "", model);
+    #else
+        char *name = NULL, *version = NULL;
+        FILE *fp = NULL;
+        size_t len = 0;
+
+        if((fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r"))) {
+            fseek(fp, 0, SEEK_END);
+            len = ftell(fp);
+            rewind(fp);
+
+            name = malloc(len);
+            name[fread(name, 1, len, fp) - 1] = 0;
+
+            fclose(fp);
         }
-    }
 
-    if(!access("/usr/bin/snap", F_OK)) {
-        pipe(pipes);
+        if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
+            fseek(fp, 0, SEEK_END);
+            len = ftell(fp);
+            rewind(fp);
 
-        if(!fork()) {
-            close(*pipes);
-            dup2(pipes[1], STDOUT_FILENO);
+            version = malloc(len);
+            version[fread(version, 1, len, fp) - 1] = 0;
 
-            execlp("sh", "sh", "-c", "snap list 2> /dev/null | wc -l", NULL);   // sending stderr to null to avoid snap printing shit when installed with 0 pacakges
+            fclose(fp);
         }
-        wait(NULL);
-        close(pipes[1]);
-        packages[read(pipes[0], packages, 10) - 1] = 0;
-        close(*pipes);
 
-        if(packages[0] != '0' && packages[0]) {
-            printf("%d (snap) ", atoi(packages) - 1);
-            supported = true;
-        }
-    }
+        if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") )
+            snprintf(dest, 256, "%s %s", name, version);
+        else if(name && strcmp(name, "System Product Name"))
+            strncpy(dest, name, 256);
+        else if(version && strcmp(version, "System Version"))
+            strncpy(dest, version, 256);
+        else
+            return 1;
 
-    if(!supported) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-    }
+        free(name);
+        free(version);
+    #endif // __ANDROID__
+    #endif // __APPLE__
+
+    return 0;
 }
-#endif
 
-// host - prints the current host machine
-#ifdef __APPLE__
-void host() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.host_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+// gets the current BIOS vendor and version (Linux only!)
+int bios(char *dest) {
+    #ifdef __APPLE__
+        (void)dest; // avoid unused parameter warning - lmao
+        return 1;
+    #else
+    char *vendor = NULL, *version = NULL;
+    FILE *fp = NULL;
+    size_t len = 0;
 
-    const size_t BUF_SIZE = 128;
-    char buf[BUF_SIZE];
-    sysctlbyname("hw.model", &buf, (size_t*)&BUF_SIZE, NULL, 0);
-
-    printf("%s", buf);
-}
-#else
-void host() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.host_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    FILE *fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r");
-    if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-    fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
-    rewind(fp);
-
-    char model[len];
-    model[fread(model, 1, len, fp) - 1] = 0;
-    fclose(fp);
-
-    fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r");
-    if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-    fseek(fp, 0, SEEK_END);
-    len = ftell(fp);
-    rewind(fp);
-
-    char model_ver[len];
-    model_ver[fread(model_ver, 1, len, fp) - 1] = 0;
-    fclose(fp);
-
-    printf("%s", model);
-    if(*model_ver)
-        printf(" %s", model_ver);
-}
-#endif
-
-// bios - prints the current host machine
-#ifdef __APPLE__
-void bios() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.bios_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
-}
-#else
-void bios() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.bios_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    bool errors = false;
-
-    FILE *fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r");
-    if(!fp) {
-        errors = true;
-    } else {
+    if((fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r"))) {
         fseek(fp, 0, SEEK_END);
-        size_t len = ftell(fp);
+        len = ftell(fp);
         rewind(fp);
 
-        char vendor[len];
+        vendor = malloc(len);
         vendor[fread(vendor, 1, len, fp) - 1] = 0;
 
-        printf("%s", vendor);
         fclose(fp);
     }
 
-    fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r");
-    if(!fp) {
-        if(errors) {
-            fflush(stdout);
-            fputs("[Unsupported]", stderr);
-            fflush(stderr);
-            return;
-        } else {
-            return;
-        }
+    if((fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r"))) {
+        fseek(fp, 0, SEEK_END);
+        len = ftell(fp);
+        rewind(fp);
+
+        version = malloc(len);
+        version[fread(version, 1, len, fp) - 1] = 0;
+
+        fclose(fp);
     }
 
-    fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
-    rewind(fp);
+    if(vendor && version)
+        snprintf(dest, 256, "%s %s", vendor, version);
+    else if(vendor)
+        strncpy(dest, vendor, 256);
+    else if(version)
+        strncpy(dest, version, 256);
+    else
+        return 1;
 
-    char version[len];
-    version[fread(version, 1, len, fp) - 1] = 0;
-
-    printf(" %s", version);
-
-    fclose(fp);
-
-    return;        
-}
-#endif
-
-// cpu - prints the current CPU
-#ifdef __APPLE__
-void cpu() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.cpu_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    size_t BUF_SIZE = 128;
-    char buf[BUF_SIZE];
-    sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
-
-    char *ptr;
-
-    // cleaning the string from various garbage
-    if((ptr = strstr(buf, "(R)")))
-        memmove(ptr, ptr+3, strlen(ptr+1));
-    if((ptr = strstr(buf, "(TM)")))
-        memmove(ptr, ptr+4, strlen(ptr+1));
-    if((ptr = strstr(buf, " CPU")))
-        memmove(ptr, ptr+4, strlen(ptr+1));
-
-    if(!config.print_cpu_brand) {
-        if((ptr = strstr(buf, "Intel Core ")))
-            memmove(ptr, ptr+11, strlen(ptr+11)+1);
-        else if((ptr = strstr(buf, "Apple ")))
-            memmove(ptr, ptr+6, strlen(ptr+6)+1);
-    }
-
-    if(!config.print_cpu_freq) {
-        if((ptr = strstr(buf, " @")))
-            *ptr = 0;
-    }
-
-    printf("%s", buf);
-}
-#else
-void cpu() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.cpu_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    FILE *fp = fopen("/proc/cpuinfo", "r");
-    if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
+    free(vendor);
+    free(version);
     
-    char buf[256];
-    char *cpu_info = buf;
+    return 0;
+    #endif
+}
 
-    read_after_sequence(fp, "model name", buf, 256);
-    fclose(fp);
-    if(!(buf[0])) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-    cpu_info += 2;
-
+// get the cpu name and frequency
+int cpu(char *dest) {
+    char *cpu_info;
     char *end;
-    if((end = strstr(cpu_info, " @"))) {
-        *end = 0;
-    }
+    int count = 0;
+    char freq[24] = "";
 
-    if(!end) {
-        end = strchr(cpu_info, '\n');
-        if(!end) { 
-            fflush(stdout);
-            fputs("[Unsupported]", stderr);
-            fflush(stderr);
-            return;
+    #ifdef __APPLE__
+        size_t BUF_SIZE = 256;
+        char buf[BUF_SIZE];
+        buf[0] = 0;
+        sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
+
+        if(!buf[0])
+            return 1;
+
+        if(!config.cpu_freq) {
+            if((end = strstr(buf, " @")))
+                *end = 0;
+            else if((end = strchr(buf, '@')))
+                *end = 0;
         }
+
+        cpu_info = buf;
+    #else
+    FILE *fp = fopen("/proc/cpuinfo", "r");
+    if(!fp)
+        return 1;
+
+    char *buf = malloc(0x10001);
+    buf[fread(buf, 1, 0x10000, fp)] = 0;
+    fclose(fp);
+
+    cpu_info = buf;
+    if(config.cpu_count) {
+        end = cpu_info;
+        while((end = strstr(end, "processor"))) {
+            count += 1;
+            end += 1;
+        }
+    }
+
+    cpu_info = strstr(cpu_info, "model name");
+    if(!cpu_info) {
+        return 1;
+        free(cpu_info);
+    }
+
+    cpu_info += 13;
+
+    // I have no clue why valgrind complains about this part
+    end = strstr(cpu_info, " @");
+    if(end)
+        *end = 0;
+    else {
+        end = strchr(cpu_info, '\n');
+        if(!end) {
+            return 1;
+            free(cpu_info);
+        }
+            
         *end = 0;
     }
 
-    char *ptr = end;
+    // Printing the clock frequency the first thread is currently running at
+    end += 1;
+    char *cpu_freq = strstr(end, "cpu MHz");
+    if(cpu_freq && config.cpu_freq) {
+        cpu_freq = strchr(cpu_freq, ':');
+        if(cpu_freq) {
+            cpu_freq += 2;
+
+            end = strchr(cpu_freq, '\n');
+            if(end) {
+                *end = 0;
+
+                snprintf(freq, 24, " @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
+            }
+        }
+    }
+    #endif
 
     // cleaning the string from various garbage
     if((end = strstr(cpu_info, "(R)")))
@@ -696,384 +697,394 @@ void cpu() {
         memmove(end, end+4, strlen(end+4)+1);
     if((end = strstr(cpu_info, "th Gen ")))
         memmove(end-2, end+7, strlen(end+7)+1);
+    if((end = strstr(cpu_info, " with Radeon Graphics")))
+        *end = 0;
     if((end = strstr(cpu_info, "-Core Processor"))) {
         end -= 4;
         end = strchr(end, ' ');
         *end = 0;
     }
 
-    if(!config.print_cpu_brand) {
-        if((end = strstr(cpu_info, "Intel Core")))
+    if(!config.cpu_brand) {
+        if((end = strstr(cpu_info, "Intel Core ")))
             memmove(end, end+11, strlen(end+1));
-        if((end = strstr(cpu_info, "AMD")))
+        else if((end = strstr(cpu_info, "Apple ")))
+            memmove(end, end+6, strlen(end+6)+1);
+        else if((end = strstr(cpu_info, "AMD ")))
             memmove(end, end+4, strlen(end+1));
     }
 
-    printf("%s", cpu_info);
+    strncpy(dest, cpu_info, 256);
+    #ifdef __linux__
+        free(buf);
+    #endif
 
-    // Printing the clock frequency the cpu is currently running at
-    if(!config.print_cpu_freq)
-        return;
-        
-    char *cpu_freq = strstr(ptr+1, "cpu MHz");
-    if(!cpu_freq)
-        return;
+    if(count && config.cpu_count) {
+        char core_count[16];
+        snprintf(core_count, 16, " (%d) ", count);
+        strncat(dest, core_count, 255-strlen(dest));
+    }
 
-    cpu_freq = strchr(cpu_freq, ':');
-    if(!cpu_freq)
-        return;
-    cpu_freq += 2;
+    if(freq[0])
+        strncat(dest, freq, 255-strlen(dest));
 
-    end = strchr(cpu_freq, '\n');
-    if(!end)
-        return;
+    // final cleanup ("Intel Core i5         650" lol)
+    while((end = strstr(dest, "  ")))
+        memmove(end, end+1, strlen(end+1)+1);
 
-    *end = 0;
-
-    printf(" @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
+    return 0;
 }
-#endif
 
-// gpu - prints the current GPU
-#ifdef __APPLE__
-void gpu() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.gpu_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    struct utsname name;
-    uname(&name);
-
-    char *gpu_string;
-
-    if(strcmp(name.machine, "arm64")) {
-        gpu_string = get_gpu_string();
-        if(!gpu_string)
-            goto error;
-    }
-    else{
-        char buf[1024];
-        int pipes[2];
-        int pipes2[2];
-        pipe(pipes);
-        pipe(pipes2);
-
-        if(!fork()) {
-            dup2(pipes[1], STDOUT_FILENO);
-            dup2(pipes[1], STDERR_FILENO);
-            close(pipes[0]);
-            close(pipes[1]);
-            close(pipes2[0]);
-            close(pipes2[1]);
-            execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
-        }
-        close(pipes2[0]);
-        close(pipes2[1]);
-        close(pipes[1]);
-        wait(NULL);
-        int bytes = read(pipes[0], buf, 1024);
-        close(pipes[0]);
-
-        if(bytes < 1) {
-            fflush(stdout);
-            fputs("[Unsupported]", stderr);
-            fflush(stderr);
-            return;
-        }
-
-        gpu_string = strstr(buf, "Chipset Model: ");
-        if(!gpu_string)
-            goto error;
-        gpu_string += 15;
-        char *end = strchr(gpu_string, '\n');
-        if(!end)
-            goto error;
-        *end = 0;
-    }
-
-    char *ptr;
-    if((ptr = strstr(gpu_string, "Intel ")))
-        gpu_string += 6;
-    else if((ptr = strstr(gpu_string, "AMD ")))
-        gpu_string += 4;
-    //else if((ptr = strstr(gpu_string, "Apple ")))
-    //    gpu_string += 6;
-
-    printf("%s", gpu_string);
-    
-    return;
-    
-    error:
-        if(!gpu_string) {
-            fflush(stdout);
-            fputs("[Unsupported]", stderr);
-            fflush(stderr);
-            return;
-        }
-}
-#else
-void gpu() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.gpu_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    if(!access("/usr/bin/lspci", F_OK)) {
-        int pipes[2];
-        int pipes2[2];
-        char *lspci = malloc(0x2000);
-        
-        pipe(pipes);
-        pipe(pipes2);
-        if(!fork()) {
-            close(pipes[0]);
-            close(pipes2[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-            dup2(pipes2[1], STDERR_FILENO);
-            execlp("lspci", "lspci", "-mm", NULL); 
-        }
-        wait(NULL);
-        close(pipes[1]);
-        close(pipes2[1]);
-        lspci[read(pipes[0], lspci, 0x2000)] = 0;
-        close(pipes[0]);
-        close(pipes2[0]);
-        char *gpu = strstr(lspci, "3D");
-        if(!gpu) {
-            gpu = strstr(lspci, "VGA");
-            if(!gpu) {
-                goto error;
-            }
-        }
-
-        for(int i = 0; i < 4; ++i) {
-            gpu = strchr(gpu, '"');
-            if(!gpu)
-                goto error;
-            ++gpu;
-            /* VGA compatible controller" "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-             *  "Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-             * Intel Corporation" "WhiskeyLake-U GT2 [UHD Graphics 620]"
-             *  "WhiskeyLake-U GT2 [UHD Graphics 620]"
-             * WhiskeyLake-U GT2 [UHD Graphics 620]"
-             */
-        }
-
-        char *end = strchr(gpu, '"');   // WhiskeyLake-U GT2 [UHD Graphics 620]
-        if(!end)
-            goto error;
-        *end = 0;
-
-        char *ptr;
-        if(!config.print_gpu_arch) {
-            if((ptr = strchr(gpu, '['))) {
-                end = strchr(ptr, ']');
-                if(end) {
-                    *end = 0;
-                    gpu = ptr + 1;
-                }
-            }
-            if((ptr = strchr(gpu, '('))) {
-                if(ptr > lspci + 1) {
-                    *(ptr-1) = 0;
-                }
-            }
-        }
-
-        if((end = strstr(gpu, " Integrated Graphics Controller")))
-            *end = 0;
-        printf("%s", gpu);
-        free(lspci);
-        return;
-
-        error:
-            free(lspci);
-            fflush(stdout);
-            fputs("[Unsupported]", stderr);
-            fflush(stderr);
-            return;
-    }
-    fflush(stdout);
-    fputs("[Unsupported]", stderr);
-    fflush(stderr);
-    return;
-}
-#endif
-
-// memory - prints the amount of memory that's currently in use
-#ifdef __APPLE__ 
-void memory() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.mem_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    bytes_t usedram = used_mem_size();
-    bytes_t totalram = system_mem_size();
-
-    if(usedram == 0 || totalram == 0) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-
-    printf("%llu MiB / %llu MiB (%llu%%)", usedram/1048576, totalram/1048576, (usedram * 100) / totalram);
-    return;
-}
-#else
-void memory() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.mem_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    struct sysinfo info;
-    sysinfo(&info);
-
-    unsigned long totalram = info.totalram / 1024;
-    unsigned long freeram = info.freeram / 1024;
-    unsigned long bufferram = info.bufferram / 1024;
-
-    FILE *fp = fopen("/proc/meminfo", "r");
-
-    if(!fp) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-
-    char buf[256];
-    char *cachedram = buf; 
-
-    read_after_sequence(fp, "Cached:", buf, 256);
-    fclose(fp);
-
-    if(!(*buf)) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;
-    }
-    cachedram += 2;
-
+// get the first gpu
+int gpu(char *dest) {
+    char *gpu_string = NULL;
     char *end;
-    end = strstr(cachedram, " kB");
-    
-    if(!end) {
-        fflush(stdout);
-        fputs("[Unsupported]", stderr);
-        fflush(stderr);
-        return;     
+
+    #ifdef __APPLE__
+        struct utsname name;
+        uname(&name);
+
+        if(!strcmp(name.machine, "x86_64"))
+            gpu_string = get_gpu_string();  // only works on x64
+        if(!gpu_string || strcmp(name.machine, "x86_64")) {     // fallback
+            char buf[1024];
+            int pipes[2];
+            pipe(pipes);
+
+            if(!fork()) {
+                dup2(pipes[1], STDOUT_FILENO);
+                close(pipes[0]);
+                close(pipes[1]);
+                execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
+            }
+            close(pipes[1]);
+            wait(0);
+            size_t bytes = read(pipes[0], buf, 1024);
+            close(pipes[0]);
+
+            if(bytes < 1) {
+                return 1;
+            }
+
+            gpu_string = strstr(buf, "Chipset Model: ");
+            if(!gpu_string)
+                return 1;
+            gpu_string += 15;
+            char *end = strchr(gpu_string, '\n');
+            if(!end)
+                return 1;
+            *end = 0;
+        }
+    #else
+    # ifdef __ANDROID__
+        return 1;
+    # else
+        // based on https://github.com/pciutils/pciutils/blob/master/example.c
+
+        char device_class[256], namebuf[256];
+        struct pci_dev *dev;
+        struct pci_access *pacc = pci_alloc();		// get the pci_access structure;
+
+        pci_init(pacc);		// initialize the PCI library
+        pci_scan_bus(pacc);		// we want to get the list of devices
+
+        for(dev=pacc->devices; dev; dev=dev->next)	{ // iterates over all devices
+            pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	// fill in header info
+
+            pci_lookup_name(pacc, device_class, 256, PCI_LOOKUP_CLASS, dev->device_class);
+            if(!strcmp(device_class, "VGA compatible controller") || !strcmp(device_class, "3D controller")) {
+                // look up the full name of the device
+                gpu_string = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
+                break;
+            }
+        }
+
+        pci_cleanup(pacc);  // close everything
+
+        char gpu[256];
+
+        if(!gpu_string) {
+            int pipes[2];
+
+            if(pipe(pipes))
+                return 1;
+
+            if(!fork()) {
+                close(pipes[0]);
+                dup2(pipes[1], STDOUT_FILENO);
+                execlp("lspci", "lspci", "-mm", NULL);
+            }
+            
+            close(pipes[1]);
+            char *lspci = malloc(0x2000);
+            
+            wait(NULL);
+            lspci[read(pipes[0], lspci, 0x2000)] = 0;
+            close(pipes[0]);
+
+            gpu_string = strstr(lspci, "3D");
+            if(!gpu_string) {
+                gpu_string = strstr(lspci, "VGA");
+                if(!gpu_string) {
+                    free(lspci);
+                    return 1;
+                }
+            }
+
+            for(int i = 0; i < 4; ++i) {
+                gpu_string = strchr(gpu_string, '"');
+                if(!gpu_string) {
+                    free(lspci);
+                    return 1;
+                }
+                ++gpu_string;
+
+                /* class" "manufacturer" "name"
+                 *  "manufacturer" "name"
+                 * manufacturer" "name"
+                 *  "name"
+                 * name"
+                 */
+            }
+
+            char *end = strchr(gpu_string, '"');   // name
+            if(!end) {
+                free(lspci);
+                return 1;
+            }
+            *end = 0;
+            
+            strncpy(gpu, gpu_string, 255);
+            free(lspci);
+            gpu_string = gpu;
+        }
+    # endif // __ANDROID__
+    #endif // __APPLE__
+
+    if(!gpu_string)
+        return 1;
+
+    if(!config.gpu_brand) {
+        if((end = strstr(gpu_string, "Intel ")))
+            gpu_string += 6;
+        else if((end = strstr(gpu_string, "AMD ")))
+            gpu_string += 4;
+        else if((end = strstr(gpu_string, "Apple ")))
+            gpu_string += 6;
     }
-    
-    (*end) = 0;
 
-    unsigned long usedram = totalram - freeram - bufferram - atol(cachedram);
+    if((end = strstr(gpu_string, " Integrated Graphics Controller")))
+        *end = 0;
 
-    printf("%lu MiB / %lu MiB", usedram/1024, totalram/1024);
+    if((end = strchr(gpu_string, '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
+        char *ptr = strchr(end, ']');
+        if(ptr) {
+            gpu_string = end;
+            *ptr = 0;
+        }
+    }
 
-    if(config.print_mem_perc)
-         printf(" (%lu%%)", (usedram * 100) / totalram);
-    return;
+    strncpy(dest, gpu_string, 256);
+    return 0;
 }
-#endif
 
-// public IP adress - get the public IP address
-void public_ip() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.pub_ip_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+// get used and total memory
+int memory(char *dest) {
+    #ifdef __APPLE__ 
+        bytes_t usedram = used_mem_size();
+        bytes_t totalram = system_mem_size();
 
-    char public_ip[20];
+        if(!usedram || !totalram) { 
+            return 1;
+        }
+
+        snprintf(dest, 200, "%llu MiB / %llu MiB", usedram/1048576, totalram/1048576);
+    #else
+        struct sysinfo info;
+        if(sysinfo(&info))
+            return 1;
+
+        unsigned long totalram = info.totalram / 1024;
+        unsigned long freeram = info.freeram / 1024;
+        unsigned long sharedram = info.sharedram / 1024;
+
+        FILE *fp = fopen("/proc/meminfo", "r");
+
+        if(!fp) {
+            return 1;
+        }
+
+        char buf[256];
+        char *cachedram = buf; 
+
+        read_after_sequence(fp, "Cached:", buf, 256);
+        fclose(fp);
+
+        if(!(buf[0])) {
+            return 1;
+        }
+        cachedram += 2;
+
+        char *end = strstr(cachedram, " kB");
+        
+        if(!end) {
+            return 1; 
+        }
+        
+        *end = 0;
+
+        unsigned long usedram = totalram - freeram - sharedram - atol(cachedram);
+
+        snprintf(dest, 200, "%lu MiB / %lu MiB", usedram/1024, totalram/1024);
+    #endif
+
+    if(config.mem_perc) {
+        char perc[56];
+        snprintf(perc, 56, " (%lu%%)", (unsigned long)((usedram * 100) / totalram));
+        strcat(dest, perc);
+    }
+
+    return 0;
+}
+
+// gets the current public ip
+int public_ip(char *dest) {
+    CURL *curl_handle = curl_easy_init();
+    CURLcode res;
+
+    // fallback
+    char ip_str[32] = "";
     int pipes[2];
 
-    pipe(pipes);
-    if(!fork()) {
-        close(*pipes);
-        dup2(pipes[1], STDOUT_FILENO);
+    struct MemoryStruct chunk;
+    chunk.memory = malloc(4096);
+    chunk.size = 0;
 
-        execlp("curl", "curl", "-s", "ident.me", NULL);        // using curl --silent to get the Public IP aress
+    if(!curl_handle) {
+        curl_easy_cleanup(curl_handle);
+        free(chunk.memory);
+
+        goto fallback;
     }
-    wait(NULL);
-    close(pipes[1]);
 
-    
-    public_ip[read(pipes[0], public_ip, 20)] = 0;
+    curl_easy_setopt(curl_handle, CURLOPT_URL, "ident.me");
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
+    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
-    close(*pipes);
-    printf("%s", public_ip);
-}
+    res = curl_easy_perform(curl_handle);
 
-// local IP adress - get the local IP address
-void local_ip() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.loc_ip_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
+    if(res != CURLE_OK) {
+        curl_easy_cleanup(curl_handle);
+        free(chunk.memory);
 
-    struct ifaddrs *ifAddrStruct=NULL;
-    struct ifaddrs *ifa=NULL;
-    
-    void *tmpAddrPtr=NULL;
+        goto fallback;
+    }
 
-    getifaddrs(&ifAddrStruct);
+    strncpy(dest, chunk.memory, 256);
 
-    for(ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
-        if(!ifa->ifa_addr) {
-            continue;
+    curl_easy_cleanup(curl_handle);
+    free(chunk.memory);
+
+    return 0;
+
+    fallback:
+        pipe(pipes);
+        
+        if(!fork()) {
+            close(*pipes);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("curl", "curl", "-s", "ident.me", NULL); 
         }
-        if(ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
-            // is a valid IP4 Address
-            tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
-            char addressBuffer[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-            if(strcmp(addressBuffer, "127.0.0.1")) 
-                printf("%s", addressBuffer);
-        }
-    } 
+        wait(0);
+        close(pipes[1]);
+        ip_str[read(pipes[0], ip_str, 32) - 1] = 0;
+        close(pipes[0]);
+
+    if(!ip_str[0]) {
+        return 1;
+    }
+
+    strcpy(dest, ip_str);
+    return 0;
 }
 
-// pwd - prints the current working directory
-void pwd() {
-    char format[100];
-    snprintf(format, 100, "%s%s", config.pwd_label, config.dash);
-    if(config.align_infos) printf("%-16s\e[0m", format);
-    else printf("%s\e[0m ", format);
-
-    char *pwd = getenv("PWD");
-    if(pwd) {
-        printf("%s", pwd);
-        return;
-    }
+// gets all local ips
+int local_ip(char *dest) {
+    struct ifaddrs *addrs=NULL;
+    bool done = false;
+    int buf_size = 256;
     
-    fflush(stdout);
-    fputs("[Unknown]", stderr);
-    fflush(stderr);
+    getifaddrs(&addrs);
+
+    while(addrs) {
+        // checking if the ip is valid
+       if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
+            if((strcmp(addrs->ifa_name, "lo") || config.loc_localdomain) || (strcmp(addrs->ifa_name, "docker0") || config.loc_docker)) {
+                struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
+                
+                snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
+                dest += strlen(dest);
+                buf_size -= strlen(dest);
+                done = true;
+            }
+        }
+
+        addrs = addrs->ifa_next;
+    }
+
+    freeifaddrs(addrs);
+    if(done)
+        return 0;
+    return 1;
 }
 
-// terminal colors
-void colors() {
-    printf("%s", config.col_prefix);
-    for(int i = 0; i < 8; ++i) {
-        printf("\e[4%dm", i);
-        for(int j = 0; j < config.col_block_len; ++j)
-            printf(" ");
-    }
-    printf("\e[0m");
-    fflush(stdout);
+// gets the current working directory
+int pwd(char *dest) {
+    if(!getcwd(dest, 256))
+        return 1;
+    return 0;
 }
-// terminal colors (light version)
-void light_colors() {
-    printf("%s", config.col_prefix);
+
+// gets the current date and time
+int date(char *dest) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    snprintf(dest, 256, "%02d/%02d/%d %02d:%02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    return 0;
+}
+
+// show the terminal color configuration
+int colors(char *dest) {
+    if(config.col_block_len > 16)
+        return 1;
+
+    memset(dest, 0, 256);
     for(int i = 0; i < 8; ++i) {
-        printf("\e[10%dm", i);
-        for(int j = 0; j < config.col_block_len; ++j)
-            printf(" ");
+        sprintf(dest+(5+config.col_block_len)*i, "\033[4%dm", i);
+        for(int i = 0; i < config.col_block_len; ++i)
+            strcat(dest, " ");
     }
-    printf("\e[0m");
-    fflush(stdout);
+
+    strcat(dest, "\033[0m");
+
+    return 0;
+}
+// show the terminal color configuration (light version)
+int light_colors(char *dest) {
+    if(config.col_block_len > 16)
+        return 1;
+
+    memset(dest, 0, 256);
+    for(int i = 0; i < 8; ++i) {
+        sprintf(dest+(6+config.col_block_len)*i, "\033[10%dm", i);
+        for(int i = 0; i < config.col_block_len; ++i)
+            strcat(dest, " ");
+    }
+
+    strcat(dest, "\033[0m");
+
+    return 0;
 }

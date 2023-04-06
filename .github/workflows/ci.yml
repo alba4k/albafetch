@@ -1,0 +1,46 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: cachix/install-nix-action@v20
+
+      - name: build (x64)
+        run: nix build .#albafetch-static
+
+      - name: test
+        run: ./result/bin/albafetch
+
+      - uses: actions/upload-artifact@v3
+        if: runner.os == 'Linux'
+        with:
+          name: albafetch-x64-linux
+          path: ${{ github.workspace }}/result/bin/albafetch
+
+      - uses: actions/upload-artifact@v3
+        if: runner.os == 'macOS'
+        with:
+          name: albafetch-x64-darwin
+          path: ${{ github.workspace }}/result/bin/albafetch
+
+      - name: build (aarch64-multiplatform)
+        if: runner.os == 'Linux'
+        run: nix build .#arm.linux.albafetch
+
+      - uses: actions/upload-artifact@v3
+        if: runner.os == 'Linux'
+        with:
+          name: albafetch-aarch64-linux
+          path: ${{ github.workspace }}/result/bin/albafetch

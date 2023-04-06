@@ -1,69 +1,73 @@
+#pragma once
+
 #ifndef INFO_H
 #define INFO_H
-#include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include <limits.h>
 
-#include "queue.h"
-#include "vars.h"
+#include <limits.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #ifndef HOST_NAME_MAX
-#ifdef _POSIX_HOST_NAME_MAX
-#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
-#else
-#define HOST_NAME_MAX 128
-#endif
+    #ifdef _POSIX_HOST_NAME_MAX
+        #define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+    #else
+        #define HOST_NAME_MAX 128
+    #endif
 #endif
 
 // Not sure if this 
 #ifndef LOGIN_NAME_MAX
-#define LOGIN_NAME_MAX HOST_NAME_MAX
+    #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
 
-void separator();   // prints a separator
+struct Info {
+    char *label;            // module label
+    int (*func)(char *);    // pointer to the function that gets the info
+    struct Info *next;      // next module
+};
 
-void separator2();  // prints a different separator
+//int separator(char *dest);
 
-void title();       // prints a title in the format user@hostname
+int user(char *dest);
 
-void hostname();    // getting the computer hostname
+int hostname(char *dest);
 
-void user();        // get the currently logged user
+int uptime(char *dest);
 
-void uptime();      // prints the uptime
+int os(char *dest);
 
-void os();          // prints the os name + arch
+int kernel(char *dest);
 
-void bios();	    // prints the current BIOS version 
+int desktop(char *dest);
 
-void kernel();      // prints the kernel version
+int shell(char *dest);
 
-void desktop();     // prints the current desktop environment
+int login_shell(char *dest);
 
-void shell();       // prints the shell that called albafetch
+int term(char *dest);
 
-void login_shell(); // prints the user default shell
+int packages(char *dest);
 
-void term();        // prints the current terminal
+int host(char *dest);
 
-void packages();    // prints the number of installed packages
+int bios(char *dest);
 
-void host();        // prints the current host machine
+int cpu(char *dest);
 
-void cpu();         // prints the current CPU
+int gpu(char *dest);
 
-void gpu();         // prints the current GPU
+int memory(char *dest);
 
-void memory();      // prints the used memory in the format used MiB / total MiB (XX%)
+int public_ip(char *dest);
 
-void public_ip();   // get the public IP adress
+int local_ip(char *dest);
 
-void local_ip();    // get the local IP adress - WORK IN PROGRESS
+int pwd(char *dest);
 
-void pwd();         // prints the current working directory
+int date(char *dest);
 
-void colors();      // prints the terminal colors
-void light_colors();// prints the light version of the terminal colors
+int colors(char *dest);
 
-#endif
+int light_colors(char *dest);
+
+#endif // INFO_H

@@ -1,8 +1,5 @@
 #include "queue.h"
 
-#include <stdio.h>
-#include <string.h>
-
 Queue *queue_with_size(size_t size) {
     Queue *q = malloc(sizeof(Queue));
 
@@ -81,9 +78,7 @@ void destroy_queue(Queue *q) {
 void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size) {
     size_t seq_size = strlen(seq);
     Queue *q = queue_with_size(3 * seq_size);
-    int ch;
-    int error;
-    int found = 0;
+    int ch, error;
     char elem;
 
     while((ch = fgetc(fp)) != EOF) {
@@ -94,10 +89,8 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
 
         assert(q->size == seq_size);   // Window is of correct width
 
-        if(!strncmp((char *)q->data + q->offset, seq, seq_size)) {
-            found = 1;
+        if(strncmp((char *) q->data + q->offset, seq, seq_size) == 0)
             break;
-        }
         
         error = dequeue(q, &elem);
         assert(error != QUEUE_EMPTY);  // Queue should always have at least `seq_size` items
@@ -107,10 +100,6 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
     }
 
     destroy_queue(q);
-
-    if(!found) {
-        buffer[0] = 0;  // make buffer an empty string if the sequence is not found
-    }
 
     // Actually read for the rest of the file, or the buffer.
     for(size_t i = 0; i < buffer_size; ++i) {

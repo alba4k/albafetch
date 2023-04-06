@@ -1,363 +1,111 @@
+#include <stdio.h>
+#include <string.h>
+
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+
 #include "info.h"
+#include "utils.h"
 #include "logos.h"
-#include "stdlib.h"
+#include "queue.h"
 
 /* TODO:
- * use strlen() to determine how far to --align ("%-%ds", max(strlen(a), strlen(b)) + 2 <-- NOT actual code)
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
- * --ascii for custom ascii art (conflicts with --logo) - work in progress (lines [64; 76]U[318; 356])
- * remove the lspci dependency for gpu()
+ * --ascii for custom ascii art (conflicts with --logo) - work in progress
+ * more config options
  */
 
-// CONFIGURATION OPTIONS:
-char *separator_string; // what is used as separator between sections
-char *dash; // default separator
+// This contains the default config values
+struct Config config = {
+    false,  // align
+    true,   // bold
+    NULL,   // logo
+    "",     // color
+    ": ",   // dash
+    "-",    // separator
+    5,      // spacing
 
-// default config
-Config config = {
-    "\e[0m------------------",          // separator
-    "",                                 // separator2
-    ":",                                // dash
-    true,                               // print_cpu_freq
-    true,                               // print_cpu_brand
-    true,                               // print_gpu_arch
-    true,                               // print_mem_perc
-    false,                               // align stats
-    "",                                 // color
-    "\e[1m",                            // bold
-    // Labels:
-    "",                                 // title_prefix
-    "",                                 // col_prefix
-    3,                                  // col_block_len
-    "Hostname",                         // hostname
-    "User",                             // user
-    "Uptime",                           // uptime
-    "OS",                               // os
-    "Kernel",                           // kernel
-    "Desktop",                          // desktop
-    "Shell",                            // shell
-    "Shell",                            // default_shell_label
-    "Terminal",                         // terminal
-    "Packages",                         // packages
-    "Host",                             // host
-    "BIOS",                             // bios
-    "CPU",                              // cpu
-    "GPU",                              // gpu
-    "Memory",                           // memory
-    "Publ. IP",                         // public IP
-    "Loc. IP",                          // local IP
-    "Directory"                         // pwd
+    true,   // title_color
+    true,   // os_arch
+    false,  // kernel_short
+    false,  // de_type
+    false,  // shell_path
+    true,   // cpu_brand
+    true,   // cpu_freq
+    true,   // cpu_count
+    false,  // gpu_brand
+    true,   // mem_perc
+    true,   // pkg_mgr
+    true,   // pkg_pacman
+    true,   // pkg_dpkg
+    true,   // pkg_rpm
+    true,   // pkg_flatpak
+    true,   // pkg_snap
+    false,  // pkg_pip
+    true,   // pkg_brew
+    false,  // loc_docker
+    false,  // loc_localdomain
+    3,      // col_block_len
+
+    "",         // separator_prefix
+    "",         // spacing_prefix
+    "",         // title_prefix
+    "User",     // user_prefix
+    "Hostname", // hostname_prefix
+    "Uptime",   // uptime_prefix
+    "OS",       // os_prefix
+    "Kernel",   // kernel_prefix
+    "Desktop",  // desktop_prefix
+    "Shell",    // shell_prefix
+    "Login",    // login_shell_prefixix
+    "Terminal", // term_prefix
+    "Packages", // packages_prefix
+    "Host",     // host_prefix
+    "BIOS",     // bios_prefix
+    "CPU",      // cpu_prefix
+    "GPU",      // gpu_prefix
+    "Memory",   // mem_prefix
+    "Public IP",// public_ip_prefix
+    "Local IP", // loc_prefix
+    "Directory",// pwd_prefix
+    "Date",     // date_prefix
+    "",         // colors_prefix
+    "",         // light_colors_prefix
 };
 
-bool print_cpu_freq;
-
-bool default_bold = false;
-char default_color[33] = "";
-char default_logo[33] = "";
-
-char **logo;
-
-char spacing[32] = "    ";
-char spacing_first[32] = "";
-char spacing_last[32] = "";
-
-/* Check what I wrote about logo_from_string - should be around line 320
- * also, this will be useful for determining how far to --align (to do comment at line 6)
-int max(const int *nums, unsigned const int lenght) {
-    if(!lenght) return 0;
-    int current_max = *nums;
-
-    for(int i = 1; i < lenght; ++i) {
-        if(nums[i] > current_max)
-            current_max = nums[i];
-    }
-
-    return current_max;
-}
-*/
-
-void unescape(char *str) {
-    // check every \ in the given string and unescape \n and \e
-    while((str=strchr(str, '\\'))) {
-        memmove(str, str+1, strlen(str+1)+1);
-        switch(*str) {
-            default: case '\\':
-                break;
-            case 'n':
-                *str = '\n';
-                break;
-            case 'e':
-                *str = '\e';
-                break;
-        }
-    ++str;
-    }
-}
-
-// in the following, a return code of 1 means success
-bool parse_config_option(char* source, char *dest, char *field) {
-    char *ptr;
-
-    // looks for the keyword, checks the string between the following " "
-
-    if((ptr = strstr(source, field))) {
-        if((ptr = strchr(ptr, '"'))) {
-            ++ptr;
-
-            if(((field = strchr(ptr, '"'))) && ptr) {
-                *field = 0;
-                strcpy(dest, ptr);
-                *field = '"';
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
-
-// in the following, a return code of 1 means success
-bool parse_config_bool(char *source, bool *dest, char *field) {
-    char *ptr;
-
-    // looks for the keyword, checks the string between the following " "
-
-    if((ptr = strstr(source, field))) {
-        if((ptr = strchr(ptr, '"'))) {
-            ++ptr; 
-
-            if(((field = strchr(ptr, '"'))) && ptr) {
-                *field = 0;
-                *dest = !strcmp(ptr, "true");
-                *field = '"';
-                return 1;
-            }
-        }
-    }
-
-    return 0;
-}
-
-// parsing the file provided in path for config options
-void parse_config(const char *path, const bool using_custom_config) {
-    // really bad code here, you don't need to look
-
-    FILE *fp = fopen(path, "r");
-    if(!fp) {
-        if(using_custom_config)
-            fprintf(stderr, "\e[91m\e[1mWARNING\e[0m: failed to open the file specified using --config (%s), using defaults.\n", path);
-        return;
-    }
-    fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
-    rewind(fp);
-    char *conf = malloc(len+1);
-    conf[fread(conf, 1, len, fp)] = 0;
-    fclose(fp);
-
-    unescape(conf);
-
-    // remove comments
-    char *ptr = conf;
-    char *ptr2 = conf;
-    while((ptr = strchr(ptr, ';'))) {
-        ptr2 = strchr(ptr, '\n');
-        memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
-    }
-    ptr = ptr2 = conf;
-    while((ptr = strchr(ptr, '#'))) {
-        ptr2 = strchr(ptr, '\n');
-        memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
-    }
-    
-    // spacing
-    parse_config_option(conf, spacing, "spacing");
-
-    // spacing_first
-    parse_config_option(conf, spacing_first, "spacing_first");
-
-    // spacing_last
-    parse_config_option(conf, spacing_last, "spacing_last");
-
-
-    // separators
-    parse_config_option(conf, config.separator, "separator");
-    parse_config_option(conf, config.separator2, "separator2");
-
-    // dash
-    parse_config_option(conf, config.dash, "dash");
-
-    // print_cpu_freq
-    parse_config_bool(conf, &config.print_cpu_freq, "print_cpu_freq");
-
-    // print_cpu_brand
-    parse_config_bool(conf, &config.print_cpu_brand, "print_cpu_brand");
-
-    // print_gpu_arch
-    parse_config_bool(conf, &config.print_gpu_arch, "print_gpu_arch");
-
-    // print_mem_perc
-    parse_config_bool(conf, &config.print_mem_perc, "print_mem_perc");
-
-    // align_infos
-    parse_config_bool(conf, &config.align_infos, "align_infos");
-    
-    // color
-    if(parse_config_option(conf, config.color, "default_color"))
-        strcpy(default_color, config.color);
-
-    // bold
-    bool bold;
-    if((default_bold = parse_config_bool(conf, &bold, "default_bold"))) {
-        if(bold)
-            strcpy(config.bold, "\e[1m");
-        else
-            strcpy(config.bold, "");
-    }
-
-    // logo
-    if((ptr = strstr(conf, "default_logo"))) {
-        if((ptr = strchr(ptr, '"'))) {
-            ++ptr;
-            if(((ptr2 = strchr(ptr, '"'))) && ptr) {
-                *ptr2 = 0;
-                for(int i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
-                    if(!strcmp(logos[i][0], ptr)) {
-                        logo = (char**)logos[i];
-                        strcpy(default_logo, *logo);
-                    }
-                *ptr2 = '"';
-            }
-        }
-    }
-
-    // col_block_len
-    if((ptr = strstr(conf, "col_block_len"))) {
-        if((ptr = strchr(ptr, '"'))) {
-            ++ptr;
-            if((ptr2 = strchr(ptr, '"'))) {
-                *ptr2 = 0;
-                config.col_block_len = atoi(ptr);
-                *ptr2 = '"';
-            }
-        }
-    }
-
-    // LABELS
-    // title
-    parse_config_option(conf, config.title_prefix, "title_prefix");
-
-    // colors
-    parse_config_option(conf, config.col_prefix, "col_prefix");
-
-    // hostname
-    parse_config_option(conf, config.hostname_label, "hostname_label");
-
-    // user
-    parse_config_option(conf, config.user_label, "user_label");
-
-    // uptime
-    parse_config_option(conf, config.uptime_label, "uptime_label");
-
-    // os
-    parse_config_option(conf, config.os_label, "os_label");
-
-    // kernel
-    parse_config_option(conf, config.kernel_label, "kernel_label");
-
-    // desktop
-    parse_config_option(conf, config.desktop_label, "desktop_label");
-
-    // shell (current)
-    parse_config_option(conf, config.shell_label, "shell_label");
-
-    // shell(default)
-    parse_config_option(conf, config.default_shell_label, "def_shell_label");
-
-    // terminal
-    parse_config_option(conf, config.term_label, "term_label");
-
-    // packages
-    parse_config_option(conf, config.packages_label, "packages_label");
-
-    // host
-    parse_config_option(conf, config.host_label, "host_label");
-
-    // bios
-    parse_config_option(conf, config.bios_label, "bios_label");
-
-    // cpu
-    parse_config_option(conf, config.cpu_label, "cpu_label");
-
-    // gpu
-    parse_config_option(conf, config.gpu_label, "gpu_label");
-    
-    // memory
-    parse_config_option(conf, config.mem_label, "mem_label");
-
-    // public IP
-    parse_config_option(conf, config.pub_ip_label, "pub_ip_label");
-
-    // local IP
-    parse_config_option(conf, config.loc_ip_label, "loc_ip_label");
-
-    // pwd
-    parse_config_option(conf, config.pwd_label, "pwd_label");
-
-    free(conf);
-}
-
-int printLogo(const int line) {
-    if(*logo[line]) {
-        printf("%s%s%s", config.bold, logo[line], config.color);
-        return line+1;
-    } else {
-        printf("%s%s%s", config.bold, logo[2], config.color);
-        return line;
-    }
-}
-
-/*  // I'm working on this part - I swear - I'm trying to implement getting a custom logo from a string (line per line)
-void logo_from_string(char *str, char **dest) {
-    unescape(str);
-
-    char *ptr;
-    int string_lengths[28];
-    memset(string_lengths, 0, sizeof(string_lengths)/sizeof(string_lengths[0]));
-    int line_count = 3;
-    char placeholder_line[64] = "";
-    char *temp_logo[32] = {
-        "custom",
-        "",
+int main(int argc, char **argv) {
+    // using a linked list like this is quite horrible, but here we go
+    struct Info infos[64] = {
+    //  {"Label", fptr, next}
+        {NULL, NULL, infos+3},                              // 00
+        {config.user_prefix, user, NULL},                   // 01
+        {config.hostname_prefix, hostname, NULL},           // 02
+        {config.title_prefix, title, infos+23},             // 03
+        {config.uptime_prefix, uptime, infos+24},           // 04
+        {config.os_prefix, os, infos+6},                    // 05
+        {config.kernel_prefix, kernel, infos+7},            // 06
+        {config.desktop_prefix, desktop, infos+8},          // 07
+        {config.shell_prefix, shell, infos+10},             // 08
+        {config.login_shell_prefixix, login_shell, NULL},   // 09
+        {config.term_prefix, term, infos+11},               // 10
+        {config.packages_prefix, packages, infos+25},       // 11
+        {config.host_prefix, host, infos+14},               // 12
+        {config.bios_prefix, bios, NULL},                   // 13
+        {config.cpu_prefix, cpu, infos+15},                 // 14
+        {config.gpu_prefix, gpu, infos+16},                 // 15
+        {config.mem_prefix, memory, infos+26},              // 16
+        {config.public_ip_prefix, public_ip, NULL},         // 17
+        {config.loc_prefix, local_ip, NULL},                // 18
+        {config.pwd_prefix, pwd, NULL},                     // 19
+        {config.date_prefix, date, NULL},                   // 20
+        {config.colors_prefix, colors, infos+22},           // 21
+        {config.light_colors_prefix, light_colors, NULL},   // 22
+        {config.separator_prefix, separator, infos+4},      // 23
+        {config.separator_prefix, separator, infos+5},      // 24
+        {config.separator_prefix, separator, infos+12},     // 25
+        {config.spacing_prefix, spacing, infos+21},         // 26
     };
 
-    // place the lines in the array
-    // TODO fix this loop, it's broken AF, it just works as a segfault farm, lol
-    while((ptr = strchr(str, '\n'))) {
-        if(line_count > 31) // prevent buffer overflow
-            break;
-
-        *ptr = 0;
-        temp_logo[line_count++] = str;
-        string_lengths[line_count-4] = (int)strlen(str);
-        *ptr = '\n';
-
-        str = ptr+1;
-    }
-
-    for(int i = 0; i < max(string_lengths, sizeof(string_lengths)/sizeof(string_lengths[0])); ++i)
-        strcat(placeholder_line, " ");
-
-    temp_logo[2] = placeholder_line;
-    temp_logo[line_count] = "";
-
-    puts("HELLO");
-
-    dest = temp_logo;
-}
-*/
-
-int main(const int argc, const char **argv) {
     bool user_is_an_idiot = false; // rtfm and stfu
 
     // are the following command line args used?
@@ -367,26 +115,46 @@ int main(const int argc, const char **argv) {
     int asking_logo = 0;
     int asking_align = 0;
 
-    bool using_custom_config = false;
+    // these store either the default values or the ones defined in the config
+    // they are needed to know what is used if no arguments are given (for --help)
+    bool default_bold;
+    char default_color[8] = "";
+    char default_logo[16] = "";
+
+    char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
+        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memset(mem, 0, 4096);
+    /* this chunk is divided as following (one line is 256B):
+     * 0  
+     * 1   
+     * 2  printed       (saves what should get printed, used for parsing)
+     * 3  printed
+     * 4  printed
+     * 5  
+     * 6  data          (buffer for every function in info.c)
+     * 7  
+     * 8  logo          (32 char* to lines (following logo.h))
+     * 9  
+     * 10 
+     * 11 
+     * 12 
+     * 13 
+     * 14 
+     * 15 
+     */
 
     // the config that's normally used is ~/.config/albafetch.conf
-    char config_file[LOGIN_NAME_MAX + 33] = "";
+    char config_file[LOGIN_NAME_MAX + 32] = "";
 
     char *home = getenv("HOME");
-    // I really hope this part will never need to run
+    // I really hope this part will never run
     if(!home) {
-        fflush(stdout);
-        fputs("\e[31m\e[1mERROR\e[0m:$HOME is not set, interrupting!\n", stderr);
-        fflush(stderr);
-
-        return 1;
+        fputs("\033[31m\033[1mERROR\033[0m: $HOME is not set, interrupting!\n", stderr);
+        return -1;
     }
     if(!home[0]) {
-        fflush(stdout);
-        fputs("\e[31m\e[1mERROR\e[0m:$HOME is empty, interrupting!\n", stderr);
-        fflush(stderr);
-
-        return 1;
+        fputs("\033[31m\033[1mERROR\033[0m: $HOME is empty, interrupting!\n", stderr);
+        return -1;
     }
 
     // parsing the command args
@@ -402,17 +170,22 @@ int main(const int argc, const char **argv) {
         else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
             asking_align = i+1;
         else if(!strcmp(argv[i], "--config")) {
-            if(i+1 < argc) {
-                using_custom_config = true;
-                strcpy(config_file, argv[i+1]);
+            if(i+1 >= argc) {   // is there such an arg?
+                fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
+                user_is_an_idiot = true;
                 continue;
             }
-            fputs("\e[31m\e[1mERROR\e[0m: --config requires a extra argument! Use --help for more info\n", stderr);
-            user_is_an_idiot = true;
+            else if(access(argv[i+1], F_OK)) {  // is it a valid file?
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid file \"%s\"! Use --help for more info\n", argv[i+1]);
+                user_is_an_idiot = true;
+                continue;
+            }
+            strcpy(config_file, argv[i+1]);
+            continue;
         }
     }
 
-    if(!using_custom_config) {
+    if(!config_file[0]) {
         char *config_home = getenv("XDG_CONFIG_HOME");
         if(config_home) { // is XDG_CONFIG_HOME set?
             if(config_home[0]) // is XDG_CONFIG_HOME empty?
@@ -424,143 +197,90 @@ int main(const int argc, const char **argv) {
             snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
     }
 
-    parse_config(config_file, using_custom_config);
-    if(!(*spacing_first)) strcpy(spacing_first, spacing);
-    if(!(*spacing_last)) strcpy(spacing_last, spacing);
+    parse_config(config_file, &default_bold, default_color, default_logo);
 
-    //logo_from_string("line1\nline2\nline3\nline4\nline5\nline6\n", logo);
+    if(asking_logo) {
+        if(asking_logo < argc) {
+            bool done = false;
+
+            for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
+                if(!strcmp(logos[i][0], argv[asking_logo])) {
+                    config.logo = (char**)logos[i];
+                    done = true;
+                }
+
+            if(!done) {
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
+                user_is_an_idiot = true;
+            }
+        } else {
+            fputs("\033[31m\033[1mERROR\033[0m: --logo srequires an extra argument!\n", stderr);
+            user_is_an_idiot = true;
+        }
+
+        strcpy(config.color, config.logo[1]);
+    }
+    if(!config.logo) {
+        #ifdef __APPLE__
+            config.logo = (char**)logos[1];
+        #else
+        # ifdef __ANDROID__
+            config.logo = (char**)logos[2];
+        # else
+            config.logo = (char**)logos[0];
+            FILE *fp = fopen("/etc/os-release", "r");
+
+            if(fp) {
+                char os_id[48];
+                read_after_sequence(fp, "\nID", os_id, 48);
+                if(!os_id[0])
+                    read_after_sequence(fp, "ID", os_id, 48);
+                fclose(fp);
+
+                char *end = strchr(os_id, '\n');
+                if(!end)
+                    return 2;
+                *end = 0;
+
+                for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
+                    if(!strcmp(logos[i][0], os_id))
+                        config.logo = (char**)logos[i];
+            }
+        # endif // __ANDROID__
+        #endif // __APPLE__
+        
+        strcpy(default_logo, config.logo[0]);
+        strcpy(config.color, config.logo[1]);
+    }
 
     if(asking_color) {
         if(asking_color < argc) {
             char *colors[9][2] = {
-                {"black", "\e[30m"},
-                {"red", "\e[31m"},
-                {"green", "\e[32m"},
-                {"yellow", "\e[33m"},
-                {"blue", "\e[34m"},
-                {"purple", "\e[35m"},
-                {"cyan", "\e[36m"},
-                {"gray", "\e[90m"},
-                {"white", "\e[37m"},
+                {"black", "\033[30m"},
+                {"red", "\033[31m"},
+                {"green", "\033[32m"},
+                {"yellow", "\033[33m"},
+                {"blue", "\033[34m"},
+                {"purple", "\033[35m"},
+                {"cyan", "\033[36m"},
+                {"gray", "\033[90m"},
+                {"white", "\033[37m"},
             };
 
-            for(int j = 0; j < 9; ++j) {
+            bool done = false;
+            for(int j = 0; j < 9; ++j)
                 if(!strcmp(argv[asking_color], *colors[j])) {
                     strcpy(config.color, colors[j][1]);
-                    goto color;
+                    done = true;
                 }
+
+            if(!done) {
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
+                user_is_an_idiot = true;
             }
-
-            fputs("\e[31m\e[1mERROR\e[0m: invalid color! Use --help for more info\n", stderr);
-            user_is_an_idiot = true;
-
-            color: ;
-        } else {
-            fputs("\e[31m\e[1mERROR\e[0m: --color requires a color! Use --help for more info\n", stderr);
-            user_is_an_idiot = true;
         }
-    }
-
-    if(asking_logo) {
-        if(asking_logo < argc) {
-            for(int j = 0; j < sizeof(logos)/sizeof(*logos); ++j)
-                if(!strcmp(logos[j][0], argv[asking_logo])) {
-                    logo = (char**)logos[j];
-                    goto logo_arg_found;
-                }
-            logo = (char**)logos[0];
-            logo_arg_found: ;
-        } else {
-            fputs("\e[31m\e[1mERROR\e[0m: --logo requires a extra argument! Use --help for more info\n", stderr);
-            user_is_an_idiot = true;
-        }
-    }
-
-    // set logo and color if not defined yet
-    if(!logo) {
-        #ifdef __APPLE__
-            logo = (char**)logos[1];
-            goto logo_found;
-        #else
-            FILE *fp = fopen("/etc/os-release", "r");
-            if(!fp) {
-                logo = (char**)logos[0];
-                goto logo_found;
-            }
-
-            char os_id[32];
-            read_after_sequence(fp, "\nID", os_id, 32);
-            if(!(*os_id))
-                read_after_sequence(fp, "ID", os_id, 32);
-            fclose(fp);
-
-            char *end = strchr(os_id, '\n');
-            if(!end)
-                return -1;
-            *end = 0;
-
-            for(int i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
-                if(!strcmp(logos[i][0], os_id)) {
-                    logo = (char**)logos[i];
-                    goto logo_found;
-                }
-            logo = (char**)logos[0];
-        #endif
-        
-        logo_found: ;
-    }
-    if(!(*config.color))
-        strcpy(config.color, logo[1]);
-
-    if(asking_help) {
-        printf("%s%salbafetch\e[0m - a system fetch utility\n",
-               config.color, config.bold);
-
-        printf("\n%s%sFLAGS\e[0m:\n",
-               config.color, config.bold);
-
-        printf("\t%s%s-h\e[0m,%s%s --help\e[0m:\t Print this help menu and exit\n",
-               config.color, config.bold, config.color, config.bold);
-
-        printf("\t%s%s-c\e[0m,%s%s --color\e[0m:\t Change the output color (%s%s\e[0m)\n"
-               "\t\t\t   [\e[30mblack\e[0m, \e[31mred\e[0m, \e[32mgreen\e[0m, \e[33myellow\e[0m,"
-               " \e[34mblue\e[0m, \e[35mpurple\e[0m, \e[36mcyan\e[0m, \e[90mgray\e[0m,"
-               " \e[37mwhite\e[0m]\n",
-               config.color, config.bold, config.color, config.bold, default_color[0] ? default_color : logo[1], default_color[0] ? "default" : "logo default");
-
-        printf("\t%s%s-b\e[0m,%s%s --bold\e[0m:\t Specifies if bold should be used in colored parts (default: %s\e[0m)\n"
-               "\t\t\t   [\e[1mon\e[0m, off]\n",
-               config.color, config.bold, config.color, config.bold, default_bold ? "\e[1mon" : "off");
-        
-        printf("\t%s%s-l\e[0m,%s%s --logo\e[0m:\t Changes the logo that will be displayed (%s)\n"
-               "\t\t\t   [linux, apple, arch, arch_small, debian, linuxmint, endeavouros, ubuntu]\n"
-               "\t\t\t   [parrot, manjaro, fedora, neon, pop, gentoo, windows]\n",
-               config.color, config.bold, config.color,config. bold, default_logo[0] ? default_logo : "OS default");
-
-        printf("\t%s%s-a\e[0m, %s%s--align\e[0m:\t Alignes the infos if set (default: %s)\n"
-               "\t\t\t   [on, off]\n", config.color, config.bold, config.color, config.bold, config.align_infos ? "on" : "off");
-
-        printf("\t%s%s--config\e[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
-               "\t\t\t   [path]\n", config.color, config.bold);
-
-        printf("\nReport a bug: %s%shttps://github.com/alba4k/albafetch/issues\e[0m\n",
-               config.color, config.bold);
-
-        return 0;
-    }
-
-    if(asking_align) {
-        if(asking_logo < argc) {
-                if(!strcmp(argv[asking_align], "on"))
-                    config.align_infos = true;
-                else if(!strcmp(argv[asking_align], "off"))
-                    config.align_infos = false;
-                else {
-                    fputs("\e[31m\e[1mERROR\e[0m: invalid extra argument for --align! Use --help for more info\n", stderr);
-                    user_is_an_idiot = true;
-                }
-        } else {
-            fputs("\e[31m\e[1mERROR\e[0m: --align requires a extra argument! Use --help for more info\n", stderr);
+        else {
+            fputs("\033[31m\033[1mERROR\033[0m: --color srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
@@ -568,67 +288,255 @@ int main(const int argc, const char **argv) {
     if(asking_bold) {
         if(asking_bold < argc) {
             if(!strcmp(argv[asking_bold], "on"))
-                strcpy(config.bold, "\e[1m");
+                config.bold = true;
             else if(!strcmp(argv[asking_bold], "off"))
-                strcpy(config.bold, "");
+                config.bold = false;
             else {
-                fputs("\e[31m\e[1mERROR\e[0m: invalid extra argument for --bold! Use --help for more info\n", stderr);
+                fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
             }
-        } else {
-            fputs("\e[31m\e[1mERROR\e[0m: --bold requires a extra argument! Use --help for more info\n", stderr);
+        }
+        else {
+            fputs("\033[31m\033[1mERROR\033[0m: --bold srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
 
-    // die if the user is a fucking moron
-    if(user_is_an_idiot)
+    // was it really that hard to type 'albafetch -h'?
+    if(user_is_an_idiot) {
+        fputs("\033[31m\033[1mFATAL\033[0m: One or multiple errors occured! Use --help for more info\n", stderr);
         return 1;
+    }
 
-    void (*infos[])() = {
-        title,
-        separator,
+    if(asking_help) {
+        printf("%s%salbafetch\033[0m - a system fetch utility\n",
+               config.color, config.bold ? "\033[1m" : "");
+
+        printf("\n%s%sFLAGS\033[0m:\n",
+               config.color, config.bold ? "\033[1m" : "");
+
+        printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "");
+
+        printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
+               "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"
+               " \033[34mblue\033[0m, \033[35mpurple\033[0m, \033[36mcyan\033[0m, \033[90mgray\033[0m,"
+               " \033[37mwhite\033[0m]\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
+
+        printf("\t%s%s-b\033[0m,%s%s --bold\033[0m:\t Specifies if bold should be used in colored parts (default: %s\033[0m)\n"
+               "\t\t\t   [\033[1mon\033[0m, off]\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
+        
+        printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
+               "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, endeavouros, fedora]\n"
+               "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
+
+        printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Alignes the infos if set (default: %s)\n"
+               "\t\t\t   [on, off]\n", config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", config.align ? "on" : "off");
+
+        printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
+               "\t\t\t   [path]\n", config.color, config.bold ? "\033[1m" : "");
+
+        printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
+               config.color, config.bold ? "\033[1m" : "");
+
+        return 0;
+    }
+
+    if(asking_align) {
+        if(asking_align < argc) {
+            if(!strcmp(argv[asking_align], "on"))
+                config.align = true;
+            else if(!strcmp(argv[asking_align], "off"))
+                config.align = false;
+            else {
+                fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
+                user_is_an_idiot = true;
+            }
+        }
+        else {
+            fputs("\033[31m\033[1mERROR\033[0m: --align srequires an extra argument!\n", stderr);
+            user_is_an_idiot = true;
+        }
+    }
+
+#ifdef _DEBUG
+    // Is there a smarter way to do this? Probably, but I'm too lazy
+    // Feel free to let me know or just open a PR if you know one <3
+    config.os_arch = 1;
+    config.de_type = 1;
+    config.shell_path = 1;
+    config.cpu_brand = 1;
+    config.cpu_freq = 1;
+    config.cpu_count = 1;
+    config.gpu_brand = 1;
+    config.mem_perc = 1;
+    config.pkg_mgr = 1;
+    config.pkg_pacman = 1;
+    config.pkg_dpkg = 1;
+    config.pkg_rpm = 1;
+    config.pkg_flatpak = 1;
+    config.pkg_snap = 1;
+    config.pkg_pip = 1;
+    config.pkg_brew = 1;
+    config.loc_localdomain = 1;
+    config.loc_docker = 1;
+
+    int (*arr[])(char *) = {
+        user,
+        hostname,
         uptime,
-        separator, 
         os,
         kernel,
-        desktop, 
+        desktop,
         shell,
+        login_shell,
         term,
-        packages, 
-        separator,
+        packages,
         host,
+        bios,
         cpu,
         gpu,
         memory,
-        separator2,
+        public_ip,
+        local_ip,
+        pwd,
+        date,
         colors,
         light_colors
     };
 
-    // The following line works because infos is declared on the stack,
-    // so sizeof returns it's real size and not the size of a pointer.
-    const int info_lines = (int)(sizeof(infos) / sizeof(*infos)) - 1;
+    for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
+        if(!arr[i](mem))
+            printf("%s\n", mem);
+        else
+            printf("%lu returned %d\n", i, arr[i](mem));
+    }
+    return 0;
+#else
+    // I am deeply sorry for the code you're about to see - I hope you like spaghettis
+    unsigned line = 3;
+    char *data = mem + 1536;
+    char *printed = mem+512;
+    char format[32] = "%s\033[0m%s";
 
-    int line = 3;   // keeps track of the line that's currently printing 
+    struct winsize w;
+    ioctl(STDIN_FILENO, TIOCGWINSZ, &w);
 
-    // logo and infos
-    for(int i = 0; i <= info_lines; ++i) {
-        line = printLogo(line);
-        if(line == 4) printf("%s", spacing_first);
-        else if(i == info_lines) printf("%s", spacing_last);
-        else printf("%s", spacing);
-        infos[i]();
-        printf("\n");
+    if(config.align) {
+        int current_len;
+        asking_align = 0;
+
+        for(struct Info *current = (infos)->next; current; current = current->next) {
+            current_len = strlen_real(current->label);
+
+            if(current_len > asking_align) {
+                asking_align = current_len;
+            }
+        }
+
+        asking_align += strlen_real(config.dash);
+
+        snprintf(format, 32, "%%-%ds\033[0m%%s", asking_align);
+    }
+    
+    for(struct Info *current = infos->next; current; current = current->next) {
+        if(current->func == separator) {    // the separators should not get aligned
+            if(!(printed[0]) || strlen(printed) > 767)
+                continue;
+
+            size_t len = (strlen_real(printed
+                                     + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
+                                     + config.spacing
+                                    ) - strlen_real(current->label))
+                                    / strlen_real(config.separator);
+
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+
+            strcat(printed, config.color);
+            strcat(printed, current->label);
+
+            for(size_t i = 0; i < len && strlen(printed) < 767 - strlen(config.separator); ++i)
+                strcat(printed, config.separator);
+        }
+        else if(current->func == spacing) {
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+
+            strcat(printed, config.color);
+            strcat(printed, current->label);
+        }
+        else if(current->func == title) {
+            char name[256];
+            char host[256];
+
+            if(user(name) || hostname(host))
+                continue;
+
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+
+             strcat(printed, config.color);
+            strcat(printed, current->label);
+
+            snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
+                                     config.bold ? "\033[1m" : "",
+                                     name,
+                                     config.title_color ? "\033[0m" : "",
+                                     config.bold ? "\033[1m" : "",
+                                     config.title_color ? config.color : "",
+                                     host
+            );
+        }
+        else {
+            if((current->func)(data))
+                continue;
+
+            char label[80];
+
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+                
+            strcat(printed, config.color);
+            strcpy(label, current->label);
+            if(current->label[0] && current->func != colors && current->func != light_colors)
+                strcat(label, config.dash);
+
+            snprintf(printed+strlen(printed), 768-strlen(printed), format, label, data);
+        }
+        
+        print_line(printed, w.ws_col);
     }
 
-    // ******** remaining lines of the logo ********
-    while(*logo[line]) {
-        line = printLogo(line);
-        printf("\n");
+    // remaining lines
+    while(config.logo[line]) {
+        printed[0] = 0;
+
+        get_logo_line(printed, &line);
+
+        print_line(printed, w.ws_col);
     }
-    printf("\e[0m");
-    fflush(stdout);
+
+#endif // _DEBUG
 
     return 0;
 }
