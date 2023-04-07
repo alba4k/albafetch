@@ -140,7 +140,9 @@ int os(char *dest) {
     #else
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
-            return 1;
+            fp = fopen("/usr/lib/os-release", "r");
+            if(!fp)
+                return 1;
         }
 
         char buf[64];
@@ -256,10 +258,10 @@ int shell(char *dest) {
 
 // get the current login shell
 int login_shell(char *dest) {
-    char *shell = getenv("SHELL");
+    char *buf = getenv("SHELL");
 
-    if(shell && shell[0]) {
-        strncpy(dest, config.shell_path ? shell : basename(shell), 256);
+    if(buf && buf[0]) {
+        strncpy(dest, config.shell_path ? buf : basename(buf), 256);
         return 0;
     }
 
@@ -1043,8 +1045,18 @@ int local_ip(char *dest) {
 
 // gets the current working directory
 int pwd(char *dest) {
+    if(!config.pwd_path) {
+        char buf[256];
+
+        if(!getcwd(buf, 256))
+            return 1;
+
+        strncpy(dest, buf, 256);
+    }
+
     if(!getcwd(dest, 256))
         return 1;
+
     return 0;
 }
 
@@ -1052,7 +1064,7 @@ int pwd(char *dest) {
 int date(char *dest) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    snprintf(dest, 256, "%02d/%02d/%d %02d:%02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    snprintf(dest, 256, config.date_format, tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
     return 0;
 }
 
