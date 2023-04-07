@@ -427,7 +427,10 @@ int main(int argc, char **argv) {
     char format[32] = "%s\033[0m%s";
 
     struct winsize w;
-    ioctl(STDIN_FILENO, TIOCGWINSZ, &w);
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1)
+        if(ioctl(STDERR_FILENO, TIOCGWINSZ, &w) == -1)
+            if(ioctl(STDIN_FILENO, TIOCGWINSZ, &w) == -1)
+                w.ws_col = -1;
 
     if(config.align) {
         int current_len;
