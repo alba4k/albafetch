@@ -10,6 +10,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: darwin
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -17,8 +22,18 @@ jobs:
 
       - uses: cachix/install-nix-action@v20
 
+      - uses: cachix/cachix-action@v12
+        with:
+          name: albafetch
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: build and push (x64)
+        if: ${{ github.event_name == 'push' }}
+        run: cachix watch-exec albafetch -- nix-build -A static.${{ matrix.platform }}.albafetch
+
       - name: build (x64)
-        run: nix build .#albafetch-static
+        if: ${{ github.event_name == 'pull_request' }}
+        run: nix-build -A static.${{ matrix.platform }}.albafetch
 
       - name: test
         run: ./result/bin/albafetch
@@ -35,9 +50,13 @@ jobs:
           name: albafetch-darwin-x64
           path: ${{ github.workspace }}/result/bin/albafetch
 
+      - name: build and push (aarch64-multiplatform)
+        if: ${{ runner.os == 'Linux' && github.event_name == 'push' }}
+        run: cachix watch-exec albafetch -- nix-build -A arm.linux.albafetch
+
       - name: build (aarch64-multiplatform)
-        if: runner.os == 'Linux'
-        run: nix build .#arm.linux.albafetch
+        if: ${{ runner.os == 'Linux' && github.event_name == 'pull_request' }}
+        run: nix-build -A arm.linux.albafetch
 
       - uses: actions/upload-artifact@v3
         if: runner.os == 'Linux'
