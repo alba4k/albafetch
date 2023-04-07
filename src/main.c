@@ -30,21 +30,23 @@ struct Config config = {
     false,  // kernel_short
     false,  // de_type
     false,  // shell_path
-    true,   // cpu_brand
-    true,   // cpu_freq
-    true,   // cpu_count
-    false,  // gpu_brand
-    true,   // mem_perc
     true,   // pkg_mgr
     true,   // pkg_pacman
     true,   // pkg_dpkg
     true,   // pkg_rpm
     true,   // pkg_flatpak
     true,   // pkg_snap
-    false,  // pkg_pip
     true,   // pkg_brew
+    false,  // pkg_pip
+    true,   // cpu_brand
+    true,   // cpu_freq
+    true,   // cpu_count
+    true,   // gpu_brand
+    true,   // mem_perc
     false,  // loc_docker
     false,  // loc_localdomain
+    true,   // pwd_path
+    "%02d/%02d/%d %02d:%02d:%02d",  // date_format
     3,      // col_block_len
 
     "",         // separator_prefix
@@ -59,13 +61,13 @@ struct Config config = {
     "Shell",    // shell_prefix
     "Login",    // login_shell_prefixix
     "Terminal", // term_prefix
-    "Packages", // packages_prefix
+    "Packages", // pkg_prefix
     "Host",     // host_prefix
     "BIOS",     // bios_prefix
     "CPU",      // cpu_prefix
     "GPU",      // gpu_prefix
     "Memory",   // mem_prefix
-    "Public IP",// public_ip_prefix
+    "Public IP",// pub_prefix
     "Local IP", // loc_prefix
     "Directory",// pwd_prefix
     "Date",     // date_prefix
@@ -88,13 +90,13 @@ int main(int argc, char **argv) {
         {config.shell_prefix, shell, infos+10},             // 08
         {config.login_shell_prefixix, login_shell, NULL},   // 09
         {config.term_prefix, term, infos+11},               // 10
-        {config.packages_prefix, packages, infos+25},       // 11
+        {config.pkg_prefix, packages, infos+25},       // 11
         {config.host_prefix, host, infos+14},               // 12
         {config.bios_prefix, bios, NULL},                   // 13
         {config.cpu_prefix, cpu, infos+15},                 // 14
         {config.gpu_prefix, gpu, infos+16},                 // 15
         {config.mem_prefix, memory, infos+26},              // 16
-        {config.public_ip_prefix, public_ip, NULL},         // 17
+        {config.pub_prefix, public_ip, NULL},         // 17
         {config.loc_prefix, local_ip, NULL},                // 18
         {config.pwd_prefix, pwd, NULL},                     // 19
         {config.date_prefix, date, NULL},                   // 20
@@ -230,6 +232,9 @@ int main(int argc, char **argv) {
             config.logo = (char**)logos[0];
             FILE *fp = fopen("/etc/os-release", "r");
 
+            if(!fp)
+                fp = fopen("/usr/lib/os-release", "r");
+
             if(fp) {
                 char os_id[48];
                 read_after_sequence(fp, "\nID", os_id, 48);
@@ -238,9 +243,8 @@ int main(int argc, char **argv) {
                 fclose(fp);
 
                 char *end = strchr(os_id, '\n');
-                if(!end)
-                    return 2;
-                *end = 0;
+                if(end)
+                    *end = 0;
 
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], os_id))
@@ -329,7 +333,7 @@ int main(int argc, char **argv) {
                config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
         
         printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
-               "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, endeavouros, fedora]\n"
+               "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, fedora]\n"
                "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
                config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
@@ -494,7 +498,8 @@ int main(int argc, char **argv) {
              strcat(printed, config.color);
             strcat(printed, current->label);
 
-            snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s", config.title_color ? config.color : "",
+            snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
+                                     config.title_color ? config.color : "\e[0m",
                                      config.bold ? "\033[1m" : "",
                                      name,
                                      config.title_color ? "\033[0m" : "",

@@ -164,7 +164,7 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
 
     // copies the option
     *end = 0;
-    *dest = !strcmp(ptr, "true");
+    *dest = strcmp(ptr, "false");
     *end = '"';
 
     return 0;
@@ -191,16 +191,22 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
     char *ptr = conf, *ptr2;
     while((ptr = strchr(ptr, ';'))) {
         ptr2 = strchr(ptr, '\n');
-        if(!ptr)
+        
+        if(!ptr2) {
+            *ptr = 0;
             break;
+        }
 
         memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
     }
     ptr = conf;
     while((ptr = strchr(ptr, '#'))) {
         ptr2 = strchr(ptr, '\n');
-        if(!ptr)
+
+        if(!ptr2) {
+            *ptr = 0;
             break;
+        }
 
         memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
     }
@@ -271,25 +277,28 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
         {&config.kernel_short, "kernel_short"},
         {&config.de_type,"desktop_type"},
         {&config.shell_path,"shell_path"},
-        {&config.cpu_brand,"cpu_brand"},
-        {&config.cpu_freq,"cpu_freq"},
-        {&config.cpu_count,"cpu_count"},
-        {&config.gpu_brand,"gpu_brand"},
-        {&config.mem_perc,"mem_perc"},
         {&config.pkg_mgr,"pkg_mgr"},
         {&config.pkg_pacman,"pkg_pacman"},
         {&config.pkg_dpkg,"pkg_dpkg"},
         {&config.pkg_rpm,"pkg_rpm"},
         {&config.pkg_flatpak,"pkg_flatpak"},
         {&config.pkg_snap,"pkg_snap"},
-        {&config.pkg_pip,"pkg_pip"},
         {&config.pkg_brew,"pkg_brew"},
+        {&config.pkg_pip,"pkg_pip"},
+        {&config.cpu_brand,"cpu_brand"},
+        {&config.cpu_freq,"cpu_freq"},
+        {&config.cpu_count,"cpu_count"},
+        {&config.gpu_brand,"gpu_brand"},
+        {&config.mem_perc,"mem_perc"},
         {&config.loc_localdomain,"loc_localdomain"},
         {&config.loc_docker,"loc_docker"},
+        {&config.pwd_path, "pwd_path"}
     };
 
     for(size_t i = 0; i < sizeof(options)/sizeof(options[0]); ++i)
         parse_config_bool(conf, options[i].config_name, options[i].config_option);
+
+    parse_config_str(conf, "date_format", config.date_format, sizeof(config.date_format));
 
     parse_config_int(conf, "col_block_len", &config.col_block_len, 16);
 
@@ -307,20 +316,20 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
         {config.kernel_prefix, "kernel_prefix"},
         {config.desktop_prefix, "desktop_prefix"},
         {config.shell_prefix, "shell_prefix"},
-        {config.login_shell_prefixix, "login_shell_prefixix"},
+        {config.login_shell_prefixix, "login_shell_prefix"},
         {config.term_prefix, "term_prefix"},
-        {config.packages_prefix, "packages_prefix"},
+        {config.pkg_prefix, "pkg_prefix"},
         {config.host_prefix, "host_prefix"},
         {config.bios_prefix, "bios_prefix"},
         {config.cpu_prefix, "cpu_prefix"},
         {config.gpu_prefix, "gpu_prefix"},
         {config.mem_prefix, "mem_prefix"},
-        {config.public_ip_prefix, "public_ip_prefix"},
+        {config.pub_prefix, "pub_prefix"},
         {config.loc_prefix, "loc_prefix"},
         {config.pwd_prefix, "pwd_prefix"},
         {config.date_prefix, "date_prefix"},
         {config.colors_prefix, "colors_prefix"},
-        {config.light_colors_prefix, "colors_prefix_light"},
+        {config.light_colors_prefix, "colors_light_prefix"},
     };
 
     for(size_t i = 0; i < sizeof(modules)/sizeof(modules[0]); ++i)

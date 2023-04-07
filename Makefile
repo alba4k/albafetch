@@ -33,7 +33,7 @@ all: build/$(TARGET) build/debug
 
 build/$(TARGET): $(OBJ)
 	mkdir -p build/
-	$(CC) -o build/$(TARGET) $(INCLUDE) $(OBJ) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(OBJ) $(INCLUDE) $(CFLAGS)
 
 build/debug:
 	mkdir -p build/

@@ -12,7 +12,7 @@ struct Config {
     char **logo;
     char color[8];
     char dash[16];
-    char separator[16];
+    char separator[8];
     int spacing;
 
     bool title_color;
@@ -20,21 +20,23 @@ struct Config {
     bool kernel_short;
     bool de_type;
     bool shell_path;
-    bool cpu_brand;
-    bool cpu_freq;
-    bool cpu_count;
-    bool gpu_brand;
-    bool mem_perc;
     bool pkg_mgr;
     bool pkg_pacman;
     bool pkg_dpkg;
     bool pkg_rpm;
     bool pkg_flatpak;
     bool pkg_snap;
-    bool pkg_pip;
     bool pkg_brew;
+    bool pkg_pip;
+    bool cpu_brand;
+    bool cpu_freq;
+    bool cpu_count;
+    bool gpu_brand;
+    bool mem_perc;
     bool loc_localdomain;
     bool loc_docker;
+    bool pwd_path;
+    char date_format[32];
     int col_block_len;
 
     char separator_prefix[64];
@@ -49,13 +51,13 @@ struct Config {
     char shell_prefix[64];
     char login_shell_prefixix[64];
     char term_prefix[64];
-    char packages_prefix[64];
+    char pkg_prefix[64];
     char host_prefix[64];
     char bios_prefix[64];
     char cpu_prefix[64];
     char gpu_prefix[64];
     char mem_prefix[64];
-    char public_ip_prefix[64];
+    char pub_prefix[64];
     char loc_prefix[64];
     char pwd_prefix[64];
     char date_prefix[64];
