@@ -2,21 +2,69 @@
 
 ![intro](images/albafetch.png)
 
-albafetch is a simple, fast system fetching program. It prints many info about the system in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable from a 10k+ lines shell script).
+albafetch is a simple and fast program to display a lot of system information in a neofetch-like layout in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable given that we're talking about a 10k+ lines shell script).
 
 Here is a time comparison (exact execution times change between machines and runs):
 
 ![neofetch](images/time_neofetch.png)
 ![albafetch](images/time_albafetch.png)
 
-## Dependencies:
+For additional usage-related info, check [`MANUAL.md`](MANUAL.md).
 
-Everything the program could need will be installed on your distribution out of the box (`sh`, `lspci`).
-I would reccoment double checking libalpm on archlinux-based systems (it's also a dependency of pacman, so that should already be there).
+## Table of contents
+1. [Dependencies](#dependencies)
+	* [For building](#build-dependencies)
+	* [At runtime](#runtime-dependencies)
+2. [Compilation](#compilation)
+	* [make](#using-the-makefile)
+	* [meson](#using-meson)
+	* [nix](#using-nix)
+3. [Installation](#installation)
+	* [Arch BTW](#for-arch-linux)
+	* [NixOS](#for-nixos)
+	* [Manually](#manual-installation)
+4. [Contributing](#contributing)
+	
 
-# Compiling:
 
-this will need gcc (`make CC=[compiler]` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
+# Dependencies
+
+the only dependencies are `pcilib` ([pciutils on arch](https://archlinux.org/packages/core/x86_64/pciutils), [libpci3 on arch](https://packages.debian.org/buster/libdevel/libpci3)) and `libcurl` ([lib32-curl on arch](https://archlinux.org/packages/core/x86_64/libcurl-gnutls), [libpci-dev on arch](https://packages.debian.org/buster/libdevel/libpci-dev)). Also, `lspci` and `curl` are used as fallback in case those libraries were unable to get the necessary info.
+
+## Build dependencies
+These will also install the relative runtime dependencies
+
+* libcurl
+	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)
+	- On Debian, [libcurl4-gnutls-dev](https://packages.debian.org/stretch/libcurl4-gnutls-dev)
+	- On fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
+	- In Termux, libcurl
+* libcurl
+	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
+	- On Debian, [pcilib-dev](https://packages.debian.org/buster/libpci-dev)
+	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
+* A build system
+	- Make and meson are already set up, more details are found [here](#compilation)
+
+## Runtime dependencies
+I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
+
+* libcurl (for dynamically linked binaries)
+	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)	
+	- On Debian, [libcurl4](https://packages.debian.org/buster/libcurl4)
+	- On Fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
+	- In Termux, libcurl
+* pcilib (for dynamically linked binaries)
+	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
+	- On Debian, [pcilib-dev](https://packages.debian.org/buster/libpci3)
+	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
+* there must be a `sh` binary in your PATH. This should already be satisfied on any UNIX-like system
+
+# Compilation
+
+## Using the Makefile
+
+This will need gcc (`make CC=[compiler]` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
 
 ```shell
 $ git clone https://github.com/alba4k/albafetch
@@ -24,7 +72,14 @@ $ cd albafetch
 $ make
 ```
 
-An executable file should appear in `build/` if the compilation succeeds.
+An executable file should appear as `build/albafetch` if the compilation succeeds.
+
+### Debug builds
+It is possible to build a debug binary (`build/debug`) that will test every single function and make sure it runs correctly. This can be done by running
+
+```sh
+$ make debug
+```
 
 ## Using meson
 
@@ -50,26 +105,34 @@ nix build .#arm.<linux/darwin> # cross compilng from x86_64 to arm
 
 # Installation
 
-### For Arch Linux based systems, an AUR package is available (`albafetch-git`)
+## For Arch Linux
+An AUR package is available, [albafetch-git](https://aur.archlinux.org/packages/albafetch-git).
+This can be installed using:
+```sh
+$ git clone https://aur.archlinux.org/albafetch-git.git
+$ cd albafetch-git
+$ makepkg -si
+```
+or using an AUR helper.
 
-### For NixOS users
+## For NixOS
 
 `nix profile`:
 
 ```sh
-nix profile install .#albafetch
+$ nix profile install .#albafetch
 ```
 
 `nix shell`:
 
 ```sh
-nix shell github:alba4k/albafetch
+$ nix shell github:alba4k/albafetch
 ```
 
 `nix-env`:
 
 ```sh
-nix-env -iA packages.<your platform>.albafetch # platform examples: x86_64-linux, aarch64-linux, aarch64-darwin
+$ nix-env -iA packages.<your platform>.albafetch # platform examples: x86_64-linux, aarch64-linux, aarch64-darwin
 ```
 
 As an overlay:
@@ -87,7 +150,7 @@ As an overlay:
 }
 ```
 
-## Manual installation:
+## Manual installation
 
 this will need gcc (`make CC=[compiler] install` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
 
@@ -100,79 +163,22 @@ $ cd albafetch
 
 ```
 
-`make install` needs to be ran as root (e.g. using `sudo` or in a root shell) to access `/usr/bin/`. It will copy the executable from `build/` to there.
+`make install` needs elevated privileges (e.g. `sudo` or a root shell) to write to `/usr/bin` or `/usr/local/bin` (macOS).
 
-# Customizing
+# Contributing
 
-A configuration should be placed in `~/.config/albafetch.conf` (`~/.config` can be overwritten using the `XDG_CONFIG_HOME` environnment variable). An example config, with comments, is found in this repository.
+Almost everything included in this program is written in C.
 
-## How to write the config:
+If you want to, you can directly modify the source code contained in this repository and recompile the program afterwards to get some features you might want or need.
 
-Basic rules:
+New logos can be added in [`src/logos.h`](src/logos.h) (be careful to follow the format), new infos in [`src/info.c`](src/info.c) and [`src/info.h`](src/info.h). You will also need to edit [`src/main.c`](src/main.c) afterwards to fully enable the new features.
 
-- comments start with ; and reach the end of the line
-- values can't be big than 32B (separators can get as long as 64B)
-- only ASCII characters will work
-- ending the file with a newline is recommended
+Don't mind opening a pull request if you think some of the changes you made should be in the public version, just try to follow the coding style that I used in the rest of the project.
 
-The config should be written in a key "value" format you can put something in between if you like (e.g. 'key = "value"' everything but a " or a keyword.
-
-### Options and default values:
-
-```python
-spacing = "    "
-separator1 = "\e[0m------------------"
-separator2 = ""
-separator_first = "\e[0m------------------"
-separator_last = "\e[0m------------------"
-dash_str = "\e[0m:"
-
-print_cpu_freq = "true"
-print_cpu_brand = "true"
-print_gpu_freq = "true"
-print_mem_perc = "true"
-align_infos = "false"
-
-default_color = ""
-default_bold = "true"
-default_logo = ""
-
-col_block_len = "3"
-
-title_prefix = ""
-col_prefix = ""
-hostname_label = "Hostname"
-user_label = "User"
-uptime_label = "Uptime"
-os_label = "OS"
-kernel_label = "Kernel"
-desktop_label = "Desktop"
-shell_label = "Shell"
-term_label = "Terminal"
-packages_label = "Packages"
-host_label = "Host"
-bios_label = "BIOS"
-cpu_label = "CPU"
-gpu_label = "GPU"
-mem_label = "Memory"
-pub_ip_label = "Publ. IP"
-loc_ip_label = "Priv. IP"
-pwd_label = "Directory"
-```
-
-Unset values will use the defaults
-Quotes in the config are **not** optional.
-
-If a key is defined more than one the first one is the only one that will get considered.
-
-This repository contains a commented example config file (`albafetch.conf`) with the default values.
-
-## Source code editing:
-
-If you like, you can directly modify the source code contained in this repository and recompile the program after. New logos can be added in `src/logos.h` (inside of `const char *logos[][]`) and in `src/main.c` (to make them show up in the help message).
-
-Don't mind doing a pull request if you think some of the changes you made should be in the global version, just try to follow the formatting that's used in the rest of the file :)
+Any contribution, even just a fix of a typo, is highly appreciated.
 
 ---
 
-### Aaron Blasko, March 2022
+### ©️ Aaron Blasko
+
+###### Initially started in March 2022
