@@ -881,7 +881,7 @@ int gpu(char *dest) {
     if((end = strchr(gpu_string, '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
         char *ptr = strchr(end, ']');
         if(ptr) {
-            gpu_string = end;
+            gpu_string = end+1;
             *ptr = 0;
         }
     }
