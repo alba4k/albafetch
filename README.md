@@ -179,6 +179,6 @@ Any contribution, even just a fix of a typo, is highly appreciated.
 
 ---
 
-### ©️ Aaron Blasko
+### © Aaron Blasko
 
 ###### Initially started in March 2022
