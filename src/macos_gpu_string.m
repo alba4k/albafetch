@@ -8,7 +8,7 @@ char *get_gpu_string() {
     CFMutableDictionaryRef dict = IOServiceMatching("IOPCIDevice");
     io_iterator_t iter;
     int success;
-    const char *result;
+    const char *result = NULL;
 
     #if __OSX_AVAILABLE_STARTING(__MAC_12_0,__IPHONE_NA)
 
@@ -47,8 +47,6 @@ char *get_gpu_string() {
                 result = [modelName cStringUsingEncoding:NSUTF8StringEncoding];
             }
         }
-        else
-            return NULL;
 
         CFRelease(services);
         IOObjectRelease(entry);

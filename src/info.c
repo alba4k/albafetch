@@ -409,7 +409,7 @@ int packages(char *dest) {
             }
         }
     #endif
-    if(config.pkg_brew && (access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
+    if(config.pkg_brew && (!access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
         pipe(pipes);
 
         if(!fork()) {
