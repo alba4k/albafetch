@@ -237,12 +237,14 @@ int shell(char *dest) {
         if(fp) {
             char shell[256];
             shell[fread(shell, 1, 255, fp)] = 0;
+            fclose(fp);
 
-            if(shell[0] == '-') // cmdline is "-bash" when login shell
-                memcpy(shell, shell+1, strlen(shell+1)+1);
+            if(shell[0] == '-') { // cmdline is "-bash" when login shell
+                strncpy(dest, config.shell_path ? shell+1 : basename(shell+1), 256);
+                return 0;
+            }
 
             strncpy(dest, config.shell_path ? shell : basename(shell), 256);
-            fclose(fp);
             return 0;
         }
     #endif

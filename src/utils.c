@@ -6,11 +6,13 @@
 
 // print a certain line of the logo
 void get_logo_line(char *dest, unsigned *line) {
-    if(!config.logo || !dest || !line)
+    if(!config.logo || !dest || *line < 2)
         return;
 
-    if(config.logo[*line])
-        strcat(dest, config.logo[(*line)++]);
+    if(config.logo[(*line)+1]) {
+        *line += 1;
+        strcat(dest, config.logo[*line]);
+    }
     else
         strcat(dest, config.logo[2]);
 }
@@ -30,10 +32,10 @@ void print_line(char *line, const size_t maxlen) {
                 break;
             else if(line[i] == '\033')
                 escaping = true;
-            else if(line[i] < 0) {
-                if(line[i] & 0x40) {
-                    if(line[i] & 0x20) {
-                        if(line[i] & 0x10)
+            else if(line[i] & 0x80) {       // is the 1st bit 1?
+                if(line[i] & 0x40) {        // is the 2nd bit 1?
+                    if(line[i] & 0x20) {    // is the 3rd bit 1?
+                        if(line[i] & 0x10)  // is the 4th bit 1?
                             unicode = 3;    // first of 4 unicode bytes (0b11110xxx)
                         else
                             unicode = 2;    // first of 3 unicode bytes (0b1110xxxx)

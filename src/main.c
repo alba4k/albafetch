@@ -421,7 +421,7 @@ int main(int argc, char **argv) {
     return 0;
 #else
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis
-    unsigned line = 3;
+    unsigned line = 2;
     char *data = mem + 1536;
     char *printed = mem+512;
     char format[32] = "%s\033[0m%s";
@@ -536,7 +536,7 @@ int main(int argc, char **argv) {
     }
 
     // remaining lines
-    while(config.logo[line]) {
+    while(config.logo[line+1]) {
         printed[0] = 0;
 
         get_logo_line(printed, &line);
