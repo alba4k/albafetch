@@ -502,7 +502,7 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
-                                     config.title_color ? config.color : "\e[0m",
+                                     config.title_color ? config.color : "\033[0m",
                                      config.bold ? "\033[1m" : "",
                                      name,
                                      config.title_color ? "\033[0m" : "",

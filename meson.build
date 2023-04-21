@@ -1,4 +1,6 @@
-project('albafetch', 'c',
+project(
+  'albafetch',
+  'c',
   version : '4.0',
   default_options : ['warning_level=3'])
 
@@ -35,9 +37,19 @@ build_args = [
 ]
 
 executable(
-  'albafetch',
+  meson.project_name(),
   src,
   dependencies : project_dependencies,
   install : true,
   c_args : build_args
 )
+
+build_args += '-D_DEBUG'
+executable(
+  'debug',
+  src,
+  dependencies : project_dependencies,
+  install : false,
+  c_args : build_args
+)
+

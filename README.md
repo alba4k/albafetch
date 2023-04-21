@@ -152,18 +152,29 @@ As an overlay:
 
 ## Manual installation
 
-this will need gcc (`make CC=[compiler] install` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
+This will need gcc (`make CC=[compiler] install` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
 
 ```
-
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
 
 # make install
-
 ```
 
 `make install` needs elevated privileges (e.g. `sudo` or a root shell) to write to `/usr/bin` or `/usr/local/bin` (macOS).
+
+Alternatively, you may use meson to do this:
+
+```
+$ git clone https://github.com/alba4k/albafetch
+$ cd albafetch
+$ meson setup build
+$ meson compile -C build
+$ cd build
+$ meson install
+```
+
+Please note that meson will always install the executable to `/usr/local/bin`, which you may or may not want (executables in this directory are ran instead of ones in `/usr/bin`)
 
 # Contributing
 
