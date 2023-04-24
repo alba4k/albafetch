@@ -29,8 +29,6 @@ For additional usage-related info, check [`MANUAL.md`](MANUAL.md).
 
 # Dependencies
 
-the only dependencies are `pcilib` ([pciutils on arch](https://archlinux.org/packages/core/x86_64/pciutils), [libpci3 on arch](https://packages.debian.org/buster/libdevel/libpci3)) and `libcurl` ([lib32-curl on arch](https://archlinux.org/packages/core/x86_64/libcurl-gnutls), [libpci-dev on arch](https://packages.debian.org/buster/libdevel/libpci-dev)). Also, `lspci` and `curl` are used as fallback in case those libraries were unable to get the necessary info.
-
 ## Build dependencies
 These will also install the relative runtime dependencies
 
@@ -48,6 +46,7 @@ These will also install the relative runtime dependencies
 
 ## Runtime dependencies
 I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
+Also, in case albafetch was unable to get the info using those libraries, it'll fall back to `curl` and `lspci` (as system shell commands).
 
 * libcurl (for dynamically linked binaries)
 	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)	
