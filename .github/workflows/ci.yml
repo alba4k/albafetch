@@ -32,7 +32,7 @@ jobs:
         run: cachix watch-exec albafetch -- nix-build -A static.${{ matrix.platform }}.albafetch
 
       - name: build (x64)
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name != 'push' }}
         run: nix-build -A static.${{ matrix.platform }}.albafetch
 
       - name: test
@@ -55,7 +55,7 @@ jobs:
         run: cachix watch-exec albafetch -- nix-build -A arm.linux.albafetch
 
       - name: build (aarch64-multiplatform)
-        if: ${{ runner.os == 'Linux' && github.event_name == 'pull_request' }}
+        if: ${{ runner.os == 'Linux' && github.event_name != 'push' }}
         run: nix-build -A arm.linux.albafetch
 
       - uses: actions/upload-artifact@v3
