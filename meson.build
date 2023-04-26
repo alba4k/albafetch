@@ -2,7 +2,9 @@ project(
   'albafetch',
   'c',
   version : '4.0',
-  default_options : ['warning_level=3'])
+  default_options : ['warning_level=3'],
+  license : 'MIT'
+)
 
 
 src = [

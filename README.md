@@ -169,8 +169,7 @@ $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
 $ meson setup build
 $ meson compile -C build
-$ cd build
-$ meson install
+$ meson install -C build
 ```
 
 Please note that meson will always install the executable to `/usr/local/bin`, which you may or may not want (executables in this directory are ran instead of ones in `/usr/bin`)
