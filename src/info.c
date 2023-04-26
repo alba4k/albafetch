@@ -123,7 +123,8 @@ int os(char *dest) {
         int pipes[2];
         char version[16];
 
-        pipe(pipes);
+        if(pipe(pipes))
+            return 1;
         if(!fork()) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
@@ -347,10 +348,11 @@ int packages(char *dest) {
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/rpm", 256-strlen(path));
         if(config.pkg_rpm && !access(path, F_OK)) {
-            pipe(pipes);
+            if(pipe(pipes))
+                return 1;
 
             if(!fork()) {
-                close(*pipes);
+                close(pipes[0]);
                 dup2(pipes[1], STDOUT_FILENO);
 
                 execlp("sh", "sh", "-c", "rpm -qa 2>/dev/null | wc -l", NULL); 
@@ -390,10 +392,11 @@ int packages(char *dest) {
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/snap", 256-strlen(path));
         if(config.pkg_snap && !access(path, F_OK)) {
-            pipe(pipes);
+            if(pipe(pipes))
+                return 1;
 
             if(!fork()) {
-                close(*pipes);
+                close(pipes[0]);
                 dup2(pipes[1], STDOUT_FILENO);
 
                 execlp("sh", "sh", "-c", "snap list 2>/dev/null | wc -l", NULL); 
@@ -412,7 +415,8 @@ int packages(char *dest) {
         }
     #endif
     if(config.pkg_brew && (!access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
-        pipe(pipes);
+        if(pipe(pipes))
+            return 1;
 
         if(!fork()) {
             close(pipes[0]);
@@ -452,10 +456,11 @@ int packages(char *dest) {
         strncpy(path, getenv("PREFIX"), 255);
     strncat(path, "/bin/pip", 256-strlen(path));
     if(config.pkg_pip && !access(path, F_OK)) {
-        pipe(pipes);
+        if(pipe(pipes))
+            return 1;
 
         if(!fork()) {
-            close(*pipes);
+            close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("sh", "sh", "-c", "pip list 2>/dev/null | wc -l", NULL); 
@@ -488,7 +493,8 @@ int host(char *dest) {
         int pipes[2];
         char brand[64], model[64];
 
-        pipe(pipes);
+        if(pipe(pipes))
+            return 1;
         if(!fork()) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
@@ -501,7 +507,8 @@ int host(char *dest) {
         brand[read(pipes[0], brand, 64) - 1] = 0;
         close(pipes[0]);
 
-        pipe(pipes);
+        if(pipe(pipes))
+            return 1;
         if(!fork()) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
@@ -753,7 +760,8 @@ int gpu(char *dest) {
         if(!gpu_string || strcmp(name.machine, "x86_64")) {     // fallback
             char buf[1024];
             int pipes[2];
-            pipe(pipes);
+            if(pipe(pipes))
+                return 1;
 
             if(!fork()) {
                 dup2(pipes[1], STDOUT_FILENO);
@@ -994,10 +1002,11 @@ int public_ip(char *dest) {
     return 0;
 
     fallback:
-        pipe(pipes);
+        if(pipe(pipes))
+            return 1;
         
         if(!fork()) {
-            close(*pipes);
+            close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
             execlp("curl", "curl", "-s", "ident.me", NULL); 
