@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
 
     // are the following command line args used?
     bool asking_help = false;
+    bool use_config = true;
     int asking_color = 0;
     int asking_bold = 0;
     int asking_logo = 0;
@@ -119,7 +120,7 @@ int main(int argc, char **argv) {
 
     // these store either the default values or the ones defined in the config
     // they are needed to know what is used if no arguments are given (for --help)
-    bool default_bold;
+    bool default_bold = config.bold;
     char default_color[8] = "";
     char default_logo[16] = "";
 
@@ -172,7 +173,7 @@ int main(int argc, char **argv) {
         else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
             asking_align = i+1;
         else if(!strcmp(argv[i], "--config")) {
-            if(i+1 >= argc) {   // is there such an arg?
+            if(i+1 >= argc || use_config == false) {   // is there such an arg?
                 fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
                 continue;
@@ -185,36 +186,39 @@ int main(int argc, char **argv) {
             strcpy(config_file, argv[i+1]);
             continue;
         }
+        else if(!strcmp(argv[i], "--no-config"))
+            use_config = false;
     }
 
-    if(!config_file[0]) {
-        char *config_home = getenv("XDG_CONFIG_HOME");
-        if(config_home) { // is XDG_CONFIG_HOME set?
-            if(config_home[0]) // is XDG_CONFIG_HOME empty?
-                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+    if(use_config) {
+        if(!config_file[0]) {
+            char *config_home = getenv("XDG_CONFIG_HOME");
+            if(config_home) { // is XDG_CONFIG_HOME set?
+                if(config_home[0]) // is XDG_CONFIG_HOME empty?
+                    snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+                else
+                    snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
+            }
             else
                 snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
         }
-        else
-            snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
-    }
 
-    parse_config(config_file, &default_bold, default_color, default_logo);
+        parse_config(config_file, &default_bold, default_color, default_logo);
+    }
 
     if(asking_logo) {
         if(asking_logo < argc) {
-            bool done = false;
-
             for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], argv[asking_logo])) {
                     config.logo = (char**)logos[i];
-                    done = true;
+                    goto done;
                 }
 
-            if(!done) {
-                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
-                user_is_an_idiot = true;
-            }
+            fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
+            user_is_an_idiot = true;
+            
+            // Don't like gotos? Well I like them.
+            done:;
         } else {
             fputs("\033[31m\033[1mERROR\033[0m: --logo srequires an extra argument!\n", stderr);
             user_is_an_idiot = true;
@@ -342,6 +346,9 @@ int main(int argc, char **argv) {
 
         printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
                "\t\t\t   [path]\n", config.color, config.bold ? "\033[1m" : "");
+
+        printf("\t%s%s--no-config\033[0m:\t Ignores any provided or existing config file\n",
+               config.color, config.bold ? "\033[1m" : "");
 
         printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
                config.color, config.bold ? "\033[1m" : "");
