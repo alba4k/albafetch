@@ -55,7 +55,7 @@ Also, in case albafetch was unable to get the info using those libraries, it'll 
 	- In Termux, libcurl
 * pcilib (for dynamically linked binaries)
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
-	- On Debian, [pcilib-dev](https://packages.debian.org/buster/libpci3)
+	- On Debian, [libpci3](https://packages.debian.org/buster/libpci3)
 	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
 * there must be a `sh` binary in your PATH. This should already be satisfied on any UNIX-like system
 
@@ -106,13 +106,12 @@ nix build .#arm.<linux/darwin> # cross compilng from x86_64 to arm
 
 ## For Arch Linux
 An AUR package is available, [albafetch-git](https://aur.archlinux.org/packages/albafetch-git).
-This can be installed using:
-```sh
-$ git clone https://aur.archlinux.org/albafetch-git.git
-$ cd albafetch-git
-$ makepkg -si
-```
-or using an AUR helper.
+There are three packages on the AUR that provide albafetch:
+* [albafetch](https://aur.archlinux.org/packages/albafetch-) will compile the source code of the latest release
+* [albafetch-bin](https://aur.archlinux.org/packages/albafetch-bin) will install a pre-compiled binary from the latest release
+* [albafetch-git](https://aur.archlinux.org/packages/albafetch-git) will compile the source of the latest commit in master
+
+You can find more information on how to install packages from the AUR in the [Arch Wiki](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages)
 
 ## For NixOS
 
@@ -151,7 +150,10 @@ As an overlay:
 
 ## Manual installation
 
-This will need gcc (`make CC=[compiler] install` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
+What if your OS is not included in the ones mentioned?
+In this case, you can either compile the source code yourself and install albafetch manually, or you can grab an executable from the [latest release](https://github.com/alba4k/albafetch/releases/latest).
+
+Please note that albafetch currently won't run on Windows (despite `albafetch --logo windows` being an option), but I'm planning to eventually add support (sooner or later). Feel free to help :)
 
 ```
 $ git clone https://github.com/alba4k/albafetch
@@ -160,9 +162,9 @@ $ cd albafetch
 # make install
 ```
 
-`make install` needs elevated privileges (e.g. `sudo` or a root shell) to write to `/usr/bin` or `/usr/local/bin` (macOS).
+`make install` needs elevated privileges on Linux (e.g. `sudo` or a root shell) to write to `/usr/bin`, while `/usr/local/bin` can be accessed as a normal user on macOS.
 
-Alternatively, you may use meson to do this:
+Alternatively, you may prefer meson to do this:
 
 ```
 $ git clone https://github.com/alba4k/albafetch
@@ -172,7 +174,7 @@ $ meson compile -C build
 $ meson install -C build
 ```
 
-Please note that meson will always install the executable to `/usr/local/bin`, which you may or may not want (executables in this directory are ran instead of ones in `/usr/bin`)
+Meson will install the executable to `/usr/local/bin`, which you may or may not want (executables in this directory are ran instead of ones in `/usr/bin`).
 
 # Contributing
 

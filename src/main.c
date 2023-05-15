@@ -431,7 +431,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("\n\e[1mDebug run finished with a total of %u errors.\e[0m\n", errors);
+    printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m\n", errors);
 
     return 0;
 #else
