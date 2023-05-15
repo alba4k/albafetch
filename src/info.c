@@ -681,6 +681,13 @@ int cpu(char *dest) {
         *end = 0;
     }
 
+    /* I might eventually add an option to get the "default" clock speed
+     * by parsing one or more of the following files:
+     * - /sys/devices/system/cpu/cpu0/cpufreq/cpupower_max_freq
+     * - /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+     * - /sys/devices/system/cpu/cpu0/cpufreq/bios_limit
+     * - /sys/devices/system/cpu/cpu0/cpufreq/base_frequency
+     */
     // Printing the clock frequency the first thread is currently running at
     end += 1;
     char *cpu_freq = strstr(end, "cpu MHz");

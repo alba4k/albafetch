@@ -39,7 +39,7 @@ These will also install the relative runtime dependencies
 	- In Termux, libcurl
 * libcurl
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
-	- On Debian, [pcilib-dev](https://packages.debian.org/buster/libpci-dev)
+	- On Debian, [libpci-dev](https://packages.debian.org/buster/libpci-dev)
 	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
 * A build system
 	- Make and meson are already set up, more details are found [here](#compilation)
