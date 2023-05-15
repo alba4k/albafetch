@@ -956,8 +956,10 @@ int memory(char *dest) {
     #endif
 
     if(config.mem_perc) {
-        char perc[56];
-        snprintf(perc, 256-strlen(dest), " (%lu%%)", (unsigned long)((usedram * 100) / totalram));
+        const size_t len = 256-strlen(dest);
+        char perc[len];
+        
+        snprintf(perc, len, " (%lu%%)", (unsigned long)((usedram * 100) / totalram));
         strcat(dest, perc);
     }
 

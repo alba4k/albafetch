@@ -217,7 +217,8 @@ int main(int argc, char **argv) {
             fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
             user_is_an_idiot = true;
             
-            // Don't like gotos? Well I like them.
+            // Don't like gotos? Well I like them.0
+             
             done:;
         } else {
             fputs("\033[31m\033[1mERROR\033[0m: --logo srequires an extra argument!\n", stderr);
@@ -419,12 +420,19 @@ int main(int argc, char **argv) {
         light_colors
     };
 
+    unsigned errors = 0;
+
     for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
         if(!arr[i](mem))
             printf("%s\n", mem);
-        else
+        else {
             printf("%lu returned %d\n", i, arr[i](mem));
+            ++errors;
+        }
     }
+
+    printf("\n\e[1mDebug run finished with a total of %u errors.\e[0m\n", errors);
+
     return 0;
 #else
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis

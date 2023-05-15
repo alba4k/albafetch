@@ -37,7 +37,7 @@ build/$(TARGET): $(OBJ)
 	mkdir -p build/
 	$(CC) -o build/$(TARGET) $(OBJ) $(INCLUDE) $(CFLAGS)
 
-build/debug:
+build/debug: $(SRC)
 	mkdir -p build/
 	$(CC) $(SRC) $(CFLAGS) $(INCLUDE) -D_DEBUG -o build/debug
 
