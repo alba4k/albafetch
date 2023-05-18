@@ -8,10 +8,17 @@ project(
 
 
 src = [
-'src/info.c',
-'src/main.c',
-'src/queue.c',
-'src/utils.c',
+  'src/main.c',
+  'src/info.c',
+  'src/queue.c',
+  'src/utils.c',
+]
+
+src_debug = [
+  'src/debug.c',
+  'src/info.c',
+  'src/queue.c',
+  'src/utils.c',
 ]
 
 project_dependencies = [
@@ -26,6 +33,11 @@ if host_machine.system() == 'darwin'
   project_dependencies += dependency('appleframeworks', modules : ['foundation', 'iokit'])
   add_languages('objc')
   src += [
+    'src/macos_infos.c',
+    'src/bsdwrap.c',
+    'src/macos_gpu_string.m',
+  ]
+  src_debug += [
     'src/macos_infos.c',
     'src/bsdwrap.c',
     'src/macos_gpu_string.m',
@@ -46,10 +58,9 @@ executable(
   c_args : build_args
 )
 
-build_args += '-D_DEBUG'
 executable(
   'debug',
-  src,
+  src_debug,
   dependencies : project_dependencies,
   install : false,
   c_args : build_args

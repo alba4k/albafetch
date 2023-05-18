@@ -716,7 +716,7 @@ int cpu(char *dest) {
     end += 1;
     char *frequency = strstr(end, "cpu MHz");
     if(frequency && cpu_freq) {
-        frequency = strchr(freq, ':');
+        frequency = strchr(frequency, ':');
         if(frequency) {
             frequency += 2;
 
@@ -724,7 +724,7 @@ int cpu(char *dest) {
             if(end) {
                 *end = 0;
 
-                snprintf(frequency, 24, " @ %g GHz", (float)(atoi(frequency)/100) / 10);
+                snprintf(freq, 24, " @ %g GHz", (float)(atoi(frequency)/100) / 10);
             }
         }
     }
@@ -761,15 +761,14 @@ int cpu(char *dest) {
         free(buf);
     #endif
 
+    if(freq[0])
+        strncat(dest, freq, 255-strlen(dest));
+
     if(count && cpu_count) {
         char core_count[16];
         snprintf(core_count, 16, " (%d) ", count);
         strncat(dest, core_count, 255-strlen(dest));
     }
-
-    if(freq[0])
-        strncat(dest, freq, 255-strlen(dest));
-
     // final cleanup ("Intel Core i5         650" lol)
     while((end = strstr(dest, "  ")))
         memmove(end, end+1, strlen(end+1)+1);

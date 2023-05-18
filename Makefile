@@ -8,25 +8,24 @@ KERNEL := $(shell uname -s 2> /dev/null)
 OS := $(shell uname -o 2> /dev/null)
 PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
-ifeq ($(OS),GNU/Linux)
+ifeq ($(KERNEL),Linux)
 	OBJ := info.o main.o queue.o utils.o
 	SRC := src/main.c src/info.c src/queue.c src/utils.c
+	SRC_DEBUG := src/debug.c src/info.c src/queue.c src/utils.c
 	INSTALLPATH := /usr/bin
 	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l curl -l pci
 endif
 
 ifeq ($(OS),Android)
-	OBJ := info.o main.o queue.o utils.o
-	SRC := src/main.c src/info.c src/queue.c src/utils.c
 	INSTALLPATH := $(PREFIX)/bin
-	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l curl
 endif
 
 ifeq ($(KERNEL),Darwin)
 	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
 	SRC := src/main.c src/info.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
+	SRC_DEBUG := src/debug.c src/info.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
 	INSTALLPATH := /usr/local/bin
 	INCLUDE := -framework Foundation -framework IOKit -l curl
 endif
@@ -37,9 +36,9 @@ build/$(TARGET): $(OBJ)
 	mkdir -p build/
 	$(CC) -o build/$(TARGET) $(OBJ) $(INCLUDE) $(CFLAGS)
 
-build/debug: $(SRC)
+build/debug: $(SRC_DEBUG)
 	mkdir -p build/
-	$(CC) $(SRC) $(CFLAGS) $(INCLUDE) -D_DEBUG -o build/debug
+	$(CC) $(SRC_DEBUG) $(CFLAGS) $(INCLUDE) -o build/debug
 
 main.o: src/main.c src/logos.h src/info.h src/utils.h src/queue.h
 	$(CC) -c src/main.c $(CFLAGS)

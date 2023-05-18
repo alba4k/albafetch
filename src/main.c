@@ -13,6 +13,9 @@
  * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress
  * more config options
+ * print shell and terminal options
+ * print kernel type (e.g. "Kernel: 6.3.2 (zen)") when using kernel_short
+ * Windows support? *BSD support?
  */
 
 // This contains the default config values
@@ -358,49 +361,6 @@ int main(int argc, char **argv) {
         }
     }
 
-#ifdef _DEBUG
-    // setting everything to 1
-    options |= ~options;
-
-    int (*arr[])(char *) = {
-        user,
-        hostname,
-        uptime,
-        os,
-        kernel,
-        desktop,
-        shell,
-        login_shell,
-        term,
-        packages,
-        host,
-        bios,
-        cpu,
-        gpu,
-        memory,
-        public_ip,
-        local_ip,
-        pwd,
-        date,
-        colors,
-        light_colors
-    };
-
-    unsigned errors = 0;
-
-    for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
-        if(!arr[i](mem))
-            printf("%s\n", mem);
-        else {
-            printf("%lu returned %d\n", i, arr[i](mem));
-            ++errors;
-        }
-    }
-
-    printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m\n", errors);
-
-    return 0;
-#else
     // I am deeply sorry for the code you're about to see - I hope you like spaghettis
     unsigned line = 2;
     char *data = mem + 1536;
@@ -524,8 +484,6 @@ int main(int argc, char **argv) {
 
         print_line(printed, w.ws_col);
     }
-
-#endif // _DEBUG
 
     return 0;
 }
