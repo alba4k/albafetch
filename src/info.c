@@ -117,7 +117,7 @@ int os(char *dest) {
     uname(&name);
 
     #ifdef __APPLE__
-        snprintf(dest, 256, "macOS %s", config.os_arch ? name.machine : "");
+        snprintf(dest, 256, "macOS %s", os_arch ? name.machine : "");
     #else
     #ifdef __ANDROID__
         int pipes[2];
@@ -137,7 +137,7 @@ int os(char *dest) {
         version[read(pipes[0], version, 16) - 1] = 0;
         close(pipes[0]);
 
-        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", config.os_arch ? name.machine : "");
+        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", os_arch ? name.machine : "");
     #else
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
@@ -168,7 +168,7 @@ int os(char *dest) {
         else if((end = strchr(os_name, '\'')))
             *end = 0;
 
-        snprintf(dest, 256, "%s %s", os_name, config.os_arch ? name.machine : "");
+        snprintf(dest, 256, "%s %s", os_name, os_arch ? name.machine : "");
     #endif // __ANDROID__
     #endif // __APPLE__
 
@@ -180,7 +180,7 @@ int kernel(char *dest) {
     struct utsname name;
     uname(&name);
 
-    if(config.kernel_short) {
+    if(kernel_short) {
         char *ptr = strchr(name.release, '-');
         *ptr = 0;
     }
@@ -209,7 +209,7 @@ int desktop(char *dest) {
 
         strcpy(dest, desktop);
 
-        if(config.de_type) {
+        if(de_type) {
             if(getenv("WAYLAND_DISPLAY"))
                 strncat(dest, " (Wayland)", 255-strlen(dest));
             else if((desktop = getenv("XDG_SESSION_TYPE"))) {
@@ -241,18 +241,18 @@ int shell(char *dest) {
             fclose(fp);
 
             if(shell[0] == '-') { // cmdline is "-bash" when login shell
-                strncpy(dest, config.shell_path ? shell+1 : basename(shell+1), 256);
+                strncpy(dest, shell_path ? shell+1 : basename(shell+1), 256);
                 return 0;
             }
 
-            strncpy(dest, config.shell_path ? shell : basename(shell), 256);
+            strncpy(dest, shell_path ? shell : basename(shell), 256);
             return 0;
         }
     #endif
 
     char *shell = getenv("SHELL");
     if(shell && shell[0]) {
-        strncpy(dest, config.shell_path ? shell : basename(shell), 256);
+        strncpy(dest, shell_path ? shell : basename(shell), 256);
         return 0;
     }
 
@@ -264,27 +264,51 @@ int login_shell(char *dest) {
     char *buf = getenv("SHELL");
 
     if(buf && buf[0]) {
-        strncpy(dest, config.shell_path ? buf : basename(buf), 256);
+        strncpy(dest, shell_path ? buf : basename(buf), 256);
         return 0;
     }
 
     return 1;
 }
 
-// gets the current terminal
+// get the current terminal
 int term(char *dest) {
-    char *terminal = getenv("TERM");
-    if(terminal) {
-        terminal = strcmp("xterm-kitty", terminal) ? terminal : "kitty";
+    // TODO: print terminal version (using env variables, parsing --version outputs, ...)
+    char *terminal = NULL;
 
-        snprintf(dest, 256, "%s", terminal);
-        return 0;
+    char *terminals[][2] = {
+     // {"ENVIRONMENT_VARIABLE", "terminal"},
+        {"ALACRITTY_SOCKET", "alacritty"},
+        {"KITTY_PID", "kitty"},
+        {"VSCODE_INJECTION", "vscode"},
+        {"TERMUX_VERSION", "termux"},
+        {"KONSOLE_VERSION", "konsole"},
+        {"GNOME_TERMINAL_SCREEN", "gnome-terminal"},
+        {"WT_SESSION", "windows terminal"},
+    };
+
+    for(size_t i = 0; i < sizeof(terminals)/sizeof(terminals[0]); ++i)
+        if(getenv(terminals[i][0]))
+            terminal = terminals[i][1];
+
+    if(!terminal) {
+        terminal = getenv("TERM");
+        if(!terminal)
+            return 1;
+        
+        if(!strcmp(terminal, "xterm-kitty"))
+            terminal = "kitty";
     }
 
-    return 1;
+    if(term_ssh && getenv("SSH_CONNECTION"))
+        snprintf(dest, 256, "%s (SSH)", terminal);
+    else
+        strncpy(dest, terminal, 256);
+
+    return 0;
 }
 
-// get amount of packages installed
+// get the number of installed packages
 int packages(char *dest) {
     dest[0] = 0;
     char buf[256] = "", str[128] = "", path[256] = "";
@@ -301,13 +325,13 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/pacman/local", 256-strlen(path));
-        if(config.pkg_pacman && (dir = opendir(path))) {
+        if(pkg_pacman && (dir = opendir(path))) {
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
                     ++count;
 
             if(count) {
-                snprintf(dest, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (pacman)" : "");
+                snprintf(dest, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (pacman)" : "");
                 done = true;
             }
             closedir(dir);
@@ -317,7 +341,7 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
-        if(config.pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
+        if(pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
             fseek(fp, 0, SEEK_END);
             size_t len = ftell(fp);
             rewind(fp);
@@ -337,7 +361,7 @@ int packages(char *dest) {
             free(dpkg_list);
 
             if(count) {
-                snprintf(buf, 256, "%u%s", count, config.pkg_mgr ? " (dpkg)" : "");
+                snprintf(buf, 256, "%u%s", count, pkg_mgr ? " (dpkg)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -347,7 +371,7 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/rpm", 256-strlen(path));
-        if(config.pkg_rpm && !access(path, F_OK)) {
+        if(pkg_rpm && !access(path, F_OK)) {
             if(pipe(pipes))
                 return 1;
 
@@ -363,7 +387,7 @@ int packages(char *dest) {
             close(pipes[0]);
 
             if(str[0] != '0' && str[0]) {
-                snprintf(buf, 256 - strlen(buf), "%s%s%s", done ? ", " : "", str, config.pkg_mgr ? " (rpm)" : "");
+                snprintf(buf, 256 - strlen(buf), "%s%s%s", done ? ", " : "", str, pkg_mgr ? " (rpm)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -373,14 +397,14 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
-        if(config.pkg_flatpak && (dir = opendir(path))) {
+        if(pkg_flatpak && (dir = opendir(path))) {
             count = 0;
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
                     ++count;
 
             if(count) {
-                snprintf(buf, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (flatpak)" : "");
+                snprintf(buf, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (flatpak)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -391,7 +415,7 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/snap", 256-strlen(path));
-        if(config.pkg_snap && !access(path, F_OK)) {
+        if(pkg_snap && !access(path, F_OK)) {
             if(pipe(pipes))
                 return 1;
 
@@ -408,13 +432,13 @@ int packages(char *dest) {
             close(pipes[0]);
 
             if(str[0] != '0' && str[0]) {
-                snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, config.pkg_mgr ? " (snap)" : "");
+                snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, pkg_mgr ? " (snap)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
         }
     #endif
-    if(config.pkg_brew && (!access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
+    if(pkg_brew && (!access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
         if(pipe(pipes))
             return 1;
 
@@ -440,7 +464,7 @@ int packages(char *dest) {
                         ++count;
 
                 if(count) {
-                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (brew)" : "");
+                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (brew)" : "");
                     done = true;
                     strncat(dest, buf, 256 - strlen(dest));
                 }
@@ -455,7 +479,7 @@ int packages(char *dest) {
     if(getenv("PREFIX"))
         strncpy(path, getenv("PREFIX"), 255);
     strncat(path, "/bin/pip", 256-strlen(path));
-    if(config.pkg_pip && !access(path, F_OK)) {
+    if(pkg_pip && !access(path, F_OK)) {
         if(pipe(pipes))
             return 1;
 
@@ -472,7 +496,7 @@ int packages(char *dest) {
         close(pipes[0]);
 
         if(str[0] != '0' && str[0]) {
-            snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, config.pkg_mgr ? " (pip)" : "");
+            snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, pkg_mgr ? " (pip)" : "");
             done = true;
             strncat(dest, buf, 256 - strlen(dest));
         }
@@ -483,7 +507,7 @@ int packages(char *dest) {
     return 1;
 }
 
-// gets the machine name and eventually model version
+// get the machine name and eventually model version
 int host(char *dest) {
     #ifdef __APPLE__
         size_t BUF_SIZE = 256;
@@ -569,7 +593,7 @@ int host(char *dest) {
     return 0;
 }
 
-// gets the current BIOS vendor and version (Linux only!)
+// get the current BIOS vendor and version (Linux only!)
 int bios(char *dest) {
     #ifdef __APPLE__
         (void)dest; // avoid unused parameter warning - lmao
@@ -633,7 +657,7 @@ int cpu(char *dest) {
         if(!buf[0])
             return 1;
 
-        if(!config.cpu_freq) {
+        if(!cpu_freq) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))
@@ -651,7 +675,7 @@ int cpu(char *dest) {
     fclose(fp);
 
     cpu_info = buf;
-    if(config.cpu_count) {
+    if(cpu_count) {
         end = cpu_info;
         while((end = strstr(end, "processor"))) {
             count += 1;
@@ -690,17 +714,17 @@ int cpu(char *dest) {
      */
     // Printing the clock frequency the first thread is currently running at
     end += 1;
-    char *cpu_freq = strstr(end, "cpu MHz");
-    if(cpu_freq && config.cpu_freq) {
-        cpu_freq = strchr(cpu_freq, ':');
-        if(cpu_freq) {
-            cpu_freq += 2;
+    char *frequency = strstr(end, "cpu MHz");
+    if(frequency && cpu_freq) {
+        frequency = strchr(freq, ':');
+        if(frequency) {
+            frequency += 2;
 
-            end = strchr(cpu_freq, '\n');
+            end = strchr(frequency, '\n');
             if(end) {
                 *end = 0;
 
-                snprintf(freq, 24, " @ %g GHz", (float)(atoi(cpu_freq)/100) / 10);
+                snprintf(frequency, 24, " @ %g GHz", (float)(atoi(frequency)/100) / 10);
             }
         }
     }
@@ -723,7 +747,7 @@ int cpu(char *dest) {
         *end = 0;
     }
 
-    if(!config.cpu_brand) {
+    if(!(cpu_brand)) {
         if((end = strstr(cpu_info, "Intel Core ")))
             memmove(end, end+11, strlen(end+1));
         else if((end = strstr(cpu_info, "Apple ")))
@@ -737,7 +761,7 @@ int cpu(char *dest) {
         free(buf);
     #endif
 
-    if(count && config.cpu_count) {
+    if(count && cpu_count) {
         char core_count[16];
         snprintf(core_count, 16, " (%d) ", count);
         strncat(dest, core_count, 255-strlen(dest));
@@ -883,7 +907,7 @@ int gpu(char *dest) {
     if(!gpu_string)
         return 1;
 
-    if(!config.gpu_brand) {
+    if(!(gpu_brand)) {
         if((end = strstr(gpu_string, "Intel ")))
             gpu_string += 6;
         else if((end = strstr(gpu_string, "AMD ")))
@@ -955,7 +979,7 @@ int memory(char *dest) {
         snprintf(dest, 256, "%lu MiB / %lu MiB", usedram/1024, totalram/1024);
     #endif
 
-    if(config.mem_perc) {
+    if(mem_perc) {
         const size_t len = 256-strlen(dest);
         char perc[len];
         
@@ -966,7 +990,7 @@ int memory(char *dest) {
     return 0;
 }
 
-// gets the current public ip
+// get the current public ip
 int public_ip(char *dest) {
     CURL *curl_handle = curl_easy_init();
     CURLcode res;
@@ -1031,7 +1055,7 @@ int public_ip(char *dest) {
     return 0;
 }
 
-// gets all local ips
+// get all local ips
 int local_ip(char *dest) {
     struct ifaddrs *addrs=NULL;
     bool done = false;
@@ -1042,7 +1066,7 @@ int local_ip(char *dest) {
     while(addrs) {
         // checking if the ip is valid
        if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
-            if((strcmp(addrs->ifa_name, "lo") || config.loc_localdomain) || (strcmp(addrs->ifa_name, "docker0") || config.loc_docker)) {
+            if((strcmp(addrs->ifa_name, "lo") || loc_localdomain) || (strcmp(addrs->ifa_name, "docker0") || loc_docker)) {
                 struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
                 
                 snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
@@ -1061,9 +1085,9 @@ int local_ip(char *dest) {
     return 1;
 }
 
-// gets the current working directory
+// get the current working directory
 int pwd(char *dest) {
-    if(!config.pwd_path) {
+    if(!(pwd_path)) {
         char buf[256];
 
         if(!getcwd(buf, 256))
@@ -1078,7 +1102,7 @@ int pwd(char *dest) {
     return 0;
 }
 
-// gets the current date and time
+// get the current date and time
 int date(char *dest) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
@@ -1088,9 +1112,6 @@ int date(char *dest) {
 
 // show the terminal color configuration
 int colors(char *dest) {
-    if(config.col_block_len > 16)
-        return 1;
-
     memset(dest, 0, 256);
     for(int i = 0; i < 8; ++i) {
         sprintf(dest+(5+config.col_block_len)*i, "\033[4%dm", i);

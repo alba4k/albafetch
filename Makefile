@@ -41,10 +41,10 @@ build/debug: $(SRC)
 	mkdir -p build/
 	$(CC) $(SRC) $(CFLAGS) $(INCLUDE) -D_DEBUG -o build/debug
 
-main.o: src/main.c src/vars.h src/logos.h src/info.h
+main.o: src/main.c src/logos.h src/info.h src/utils.h src/queue.h
 	$(CC) -c src/main.c $(CFLAGS)
 
-info.o: src/info.c src/vars.h src/info.h
+info.o: src/info.c src/utils.h src/queue.h src/macos_infos.h src/bsdwrap.h
 	$(CC) -c src/info.c $(CFLAGS)
 
 utils.o: src/utils.c

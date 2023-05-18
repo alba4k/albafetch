@@ -67,4 +67,4 @@ This error should only pop up if the program was not able to get the `HOME` envi
 
 ---
 
-### © Aaron Blasko
+###### © Aaron Blasko

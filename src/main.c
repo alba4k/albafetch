@@ -17,35 +17,12 @@
 
 // This contains the default config values
 struct Config config = {
-    false,  // align
-    true,   // bold
     NULL,   // logo
     "",     // color
     ": ",   // dash
     "-",    // separator
     5,      // spacing
 
-    true,   // title_color
-    true,   // os_arch
-    false,  // kernel_short
-    false,  // de_type
-    false,  // shell_path
-    true,   // pkg_mgr
-    true,   // pkg_pacman
-    true,   // pkg_dpkg
-    true,   // pkg_rpm
-    true,   // pkg_flatpak
-    true,   // pkg_snap
-    true,   // pkg_brew
-    false,  // pkg_pip
-    true,   // cpu_brand
-    true,   // cpu_freq
-    true,   // cpu_count
-    true,   // gpu_brand
-    true,   // mem_perc
-    false,  // loc_docker
-    false,  // loc_localdomain
-    true,   // pwd_path
     "%02d/%02d/%d %02d:%02d:%02d",  // date_format
     3,      // col_block_len
 
@@ -74,6 +51,12 @@ struct Config config = {
     "",         // colors_prefix
     "",         // light_colors_prefix
 };
+
+// Default values for boolean options (least to most significant bit)
+                // 1001 1111 0111 1111 1000 1110
+uint64_t options = 0x9f7f8e;
+// 1000 1001 0111 1111 1001 0110
+
 
 int main(int argc, char **argv) {
     // using a linked list like this is quite horrible, but here we go
@@ -120,7 +103,7 @@ int main(int argc, char **argv) {
 
     // these store either the default values or the ones defined in the config
     // they are needed to know what is used if no arguments are given (for --help)
-    bool default_bold = config.bold;
+    bool default_bold = bold;
     char default_color[8] = "";
     char default_logo[16] = "";
 
@@ -136,7 +119,7 @@ int main(int argc, char **argv) {
      * 5  
      * 6  data          (buffer for every function in info.c)
      * 7  
-     * 8  logo          (32 char* to lines (following logo.h))
+     * 8  logo          (32 char* to lines (following logo.h)) (WIP)
      * 9  
      * 10 
      * 11 
@@ -296,10 +279,11 @@ int main(int argc, char **argv) {
 
     if(asking_bold) {
         if(asking_bold < argc) {
+            // modifying the 2nd least significant bit of options
             if(!strcmp(argv[asking_bold], "on"))
-                config.bold = true;
+                options |= ((uint64_t)1 << 1);
             else if(!strcmp(argv[asking_bold], "off"))
-                config.bold = false;
+                options &= ~((uint64_t)1 << 1);
             else {
                 fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
@@ -319,40 +303,40 @@ int main(int argc, char **argv) {
 
     if(asking_help) {
         printf("%s%salbafetch\033[0m - a system fetch utility\n",
-               config.color, config.bold ? "\033[1m" : "");
+               config.color, bold ? "\033[1m" : "");
 
         printf("\n%s%sFLAGS\033[0m:\n",
-               config.color, config.bold ? "\033[1m" : "");
+               config.color, bold ? "\033[1m" : "");
 
         printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n",
-               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "");
+               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "");
 
         printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
                "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"
                " \033[34mblue\033[0m, \033[35mpurple\033[0m, \033[36mcyan\033[0m, \033[90mgray\033[0m,"
                " \033[37mwhite\033[0m]\n",
-               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
+               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
 
         printf("\t%s%s-b\033[0m,%s%s --bold\033[0m:\t Specifies if bold should be used in colored parts (default: %s\033[0m)\n"
                "\t\t\t   [\033[1mon\033[0m, off]\n",
-               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
+               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
         
         printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
                "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, fedora]\n"
                "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
-               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
+               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
         printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Alignes the infos if set (default: %s)\n"
-               "\t\t\t   [on, off]\n", config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", config.align ? "on" : "off");
+               "\t\t\t   [on, off]\n", config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", align ? "on" : "off");
 
         printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
-               "\t\t\t   [path]\n", config.color, config.bold ? "\033[1m" : "");
+               "\t\t\t   [path]\n", config.color, bold ? "\033[1m" : "");
 
         printf("\t%s%s--no-config\033[0m:\t Ignores any provided or existing config file\n",
-               config.color, config.bold ? "\033[1m" : "");
+               config.color, bold ? "\033[1m" : "");
 
         printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
-               config.color, config.bold ? "\033[1m" : "");
+               config.color, bold ? "\033[1m" : "");
 
         return 0;
     }
@@ -360,9 +344,9 @@ int main(int argc, char **argv) {
     if(asking_align) {
         if(asking_align < argc) {
             if(!strcmp(argv[asking_align], "on"))
-                config.align = true;
+                options |= (uint64_t)1;
             else if(!strcmp(argv[asking_align], "off"))
-                config.align = false;
+                options &= ~((uint64_t)1);
             else {
                 fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
@@ -375,26 +359,8 @@ int main(int argc, char **argv) {
     }
 
 #ifdef _DEBUG
-    // Is there a smarter way to do this? Probably, but I'm too lazy
-    // Feel free to let me know or just open a PR if you know one <3
-    config.os_arch = 1;
-    config.de_type = 1;
-    config.shell_path = 1;
-    config.cpu_brand = 1;
-    config.cpu_freq = 1;
-    config.cpu_count = 1;
-    config.gpu_brand = 1;
-    config.mem_perc = 1;
-    config.pkg_mgr = 1;
-    config.pkg_pacman = 1;
-    config.pkg_dpkg = 1;
-    config.pkg_rpm = 1;
-    config.pkg_flatpak = 1;
-    config.pkg_snap = 1;
-    config.pkg_pip = 1;
-    config.pkg_brew = 1;
-    config.loc_localdomain = 1;
-    config.loc_docker = 1;
+    // setting everything to 1
+    options |= ~options;
 
     int (*arr[])(char *) = {
         user,
@@ -447,7 +413,7 @@ int main(int argc, char **argv) {
             if(ioctl(STDIN_FILENO, TIOCGWINSZ, &w) == -1)
                 w.ws_col = -1;
 
-    if(config.align) {
+    if(align) {
         int current_len;
         asking_align = 0;
 
@@ -517,12 +483,12 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
-                                     config.title_color ? config.color : "\033[0m",
-                                     config.bold ? "\033[1m" : "",
+                                     title_color ? config.color : "\033[0m",
+                                     bold ? "\033[1m" : "",
                                      name,
-                                     config.title_color ? "\033[0m" : "",
-                                     config.bold ? "\033[1m" : "",
-                                     config.title_color ? config.color : "",
+                                     title_color ? "\033[0m" : "",
+                                     bold ? "\033[1m" : "",
+                                     title_color ? config.color : "",
                                      host
             );
         }

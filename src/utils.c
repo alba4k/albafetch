@@ -19,7 +19,7 @@ void get_logo_line(char *dest, unsigned *line) {
 
 // print no more than maxlen visible characters of line
 void print_line(char *line, const size_t maxlen) {
-    if(config.bold)
+    if(bold)
         fputs("\033[1m", stdout);
 
     bool escaping = false;
@@ -172,7 +172,7 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
     return 0;
 }
 
-// output is 1 if there's a user error.
+// parse the provided config file.
 void parse_config(const char *file, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
@@ -214,14 +214,6 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
     }
 
     // GENERAL OPTIONS
-
-    // align_infos
-    parse_config_bool(conf, "align_infos", &config.align);
-    
-    // bold
-    parse_config_bool(conf, "bold", &config.bold);
-    *default_bold = config.bold;
-
     // logo
     char logo[32] = "";
     parse_config_str(conf, "logo", logo, sizeof(logo));
@@ -266,39 +258,46 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
     // separator
     parse_config_str(conf, "separator", config.separator, sizeof(config.separator));
 
-    // MODULE-SPECIFIC OPTIONS
-
-    struct BooleanOption {
-        bool *config_option;
-        char *config_name;
-    };
-    struct BooleanOption options[] = {
-    //  {&config.config_option, "config_name"}
-        {&config.title_color,"colored_title"},
-        {&config.os_arch,"os_arch"},
-        {&config.kernel_short, "kernel_short"},
-        {&config.de_type,"desktop_type"},
-        {&config.shell_path,"shell_path"},
-        {&config.pkg_mgr,"pkg_mgr"},
-        {&config.pkg_pacman,"pkg_pacman"},
-        {&config.pkg_dpkg,"pkg_dpkg"},
-        {&config.pkg_rpm,"pkg_rpm"},
-        {&config.pkg_flatpak,"pkg_flatpak"},
-        {&config.pkg_snap,"pkg_snap"},
-        {&config.pkg_brew,"pkg_brew"},
-        {&config.pkg_pip,"pkg_pip"},
-        {&config.cpu_brand,"cpu_brand"},
-        {&config.cpu_freq,"cpu_freq"},
-        {&config.cpu_count,"cpu_count"},
-        {&config.gpu_brand,"gpu_brand"},
-        {&config.mem_perc,"mem_perc"},
-        {&config.loc_localdomain,"loc_localdomain"},
-        {&config.loc_docker,"loc_docker"},
-        {&config.pwd_path, "pwd_path"}
+    // BOOLEAN OPTIONS (check utils.h)
+    char *booleanOptions[] = {
+        "align_infos",
+        "bold",
+        "colored_title",
+        "os_arch",
+        "kernel_short",
+        "desktop_type",
+        "shell_path",
+        "term_ssh",
+        "pkg_mgr",
+        "pkg_pacman",
+        "pkg_dpkg",
+        "pkg_rpm",
+        "pkg_flatpak",
+        "pkg_snap",
+        "pkg_brew",
+        "pkg_pip",
+        "cpu_brand",
+        "cpu_freq",
+        "cpu_count",
+        "gpu_brand",
+        "mem_perc",
+        "loc_localdomain",
+        "loc_docker",
+        "pwd_path"
     };
 
-    for(size_t i = 0; i < sizeof(options)/sizeof(options[0]); ++i)
-        parse_config_bool(conf, options[i].config_name, options[i].config_option);
+    bool buffer;
+    for(size_t i = 0; i < sizeof(booleanOptions)/sizeof(booleanOptions[0]); ++i) {
+        if(!parse_config_bool(conf, booleanOptions[i], &buffer)) {
+            if(buffer)
+                options |= ((uint64_t)1 << i);
+            else
+                options &= ~((uint64_t)1 << i);
+        }
+    }
+    *default_bold = bold;
+
+    // OTHER MODULE-RELATED OPTIONS
 
     parse_config_str(conf, "date_format", config.date_format, sizeof(config.date_format));
 
