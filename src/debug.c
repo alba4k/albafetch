@@ -10,8 +10,6 @@
 
 // Most of those aren't even needed
 struct Config config;
-// setting every option to 1
-uint64_t options = 0xffffffffffffffff;
 
 int main() {
     int (*arr[])(char *) = {
@@ -42,7 +40,9 @@ int main() {
     int return_value;
     char mem[256];
 
-    // There are just defaults
+    // just setting everything to 1
+    config.options = 0xffffffffffffffff;
+    // these are just defaults
     config.col_block_len = 3;
     strcpy(config.date_format, "%02d/%02d/%d %02d:%02d:%02d");
 

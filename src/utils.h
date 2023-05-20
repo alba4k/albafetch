@@ -8,6 +8,35 @@
 #include <stdint.h>
 
 struct Config {
+    /* Starting from the least significant byte, see the #define statements later
+    * 0. align
+    * 1. bold
+    * 2. title_color
+    * 3. os_arch
+    * 4. kernel_short
+    * 5. de_type
+    * 6. shell_path
+    * 7. term_ssh
+    * 8. pkg_mgr
+    * 9. pkg_pacman
+    * 10. pkg_dpkg
+    * 11. pkg_rpm
+    * 12. pkg_flatpak
+    * 13. pkg_snap
+    * 14. pkg_brew
+    * 15. pkg_pip
+    * 16. cpu_brand
+    * 17. cpu_freq
+    * 18. cpu_count
+    * 19. gpu_brand
+    * 20. mem_perc
+    * 21. loc_localdomain
+    * 22. loc_docker
+    * 23. pwd_path
+    * 24. [...]
+    */
+    uint64_t options;
+
     char **logo;
     char color[8];
     char dash[16];
@@ -44,60 +73,30 @@ struct Config {
 };
 extern struct Config config;
 
-
-/* Starting from the least significant byte, see the #define statements later
- * 0. align
- * 1. bold
- * 2. title_color
- * 3. os_arch
- * 4. kernel_short
- * 5. de_type
- * 6. shell_path
- * 7. term_ssh
- * 8. pkg_mgr
- * 9. pkg_pacman
- * 10. pkg_dpkg
- * 11. pkg_rpm
- * 12. pkg_flatpak
- * 13. pkg_snap
- * 14. pkg_brew
- * 15. pkg_pip
- * 16. cpu_brand
- * 17. cpu_freq
- * 18. cpu_count
- * 19. gpu_brand
- * 20. mem_perc
- * 21. loc_localdomain
- * 22. loc_docker
- * 23. pwd_path
- * 24. [...]
- */
-extern uint64_t options;
-
-#define align           options & 0x1
-#define bold            options & 0x2
-#define title_color     options & 0x4
-#define os_arch         options & 0x8
-#define kernel_short    options & 0x10
-#define de_type         options & 0x20
-#define shell_path      options & 0x40
-#define term_ssh        options & 0x80
-#define pkg_mgr         options & 0x100
-#define pkg_pacman      options & 0x200
-#define pkg_dpkg        options & 0x400
-#define pkg_rpm         options & 0x800
-#define pkg_flatpak     options & 0x1000
-#define pkg_snap        options & 0x2000
-#define pkg_brew        options & 0x4000
-#define pkg_pip         options & 0x8000
-#define cpu_brand       options & 0x10000
-#define cpu_freq        options & 0x20000
-#define cpu_count       options & 0x40000
-#define gpu_brand       options & 0x80000
-#define mem_perc        options & 0x100000
-#define loc_localdomain options & 0x200000
-#define loc_docker      options & 0x400000
-#define pwd_path        options & 0x800000
+#define align           config.options & 0x1
+#define bold            config.options & 0x2
+#define title_color     config.options & 0x4
+#define os_arch         config.options & 0x8
+#define kernel_short    config.options & 0x10
+#define de_type         config.options & 0x20
+#define shell_path      config.options & 0x40
+#define term_ssh        config.options & 0x80
+#define pkg_mgr         config.options & 0x100
+#define pkg_pacman      config.options & 0x200
+#define pkg_dpkg        config.options & 0x400
+#define pkg_rpm         config.options & 0x800
+#define pkg_flatpak     config.options & 0x1000
+#define pkg_snap        config.options & 0x2000
+#define pkg_brew        config.options & 0x4000
+#define pkg_pip         config.options & 0x8000
+#define cpu_brand       config.options & 0x10000
+#define cpu_freq        config.options & 0x20000
+#define cpu_count       config.options & 0x40000
+#define gpu_brand       config.options & 0x80000
+#define mem_perc        config.options & 0x100000
+#define loc_localdomain config.options & 0x200000
+#define loc_docker      config.options & 0x400000
+#define pwd_path        config.options & 0x800000
 
 // needed for libcurl
 struct MemoryStruct {

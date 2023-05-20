@@ -20,6 +20,10 @@
 
 // This contains the default config values
 struct Config config = {
+    // Default values for boolean options (least to most significant bit)
+    // 1001 1111 0111 1111 1000 1110
+    0x9f7f8e,
+
     NULL,   // logo
     "",     // color
     ": ",   // dash
@@ -55,10 +59,6 @@ struct Config config = {
     "",         // light_colors_prefix
 };
 
-// Default values for boolean options (least to most significant bit)
-                // 1001 1111 0111 1111 1000 1110
-uint64_t options = 0x9f7f8e;
-// 1000 1001 0111 1111 1001 0110
 
 
 int main(int argc, char **argv) {
@@ -284,9 +284,9 @@ int main(int argc, char **argv) {
         if(asking_bold < argc) {
             // modifying the 2nd least significant bit of options
             if(!strcmp(argv[asking_bold], "on"))
-                options |= ((uint64_t)1 << 1);
+                config.options |= ((uint64_t)1 << 1);
             else if(!strcmp(argv[asking_bold], "off"))
-                options &= ~((uint64_t)1 << 1);
+                config.options &= ~((uint64_t)1 << 1);
             else {
                 fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
@@ -347,9 +347,9 @@ int main(int argc, char **argv) {
     if(asking_align) {
         if(asking_align < argc) {
             if(!strcmp(argv[asking_align], "on"))
-                options |= (uint64_t)1;
+                config.options |= (uint64_t)1;
             else if(!strcmp(argv[asking_align], "off"))
-                options &= ~((uint64_t)1);
+                config.options &= ~((uint64_t)1);
             else {
                 fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
                 user_is_an_idiot = true;
