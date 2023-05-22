@@ -4,6 +4,31 @@
 #include "logos.h"
 #include "utils.h"
 
+// begginning a decent linked list implementation for the modules lmao
+void add_module(struct Module *array, char *id) {
+    struct Module *new = malloc(sizeof(struct Module));
+    struct Module *last = array;
+
+    for(struct Module *current = array; current->next; current = current->next)
+        last = current->next;
+    
+    last->next = new;
+
+    new->id = id;
+    new->next = NULL;
+}
+
+void destroy_array(struct Module *array) {
+    struct Module *current = array;
+    struct Module *next;
+
+    while(current) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+}
+
 // print a certain line of the logo
 void get_logo_line(char *dest, unsigned *line) {
     if(!config.logo || !dest || *line < 2)

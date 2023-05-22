@@ -98,6 +98,16 @@ extern struct Config config;
 #define loc_docker      config.options & 0x400000
 #define pwd_path        config.options & 0x800000
 
+// begginning a decent linked list implementation for the modules lmao
+struct Module {
+    char *id;               // module identifier
+    struct Module *next;    // next module
+};
+
+void add_module(struct Module *array, char *id);
+
+void destroy_array(struct Module *array);
+
 // needed for libcurl
 struct MemoryStruct {
     char *memory;

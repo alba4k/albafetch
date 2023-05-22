@@ -26,8 +26,6 @@ struct Info {
     struct Info *next;      // next module
 };
 
-//int separator(char *dest);
-
 int user(char *dest);
 
 int hostname(char *dest);
