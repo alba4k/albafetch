@@ -30,7 +30,7 @@ struct Config {
     * 18. cpu_count
     * 19. gpu_brand
     * 20. mem_perc
-    * 21. loc_localdomain
+    * 21. loc_localhost
     * 22. loc_docker
     * 23. pwd_path
     * 24. [...]
@@ -94,7 +94,7 @@ extern struct Config config;
 #define cpu_count       config.options & 0x40000
 #define gpu_brand       config.options & 0x80000
 #define mem_perc        config.options & 0x100000
-#define loc_localdomain config.options & 0x200000
+#define loc_localhost config.options & 0x200000
 #define loc_docker      config.options & 0x400000
 #define pwd_path        config.options & 0x800000
 

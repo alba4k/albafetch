@@ -4,6 +4,7 @@
 * `modules`: Module array that specifies which modules should be printed
 * `date_format`: Specifies how the date should be formatted
 * `term_ssh`: prints `(SSH)` after the terminal name when running inside of an SSH connection
+* renamed `loc_localdomain` to `loc_localhost`
 
 ### Command line arguments
 * `--no-config`: Ignores any provided or existing config file
@@ -12,11 +13,12 @@
 ## Bug fixes
 
 ### Noticeable fixes
-* Fixed a bug where the separators would print of the wrong lenght because of logo escape sequences parsed incorrectly
+* Fixed a bug where the separators would print of the wrong length because of logo escape sequences parsed incorrectly
+* Fixed `loc_localhost` (used to be `loc_localdomain`) and `loc_docker` not working
 
 ### Technical fixes
 * The memory module can now print in up to 256B (was 200B because of 55 reserved for the percentage)
-* Reduced the amount of memory the boolean options take (by bitmasking a big 64-bit integer)
+* Reduced the amount of memory the boolean options take (by bit-masking a big 64-bit integer)
 
 ---
 

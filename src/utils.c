@@ -313,7 +313,7 @@ void parse_config(const char *file, struct Module *modules, bool *default_bold, 
         "cpu_count",
         "gpu_brand",
         "mem_perc",
-        "loc_localdomain",
+        "loc_localhost",
         "loc_docker",
         "pwd_path"
     };

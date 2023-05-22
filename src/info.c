@@ -1065,7 +1065,7 @@ int local_ip(char *dest) {
     while(addrs) {
         // checking if the ip is valid
        if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
-            if((strcmp(addrs->ifa_name, "lo") || loc_localdomain) || (strcmp(addrs->ifa_name, "docker0") || loc_docker)) {
+            if((strcmp(addrs->ifa_name, "lo") || loc_localhost) && (strcmp(addrs->ifa_name, "docker0") || loc_docker)) {
                 struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
                 
                 snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
