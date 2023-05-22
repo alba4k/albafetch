@@ -20,12 +20,6 @@
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
 
-struct Info {
-    char *label;            // module label
-    int (*func)(char *);    // pointer to the function that gets the info
-    struct Info *next;      // next module
-};
-
 int user(char *dest);
 
 int hostname(char *dest);

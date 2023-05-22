@@ -101,6 +101,8 @@ extern struct Config config;
 // begginning a decent linked list implementation for the modules lmao
 struct Module {
     char *id;               // module identifier
+    char *label;            // module label
+    int (*func)(char *);    // function to run
     struct Module *next;    // next module
 };
 
@@ -118,18 +120,12 @@ void get_logo_line(char *dest, unsigned *line);
 
 void print_line(char *line, const size_t maxlen);
 
-void parse_config(const char *file, bool *default_bold, char *default_color, char *default_logo);
+void parse_config(const char *file, struct Module *modules, bool *default_bold, char *default_color, char *default_logo);
 
 void unescape(char *str);
 
 size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 size_t strlen_real(const char *str);
-
-// TODO
-// this will be removed once I write a decent logic for the single modules
-int separator(char *dest);
-int spacing(char *dest);
-int title(char *dest);
 
 #endif // UTILS_H

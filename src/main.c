@@ -10,7 +10,6 @@
 #include "queue.h"
 
 /* TODO:
- * !!! option to choose what order the infos are printed in ( modules {"a", "b"} in albafetch.conf)
  * --ascii for custom ascii art (conflicts with --logo) - work in progress
  * more config options
  * print shell and terminal options
@@ -62,38 +61,6 @@ struct Config config = {
 
 
 int main(int argc, char **argv) {
-    // using a linked list like this is quite horrible, but here we go
-    struct Info infos[64] = {
-    //  {"Label", fptr, next}
-        {NULL, NULL, infos+3},                              // 00
-        {config.user_prefix, user, NULL},                   // 01
-        {config.hostname_prefix, hostname, NULL},           // 02
-        {config.title_prefix, title, infos+23},             // 03
-        {config.uptime_prefix, uptime, infos+24},           // 04
-        {config.os_prefix, os, infos+6},                    // 05
-        {config.kernel_prefix, kernel, infos+7},            // 06
-        {config.desktop_prefix, desktop, infos+8},          // 07
-        {config.shell_prefix, shell, infos+10},             // 08
-        {config.login_shell_prefixix, login_shell, NULL},   // 09
-        {config.term_prefix, term, infos+11},               // 10
-        {config.pkg_prefix, packages, infos+25},       // 11
-        {config.host_prefix, host, infos+14},               // 12
-        {config.bios_prefix, bios, NULL},                   // 13
-        {config.cpu_prefix, cpu, infos+15},                 // 14
-        {config.gpu_prefix, gpu, infos+16},                 // 15
-        {config.mem_prefix, memory, infos+26},              // 16
-        {config.pub_prefix, public_ip, NULL},         // 17
-        {config.loc_prefix, local_ip, NULL},                // 18
-        {config.pwd_prefix, pwd, NULL},                     // 19
-        {config.date_prefix, date, NULL},                   // 20
-        {config.colors_prefix, colors, infos+22},           // 21
-        {config.light_colors_prefix, light_colors, NULL},   // 22
-        {config.separator_prefix, separator, infos+4},      // 23
-        {config.separator_prefix, separator, infos+5},      // 24
-        {config.separator_prefix, separator, infos+12},     // 25
-        {config.spacing_prefix, spacing, infos+21},         // 26
-    };
-
     bool user_is_an_idiot = false; // rtfm and stfu
 
     // are the following command line args used?
@@ -176,6 +143,10 @@ int main(int argc, char **argv) {
             use_config = false;
     }
 
+    struct Module *modules = malloc(sizeof(struct Module));
+    modules->id = NULL;
+    modules->next = NULL;
+
     if(use_config) {
         if(!config_file[0]) {
             char *config_home = getenv("XDG_CONFIG_HOME");
@@ -189,7 +160,7 @@ int main(int argc, char **argv) {
                 snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
         }
 
-        parse_config(config_file, &default_bold, default_color, default_logo);
+        parse_config(config_file, modules, &default_bold, default_color, default_logo);
     }
 
     if(asking_logo) {
@@ -301,6 +272,8 @@ int main(int argc, char **argv) {
     // was it really that hard to type 'albafetch -h'?
     if(user_is_an_idiot) {
         fputs("\033[31m\033[1mFATAL\033[0m: One or multiple errors occured! Use --help for more info\n", stderr);
+
+        destroy_array(modules);
         return 1;
     }
 
@@ -341,6 +314,7 @@ int main(int argc, char **argv) {
         printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
                config.color, bold ? "\033[1m" : "");
 
+        destroy_array(modules);
         return 0;
     }
 
@@ -373,16 +347,83 @@ int main(int argc, char **argv) {
             if(ioctl(STDIN_FILENO, TIOCGWINSZ, &w) == -1)
                 w.ws_col = -1;
 
+    struct Info {
+        char *id;               // module identifier
+        char *label;            // module label
+        int (*func)(char *);    // function to run
+    };
+    struct Info module_table[] = {
+     // {"identifier", "label", func},
+        {"separator", config.separator_prefix, NULL},
+        {"space", config.spacing_prefix, NULL},
+        {"title", config.title_prefix, NULL},
+        {"user", config.user_prefix, user},
+        {"hostname", config.hostname_prefix, hostname},
+        {"uptime", config.uptime_prefix, uptime},
+        {"os", config.os_prefix, os},
+        {"kernel", config.kernel_prefix, kernel},
+        {"desktop", config.desktop_prefix, desktop},
+        {"shell", config.shell_prefix, shell},
+        {"login_shell", config.login_shell_prefixix, login_shell},
+        {"term", config.term_prefix, term},
+        {"packages", config.pkg_prefix, packages},
+        {"host", config.host_prefix, host},
+        {"bios", config.bios_prefix, bios},
+        {"cpu", config.cpu_prefix, cpu},
+        {"gpu", config.gpu_prefix, gpu},
+        {"memory", config.mem_prefix, memory},
+        {"public_ip", config.pub_prefix, public_ip},
+        {"local_ip", config.loc_prefix, local_ip},
+        {"pwd", config.pwd_prefix, pwd},
+        {"date", config.date_prefix, date},
+        {"colors", config.colors_prefix, colors},
+        {"light_colors", config.light_colors_prefix, light_colors},
+    };
+
+    // this sets the default module order in case it was not set in a config file
+    if(!modules->next) {
+        char *default_order[] = {
+            "title",
+            "separator",
+            "uptime",
+            "separator",
+            "os",
+            "kernel",
+            "desktop",
+            "shell",
+            "term",
+            "packages",
+            "separator",
+            "host",
+            "cpu",
+            "gpu",
+            "memory",
+            "space",
+            "colors",
+            "light_colors",
+        };
+
+        for(size_t i = 0; i < sizeof(default_order)/sizeof(default_order[0]); ++i)
+            add_module(modules, default_order[i]);
+    }
+
+    // filling in the linked list (with function pointers and labels) based on the ids
+    for(struct Module *current = modules->next; current; current = current->next)
+        for(size_t i = 0; i < sizeof(module_table)/sizeof(module_table[0]); ++i)
+            if(!strcmp(module_table[i].id, current->id)) {
+                current->label = module_table[i].label;
+                current->func = module_table[i].func;
+            }
+
     if(align) {
         int current_len;
         asking_align = 0;
 
-        for(struct Info *current = (infos)->next; current; current = current->next) {
+        for(struct Module *current = modules->next; current; current = current->next) {
             current_len = strlen_real(current->label);
 
-            if(current_len > asking_align) {
+            if(current_len > asking_align)
                 asking_align = current_len;
-            }
         }
 
         asking_align += strlen_real(config.dash);
@@ -390,8 +431,8 @@ int main(int argc, char **argv) {
         snprintf(format, 32, "%%-%ds\033[0m%%s", asking_align);
     }
     
-    for(struct Info *current = infos->next; current; current = current->next) {
-        if(current->func == separator) {    // the separators should not get aligned
+    for(struct Module *current = modules->next; current; current = current->next) {
+        if(!strcmp(current->id, "separator")) {    // separators don't call a function
             if(!(printed[0]) || strlen(printed) > 767)
                 continue;
 
@@ -414,7 +455,7 @@ int main(int argc, char **argv) {
             for(size_t i = 0; i < len && strlen(printed) < 767 - strlen(config.separator); ++i)
                 strcat(printed, config.separator);
         }
-        else if(current->func == spacing) {
+        else if(!strcmp(current->id, "space")) {  // spacings don't call a function
             printed[0] = 0;
 
             get_logo_line(printed, &line);
@@ -425,7 +466,7 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strcat(printed, current->label);
         }
-        else if(current->func == title) {
+        else if(!strcmp(current->id, "title")) {    // titles don't call a function
             char name[256];
             char host[256];
 
@@ -439,7 +480,7 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
 
-             strcat(printed, config.color);
+            strcat(printed, config.color);
             strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
@@ -451,6 +492,17 @@ int main(int argc, char **argv) {
                                      title_color ? config.color : "",
                                      host
             );
+        }
+        else if(current->func == NULL) {            // printing a custom text
+            printed[0] = 0;
+
+            get_logo_line(printed, &line);
+
+            for(int i = 0; i < config.spacing; ++i)
+                strcat(printed, " ");
+
+            strcat(printed, config.color);
+            strcat(printed, current->id);
         }
         else {
             if((current->func)(data))
@@ -485,5 +537,6 @@ int main(int argc, char **argv) {
         print_line(printed, w.ws_col);
     }
 
+    destroy_array(modules);
     return 0;
 }

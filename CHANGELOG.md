@@ -1,11 +1,12 @@
 ## New Features
 
-### Command line arguments
-* `--no-config`: Ignores any provided or existing config file
-
 ### Config options
+* `modules`: Module array that specifies which modules should be printed
 * `date_format`: Specifies how the date should be formatted
 * `term_ssh`: prints `(SSH)` after the terminal name when running inside of an SSH connection
+
+### Command line arguments
+* `--no-config`: Ignores any provided or existing config file
 
 
 ## Bug fixes

@@ -9,7 +9,7 @@ Here is a time comparison (exact execution times change between machines and run
 ![neofetch](images/time_neofetch.png)
 ![albafetch](images/time_albafetch.png)
 
-For additional usage-related info, check [`MANUAL.md`](MANUAL.md).
+You will find a lot of useful usage and configuration related info inside of the [user manual](MANUAL.md) and a small list of the things I changed since the last release in the [changelog](CHANGELOG.md).
 
 ## Table of contents
 1. [Dependencies](#dependencies)
@@ -23,7 +23,9 @@ For additional usage-related info, check [`MANUAL.md`](MANUAL.md).
 	* [Arch BTW](#for-arch-linux)
 	* [NixOS](#for-nixos)
 	* [Manually](#manual-installation)
-4. [Contributing](#contributing)
+4. [Configuration](#configuration)
+	> [example config](albafetch.conf)
+5. [Contributing](#contributing)
 	
 
 
@@ -94,12 +96,12 @@ Like `make`, an executable file with appear in `build/` if compilation succeeds
 ## Using nix
 
 Building with nix can make compiling in some ways much easier, such as when compiling statically
-or cross compilng. A few convenience outputs are included:
+or cross compiling. A few convenience outputs are included:
 
 ```sh
 nix build .#albafetch # regular, dynamically linked build
 nix build .#albafetch-static # statically linked build
-nix build .#arm.<linux/darwin> # cross compilng from x86_64 to arm
+nix build .#arm.<linux/darwin> # cross compiling from x86_64 to arm
 ```
 
 # Installation
@@ -141,7 +143,7 @@ As an overlay:
 	pkgs,
 	...
 }: {
-	nixpkgs.overlays = [albafetch.overlays.default];
+	Nixon's.overlays = [albafetch.overlays.default];
 	environment.systemPackages = with pkgs; [
 		albafetch
 	];
@@ -175,6 +177,13 @@ $ meson install -C build
 ```
 
 Meson will install the executable to `/usr/local/bin`, which you may or may not want (executables in this directory are ran instead of ones in `/usr/bin`).
+
+# Configuration
+
+albafetch can be customized using a config file, usually `~/.config/albafetch.conf`.
+
+You can find an example configuration file (which only provides the default values of every option) [here](albafetch.conf).
+Although this file includes some short comments on how the various options work, I highly recommend checking out the [user manual](MANUAL.md) for a deeper understanding of the way this config file works.
 
 # Contributing
 

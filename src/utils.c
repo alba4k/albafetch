@@ -4,7 +4,7 @@
 #include "logos.h"
 #include "utils.h"
 
-// begginning a decent linked list implementation for the modules lmao
+// add a module containing id to array
 void add_module(struct Module *array, char *id) {
     struct Module *new = malloc(sizeof(struct Module));
     struct Module *last = array;
@@ -14,16 +14,23 @@ void add_module(struct Module *array, char *id) {
     
     last->next = new;
 
-    new->id = id;
+    new->id = malloc(strlen(id)+1);
+    strcpy(new->id, id);
+
+    new->label = NULL;
+    new->func = NULL;
+
     new->next = NULL;
 }
 
+// destroy array
 void destroy_array(struct Module *array) {
     struct Module *current = array;
     struct Module *next;
 
     while(current) {
         next = current->next;
+        free(current->id);
         free(current);
         current = next;
     }
@@ -198,7 +205,7 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
 }
 
 // parse the provided config file.
-void parse_config(const char *file, bool *default_bold, char *default_color, char *default_logo) {
+void parse_config(const char *file, struct Module *modules, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
     if(!fp)
@@ -330,7 +337,7 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
 
     // LABELS
 
-    char *modules[][2] = {
+    char *prefixes[][2] = {
     //  {config.module_prefix, "module_prefix"}
         {config.separator_prefix, "separator_prefix"},
         {config.spacing_prefix, "spacing_prefix"},
@@ -358,13 +365,52 @@ void parse_config(const char *file, bool *default_bold, char *default_color, cha
         {config.light_colors_prefix, "colors_light_prefix"},
     };
 
-    for(size_t i = 0; i < sizeof(modules)/sizeof(modules[0]); ++i)
-        parse_config_str(conf, modules[i][1], modules[i][0], sizeof(modules[i][0]));
+    for(size_t i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); ++i)
+        parse_config_str(conf, prefixes[i][1], prefixes[i][0], sizeof(prefixes[i][0]));
+
+    // MODULES
+    
+    ptr = strstr(conf, "modules");
+    if(!ptr) {
+        free(conf);
+        return;
+    }
+
+    ptr2 = strchr(ptr, '{');
+    if(!ptr2) {
+        free(conf);
+        return;
+    }
+
+    char *end = strchr(ptr2, '}');
+    if(!end) {
+        free(conf);
+        return;
+    }
+    *end = 0;
+
+    while((ptr = strchr(ptr2, '"'))) {
+        ++ptr;
+
+        ptr2 = strchr(ptr, '"');
+        if(!ptr2) {
+            free(conf);
+            return;
+        }
+        *ptr2 = 0;
+
+        add_module(modules, ptr);
+
+     // *ptr2 = '"';
+        ++ptr2;
+    }
+
+ // *end = '}';
 
     free(conf);
 }
 
-// check every '\\' in str and unescape "\\\\" "\\n" "\\033"
+// check every '\' in str and unescape "\\" "\n" "\e" "\033"
 void unescape(char *str) {
     while((str = strchr(str, '\\'))) {
         switch(str[1]) {
@@ -408,6 +454,9 @@ size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 }
 
 size_t strlen_real(const char *str) {
+    if(str == NULL)
+        return 0;
+
     size_t len = 0;
 
     bool escaping = false;
@@ -436,9 +485,3 @@ size_t strlen_real(const char *str) {
 
     return len;
 }
-
-// TODO
-// this will be removed once I write a decent logic for the single modules
-int separator(char *dest){(void)dest;return 1;}
-int spacing(char *dest){(void)dest;return 1;}
-int title(char *dest){(void)dest;return 1;}
