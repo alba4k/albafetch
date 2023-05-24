@@ -42,7 +42,7 @@ struct Config config = {
     "Kernel",   // kernel_prefix
     "Desktop",  // desktop_prefix
     "Shell",    // shell_prefix
-    "Login",    // login_shell_prefixix
+    "Login",    // login_shell_prefix
     "Terminal", // term_prefix
     "Packages", // pkg_prefix
     "Host",     // host_prefix
@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
              
             done:;
         } else {
-            fputs("\033[31m\033[1mERROR\033[0m: --logo srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
 
@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
             }
         }
         else {
-            fputs("\033[31m\033[1mERROR\033[0m: --color srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --color requires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
@@ -264,14 +264,14 @@ int main(int argc, char **argv) {
             }
         }
         else {
-            fputs("\033[31m\033[1mERROR\033[0m: --bold srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --bold requires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
 
     // was it really that hard to type 'albafetch -h'?
     if(user_is_an_idiot) {
-        fputs("\033[31m\033[1mFATAL\033[0m: One or multiple errors occured! Use --help for more info\n", stderr);
+        fputs("\033[31m\033[1mFATAL\033[0m: One or multiple errors occurred! Use --help for more info\n", stderr);
 
         destroy_array(modules);
         return 1;
@@ -302,7 +302,7 @@ int main(int argc, char **argv) {
                "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
                config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
-        printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Alignes the infos if set (default: %s)\n"
+        printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Aligns the infos if set (default: %s)\n"
                "\t\t\t   [on, off]\n", config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", align ? "on" : "off");
 
         printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
@@ -330,12 +330,12 @@ int main(int argc, char **argv) {
             }
         }
         else {
-            fputs("\033[31m\033[1mERROR\033[0m: --align srequires an extra argument!\n", stderr);
+            fputs("\033[31m\033[1mERROR\033[0m: --align requires an extra argument!\n", stderr);
             user_is_an_idiot = true;
         }
     }
 
-    // I am deeply sorry for the code you're about to see - I hope you like spaghettis
+    // I am deeply sorry for the code you're about to see - I hope you like spaghetti
     unsigned line = 2;
     char *data = mem + 1536;
     char *printed = mem+512;
@@ -364,7 +364,7 @@ int main(int argc, char **argv) {
         {"kernel", config.kernel_prefix, kernel},
         {"desktop", config.desktop_prefix, desktop},
         {"shell", config.shell_prefix, shell},
-        {"login_shell", config.login_shell_prefixix, login_shell},
+        {"login_shell", config.login_shell_prefix, login_shell},
         {"term", config.term_prefix, term},
         {"packages", config.pkg_prefix, packages},
         {"host", config.host_prefix, host},

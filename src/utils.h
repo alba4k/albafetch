@@ -56,7 +56,7 @@ struct Config {
     char kernel_prefix[64];
     char desktop_prefix[64];
     char shell_prefix[64];
-    char login_shell_prefixix[64];
+    char login_shell_prefix[64];
     char term_prefix[64];
     char pkg_prefix[64];
     char host_prefix[64];
@@ -98,7 +98,7 @@ extern struct Config config;
 #define loc_docker      config.options & 0x400000
 #define pwd_path        config.options & 0x800000
 
-// begginning a decent linked list implementation for the modules lmao
+// beginning a decent linked list implementation for the modules OMMMOMMM
 struct Module {
     char *id;               // module identifier
     char *label;            // module label

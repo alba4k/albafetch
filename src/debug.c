@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "info.h"
 #include "utils.h"
@@ -46,6 +47,7 @@ int main() {
     config.col_block_len = 3;
     strcpy(config.date_format, "%02d/%02d/%d %02d:%02d:%02d");
 
+    clock_t start = clock();
     for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
         if(!(return_value = arr[i](mem)))
             printf("%s\n", mem);
@@ -54,8 +56,9 @@ int main() {
             ++errors;
         }
     }
+    clock_t end = clock();
 
-    printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m\n", errors);
+    printf("\n\033[1mDebug run finished with a total of %u errors. [Took %f ms]\033[0m\n", errors, (double)(end-start)/CLOCKS_PER_SEC*1000);
 
     return 0;
 }
