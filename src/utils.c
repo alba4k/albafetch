@@ -23,7 +23,7 @@ void add_module(struct Module *array, char *id) {
     new->next = NULL;
 }
 
-// destroy array
+// free every module in array
 void destroy_array(struct Module *array) {
     struct Module *current = array;
     struct Module *next;

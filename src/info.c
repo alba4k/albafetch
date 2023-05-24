@@ -111,7 +111,7 @@ int uptime(char *dest) {
     return 0;
 }
 
-// print the operating system name and architechture (uname -m)
+// print the operating system name and architecture (uname -m)
 int os(char *dest) {
     struct utsname name;
     uname(&name);
@@ -190,7 +190,7 @@ int kernel(char *dest) {
     return 0;
 }
 
-// get the current desktop environnment
+// get the current desktop environment
 int desktop(char *dest) {
     #ifdef __APPLE__
         strcpy(dest, "Aqua");
@@ -502,9 +502,7 @@ int packages(char *dest) {
         }
     }
 
-    if(done)
-        return 0;
-    return 1;
+    return !done;
 }
 
 // get the machine name and eventually model version
@@ -956,7 +954,7 @@ int memory(char *dest) {
             return 1;
 
         char buf[256];
-        char *cachedram = buf; 
+        char *cachedram = buf;
 
         read_after_sequence(fp, "Cached:", buf, 256);
         fclose(fp);
@@ -1065,9 +1063,11 @@ int local_ip(char *dest) {
     while(addrs) {
         // checking if the ip is valid
        if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
+            // filtering out docker or localhost ips
             if((strcmp(addrs->ifa_name, "lo") || loc_localhost) && (strcmp(addrs->ifa_name, "docker0") || loc_docker)) {
                 struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
                 
+                // saving it to the list of interfaces
                 snprintf(dest, buf_size, "%s%s (%s)", done ? ", " : "", inet_ntoa(pAddr->sin_addr), addrs->ifa_name);
                 dest += strlen(dest);
                 buf_size -= strlen(dest);
@@ -1079,9 +1079,8 @@ int local_ip(char *dest) {
     }
 
     freeifaddrs(addrs);
-    if(done)
-        return 0;
-    return 1;
+    
+    return !done;
 }
 
 // get the current working directory

@@ -99,19 +99,8 @@ int main(int argc, char **argv) {
      * 15 
      */
 
-    // the config that's normally used is ~/.config/albafetch.conf
+    // the default config file is ~/.config/albafetch.conf
     char config_file[LOGIN_NAME_MAX + 32] = "";
-
-    char *home = getenv("HOME");
-    // I really hope this part will never run
-    if(!home) {
-        fputs("\033[31m\033[1mERROR\033[0m: $HOME is not set, interrupting!\n", stderr);
-        return -1;
-    }
-    if(!home[0]) {
-        fputs("\033[31m\033[1mERROR\033[0m: $HOME is empty, interrupting!\n", stderr);
-        return -1;
-    }
 
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
@@ -147,44 +136,43 @@ int main(int argc, char **argv) {
     modules->id = NULL;
     modules->next = NULL;
 
-    if(use_config) {
-        if(!config_file[0]) {
+    if(use_config) {    // --no-config was not used
+        if(!config_file[0]) {   // --config was not used, using the default path
+            char *home = getenv("HOME");
             char *config_home = getenv("XDG_CONFIG_HOME");
-            if(config_home) { // is XDG_CONFIG_HOME set?
-                if(config_home[0]) // is XDG_CONFIG_HOME empty?
-                    snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
-                else
-                    snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
-            }
-            else
+
+            if(config_home) // is XDG_CONFIG_HOME set?
+                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+            else if(home)   // is HOME set?
                 snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
+            else    // WHY TF WOULD HOME NOT BE SET???
+                return -1;
         }
 
         parse_config(config_file, modules, &default_bold, default_color, default_logo);
     }
 
-    if(asking_logo) {
+    if(asking_logo) {   // --logo was used
+        bool found = false;
         if(asking_logo < argc) {
+            // find the matching logo
             for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], argv[asking_logo])) {
                     config.logo = (char**)logos[i];
-                    goto done;
+                    found = true;
+                    break;
                 }
 
             fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
-            user_is_an_idiot = true;
-            
-            // Don't like gotos? Well I like them.0
-             
-            done:;
-        } else {
+        } else
             fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
-            user_is_an_idiot = true;
-        }
 
-        strcpy(config.color, config.logo[1]);
+        if(found)
+            strcpy(config.color, config.logo[1]);
+        else
+            user_is_an_idiot = true;
     }
-    if(!config.logo) {
+    if(!config.logo) {  // get a logo based on the OS (--logo was not used and no logo was set by the config)
         #ifdef __APPLE__
             config.logo = (char**)logos[1];
         #else
@@ -208,9 +196,12 @@ int main(int argc, char **argv) {
                 if(end)
                     *end = 0;
 
+                // find the matching logo
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
-                    if(!strcmp(logos[i][0], os_id))
+                    if(!strcmp(logos[i][0], os_id)) {
                         config.logo = (char**)logos[i];
+                        break;
+                    }
             }
         # endif // __ANDROID__
         #endif // __APPLE__
@@ -233,51 +224,57 @@ int main(int argc, char **argv) {
                 {"white", "\033[37m"},
             };
 
-            bool done = false;
             for(int j = 0; j < 9; ++j)
                 if(!strcmp(argv[asking_color], *colors[j])) {
                     strcpy(config.color, colors[j][1]);
-                    done = true;
+                    goto color_done;
                 }
 
-            if(!done) {
-                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
-                user_is_an_idiot = true;
-            }
+            fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
         }
-        else {
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --color requires an extra argument!\n", stderr);
-            user_is_an_idiot = true;
-        }
+
+        user_is_an_idiot = true;
+
+        color_done:;
     }
 
     if(asking_bold) {
         if(asking_bold < argc) {
             // modifying the 2nd least significant bit of options
-            if(!strcmp(argv[asking_bold], "on"))
+            if(!strcmp(argv[asking_bold], "on")) {
                 config.options |= ((uint64_t)1 << 1);
-            else if(!strcmp(argv[asking_bold], "off"))
-                config.options &= ~((uint64_t)1 << 1);
-            else {
-                fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
-                user_is_an_idiot = true;
+                goto bold_done;
             }
+            else if(!strcmp(argv[asking_bold], "off")) {
+                config.options &= ~((uint64_t)1 << 1);
+                goto bold_done;
+            }
+
+            fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
         }
-        else {
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --bold requires an extra argument!\n", stderr);
-            user_is_an_idiot = true;
-        }
+
+        user_is_an_idiot = true;
+
+        bold_done:;
     }
 
     // was it really that hard to type 'albafetch -h'?
     if(user_is_an_idiot) {
+        destroy_array(modules);
+
         fputs("\033[31m\033[1mFATAL\033[0m: One or multiple errors occurred! Use --help for more info\n", stderr);
 
-        destroy_array(modules);
         return 1;
     }
 
     if(asking_help) {
+        // it won't be used anyway lol
+        destroy_array(modules);
+
         printf("%s%salbafetch\033[0m - a system fetch utility\n",
                config.color, bold ? "\033[1m" : "");
 
@@ -314,25 +311,28 @@ int main(int argc, char **argv) {
         printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
                config.color, bold ? "\033[1m" : "");
 
-        destroy_array(modules);
         return 0;
     }
 
     if(asking_align) {
         if(asking_align < argc) {
-            if(!strcmp(argv[asking_align], "on"))
+            if(!strcmp(argv[asking_align], "on")) {
                 config.options |= (uint64_t)1;
-            else if(!strcmp(argv[asking_align], "off"))
-                config.options &= ~((uint64_t)1);
-            else {
-                fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
-                user_is_an_idiot = true;
+                goto align_done;
             }
+            else if(!strcmp(argv[asking_align], "off")) {
+                config.options &= ~((uint64_t)1);
+                goto align_done;
+            }
+
+            fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
         }
-        else {
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --align requires an extra argument!\n", stderr);
-            user_is_an_idiot = true;
-        }
+
+        user_is_an_idiot = true;
+
+        align_done:;
     }
 
     // I am deeply sorry for the code you're about to see - I hope you like spaghetti
@@ -341,6 +341,12 @@ int main(int argc, char **argv) {
     char *printed = mem+512;
     char format[32] = "%s\033[0m%s";
 
+    /* getting the terminal width
+     * I start by using stdout
+     * if it is not a terminal (e.g. if the user did albafetch | lolcat) I use stderr
+     * if stderr doesn't work either, I use stdin (albafetch 2>/dev/null | lolcat)"
+     * now, let's assume the user is a complete moron and redirects everything. Then I just use an "infinite" width
+     */
     struct winsize w;
     if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1)
         if(ioctl(STDERR_FILENO, TIOCGWINSZ, &w) == -1)
@@ -408,6 +414,7 @@ int main(int argc, char **argv) {
     }
 
     // filling in the linked list (with function pointers and labels) based on the ids
+    // I prefer doing it here than in add_module as this part only runs when it's needed
     for(struct Module *current = modules->next; current; current = current->next)
         for(size_t i = 0; i < sizeof(module_table)/sizeof(module_table[0]); ++i)
             if(!strcmp(module_table[i].id, current->id)) {
@@ -419,6 +426,7 @@ int main(int argc, char **argv) {
         int current_len;
         asking_align = 0;
 
+        // determining how far the text should be aligned
         for(struct Module *current = modules->next; current; current = current->next) {
             current_len = strlen_real(current->label);
 
@@ -431,11 +439,13 @@ int main(int argc, char **argv) {
         snprintf(format, 32, "%%-%ds\033[0m%%s", asking_align);
     }
     
+    // printing every module
     for(struct Module *current = modules->next; current; current = current->next) {
-        if(!strcmp(current->id, "separator")) {    // separators don't call a function
+        if(!strcmp(current->id, "separator")) {    // separators are handled differently
             if(!(printed[0]) || strlen(printed) > 767)
                 continue;
 
+            // this is the length of the previous printed text
             size_t len = (strlen_real(printed
                                      + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
                                      + config.spacing
@@ -455,7 +465,7 @@ int main(int argc, char **argv) {
             for(size_t i = 0; i < len && strlen(printed) < 767 - strlen(config.separator); ++i)
                 strcat(printed, config.separator);
         }
-        else if(!strcmp(current->id, "space")) {  // spacings don't call a function
+        else if(!strcmp(current->id, "space")) {  // spacings are handled differently (they don't do shit)
             printed[0] = 0;
 
             get_logo_line(printed, &line);
@@ -466,7 +476,7 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strcat(printed, current->label);
         }
-        else if(!strcmp(current->id, "title")) {    // titles don't call a function
+        else if(!strcmp(current->id, "title")) {    // titles are handled differently
             char name[256];
             char host[256];
 
@@ -509,7 +519,6 @@ int main(int argc, char **argv) {
                 continue;
 
             char label[80];
-
             printed[0] = 0;
 
             get_logo_line(printed, &line);
