@@ -10,9 +10,7 @@
 #include "queue.h"
 
 /* TODO:
- * --ascii for custom ascii art (conflicts with --logo) - work in progress
- * more config options
- * print shell and terminal options
+ * print de, shell and terminal versions
  * print kernel type (e.g. "Kernel: 6.3.2 (zen)") when using kernel_short
  * Windows support? *BSD support?
  */
@@ -77,30 +75,10 @@ int main(int argc, char **argv) {
     char default_color[8] = "";
     char default_logo[16] = "";
 
-    char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
-        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    memset(mem, 0, 4096);
-    /* this chunk is divided as following (one line is 256B):
-     * 0  
-     * 1   
-     * 2  printed       (saves what should get printed, used for parsing)
-     * 3  printed
-     * 4  printed
-     * 5  
-     * 6  data          (buffer for every function in info.c)
-     * 7  
-     * 8  logo          (32 char* to lines (following logo.h)) (WIP)
-     * 9  
-     * 10 
-     * 11 
-     * 12 
-     * 13 
-     * 14 
-     * 15 
-     */
-
     // the default config file is ~/.config/albafetch.conf
     char config_file[LOGIN_NAME_MAX + 32] = "";
+    // path of a custom ascii art
+    char *ascii_file = NULL;
 
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
@@ -110,11 +88,7 @@ int main(int argc, char **argv) {
             asking_color = i+1;
         else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold"))
             asking_bold = i+1;
-        else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo"))
-            asking_logo = i+1;
-        else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
-            asking_align = i+1;
-        else if(!strcmp(argv[i], "--config")) {
+        else if(!strcmp(argv[i], "--ascii")) {
             if(i+1 >= argc || use_config == false) {   // is there such an arg?
                 fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
@@ -125,13 +99,50 @@ int main(int argc, char **argv) {
                 user_is_an_idiot = true;
                 continue;
             }
-            strcpy(config_file, argv[i+1]);
+            ascii_file = argv[i+1];
+            continue;
+        }
+        else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo"))
+            asking_logo = i+1;
+        else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
+            asking_align = i+1;
+        else if(!strcmp(argv[i], "--config") && use_config) {
+            if(i+1 >= argc || use_config == false) {   // is there such an arg?
+                fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
+                user_is_an_idiot = true;
+                continue;
+            }
+            else if(access(argv[i+1], F_OK)) {  // is it a valid file?
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid file \"%s\"! Use --help for more info\n", argv[i+1]);
+                user_is_an_idiot = true;
+                continue;
+            }
+            strncpy(config_file, argv[i+1], sizeof(config_file)-1);
             continue;
         }
         else if(!strcmp(argv[i], "--no-config"))
             use_config = false;
     }
 
+    char *mem = mmap(NULL, 8192, PROT_READ | PROT_WRITE,
+        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    memset(mem, 0, 8192);
+    /* this chunk is divided as following (every line represents 256B):
+     * 0  
+     * 1  
+     * 2  printed       (what should get printed, used for parsing)
+     * 3  printed
+     * 4  printed
+     * 5  
+     * 6  data          (buffer for every function in info.c)
+     * 7  
+     * 8  logo          (when using a custom ascii, used to store
+     * 10 logo           some logo metadata (id, color, length)
+     * 11 logo           and the lines of the logo).
+     * .. logo
+     * 31 logo
+     */
+    
     struct Module *modules = malloc(sizeof(struct Module));
     modules->id = NULL;
     modules->next = NULL;
@@ -142,15 +153,19 @@ int main(int argc, char **argv) {
             char *config_home = getenv("XDG_CONFIG_HOME");
 
             if(config_home) // is XDG_CONFIG_HOME set?
-                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/albafetch.conf", config_home);
+                snprintf(config_file, sizeof(config_file), "%s/albafetch.conf", config_home);
             else if(home)   // is HOME set?
-                snprintf(config_file, LOGIN_NAME_MAX + 32, "%s/.config/albafetch.conf", home);
+                snprintf(config_file, sizeof(config_file), "%s/.config/albafetch.conf", home);
             else    // WHY TF WOULD HOME NOT BE SET???
                 return -1;
         }
 
-        parse_config(config_file, modules, &default_bold, default_color, default_logo);
+        parse_config(config_file, modules, mem, &default_bold, default_color, default_logo);
     }
+
+    //char *logo[68];
+    if(ascii_file)
+        file_to_logo(ascii_file, mem + 2048);
 
     if(asking_logo) {   // --logo was used
         bool found = false;
@@ -160,10 +175,10 @@ int main(int argc, char **argv) {
                 if(!strcmp(logos[i][0], argv[asking_logo])) {
                     config.logo = (char**)logos[i];
                     found = true;
-                    break;
                 }
 
-            fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
+            if(!found)
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
         } else
             fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
 
@@ -298,6 +313,9 @@ int main(int argc, char **argv) {
                "\t\t\t   [android, apple, arch, arch_small, debian, endeavouros, fedora]\n"
                "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
                config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
+
+        printf("\t%s%s--ascii\033[0m:\t Specifies a file containing a custom ascii art to use as logo (default: none)\n"
+               "\t\t\t   [path]\n", config.color, bold ? "\033[1m" : "");
 
         printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Aligns the infos if set (default: %s)\n"
                "\t\t\t   [on, off]\n", config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", align ? "on" : "off");
@@ -490,7 +508,6 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
 
-            strcat(printed, config.color);
             strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",

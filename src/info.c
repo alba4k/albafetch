@@ -676,8 +676,8 @@ int cpu(char *dest) {
     if(cpu_count) {
         end = cpu_info;
         while((end = strstr(end, "processor"))) {
-            count += 1;
-            end += 1;
+            ++count;
+            ++end;
         }
     }
 
@@ -711,7 +711,7 @@ int cpu(char *dest) {
      * - /sys/devices/system/cpu/cpu0/cpufreq/base_frequency
      */
     // Printing the clock frequency the first thread is currently running at
-    end += 1;
+    ++end;
     char *frequency = strstr(end, "cpu MHz");
     if(frequency && cpu_freq) {
         frequency = strchr(frequency, ':');
@@ -769,7 +769,7 @@ int cpu(char *dest) {
     }
     // final cleanup ("Intel Core i5         650" lol)
     while((end = strstr(dest, "  ")))
-        memmove(end, end+1, strlen(end+1)+1);
+        memmove(end, end+1, strlen(end));
 
     return 0;
 }

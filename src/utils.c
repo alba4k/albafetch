@@ -4,6 +4,92 @@
 #include "logos.h"
 #include "utils.h"
 
+// copy an ascii art from file to mem
+int file_to_logo(char *file, char *mem) {
+    FILE *fp = fopen(file, "r");
+    if(!fp)
+        return 1;
+
+    static char *logo[49];
+
+    char *buffer = NULL;
+    size_t len = 0;
+    size_t line_len;
+    int i = 1;
+
+    // setting the correct color (or eventually the first line)
+    if((line_len = getline(&buffer, &len, fp)) != (size_t)-1) {
+        if(buffer[line_len-1] == '\n')
+            buffer[line_len-1] = 0;
+
+        unescape(buffer);
+
+        config.color[0] = 0;
+
+        char *colors[9][2] = {
+            {"black", "\033[30m"},
+            {"red", "\033[31m"},
+            {"green", "\033[32m"},
+            {"yellow", "\033[33m"},
+            {"blue", "\033[34m"},
+            {"purple", "\033[35m"},
+            {"cyan", "\033[36m"},
+            {"gray", "\033[90m"},
+            {"white", "\033[37m"},
+        };
+
+        for(int j = 0; j < 9; ++j)
+            if(!strcmp(buffer, *colors[j])) {
+                strcpy(config.color, colors[j][1]);
+            }
+            
+        if(!config.color[0]) {
+            logo[i+2] = mem + i*128;
+            buffer[127] = 0;    // just using strncpy causes problems so yk
+            strcpy(logo[i+2], buffer);
+
+            ++i;
+        }
+    }
+    else
+        return 1;
+
+    // for every remaining line of the logo...
+    while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < 48) {
+        if(buffer[line_len-1] == '\n')
+            buffer[line_len-1] = 0;
+
+        unescape(buffer);
+
+        logo[i+2] = mem + i*128;
+        buffer[127] = 0;    // just using strncpy causes problems so yk
+        strcpy(logo[i+2], buffer);
+
+        ++i;
+    }
+
+    // cleaning up
+    fclose(fp);
+    free(buffer);
+
+    // set up the logo metadata;
+    logo[0] = "custom"; // logo ID
+    logo[2] = mem;
+    size_t j;
+    for(j = 0; j < strlen_real(logo[3]); ++j) {   // line length
+        mem[j] = ' ';
+    }
+    mem[j+1] = 0;
+    
+    // the array of lines is NULL-terminated;
+    logo[i+2] = NULL;
+
+    // finally, the logo can be saved
+    config.logo = logo;
+
+    return 0;
+}
+
 // add a module containing id to array
 void add_module(struct Module *array, char *id) {
     struct Module *new = malloc(sizeof(struct Module));
@@ -40,9 +126,9 @@ void destroy_array(struct Module *array) {
 void get_logo_line(char *dest, unsigned *line) {
     if(!config.logo || !dest || *line < 2)
         return;
-
+        
     if(config.logo[(*line)+1]) {
-        *line += 1;
+        ++(*line);
         strcat(dest, config.logo[*line]);
     }
     else
@@ -204,8 +290,8 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
     return 0;
 }
 
-// parse the provided config file.
-void parse_config(const char *file, struct Module *modules, bool *default_bold, char *default_color, char *default_logo) {
+// parse the provided config file
+void parse_config(const char *file, struct Module *modules, char *mem, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
     if(!fp)
@@ -231,7 +317,7 @@ void parse_config(const char *file, struct Module *modules, bool *default_bold, 
             break;
         }
 
-        memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
+        memmove(ptr, ptr2+1, strlen(ptr2));
     }
     ptr = conf;
     while((ptr = strchr(ptr, '#'))) {
@@ -242,10 +328,17 @@ void parse_config(const char *file, struct Module *modules, bool *default_bold, 
             break;
         }
 
-        memmove(ptr, ptr2+1, strlen(ptr2+1)+1);
+        memmove(ptr, ptr2+1, strlen(ptr2));
     }
 
     // GENERAL OPTIONS
+
+    // ascii art
+    char path[96] = "";
+    parse_config_str(conf, "ascii_art", path, sizeof(path));
+    if(path[0])
+        file_to_logo(path, mem + 2048);
+    
     // logo
     char logo[32] = "";
     parse_config_str(conf, "logo", logo, sizeof(logo));
@@ -436,23 +529,7 @@ void unescape(char *str) {
     }
 }
 
-// stuff needed for libcurl
-size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-    size_t realsize = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
-
-    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
-    if(ptr == NULL)
-        return 0;
-
-    mem->memory = ptr;
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-
-    return realsize;
-}
-
+// get the printed length of a string (not how big it is in memory)
 size_t strlen_real(const char *str) {
     if(str == NULL)
         return 0;
@@ -484,4 +561,21 @@ size_t strlen_real(const char *str) {
     }
 
     return len;
+}
+
+// stuff needed for libcurl
+size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    size_t realsize = size * nmemb;
+    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+
+    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
+    if(ptr == NULL)
+        return 0;
+
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
 }

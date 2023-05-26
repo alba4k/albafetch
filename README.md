@@ -11,6 +11,9 @@ Here is a time comparison (exact execution times change between machines and run
 
 You will find a lot of useful usage and configuration related info inside of the [user manual](MANUAL.md) and a small list of the things I changed since the last release in the [changelog](CHANGELOG.md).
 
+It currently supports a lot of GNU/Linux distributions, macOS (both x64 and arm64 macs) and even Android (only tested in Termux).
+Feel free to test any other platform :)
+
 ## Table of contents
 1. [Dependencies](#dependencies)
 	* [For building](#build-dependencies)

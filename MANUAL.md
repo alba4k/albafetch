@@ -33,6 +33,21 @@ There are three different types of data that will be parsed:
 All of this means that `AB"CboldDEF"whatever lol"wo"w` will be parsed the exact same way as `bold = "true",` or `bold""`, but I would not recommend this as it makes everything less readable. I might also stop supporting this at any moment, so the specified syntax is the only one that's guaranteed to work.
 I might also make the parser stricter in the future and configs written this way might stop working entirely.
 
+A specific option that's worth spending some extra time talking about is `ascii_art`. This option expects the path to a file that contains a custom logo. Its syntax is really straight-forward: You can specify up to 47 lines you want to use as logo (which can not be longer than 128 bytes long, including the closing null character. Note that Unicode characters will be bigger than 1B), and eventually a color on the first line. Anything that's not recognized as a color ("colors" are defined as black, red, green, yellow, blue, purple, cyan, gray or white) Will be considered the first line of the logo.
+
+This is what a logo file could look like:
+```
+blue
+first_line 
+second_line
+third_line 
+fourth_line
+```
+
+This file should **not** end with an empty line, and every logo line should be equally long (you can achieve this simply by adding spaces at the end of the shorter lines), or albafetch will have alignment problems. There is no way to add comments in this file, everything will be used as it is written (except some escape sequences, more about this further down).
+
+You can find an example logo file in this repository, more specifically [example_logo.txt](example_logo.txt).
+
 The config can also contain an ordered array of the modules that you want albafetch to print. The array has a vastly different syntax in the config, as shown here:
 ```
 modules = {
@@ -49,6 +64,14 @@ As for normal options, this allows some weird formats, like `modules{"module1""m
 Anything that doesn't match what the parser is looking for will be ignored, but the usage of explicit comments is encouraged:
 Anything between a `;` or a `#` and the end of the line will not be read as part of the config. There is currently no way to use multi-line comments.
 
+When albafetch parses a file (config or custom ascii art), it will also automatically unescape some escape sequences, like the following table shows:
+| File content | How it will be parsed |
+| ---          | ---                   |
+| "\\\\"       | "\\"                  |
+| "\\e"        | "\\033" (ANSI escape) |
+| "\\033"      | "\\033" (ANSI escape) |
+| "\\n"        | "\\n" (new line)      |
+
 # Command-line arguments
 albafetch accepts a few command line arguments, which can be used to override certain values set in the config file.
 
@@ -60,6 +83,7 @@ Here they are:
 * `--bold` (or `-b`): followed by a boolean "on" or "off", this option overrides the config `bold` entry and enables or disables the usage of bold in the output.
 * `--logo` (or `-l`): This option, followed by the logo you want to print, overrides the config `logo` entry and makes albafetch print a custom logo instead of the default one.
 * `--align` (or `-a`): followed by a boolean "on" or "off", this option overrides the config `align_infos` entry and enables of disables the alignment of the infos in the printed output.
+* `--ascii`: followed by a valid file path, it lets you pick a file containing a custom ascii art that you'd like to use. When this option is used together with `--logo`, the latter has priority.
 * `--config`: followed by a valid file path, this changes the config file that will be parsed to look for a valid configuration.
 * `--no-config`: Using this will prevent any config file (provided using `--config` or the default one) from being used.
 
@@ -68,7 +92,7 @@ Here they are:
 | ---           | ---                   |
 | 0             | Correct execution     |
 | 1             | Bad argument usage    |
-| -1            | Bad environment      |
+| -1            | Bad environment       |
 
 ## Return code 0
 As you probably already know, this is not an error, but it simply indicates that everything executed correctly. No need to worry.

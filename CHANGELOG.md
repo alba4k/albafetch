@@ -2,11 +2,13 @@
 
 ### Config options
 * `modules`: Module array that specifies which modules should be printed
+* `ascii_art`: Path to a file containing a custom logo (and color)
 * `date_format`: Specifies how the date should be formatted
 * `term_ssh`: prints `(SSH)` after the terminal name when running inside of an SSH connection
 * renamed `loc_localdomain` to `loc_localhost`
 
 ### Command line arguments
+* `--ascii`: Path to a file containing a custom logo (and color)
 * `--no-config`: Ignores any provided or existing config file
 
 

@@ -3,6 +3,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define _GNU_SOURCE
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -98,7 +100,7 @@ extern struct Config config;
 #define loc_docker      config.options & 0x400000
 #define pwd_path        config.options & 0x800000
 
-// beginning a decent linked list implementation for the modules OMMMOMMM
+// element of a module linked list
 struct Module {
     char *id;               // module identifier
     char *label;            // module label
@@ -106,26 +108,27 @@ struct Module {
     struct Module *next;    // next module
 };
 
+int file_to_logo(char *file, char *mem);
+
 void add_module(struct Module *array, char *id);
 
 void destroy_array(struct Module *array);
-
-// needed for libcurl
-struct MemoryStruct {
-    char *memory;
-    size_t size;
-};
 
 void get_logo_line(char *dest, unsigned *line);
 
 void print_line(char *line, const size_t maxlen);
 
-void parse_config(const char *file, struct Module *modules, bool *default_bold, char *default_color, char *default_logo);
+void parse_config(const char *file, struct Module *modules, char *chunk, bool *default_bold, char *default_color, char *default_logo);
 
 void unescape(char *str);
 
-size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
-
 size_t strlen_real(const char *str);
+
+// libcurl stuff
+struct MemoryStruct {
+    char *memory;
+    size_t size;
+};
+size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 #endif // UTILS_H
