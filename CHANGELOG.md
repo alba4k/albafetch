@@ -17,6 +17,7 @@
 ### Noticeable fixes
 * Fixed a bug where the separators would print of the wrong length because of logo escape sequences parsed incorrectly
 * Fixed `loc_localhost` (used to be `loc_localdomain`) and `loc_docker` not working
+* Title no longer uses bold when `title_color` is set to false
 
 ### Technical fixes
 * The memory module can now print in up to 256B (was 200B because of 55 reserved for the percentage)

@@ -17,6 +17,8 @@ A complete configuration file with comments can be found as [`albafetch.conf`](a
 ## Which file is used?
 Albafetch supports a series of configuration options that can be placed inside of a configuration file located in `$XDG_CONFIG_HOME/albafetch.conf` (`~/.config/albafetch.conf` is parsed if `XDG_CONFIG_HOME` is not set).
 
+Alternatively, if this file is not found, albafetch will look for `XDG_CONFIG_HOME/albafetch/albafetch.conf` (or `~/.config/albafetch/albafetch.conf`). This can be useful if you want to keep multiple configurations in the same folder.
+
 A custom file might be specified using the `--config` argument.
 
 ## Syntax

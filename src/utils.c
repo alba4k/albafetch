@@ -171,16 +171,16 @@ void print_line(char *line, const size_t maxlen) {
                 // ++len <=> escaping == 0
                 len += 1-escaping;
 
-                /* m is found and escaping => escaping = 0
-                 * m is found and not escaping => escaping = 0
-                 * m is not found and escaping => escaping = 1
-                 * m is found and not escaping => escaping = 0
+                /* m is found     and escaping     => escaping = 0
+                 * m is found     and not escaping => escaping = 0
+                 * m is not found and escaping     => escaping = 1
+                 * m is not found and not escaping => escaping = 0
                  */
                 escaping = (line[i] != 'm') && escaping;
             }
         }
 
-    fputs("\n\033[0m", stdout);
+    fputs("\033[0m\n", stdout);
 }
 
 // a return code of 0 means that the option was parsed successfully

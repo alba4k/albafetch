@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     char default_logo[16] = "";
 
     // the default config file is ~/.config/albafetch.conf
-    char config_file[LOGIN_NAME_MAX + 32] = "";
+    char config_file[LOGIN_NAME_MAX + 64] = "";
     // path of a custom ascii art
     char *ascii_file = NULL;
 
@@ -147,15 +147,23 @@ int main(int argc, char **argv) {
     modules->id = NULL;
     modules->next = NULL;
 
+    // albafetch will first parse ~/.config/albafetch.conf
+    // ~/.config/albafetch/albafetch.conf if the former is not found
     if(use_config) {    // --no-config was not used
         if(!config_file[0]) {   // --config was not used, using the default path
             char *home = getenv("HOME");
             char *config_home = getenv("XDG_CONFIG_HOME");
 
-            if(config_home) // is XDG_CONFIG_HOME set?
+            if(config_home) { // is XDG_CONFIG_HOME set?
                 snprintf(config_file, sizeof(config_file), "%s/albafetch.conf", config_home);
-            else if(home)   // is HOME set?
+                if(access(config_file, F_OK))
+                    snprintf(config_file, sizeof(config_file), "%s/albafetch/albafetch.conf", config_home);
+            }
+            else if(home) {  // is HOME set?
                 snprintf(config_file, sizeof(config_file), "%s/.config/albafetch.conf", home);
+                if(access(config_file, F_OK))
+                    snprintf(config_file, sizeof(config_file), "%s/.config/albafetch/albafetch.conf", home);
+            }
             else    // WHY TF WOULD HOME NOT BE SET???
                 return -1;
         }
@@ -508,6 +516,7 @@ int main(int argc, char **argv) {
             for(int i = 0; i < config.spacing; ++i)
                 strcat(printed, " ");
 
+            strcat(printed, config.color);
             strcat(printed, current->label);
 
             snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
@@ -519,6 +528,22 @@ int main(int argc, char **argv) {
                                      title_color ? config.color : "",
                                      host
             );
+            if(title_color)
+                snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
+                    config.color,
+                    bold ? "\033[1m" : "",
+                    name,
+                    "\033[0m",
+                    bold ? "\033[1m" : "",
+                    config.color,
+                    host
+                );
+            else
+                snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s@%s",
+                    "\033[0m",
+                    name,
+                    host
+                );
         }
         else if(current->func == NULL) {            // printing a custom text
             printed[0] = 0;
