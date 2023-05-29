@@ -519,15 +519,6 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strcat(printed, current->label);
 
-            snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
-                                     title_color ? config.color : "\033[0m",
-                                     bold ? "\033[1m" : "",
-                                     name,
-                                     title_color ? "\033[0m" : "",
-                                     bold ? "\033[1m" : "",
-                                     title_color ? config.color : "",
-                                     host
-            );
             if(title_color)
                 snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
                     config.color,
