@@ -179,13 +179,22 @@ int os(char *dest) {
 int kernel(char *dest) {
     struct utsname name;
     uname(&name);
-
-    if(kernel_short) {
-        char *ptr = strchr(name.release, '-');
-        *ptr = 0;
+    char *ptr = name.release, *type = NULL;
+    
+    if(kernel_type) {
+        while((ptr = strchr(ptr, '-')))
+            type = ++ptr;
     }
 
-    strncpy(dest, name.release, 256);
+    if(kernel_short) {
+        if((ptr = strchr(name.release, '-')))
+            *ptr = 0;
+    }
+
+    if(kernel_type && type)
+        snprintf(dest, 256, "%s (%s)", name.release, type);
+    else
+        strncpy(dest, name.release, 256);
 
     return 0;
 }

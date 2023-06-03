@@ -5,6 +5,7 @@
 * `ascii_art`: Path to a file containing a custom logo (and color)
 * `date_format`: Specifies how the date should be formatted
 * `term_ssh`: prints `(SSH)` after the terminal name when running inside of an SSH connection
+* `kernel_type`: prints the kernel type in brackets (e.g. `(zen)`)
 * renamed `loc_localdomain` to `loc_localhost`
 
 ### Command line arguments

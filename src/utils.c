@@ -408,7 +408,8 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
         "mem_perc",
         "loc_localhost",
         "loc_docker",
-        "pwd_path"
+        "pwd_path",
+        "kernel_type",
     };
 
     bool buffer;

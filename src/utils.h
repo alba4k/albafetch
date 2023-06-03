@@ -80,6 +80,7 @@ extern struct Config config;
 #define title_color     config.options & 0x4
 #define os_arch         config.options & 0x8
 #define kernel_short    config.options & 0x10
+#define kernel_type     config.options & 0x1000000
 #define de_type         config.options & 0x20
 #define shell_path      config.options & 0x40
 #define term_ssh        config.options & 0x80
@@ -96,7 +97,7 @@ extern struct Config config;
 #define cpu_count       config.options & 0x40000
 #define gpu_brand       config.options & 0x80000
 #define mem_perc        config.options & 0x100000
-#define loc_localhost config.options & 0x200000
+#define loc_localhost   config.options & 0x200000
 #define loc_docker      config.options & 0x400000
 #define pwd_path        config.options & 0x800000
 

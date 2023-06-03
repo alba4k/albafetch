@@ -11,7 +11,6 @@
 
 /* TODO:
  * print de, shell and terminal versions
- * print kernel type (e.g. "Kernel: 6.3.2 (zen)") when using kernel_short
  * Windows support? *BSD support?
  */
 
