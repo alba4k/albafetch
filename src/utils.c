@@ -26,7 +26,7 @@ int file_to_logo(char *file, char *mem) {
 
         config.color[0] = 0;
 
-        char *colors[9][2] = {
+        char *colors[][2] = {
             {"black", "\033[30m"},
             {"red", "\033[31m"},
             {"green", "\033[32m"},
@@ -220,7 +220,7 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 }
 
 // a return code of 0 means that the option was parsed successfully
-int parse_config_int(const char *source, const char *field, int *dest, const int max) {
+int parse_config_int(const char *source, const char *field, int *dest, const unsigned max) {
     char *ptr;
     char *end;
 
@@ -249,7 +249,7 @@ int parse_config_int(const char *source, const char *field, int *dest, const int
     int num = atoi(ptr);
     *end = '"';
 
-    if((unsigned)num > (unsigned)max)
+    if((unsigned)num > max)
         return 1;
 
     *dest =  num;
@@ -355,7 +355,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     char color[16] = "";
     parse_config_str(conf, "default_color", color, sizeof(color));
     if(color[0]) {
-        char *colors[9][2] = {
+        char *colors[][2] = {
             {"black", "\033[30m"},
             {"red", "\033[31m"},
             {"green", "\033[32m"},
@@ -424,6 +424,8 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     *default_bold = bold;
 
     // OTHER MODULE-RELATED OPTIONS
+
+    parse_config_int(conf, "gpu_index", &config.gpu_index, 3);
 
     parse_config_str(conf, "date_format", config.date_format, sizeof(config.date_format));
 

@@ -27,7 +27,8 @@ The config should contain `entry = "value",` pairs (using quotation marks is man
 There are three different types of data that will be parsed:
 * Strings: No more than N bytes between the quotation marks will be read, but every single one of those bytes will be used.
            These variables will be marked in the example config with a `; str [N]` following the option.
-* Integers: An integer smaller or equal to N will be parsed using the C standard `atoi()` function (use `man 3 atoi` for specific information)
+* Integers: An integer smaller or equal to N will be parsed using the C standard `atoi()` function (use `man 3 atoi` for specific information).
+            The provided value will always be treaded as unsigned (using something like -1 will therefore be treated as 2³²-1, 4294967295)
             These variables will be marked in the example config with a `; int [N]` following the option.
 * Booleans: The program will recognize anything different from "false" as "true".
             These variables will be marked in the example config with a `; bool` following the option.

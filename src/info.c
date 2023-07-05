@@ -785,7 +785,7 @@ int cpu(char *dest) {
 
 // get the first gpu
 int gpu(char *dest) {
-    char *gpu_string = NULL;
+    char *gpus[] = {NULL, NULL, NULL};
     char *end;
 
     #ifdef __APPLE__
@@ -793,8 +793,8 @@ int gpu(char *dest) {
         uname(&name);
 
         if(!strcmp(name.machine, "x86_64"))
-            gpu_string = get_gpu_string();  // only works on x64
-        if(!gpu_string || strcmp(name.machine, "x86_64")) {     // fallback
+            gpus[0] = get_gpu_string();  // only works on x64
+        if(!gpus[0] || strcmp(name.machine, "x86_64")) {     // fallback
             char buf[1024];
             int pipes[2];
             if(pipe(pipes))
@@ -811,15 +811,14 @@ int gpu(char *dest) {
             size_t bytes = read(pipes[0], buf, 1024);
             close(pipes[0]);
 
-            if(bytes < 1) {
+            if(bytes < 1)
                 return 1;
-            }
 
-            gpu_string = strstr(buf, "Chipset Model: ");
-            if(!gpu_string)
+            gpus[0] = strstr(buf, "Chipset Model: ");
+            if(!gpus[0])
                 return 1;
-            gpu_string += 15;
-            char *end = strchr(gpu_string, '\n');
+            gpus[0] += 15;
+            char *end = strchr(gpus[0], '\n');
             if(!end)
                 return 1;
             *end = 0;
@@ -837,22 +836,46 @@ int gpu(char *dest) {
         pci_init(pacc);		// initialize the PCI library
         pci_scan_bus(pacc);		// we want to get the list of devices
 
+        int i = 0;
+
         for(dev=pacc->devices; dev; dev=dev->next)	{ // iterates over all devices
             pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	// fill in header info
 
             pci_lookup_name(pacc, device_class, 256, PCI_LOOKUP_CLASS, dev->device_class);
             if(!strcmp(device_class, "VGA compatible controller") || !strcmp(device_class, "3D controller")) {
                 // look up the full name of the device
-                gpu_string = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
-                break;
+                if(config.gpu_index == 0) {
+                    gpus[i] = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
+                    
+                    if(i < 2)
+                        ++i;
+                    else
+                        break;
+                }
+                else {
+                    if(i == config.gpu_index-1) {
+                        gpus[0] = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
+                        break;
+                    }
+
+                    if(i < 2)
+                        ++i;
+                    else
+                        break;
+                }
             }
         }
 
         pci_cleanup(pacc);  // close everything
 
+        // fallback (will only get 1 gpu)
+
         char gpu[256];
 
-        if(!gpu_string) {
+        if(!gpus[0]) {
+            if(config.gpu_index != 0)   // lol why would you choose a non-existing GPU
+                return 1;
+
             int pipes[2];
 
             if(pipe(pipes))
@@ -871,22 +894,22 @@ int gpu(char *dest) {
             lspci[read(pipes[0], lspci, 0x2000)] = 0;
             close(pipes[0]);
 
-            gpu_string = strstr(lspci, "3D");
-            if(!gpu_string) {
-                gpu_string = strstr(lspci, "VGA");
-                if(!gpu_string) {
+            gpus[0] = strstr(lspci, "3D");
+            if(!gpus[0]) {
+                gpus[0] = strstr(lspci, "VGA");
+                if(!gpus[0]) {
                     free(lspci);
                     return 1;
                 }
             }
 
             for(int i = 0; i < 4; ++i) {
-                gpu_string = strchr(gpu_string, '"');
-                if(!gpu_string) {
+                gpus[0] = strchr(gpus[0], '"');
+                if(!gpus[0]) {
                     free(lspci);
                     return 1;
                 }
-                ++gpu_string;
+                ++gpus[0];
 
                 /* class" "manufacturer" "name"
                  *  "manufacturer" "name"
@@ -896,44 +919,59 @@ int gpu(char *dest) {
                  */
             }
 
-            char *end = strchr(gpu_string, '"');   // name
+            char *end = strchr(gpus[0], '"');   // name
             if(!end) {
                 free(lspci);
                 return 1;
             }
             *end = 0;
             
-            strncpy(gpu, gpu_string, 255);
+            strncpy(gpu, gpus[0], 255);
             free(lspci);
-            gpu_string = gpu;
+            gpus[0] = gpu;
         }
     # endif // __ANDROID__
     #endif // __APPLE__
 
-    if(!gpu_string)
+    if(!gpus[0])
         return 1;
 
+    // this next part is just random cleanup
+    // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
+
     if(!(gpu_brand)) {
-        if((end = strstr(gpu_string, "Intel ")))
-            gpu_string += 6;
-        else if((end = strstr(gpu_string, "AMD ")))
-            gpu_string += 4;
-        else if((end = strstr(gpu_string, "Apple ")))
-            gpu_string += 6;
-    }
-
-    if((end = strstr(gpu_string, " Integrated Graphics Controller")))
-        *end = 0;
-
-    if((end = strchr(gpu_string, '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
-        char *ptr = strchr(end, ']');
-        if(ptr) {
-            gpu_string = end+1;
-            *ptr = 0;
+        for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+            if((end = strstr(gpus[i], "Intel ")))
+                gpus[i] += 6;
+            else if((end = strstr(gpus[i], "AMD ")))
+                gpus[i] += 4;
+            else if((end = strstr(gpus[i], "Apple ")))
+                gpus[i] += 6;
         }
     }
 
-    strncpy(dest, gpu_string, 256);
+    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+        if((end = strstr(gpus[i], " Integrated Graphics Controller")))
+            *end = 0;
+    }
+
+    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+        if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
+            char *ptr = strchr(end, ']');
+            if(ptr) {
+                gpus[i] = end+1;
+                *ptr = 0;
+            }
+        }
+    }
+
+    dest[0] = 0;    // this is kinda meh and avoidable but yk it's decent
+    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+        if(i > 0)
+            strncat(dest, ", ", 256-strlen(dest));
+        strncat(dest, gpus[i], 256-strlen(dest));
+    }
+
     return 0;
 }
 

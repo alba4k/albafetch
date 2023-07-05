@@ -12,6 +12,7 @@
 /* TODO:
  * print de, shell and terminal versions
  * Windows support? *BSD support?
+ * split info.c into multiple files (cpu.c, gpu.c, ...)
  */
 
 // This contains the default config values
@@ -26,8 +27,9 @@ struct Config config = {
     "-",    // separator
     5,      // spacing
 
+    0,                              // gpu_index
     "%02d/%02d/%d %02d:%02d:%02d",  // date_format
-    3,      // col_block_len
+    3,                              // col_block_len
 
     "",         // separator_prefix
     "",         // spacing_prefix
@@ -234,7 +236,7 @@ int main(int argc, char **argv) {
 
     if(asking_color) {
         if(asking_color < argc) {
-            char *colors[9][2] = {
+            char *colors[][2] = {
                 {"black", "\033[30m"},
                 {"red", "\033[31m"},
                 {"green", "\033[32m"},

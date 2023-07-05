@@ -45,6 +45,7 @@ struct Config {
     char separator[8];
     int spacing;
 
+    int gpu_index;
     char date_format[32];
     int col_block_len;
 
