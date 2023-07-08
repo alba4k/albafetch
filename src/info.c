@@ -866,9 +866,8 @@ int gpu(char *dest) {
             }
         }
 
-
-
         pci_cleanup(pacc);  // close everything
+    
         // fallback (will only get 1 gpu)
 
         char gpu[256];
@@ -941,6 +940,7 @@ int gpu(char *dest) {
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
 
     dest[0] = 0;    //  yk it's decent a yk it works
+    
     for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
         if(!(gpu_brand)) {
             if((end = strstr(gpus[i], "Intel ")))
