@@ -829,7 +829,7 @@ int gpu(char *dest) {
     # else
         // based on https://github.com/pciutils/pciutils/blob/master/example.c
 
-        char device_class[256], namebuf[256];
+        char device_class[256], namebuf[768];
         struct pci_dev *dev;
         struct pci_access *pacc = pci_alloc();		// get the pci_access structure;
 
@@ -845,7 +845,7 @@ int gpu(char *dest) {
             if(!strcmp(device_class, "VGA compatible controller") || !strcmp(device_class, "3D controller")) {
                 // look up the full name of the device
                 if(config.gpu_index == 0) {
-                    gpus[i] = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
+                    gpus[i] = pci_lookup_name(pacc, namebuf+i*256, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
                     
                     if(i < 2)
                         ++i;
@@ -866,8 +866,9 @@ int gpu(char *dest) {
             }
         }
 
-        pci_cleanup(pacc);  // close everything
 
+
+        pci_cleanup(pacc);  // close everything
         // fallback (will only get 1 gpu)
 
         char gpu[256];
@@ -939,8 +940,9 @@ int gpu(char *dest) {
     // this next part is just random cleanup
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
 
-    if(!(gpu_brand)) {
-        for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+    dest[0] = 0;    //  yk it's decent a yk it works
+    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+        if(!(gpu_brand)) {
             if((end = strstr(gpus[i], "Intel ")))
                 gpus[i] += 6;
             else if((end = strstr(gpus[i], "AMD ")))
@@ -948,25 +950,18 @@ int gpu(char *dest) {
             else if((end = strstr(gpus[i], "Apple ")))
                 gpus[i] += 6;
         }
-    }
 
-    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
         if((end = strstr(gpus[i], " Integrated Graphics Controller")))
             *end = 0;
-    }
-
-    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
-        if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
+        else if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
             char *ptr = strchr(end, ']');
             if(ptr) {
                 gpus[i] = end+1;
                 *ptr = 0;
             }
         }
-    }
 
-    dest[0] = 0;    // this is kinda meh and avoidable but yk it's decent
-    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+        // (finally) writing the GPUs into dest
         if(i > 0)
             strncat(dest, ", ", 256-strlen(dest));
         strncat(dest, gpus[i], 256-strlen(dest));
