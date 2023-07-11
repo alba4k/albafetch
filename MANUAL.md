@@ -75,6 +75,24 @@ When albafetch parses a file (config or custom ascii art), it will also automati
 | "\\033"      | "\\033" (ANSI escape) |
 | "\\n"        | "\\n" (new line)      |
 
+Since it might be useful, here are some of the most useful ANSI escape sequences (you can find a more complete list [here](https://stackoverflow.com/a/33206814))
+| Function | Escape   |
+| ---      | ---      |
+| Reset    | `\e[0m`  |
+| Bold     | `\e[1m`  |
+| Black    | `\e[30m` |
+| Red      | `\e[31m` |
+| Green    | `\e[32m` |
+| Yellow   | `\e[33m` |
+| Blue     | `\e[34m` |
+| Purple   | `\e[35m` |
+| Cyan     | `\e[36m` |
+| White    | `\e[37m` |
+
+Please note that these colors will be displayed as defined in the configuration of your terminal.
+You can check how a certain string will look using something like `echo -e "\e[1mHello, \e[31mWorld\e[0m"`.
+
+
 # Command-line arguments
 albafetch accepts a few command line arguments, which can be used to override certain values set in the config file.
 
