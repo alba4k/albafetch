@@ -664,7 +664,7 @@ int cpu(char *dest) {
         if(!buf[0])
             return 1;
 
-        if(!cpu_freq) {
+        if(!(cpu_freq)) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))
