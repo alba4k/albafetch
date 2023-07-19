@@ -40,6 +40,7 @@ struct Config config = {
     "OS",       // os_prefix
     "Kernel",   // kernel_prefix
     "Desktop",  // desktop_prefix
+    "Theme",    // theme_prefix
     "Shell",    // shell_prefix
     "Login",    // login_shell_prefix
     "Terminal", // term_prefix
@@ -396,6 +397,7 @@ int main(int argc, char **argv) {
         {"os", config.os_prefix, os},
         {"kernel", config.kernel_prefix, kernel},
         {"desktop", config.desktop_prefix, desktop},
+        {"theme",config.theme_prefix, theme},
         {"shell", config.shell_prefix, shell},
         {"login_shell", config.login_shell_prefix, login_shell},
         {"term", config.term_prefix, term},
@@ -423,6 +425,7 @@ int main(int argc, char **argv) {
             "os",
             "kernel",
             "desktop",
+            "theme",
             "shell",
             "term",
             "packages",
