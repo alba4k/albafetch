@@ -236,27 +236,28 @@ int desktop(char *dest) {
     return 0;
 }
 
-//get theme
-int theme(char *dest){
-    
-    FILE *fp_gtk;
-    char buffer[256];
-    fp_gtk= popen("gsettings get org.gnome.desktop.interface gtk-theme","r");
+// get the current GTK Theme
+int gtk_theme(char *dest){ 
+    FILE *fp;
+    fp = popen("gsettings get org.gnome.desktop.interface gtk-theme","r");
 
-    if(fp_gtk!=NULL){
-        fgets(buffer,sizeof(buffer),fp_gtk);
-        pclose(fp_gtk);
-        buffer[strcspn(buffer, "\n")] = '\0';
-        strcat(dest,buffer);
+    if(fp){
+        fgets(dest, 256, fp);
+        pclose(fp);
+        dest[strcspn(dest, "\n")] = 0;
+
+        // cleanup
+        if(dest[0] == '\'') {
+            strcpy(dest, dest+1);
+
+            char *ptr = strchr(dest, '\'');
+            if(ptr)
+                *ptr = 0;
+        }
 
         return 0;
-    } else {
-
-        printf("theme not found ");
+    } else
         return 1;
-    }
-
-    
 }
 
 // get the parent process name (usually the shell)
@@ -623,8 +624,6 @@ int host(char *dest) {
     return 0;
 }
 
-
-
 // get the current BIOS vendor and version (Linux only!)
 int bios(char *dest) {
     #ifdef __APPLE__
@@ -689,7 +688,7 @@ int cpu(char *dest) {
         if(!buf[0])
             return 1;
 
-        if(!cpu_freq) {
+        if((!cpu_freq)) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))

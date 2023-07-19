@@ -32,6 +32,7 @@ int main() {
         {os, "os"},
         {kernel, "kernel"},
         {desktop, "desktop"},
+        {gtk_theme, "gtk_theme"},
         {shell, "shell"},
         {login_shell, "login_shell"},
         {term, "term"},

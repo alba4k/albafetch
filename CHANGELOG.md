@@ -1,5 +1,9 @@
 # Changes since v4.0
+
 # New Features
+
+### Modules
+* `gtk_theme`: Prints the current GTK theme
 
 ### Config options
 * `ascii_art`: Path to a file containing a custom logo (and color)

@@ -210,10 +210,7 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 
     // copies the option
     *end = 0;
-
-    // doing this instead of strncpy because I get some weird behaviour using that
-    size_t len = strlen(ptr);
-    memcpy(dest, ptr, len > maxlen ? maxlen : len);
+    strncpy(dest, ptr, maxlen);
     *end = '"';
 
     return 0;
@@ -391,7 +388,6 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
         "os_arch",
         "kernel_short",
         "desktop_type",
-        "theme_type",
         "shell_path",
         "term_ssh",
         "pkg_mgr",
@@ -445,7 +441,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
         {config.os_prefix, "os_prefix"},
         {config.kernel_prefix, "kernel_prefix"},
         {config.desktop_prefix, "desktop_prefix"},
-        {config.theme_prefix, "theme_prefix"},
+        {config.gtk_theme_prefix, "gtk_theme_prefix"},
         {config.shell_prefix, "shell_prefix"},
         {config.login_shell_prefix, "login_shell_prefix"},
         {config.term_prefix, "term_prefix"},

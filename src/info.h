@@ -32,7 +32,7 @@ int kernel(char *dest);
 
 int desktop(char *dest);
 
-int theme(char *dest);
+int gtk_theme(char *dest);
 
 int shell(char *dest);
 
