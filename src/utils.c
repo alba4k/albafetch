@@ -210,7 +210,15 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 
     // copies the option
     *end = 0;
-    strncpy(dest, ptr, maxlen);
+    
+    size_t len = strlen(ptr);
+    if(len+1 > maxlen) {
+        memcpy(dest, ptr, maxlen);
+        dest[maxlen-1] = 0;
+    } else
+        memcpy(dest, ptr, len+1);
+
+
     *end = '"';
 
     return 0;
@@ -460,7 +468,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     };
 
     for(size_t i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); ++i)
-        parse_config_str(conf, prefixes[i][1], prefixes[i][0], sizeof(prefixes[i][0]));
+        parse_config_str(conf, prefixes[i][1], prefixes[i][0], 64);
 
     // MODULES
     

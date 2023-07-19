@@ -238,13 +238,23 @@ int desktop(char *dest) {
 
 // get the current GTK Theme
 int gtk_theme(char *dest){ 
-    FILE *fp;
-    fp = popen("gsettings get org.gnome.desktop.interface gtk-theme","r");
+    int pipes[2];
 
-    if(fp){
-        fgets(dest, 256, fp);
-        pclose(fp);
-        dest[strcspn(dest, "\n")] = 0;
+    if(!access("/bin/gsettings", F_OK)){
+        if(pipe(pipes))
+            return 1;
+
+        if(!fork()) {
+            close(pipes[0]);
+            dup2(pipes[1], STDOUT_FILENO);
+
+            execlp("gsettings", "gsettings" , "get", "org.gnome.desktop.interface", "gtk-theme", NULL); 
+        }
+
+        wait(0);
+        close(pipes[1]);
+        dest[read(pipes[0], dest, 256) - 1] = 0;
+        close(pipes[0]);
 
         // cleanup
         if(dest[0] == '\'') {
@@ -688,7 +698,7 @@ int cpu(char *dest) {
         if(!buf[0])
             return 1;
 
-        if((!cpu_freq)) {
+        if(!(cpu_freq)) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))
