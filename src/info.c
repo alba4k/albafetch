@@ -236,6 +236,29 @@ int desktop(char *dest) {
     return 0;
 }
 
+//get theme
+int theme(char *dest){
+    
+    FILE *fp_gtk;
+    char buffer[256];
+    fp_gtk= popen("gsettings get org.gnome.desktop.interface gtk-theme","r");
+
+    if(fp_gtk!=NULL){
+        fgets(buffer,sizeof(buffer),fp_gtk);
+        pclose(fp);
+        buffer[strcspn(buffer, "\n")] = '\0';
+        strcat(dest,buffer);
+
+        return 0;
+    } else {
+
+        printf("cerca altrove ");
+        return 1;
+    }
+
+    
+}
+
 // get the parent process name (usually the shell)
 int shell(char *dest) {
     #ifdef __linux__
@@ -568,10 +591,10 @@ int host(char *dest) {
 
             name = malloc(len);
             name[fread(name, 1, len, fp) - 1] = 0;
-
+            
             fclose(fp);
         }
-
+       
         if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
             fseek(fp, 0, SEEK_END);
             len = ftell(fp);
@@ -599,6 +622,8 @@ int host(char *dest) {
 
     return 0;
 }
+
+
 
 // get the current BIOS vendor and version (Linux only!)
 int bios(char *dest) {
@@ -664,7 +689,7 @@ int cpu(char *dest) {
         if(!buf[0])
             return 1;
 
-        if(!(cpu_freq)) {
+        if(!cpu_freq) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))
@@ -866,8 +891,9 @@ int gpu(char *dest) {
             }
         }
 
+
+
         pci_cleanup(pacc);  // close everything
-    
         // fallback (will only get 1 gpu)
 
         char gpu[256];
@@ -940,7 +966,6 @@ int gpu(char *dest) {
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
 
     dest[0] = 0;    //  yk it's decent a yk it works
-    
     for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
         if(!(gpu_brand)) {
             if((end = strstr(gpus[i], "Intel ")))

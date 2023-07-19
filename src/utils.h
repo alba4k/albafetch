@@ -58,6 +58,7 @@ struct Config {
     char os_prefix[64];
     char kernel_prefix[64];
     char desktop_prefix[64];
+    char theme_prefix[64];
     char shell_prefix[64];
     char login_shell_prefix[64];
     char term_prefix[64];

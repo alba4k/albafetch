@@ -32,6 +32,8 @@ int kernel(char *dest);
 
 int desktop(char *dest);
 
+int theme(char *dest);
+
 int shell(char *dest);
 
 int login_shell(char *dest);
