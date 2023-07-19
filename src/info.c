@@ -245,14 +245,14 @@ int theme(char *dest){
 
     if(fp_gtk!=NULL){
         fgets(buffer,sizeof(buffer),fp_gtk);
-        pclose(fp);
+        pclose(fp_gtk);
         buffer[strcspn(buffer, "\n")] = '\0';
         strcat(dest,buffer);
 
         return 0;
     } else {
 
-        printf("cerca altrove ");
+        printf("theme not found ");
         return 1;
     }
 
