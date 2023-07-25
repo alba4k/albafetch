@@ -99,13 +99,14 @@ albafetch accepts a few command line arguments, which can be used to override ce
 A short explanation of what every argument does, including every accepted and default value, can be obtained by running `albafetch --help`
 
 Here they are:
-* `--help` (or `-h`): prints a small guide on the program usage and return 0.
-* `--color` (or `-c`): followed by the color you want to set, this option will override the config `default_color` entry and set a custom color for the whole output.
-* `--bold` (or `-b`): followed by a boolean "on" or "off", this option overrides the config `bold` entry and enables or disables the usage of bold in the output.
+* `--help` (or `-h`): Prints a small guide on the program usage and return 0.
+* `--color` (or `-c`): Followed by the color you want to set, this option will override the config `default_color` entry and set a custom color for the whole output.
+* `--bold` (or `-b`): Followed by a boolean "on" or "off", this option overrides the config `bold` entry and enables or disables the usage of bold in the output.
 * `--logo` (or `-l`): This option, followed by the logo you want to print, overrides the config `logo` entry and makes albafetch print a custom logo instead of the default one.
-* `--align` (or `-a`): followed by a boolean "on" or "off", this option overrides the config `align_infos` entry and enables of disables the alignment of the infos in the printed output.
-* `--ascii`: followed by a valid file path, it lets you pick a file containing a custom ascii art that you'd like to use. When this option is used together with `--logo`, the latter has priority.
-* `--config`: followed by a valid file path, this changes the config file that will be parsed to look for a valid configuration.
+* `--align` (or `-a`): Followed by a boolean "on" or "off", this option overrides the config `align_infos` entry and enables of disables the alignment of the infos in the printed output.
+* `--ascii`: Followed by a valid file path, it lets you pick a file containing a custom ascii art that you'd like to use. When this option is used together with `--logo`, the latter has priority.
+* `--config`: Followed by a valid file path, this changes the config file that will be parsed to look for a valid configuration.
+* `--no-logo`: Using this will make albafetch not print a logo or ascii art (while still using it to get the color that should be printed).
 * `--no-config`: Using this will prevent any config file (provided using `--config` or the default one) from being used.
 
 # Return codes and errors

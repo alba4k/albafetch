@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
     // are the following command line args used?
     bool asking_help = false;
     bool use_config = true;
+    bool print_logo = true;
     int asking_color = 0;
     int asking_bold = 0;
     int asking_logo = 0;
@@ -122,6 +123,8 @@ int main(int argc, char **argv) {
             strncpy(config_file, argv[i+1], sizeof(config_file)-1);
             continue;
         }
+        else if(!strcmp(argv[i], "--no-logo"))
+            print_logo = false;
         else if(!strcmp(argv[i], "--no-config"))
             use_config = false;
     }
@@ -333,6 +336,9 @@ int main(int argc, char **argv) {
         printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
                "\t\t\t   [path]\n", config.color, bold ? "\033[1m" : "");
 
+        printf("\t%s%s--no-logo\033[0m:\t Prints the infos without a logo or ascii art\n",
+               config.color, bold ? "\033[1m" : "");
+
         printf("\t%s%s--no-config\033[0m:\t Ignores any provided or existing config file\n",
                config.color, bold ? "\033[1m" : "");
 
@@ -476,32 +482,37 @@ int main(int argc, char **argv) {
                 continue;
 
             // this is the length of the previous printed text
-            size_t len = (strlen_real(printed
-                                     + strlen(config.logo[line] ? config.logo[line] : config.logo[2])
-                                     + config.spacing
-                                    ) - strlen_real(current->label))
-                                    / strlen_real(config.separator);
+            const size_t logo_len = strlen(config.logo[line] ? config.logo[line] : config.logo[2]) + config.spacing;
+            const size_t len = (strlen_real(printed
+                                      + (print_logo ? logo_len : 0)
+                                      - strlen_real(current->label))
+                                    / strlen_real(config.separator));
 
             printed[0] = 0;
 
-            get_logo_line(printed, &line);
+            if(print_logo) {
+                get_logo_line(printed, &line);
 
-            for(int i = 0; i < config.spacing; ++i)
-                strcat(printed, " ");
+                for(int i = 0; i < config.spacing; ++i)
+                    strcat(printed, " ");
+            }
 
             strcat(printed, config.color);
             strcat(printed, current->label);
 
-            for(size_t i = 0; i < len && strlen(printed) < 767 - strlen(config.separator); ++i)
+            const size_t separator_len = strlen(config.separator);
+            for(size_t i = 0; i < len && strlen(printed) < 767 - separator_len; ++i)
                 strcat(printed, config.separator);
         }
         else if(!strcmp(current->id, "space")) {  // spacings are handled differently (they don't do shit)
             printed[0] = 0;
 
-            get_logo_line(printed, &line);
+            if(print_logo) {
+                get_logo_line(printed, &line);
 
-            for(int i = 0; i < config.spacing; ++i)
-                strcat(printed, " ");
+                for(int i = 0; i < config.spacing; ++i)
+                    strcat(printed, " ");
+            }
 
             strcat(printed, config.color);
             strcat(printed, current->label);
@@ -515,10 +526,12 @@ int main(int argc, char **argv) {
 
             printed[0] = 0;
 
-            get_logo_line(printed, &line);
+            if(print_logo) {
+                get_logo_line(printed, &line);
 
-            for(int i = 0; i < config.spacing; ++i)
-                strcat(printed, " ");
+                for(int i = 0; i < config.spacing; ++i)
+                    strcat(printed, " ");
+            }
 
             strcat(printed, config.color);
             strcat(printed, current->label);
@@ -543,10 +556,12 @@ int main(int argc, char **argv) {
         else if(current->func == NULL) {            // printing a custom text
             printed[0] = 0;
 
-            get_logo_line(printed, &line);
+            if(print_logo) {
+                get_logo_line(printed, &line);
 
-            for(int i = 0; i < config.spacing; ++i)
-                strcat(printed, " ");
+                for(int i = 0; i < config.spacing; ++i)
+                    strcat(printed, " ");
+            }
 
             strcat(printed, config.color);
             strcat(printed, current->id);
@@ -558,10 +573,12 @@ int main(int argc, char **argv) {
             char label[80];
             printed[0] = 0;
 
-            get_logo_line(printed, &line);
+            if(print_logo) {
+                get_logo_line(printed, &line);
 
-            for(int i = 0; i < config.spacing; ++i)
-                strcat(printed, " ");
+                for(int i = 0; i < config.spacing; ++i)
+                    strcat(printed, " ");
+            }
                 
             strcat(printed, config.color);
             strcpy(label, current->label);
@@ -575,7 +592,7 @@ int main(int argc, char **argv) {
     }
 
     // remaining lines
-    while(config.logo[line+1]) {
+    while(config.logo[line+1] && print_logo) {
         printed[0] = 0;
 
         get_logo_line(printed, &line);

@@ -16,6 +16,7 @@
 ### Command line arguments
 * `--ascii`: Path to a file containing a custom logo (and color)
 * `--no-config`: Ignores any provided or existing config file
+* `--no-logo`: Prevents a logo or ascii art from being printed (while still using it for the color)
 
 
 # Bug fixes
