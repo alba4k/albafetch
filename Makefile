@@ -68,7 +68,7 @@ debug: build/debug
 	build/debug
 
 install: build/$(TARGET)
-	@install $(INSTALL_FLAGS) build/$(TARGET) $(DESTDIR)$(INSTALLPATH)/$(TARGET) || \
+	@install $(INSTALL_FLAGS) build/$(TARGET) $(INSTALLPATH)/$(TARGET) || \
 	bash -c 'echo -e "\e[31m\e[1mERROR\e[0m: Running without root proviliges?"'
 
 uninstall:
