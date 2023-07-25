@@ -12,7 +12,7 @@ ifeq ($(KERNEL),Linux)
 	OBJ := info.o main.o queue.o utils.o
 	SRC := src/main.c src/info.c src/queue.c src/utils.c
 	SRC_DEBUG := src/debug.c src/info.c src/queue.c src/utils.c
-	INSTALLPATH := /usr/bin
+	INSTALLPATH := /usr/local/bin
 	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l curl -l pci
 endif
