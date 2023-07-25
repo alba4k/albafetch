@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <sys/time.h>
 
 #include "info.h"
 #include "utils.h"
@@ -54,27 +54,42 @@ int main() {
     int return_value;
     char mem[256];
 
-    // just setting everything to 1
+    struct timeval start, end, start_all;
+    double time;
+
+    // just setting every option to 1
     config.options = 0xffffffffffffffff;
     // these are just defaults
     config.col_block_len = 3;
     strcpy(config.date_format, "%02d/%02d/%d %02d:%02d:%02d");
 
-    // The time thing doesn't work lol
-    // clock_t start = clock();
+    gettimeofday(&start_all, NULL);
+
     for(unsigned long i = 0; i < sizeof(arr)/sizeof(arr[0]); ++i) {
-        if(!(return_value = arr[i].func(mem)))
-            printf("\e[1m\e[32m%s\e[0m: %s\n", arr[i].name, mem);
+        gettimeofday(&start, NULL);
+
+        return_value = arr[i].func(mem);
+
+        gettimeofday(&end, NULL);
+
+        time = ((end.tv_sec  - start.tv_sec) * 1e6 +
+                 end.tv_usec - start.tv_usec) / 1e3;
+
+        if(!return_value)
+            printf("\033[1m\033[32m%-12s\033[0m %-40s [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", arr[i].name, mem, time);
         else {
-            printf("\e[1m\e[31m%s\e[0m: %d\n", arr[i].name, return_value);
+            printf("\033[1m\033[31m%-12s\033[0m %d                                    "    
+                   "[\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", arr[i].name, return_value, time);
             ++errors;
         }
     }
-    // clock_t end = clock();
 
-    // printf("\n\033[1mDebug run finished with a total of %u errors. [Took %f ms]\033[0m\n", errors, (double)(end-start)/CLOCKS_PER_SEC*1000);
-    printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m\n", errors);
+    gettimeofday(&end, NULL);
+
+    time = ((end.tv_sec  - start_all.tv_sec) * 1e6 +
+                 end.tv_usec - start_all.tv_usec) / 1e3;
+
+    printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
     
-
     return 0;
 }
