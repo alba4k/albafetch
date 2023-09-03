@@ -1,7 +1,11 @@
 {self, ...}: {
-  perSystem = {pkgs, ...}: {
+  perSystem = {
+    lib,
+    pkgs,
+    ...
+  }: {
     packages = let
-      p = self.overlays.default null pkgs;
+      p = lib.fix (final: self.overlays.default ({inherit (pkgs) darwin;} // final) pkgs);
     in {
       inherit (p) albafetch;
       default = p.albafetch;
