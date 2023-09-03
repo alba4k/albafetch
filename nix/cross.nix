@@ -1,23 +1,28 @@
-{
-  self,
-  withSystem,
-  ...
-}: {
-  flake.crossPackages = let
-    getPkgs = system: withSystem system (p: p.pkgs);
-    linuxPkgs = getPkgs "x86_64-linux";
-    darwinPkgs = getPkgs "x86_64-darwin";
+{self, ...}: {
+  perSystem = {
+    lib,
+    pkgs,
+    ...
+  }: {
+    legacyPackages = let
+      inherit (lib) optionalAttrs;
+      inherit (pkgs.stdenv) isLinux;
+      inherit (pkgs.stdenv.hostPlatform) isx86_64;
 
-    genPkg = pkgs: {inherit (self.overlays.default null pkgs) albafetch;};
-  in {
-    arm = {
-      linux = genPkg linuxPkgs.pkgsCross.aarch64-multiplatform.pkgsStatic;
-      darwin = genPkg darwinPkgs.pkgsCross.aarch64-darwin;
-    };
+      arm = pkgs.pkgsCross.aarch64-multiplatform;
 
-    static = {
-      linux = genPkg linuxPkgs.pkgsStatic;
-      darwin = genPkg darwinPkgs.pkgsStatic;
-    };
+      fn = pkgs: lib.fix (final: self.overlays.default ({inherit (pkgs) darwin;} // final) pkgs);
+      genPkg = pkgs: {inherit (fn pkgs) albafetch;};
+    in
+      optionalAttrs isx86_64 {
+        arm = genPkg (
+          if isLinux
+          then arm.pkgsStatic
+          else arm
+        );
+      }
+      // optionalAttrs isLinux {
+        static = genPkg pkgs.pkgsStatic;
+      };
   };
 }

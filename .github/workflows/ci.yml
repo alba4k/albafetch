@@ -27,8 +27,13 @@ jobs:
           name: albafetch
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
-      - name: build (x64)
-        run: nix build --accept-flake-config .#crossPackages.static.${{ matrix.platform }}.albafetch
+      - name: build (linux/x64)
+        if: runner.os == 'Linux'
+        run: nix build --accept-flake-config .#static.albafetch
+
+      - name: build (darwin/x64)
+        if: runner.os == 'macOS'
+        run: nix build --accept-flake-config
 
       - name: test
         run: ./result/bin/albafetch
@@ -42,12 +47,12 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: runner.os == 'macOS'
         with:
-          name: albafetch-darwin-x64-static
+          name: albafetch-darwin-x64
           path: ${{ github.workspace }}/result/bin/albafetch
 
       - name: build (linux/aarch64-multiplatform)
         if: runner.os == 'Linux'
-        run: nix build --accept-flake-config .#crossPackages.arm.linux.albafetch
+        run: nix build --accept-flake-config .#arm.albafetch
 
       - uses: actions/upload-artifact@v3
         if: runner.os == 'Linux'
