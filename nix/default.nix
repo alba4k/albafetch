@@ -1,47 +1,19 @@
 {
-  lib,
-  curl,
-  darwin,
-  meson,
-  ninja,
-  pciutils,
-  pkgconfig,
-  stdenv,
-  version,
-}: let
-  inherit (lib) cleanSource licenses maintainers optionals platforms;
-  inherit (stdenv) isLinux isDarwin;
-in
-  stdenv.mkDerivation rec {
-    name = "albafetch";
-    inherit version;
-    src = cleanSource ../.;
+  imports = [
+    ./cross.nix
+    ./dev.nix
+    ./overlay.nix
+    ./packages.nix
+  ];
 
-    buildInputs =
-      [
-        curl.dev
-      ]
-      ++ optionals isLinux [
-        pciutils
-      ];
+  systems = [
+    "x86_64-linux"
+    "aarch64-linux"
+    "x86_64-darwin"
+    "aarch64-darwin"
+  ];
 
-    nativeBuildInputs =
-      [meson ninja pkgconfig]
-      ++ optionals isDarwin (with darwin.apple_sdk.frameworks; [
-        Foundation
-        IOKit
-      ]);
-
-    OBJC =
-      if isDarwin
-      then "clang"
-      else "";
-
-    meta = {
-      description = "Faster neofetch alternative, written in C.";
-      homepage = "https://github.com/alba4k/albafetch";
-      license = licenses.mit;
-      maintainers = with maintainers; [getchoo];
-      platforms = platforms.unix;
-    };
-  }
+  perSystem = {pkgs, ...}: {
+    formatter = pkgs.alejandra;
+  };
+}
