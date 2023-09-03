@@ -103,8 +103,8 @@ or cross compiling. A few convenience outputs are included:
 
 ```sh
 nix build .#albafetch # regular, dynamically linked build
-nix build .#albafetch-static # statically linked build
-nix build .#arm.<linux/darwin> # cross compiling from x86_64 to arm
+nix build .#static.albafetch # statically linked build (only available on linux)
+nix build .#arm.albafetch # cross compiling from x86_64 to arm (only available on x86_64)
 ```
 
 # Installation
@@ -126,30 +126,47 @@ You can find more information on how to install packages from the AUR in the [Ar
 $ nix profile install .#albafetch
 ```
 
-`nix shell`:
-
-```sh
-$ nix shell github:alba4k/albafetch
-```
-
 `nix-env`:
 
 ```sh
 $ nix-env -iA packages.<your platform>.albafetch # platform examples: x86_64-linux, aarch64-linux, aarch64-darwin
 ```
 
-As an overlay:
+Using the overlay (Flake):
 
 ```nix
 {
-	albafetch,
-	pkgs,
-	...
-}: {
-	Nixon's.overlays = [albafetch.overlays.default];
-	environment.systemPackages = with pkgs; [
-		albafetch
-	];
+  inputs = {
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    albafetch = {
+      url = "github:alba4k/albafetch";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs = {nixpkgs, albafetch, ...}: {
+    nixosConfigurations.host = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        {
+          nixpkgs.overlays = [albafetch.overlays.default];
+          environment.systemPackages = [pkgs.albafetch];
+        }
+      ];
+    };
+  };
+}
+```
+
+Using the overlay (`builtins.fetchTarball`):
+
+```nix
+{pkgs, ...}: {
+  nixpkgs.overlays = [(import (builtins.fetchTarball "https://github.com/alba4k/albafetch/master.tar.gz")).overlays.default];
+  environment.systemPackages = with pkgs; [
+    albafetch
+  ];
 }
 ```
 
