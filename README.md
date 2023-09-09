@@ -103,8 +103,8 @@ or cross compiling. A few convenience outputs are included:
 
 ```sh
 nix build .#albafetch # regular, dynamically linked build
-nix build .#static.albafetch # statically linked build (only available on linux)
-nix build .#arm.albafetch # cross compiling from x86_64 to arm (only available on x86_64)
+nix build .#albafetch-static # statically linked build (only available on linux)
+nix build .#albafetch-arm # cross compiling from x86_64 to arm (only available on x86_64)
 ```
 
 # Installation

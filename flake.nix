@@ -17,6 +17,21 @@
 
   outputs = {parts, ...} @ inputs:
     parts.lib.mkFlake {inherit inputs;} {
-      imports = [./nix];
+      imports = [
+        ./nix/dev.nix
+        ./nix/overlay.nix
+        ./nix/packages.nix
+      ];
+
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+
+      perSystem = {pkgs, ...}: {
+        formatter = pkgs.alejandra;
+      };
     };
 }

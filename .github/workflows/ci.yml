@@ -29,7 +29,7 @@ jobs:
 
       - name: build (linux/x64)
         if: runner.os == 'Linux'
-        run: nix build -L --accept-flake-config .#static.albafetch
+        run: nix build -L --accept-flake-config .#albafetch-static
 
       - name: build (darwin/x64)
         if: runner.os == 'macOS'
@@ -52,7 +52,7 @@ jobs:
 
       - name: build (linux/aarch64-multiplatform)
         if: runner.os == 'Linux'
-        run: nix build -L --accept-flake-config .#arm.albafetch
+        run: nix build -L --accept-flake-config .#albafetch-arm
 
       - uses: actions/upload-artifact@v3
         if: runner.os == 'Linux'

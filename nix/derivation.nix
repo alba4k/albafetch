@@ -9,40 +9,58 @@
   Foundation,
   IOKit,
   self,
-  version,
-}:
-stdenv.mkDerivation {
-  name = "albafetch";
-  inherit version;
-  src = lib.cleanSource self;
+}: let
+  filter = path: type: let
+    path' = toString path;
+    base = baseNameOf path';
 
-  buildInputs =
-    [
-      curl.dev
-    ]
-    ++ lib.optional stdenv.isLinux pciutils;
+    extensions = [".c" ".h" ".m"];
+    matches = lib.any (suffix: lib.hasSuffix suffix base) extensions;
 
-  nativeBuildInputs =
-    [
-      meson
-      ninja
-      pkgconfig
-    ]
-    ++ lib.optionals stdenv.isDarwin [
-      Foundation
-      IOKit
-    ];
+    isAllowedDir = type == "directory" && base == "src";
+    isMesonFile = base == "meson.build";
+  in
+    matches || isAllowedDir || isMesonFile;
 
-  OBJC =
-    if stdenv.isDarwin
-    then "clang"
-    else "";
+  filterSource = src:
+    lib.cleanSourceWith {
+      src = lib.cleanSource src;
+      inherit filter;
+    };
+in
+  stdenv.mkDerivation {
+    name = "albafetch";
+    version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
 
-  meta = with lib; {
-    description = "Faster neofetch alternative, written in C.";
-    homepage = "https://github.com/alba4k/albafetch";
-    license = licenses.mit;
-    maintainers = with maintainers; [getchoo];
-    platforms = platforms.unix;
-  };
-}
+    src = filterSource self;
+
+    buildInputs =
+      [
+        curl.dev
+      ]
+      ++ lib.optional stdenv.isLinux pciutils;
+
+    nativeBuildInputs =
+      [
+        meson
+        ninja
+        pkgconfig
+      ]
+      ++ lib.optionals stdenv.isDarwin [
+        Foundation
+        IOKit
+      ];
+
+    OBJC =
+      if stdenv.isDarwin
+      then "clang"
+      else "";
+
+    meta = with lib; {
+      description = "Faster neofetch alternative, written in C.";
+      homepage = "https://github.com/alba4k/albafetch";
+      license = licenses.mit;
+      maintainers = with maintainers; [getchoo];
+      platforms = platforms.unix;
+    };
+  }
