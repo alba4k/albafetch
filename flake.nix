@@ -1,6 +1,11 @@
 {
   description = "Faster neofetch alternative, written in C";
 
+  nixConfig = {
+    extra-substituters = ["https://albafetch.cachix.org"];
+    extra-trusted-public-keys = ["albafetch.cachix.org-1:wTFl2hoUXiYlzUp/XA/bfZTP5KqZTToyq0+sfIVseUU="];
+  };
+
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
 
