@@ -5,4 +5,5 @@ albafetch.conf.link
 
 # nix stuff
 .direnv/
-result
+result*
+repl-result-out*
