@@ -13,6 +13,7 @@
  * print de, shell and terminal versions
  * Windows support? *BSD support?
  * split info.c into multiple files (cpu.c, gpu.c, ...)
+ * Clean up some extra stuff in gpu(), " Rev. A" in NVIDIA cards
  */
 
 // This contains the default config values

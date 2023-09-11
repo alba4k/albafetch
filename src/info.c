@@ -240,6 +240,16 @@ int desktop(char *dest) {
 int gtk_theme(char *dest){ 
     int pipes[2];
 
+    char *theme = getenv("GTK_THEME");
+
+    // try using GTK_THEME (faster)
+    if(theme) {
+        strncpy(dest, theme, 256);
+
+        return 0;
+    }
+
+    // try using gsettings (fallback)
     if(!access("/bin/gsettings", F_OK)){
         if(pipe(pipes))
             return 1;
@@ -266,8 +276,9 @@ int gtk_theme(char *dest){
         }
 
         return 0;
-    } else
-        return 1;
+    }
+
+    return 1;
 }
 
 // get the parent process name (usually the shell)
@@ -987,7 +998,9 @@ int gpu(char *dest) {
 
         if((end = strstr(gpus[i], " Integrated Graphics Controller")))
             *end = 0;
-        else if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
+        if((end = strstr(gpus[i], " Rev. ")))
+            *end = 0;
+        if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
             char *ptr = strchr(end, ']');
             if(ptr) {
                 gpus[i] = end+1;
