@@ -225,6 +225,10 @@ int main(int argc, char **argv) {
                 if(end)
                     *end = 0;
 
+                // because Arch Linux ARM has to be special for some reason
+                if(!strcmp(os_id, "archarm"))
+                    strcpy(os_id, "arch");
+
                 // find the matching logo
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], os_id)) {
