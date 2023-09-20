@@ -5,7 +5,7 @@
   meson,
   ninja,
   pciutils,
-  pkgconfig,
+  pkg-config,
   Foundation,
   IOKit,
   self,
@@ -44,7 +44,7 @@ in
       [
         meson
         ninja
-        pkgconfig
+        pkg-config
       ]
       ++ lib.optionals stdenv.isDarwin [
         Foundation
