@@ -628,11 +628,25 @@ int host(char *dest) {
             fclose(fp);
         }
 
-        if(name && version && strcmp(name, "System Product Name") && strcmp(version, "System Version") )
+        // filtering out some shitty defaults because the file can't just be empty
+        const char *errors[] = {"System Product Name", "System Version", "To Be Filled By O.E.M.", ""};
+        bool name_defined = true;
+        bool version_defined = true;
+
+        for(unsigned long i = 0; i < sizeof(errors)/sizeof(errors[0]); ++i) {
+            if(name)
+                if(!strcmp(name, errors[i]))
+                    name_defined = false;
+            if(version)
+                if(!strcmp(version, errors[i]))
+                    version_defined = false;
+        }
+
+        if(name && version && name_defined && version_defined)
             snprintf(dest, 256, "%s %s", name, version);
-        else if(name && strcmp(name, "System Product Name"))
+        else if(name && name_defined)
             strncpy(dest, name, 256);
-        else if(version && strcmp(version, "System Version"))
+        else if(version && version_defined)
             strncpy(dest, version, 256);
         else
             return 1;
