@@ -3,7 +3,7 @@
 # New Features
 
 ### Modules
-* `gtk_theme`: Prints the current GTK theme
+* `gtk_theme`: Prints the current GTK theme (off by default)
 
 ### Config options
 * `ascii_art`: Path to a file containing a custom logo (and color)
@@ -26,6 +26,8 @@
 * Fixed `loc_localhost` (used to be `loc_localdomain`) and `loc_docker` not working
 * Title no longer uses bold when `title_color` is set to false
 * Up to 3 GPUs will be listed, instead of just the first found
+* gpu() will now hide `Rev. A` or similar in NVIDIA cards
+* host() will not print `To Be Filled By O.E.M.` anymore
 
 ### Technical fixes
 * The memory module can now print in up to 256B (was 200B because of 55 reserved for the percentage)
