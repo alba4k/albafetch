@@ -386,7 +386,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     parse_config_int(conf, "spacing", &config.spacing, 64);
 
     // separator
-    parse_config_str(conf, "separator", config.separator, sizeof(config.separator));
+    parse_config_str(conf, "separator_character", config.separator, sizeof(config.separator));
 
     // BOOLEAN OPTIONS (check utils.h)
     char *booleanOptions[] = {

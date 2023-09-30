@@ -436,7 +436,6 @@ int main(int argc, char **argv) {
             "os",
             "kernel",
             "desktop",
-            "gtk_theme",
             "shell",
             "term",
             "packages",
