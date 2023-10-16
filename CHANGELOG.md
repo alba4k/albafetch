@@ -12,6 +12,7 @@
 * `term_ssh`: prints `(SSH)` after the terminal name when running inside of an SSH connection
 * `date_format`: Specifies how the date should be formatted
 * renamed `loc_localdomain` to `loc_localhost`
+* `desktop_type` is now enabled by default
 
 ### Command line arguments
 * `--ascii`: Path to a file containing a custom logo (and color)

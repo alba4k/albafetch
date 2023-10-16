@@ -19,8 +19,8 @@
 // This contains the default config values
 struct Config config = {
     // Default values for boolean options (least to most significant bit)
-    // 1001 1111 0111 1111 1000 1110
-    0x9f7f8e,
+    // 1001 1111 0111 1111 1010 1110
+    0x9f7fae,
 
     NULL,   // logo
     "",     // color
