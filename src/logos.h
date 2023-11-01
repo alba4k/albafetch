@@ -421,6 +421,32 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
         "\033[0m                               ╠╠╠                   ",
         "\033[0m                                ╜                    ",
         NULL
+    },
+    {   // Alpine Linux
+        "alpine",
+        "\033[34m",
+        "\033[34m                                        ",
+        "\033[34m       .hddddddddddddddddddddddh.       ",
+        "\033[34m      :dddddddddddddddddddddddddd:      ",
+        "\033[34m     /dddddddddddddddddddddddddddd/     ",
+        "\033[34m    +dddddddddddddddddddddddddddddd+    ",
+        "\033[34m  `sdddddddddddddddddddddddddddddddds`  ",
+        "\033[34m `ydddddddddddd++hdddddddddddddddddddy` ",
+        "\033[34m `ydddddddddddd++hdddddddddddddddddddy` ",
+        "\033[34mhdddddddddd+`      `+y:    .sddddddddddh",
+        "\033[34mddddddddh+`   `//`   `.`     -sddddddddd",
+        "\033[34mddddddh+`   `/hddh/`   `:s-    -sddddddd",
+        "\033[34mddddh+`   `/+/dddddh/`   `+s-    -sddddd",
+        "\033[34mddd+`   `/o` :dddddddh/`   `oy-    .yddd",
+        "\033[34mhdddyo+ohddyosdddddddddho+oydddy++ohdddh",
+        "\033[34m.hddddddddddddddddddddddddddddddddddddh.",
+        "\033[34m `yddddddddddddddddddddddddddddddddddy` ",
+        "\033[34m  `sdddddddddddddddddddddddddddddddds`  ",
+        "\033[34m    +dddddddddddddddddddddddddddddd+    ",
+        "\033[34m     /dddddddddddddddddddddddddddd/     ",
+        "\033[34m      :dddddddddddddddddddddddddd:      ",
+        "\033[34m       .hddddddddddddddddddddddh.       ",
+        NULL
     }
 };
 

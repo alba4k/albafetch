@@ -37,28 +37,32 @@ Feel free to test any other platform :)
 ## Build dependencies
 These will also install the relative runtime dependencies
 
-* libcurl
+* libcurl:
 	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)
 	- On Debian, [libcurl4-gnutls-dev](https://packages.debian.org/stretch/libcurl4-gnutls-dev)
-	- On fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
+	- On Fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
+	- On Alpine Linux, [curl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/curl-dev)
 	- In Termux, libcurl
-* libcurl
+* libpci:
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci-dev](https://packages.debian.org/buster/libpci-dev)
-	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
-* A build system
-	- Make and meson are already set up, more details are found [here](#compilation)
+	- On Fedora, [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
+	- On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils-dev)
+* libc (should already be installed):
+	- On Alpine Linux, [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
+* A build system:
+	- Make and meson are already set up, more details are found [here](#compilation). I am using gcc, but clang may also be used (when using make, append `CC=clang` or any other c compiler)
 
 ## Runtime dependencies
 I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
 Also, in case albafetch was unable to get the info using those libraries, it'll fall back to `curl` and `lspci` (as system shell commands).
 
-* libcurl (for dynamically linked binaries)
+* libcurl (for dynamically linked binaries):
 	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)	
 	- On Debian, [libcurl4](https://packages.debian.org/buster/libcurl4)
 	- On Fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
 	- In Termux, libcurl
-* pcilib (for dynamically linked binaries)
+* libpci (for dynamically linked binaries):
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci3](https://packages.debian.org/buster/libpci3)
 	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
