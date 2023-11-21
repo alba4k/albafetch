@@ -1010,16 +1010,16 @@ int gpu(char *dest) {
                 gpus[i] += 6;
         }
 
-        if((end = strstr(gpus[i], " Integrated Graphics Controller")))
-            *end = 0;
-        if((end = strstr(gpus[i], " Rev. ")))
-            *end = 0;
         if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
             char *ptr = strchr(end, ']');
             if(ptr) {
                 gpus[i] = end+1;
                 *ptr = 0;
             }
+        if((end = strstr(gpus[i], " Integrated Graphics Controller")))
+            *end = 0;
+        if((end = strstr(gpus[i], " Rev. ")))
+            *end = 0;
         }
 
         // (finally) writing the GPUs into dest
