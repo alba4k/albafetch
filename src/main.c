@@ -13,7 +13,6 @@
  * print de, shell and terminal versions
  * Windows support? *BSD support?
  * split info.c into multiple files (cpu.c, gpu.c, ...)
- * Clean up some extra stuff in gpu(), " Rev. A" in NVIDIA cards
  */
 
 // This contains the default config values
@@ -308,7 +307,7 @@ int main(int argc, char **argv) {
         // it won't be used anyway lol
         destroy_array(modules);
 
-        printf("%s%salbafetch\033[0m - a system fetch utility\n",
+        printf("%s%salbafetch\033[0m - a system fetch utility (v4.1)\n",
                config.color, bold ? "\033[1m" : "");
 
         printf("\n%s%sFLAGS\033[0m:\n",
