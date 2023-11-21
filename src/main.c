@@ -93,8 +93,8 @@ int main(int argc, char **argv) {
         else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold"))
             asking_bold = i+1;
         else if(!strcmp(argv[i], "--ascii")) {
-            if(i+1 >= argc || use_config == false) {   // is there such an arg?
-                fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
+            if(i+1 >= argc) {   // is there such an arg?
+                fputs("\033[31m\033[1mERROR\033[0m: --ascii requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
                 continue;
             }
@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
         else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
             asking_align = i+1;
         else if(!strcmp(argv[i], "--config") && use_config) {
-            if(i+1 >= argc || use_config == false) {   // is there such an arg?
+            if(i+1 >= argc) {   // is there such an arg?
                 fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
                 continue;
