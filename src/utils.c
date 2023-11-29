@@ -33,8 +33,6 @@ int file_to_logo(char *file, char *mem) {
         if(buffer[line_len-1] == '\n')
             buffer[line_len-1] = 0;
 
-        unescape(buffer);
-
         config.color[0] = 0;
 
         char *colors[][2] = {
@@ -50,11 +48,12 @@ int file_to_logo(char *file, char *mem) {
         };
 
         for(int j = 0; j < 9; ++j)
-            if(!strcmp(buffer, *colors[j])) {
+            if(!strcmp(buffer, *colors[j]))
                 strcpy(config.color, colors[j][1]);
-            }
             
         if(!config.color[0]) {
+            unescape(buffer);
+
             logo[i+2] = mem + i*LINE_LEN;
             strncpy(logo[i+2], buffer, LINE_LEN);
 
