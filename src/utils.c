@@ -10,7 +10,17 @@ int file_to_logo(char *file, char *mem) {
     if(!fp)
         return 1;
 
-    static char *logo[49];
+    /* mem is assumed to be a 10 KiB buffer, aka 10240 B.
+     * this will be filled in with up to 64 lines,
+     * each of which can be up to 160 bytes long.
+     * (LINE_LEN * LINE_NUM) should equal this size.
+     * Check out main.c, line 132
+    */
+    #define LINE_LEN 256
+    #define LINE_NUM 40
+
+    // where the final logo is saved
+    static char *logo[LINE_NUM + 1];
 
     char *buffer = NULL;
     size_t len = 0;
@@ -18,7 +28,8 @@ int file_to_logo(char *file, char *mem) {
     int i = 1;
 
     // setting the correct color (or eventually the first line)
-    if((line_len = getline(&buffer, &len, fp)) != (size_t)-1) {
+    line_len = getline(&buffer, &len, fp);  // save the first line to buffer
+    if(line_len != (size_t)-1) {            // getline returns -1 in case of error
         if(buffer[line_len-1] == '\n')
             buffer[line_len-1] = 0;
 
@@ -44,9 +55,8 @@ int file_to_logo(char *file, char *mem) {
             }
             
         if(!config.color[0]) {
-            logo[i+2] = mem + i*128;
-            buffer[127] = 0;    // just using strncpy causes problems so yk
-            strcpy(logo[i+2], buffer);
+            logo[i+2] = mem + i*LINE_LEN;
+            strncpy(logo[i+2], buffer, LINE_LEN);
 
             ++i;
         }
@@ -55,15 +65,14 @@ int file_to_logo(char *file, char *mem) {
         return 1;
 
     // for every remaining line of the logo...
-    while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < 48) {
+    while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < LINE_NUM) {
         if(buffer[line_len-1] == '\n')
             buffer[line_len-1] = 0;
 
         unescape(buffer);
 
-        logo[i+2] = mem + i*128;
-        buffer[127] = 0;    // just using strncpy causes problems so yk
-        strcpy(logo[i+2], buffer);
+        logo[i+2] = mem + i*LINE_LEN;
+        strncpy(logo[i+2], buffer, LINE_LEN);
 
         ++i;
     }
@@ -74,9 +83,9 @@ int file_to_logo(char *file, char *mem) {
 
     // set up the logo metadata;
     logo[0] = "custom"; // logo ID
-    logo[2] = mem;
+    logo[2] = mem;      // the first characters of mem are used for the whitespace
     size_t j;
-    for(j = 0; j < strlen_real(logo[3]); ++j) {   // line length
+    for(j = 0; j < strlen_real(logo[3]); ++j) {   // filling in the whitespace
         mem[j] = ' ';
     }
     mem[j+1] = 0;
@@ -310,11 +319,16 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     conf[fread(conf, 1, len, fp)] = 0;
     fclose(fp);
 
-    unescape(conf);
-
     // remove comments
     char *ptr = conf, *ptr2;
     while((ptr = strchr(ptr, ';'))) {
+        if(ptr != conf) {   // don't want to check ptr[-1] on the first character of the buffer ;)
+            if(ptr[-1] == '\\') {
+                ++ptr;
+                continue;
+            }
+        }
+
         ptr2 = strchr(ptr, '\n');
         
         if(!ptr2) {
@@ -326,6 +340,13 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     }
     ptr = conf;
     while((ptr = strchr(ptr, '#'))) {
+        if(ptr != conf) {   // same as above
+            if(ptr[-1] == '\\') {
+                ++ptr;
+                continue;
+            }
+        }
+
         ptr2 = strchr(ptr, '\n');
 
         if(!ptr2) {
@@ -335,6 +356,8 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
 
         memmove(ptr, ptr2+1, strlen(ptr2));
     }
+
+    unescape(conf);
 
     // GENERAL OPTIONS
 
@@ -350,7 +373,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     if(logo[0]) {
         for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
             if(!strcmp(logos[i][0], logo)) {
-                config.logo = (char**)logos[i];
+                config.logo = logos[i];
                 strcpy(default_logo, logos[i][0]);
                 strcpy(config.color, logos[i][1]);
             }
@@ -516,16 +539,13 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
 void unescape(char *str) {
     while((str = strchr(str, '\\'))) {
         switch(str[1]) {
-            case '\\':
-                memmove(str, str+1, strlen(str));
-                break;
             case 'e':
                 memmove(str, str+1, strlen(str));
                 *str = '\033';
                 break;
             case '0':
                 if(str[2] == '3' && str[3] == '3') {
-                    memmove(str, str+3, strlen(str));
+                    memmove(str, str+3, strlen(str+2));
                     *str = '\033';
                 }
                 break;
@@ -533,6 +553,8 @@ void unescape(char *str) {
                 memmove(str, str+1, strlen(str));
                 *str = '\n';
                 break;
+            default:    // takes care of "\\", "\;" and "\#"
+                memmove(str, str+1, strlen(str));
         }
         ++str;
     }

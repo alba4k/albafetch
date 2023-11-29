@@ -6,9 +6,9 @@
 static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to macOS
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-release
-        "\033[90m",                                               // default color for the printed text
-        "                     ",                                // numbers of spaces to use when ran out of lines
-        "\033[90m        #####        ",                          // just the logo
+        "\033[90m",                                             // default color for the printed text
+        "                     ",                                // numbers of spaces to use when ran out of lines (whitespace)
+        "\033[90m        #####        ",                        // just the logo
         "\033[90m       #######       ",
         "\033[90m       ##\033[37mO\033[90m#\033[37mO\033[90m##       ",
         "\033[90m       #\033[33m#####\033[90m#       ",
@@ -20,7 +20,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
         "\033[33m######\033[90m#\033[37m#######\033[90m#\033[33m######",
         "\033[33m#######\033[90m#\033[37m#####\033[90m#\033[33m#######",
         "\033[33m  #####\033[90m#######\033[33m#####  ",
-        NULL                                                 // the logo is terminated by NULL
+        NULL                                                    // the logo is terminated by NULL
     },
     {   // MacOS X
         "apple",

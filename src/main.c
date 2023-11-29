@@ -13,12 +13,13 @@
  * print de, shell and terminal versions
  * Windows support? *BSD support?
  * split info.c into multiple files (cpu.c, gpu.c, ...)
+ * make ascii dinamically use the avaiable space (aka line by line)
  */
 
 // This contains the default config values
 struct Config config = {
     // Default values for boolean options (least to most significant bit)
-    // 1001 1111 0111 1111 1010 1110
+    // 1001 1111 0111 1111 1010 1110 0...
     0x9f7fae,
 
     NULL,   // logo
@@ -129,10 +130,14 @@ int main(int argc, char **argv) {
             use_config = false;
     }
 
-    char *mem = mmap(NULL, 8192, PROT_READ | PROT_WRITE,
+    // 4 KiB if no ascii logo is specified, 12 if one is provided
+    const size_t mem_size = ascii_file ? 12288 : 4096;
+
+    char *mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    memset(mem, 0, 8192);
+    memset(mem, 0, mem_size);
     /* this chunk is divided as following (every line represents 256B):
+     * lines from 16 to 47 only exist when a logo is provided via --ascii
      * 0  
      * 1  
      * 2  printed       (what should get printed, used for parsing)
@@ -145,7 +150,7 @@ int main(int argc, char **argv) {
      * 10 logo           some logo metadata (id, color, length)
      * 11 logo           and the lines of the logo).
      * .. logo
-     * 31 logo
+     * 47 logo
      */
     
     struct Module *modules = malloc(sizeof(struct Module));
@@ -186,7 +191,7 @@ int main(int argc, char **argv) {
             // find the matching logo
             for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
                 if(!strcmp(logos[i][0], argv[asking_logo])) {
-                    config.logo = (char**)logos[i];
+                    config.logo = logos[i];
                     found = true;
                 }
 
@@ -202,12 +207,12 @@ int main(int argc, char **argv) {
     }
     if(!config.logo) {  // get a logo based on the OS (--logo was not used and no logo was set by the config)
         #ifdef __APPLE__
-            config.logo = (char**)logos[1];
+            config.logo = logos[1];
         #else
         # ifdef __ANDROID__
-            config.logo = (char**)logos[2];
+            config.logo = logos[2];
         # else
-            config.logo = (char**)logos[0];
+            config.logo = logos[0];
             FILE *fp = fopen("/etc/os-release", "r");
 
             if(!fp)
@@ -231,7 +236,7 @@ int main(int argc, char **argv) {
                 // find the matching logo
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
                     if(!strcmp(logos[i][0], os_id)) {
-                        config.logo = (char**)logos[i];
+                        config.logo = logos[i];
                         break;
                     }
             }
