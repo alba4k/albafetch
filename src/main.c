@@ -1,19 +1,37 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
+#include <limits.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
-#include "info.h"
+#include "info/info.h"
 #include "utils.h"
 #include "logos.h"
 #include "queue.h"
+
+// idk why but this is sometimes not defined
+#ifndef HOST_NAME_MAX
+    #ifdef _POSIX_HOST_NAME_MAX
+        #define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+    #else
+        #define HOST_NAME_MAX 255
+    #endif
+#endif
+
+// Not sure if this 
+#ifndef LOGIN_NAME_MAX
+    #define LOGIN_NAME_MAX HOST_NAME_MAX
+#endif
 
 /* TODO:
  * print de, shell and terminal versions
  * Windows support? *BSD support?
  * split info.c into multiple files (cpu.c, gpu.c, ...)
- * make ascii dinamically use the avaiable space (aka line by line)
+ * make ascii dynamically use the available space (aka line by line)
  */
 
 // This contains the default config values

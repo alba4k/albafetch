@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "logos.h"
 #include "utils.h"
@@ -593,19 +594,3 @@ size_t strlen_real(const char *str) {
     return len;
 }
 
-// stuff needed for libcurl
-size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-    size_t realsize = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
-
-    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
-    if(ptr == NULL)
-        return 0;
-
-    mem->memory = ptr;
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-
-    return realsize;
-}

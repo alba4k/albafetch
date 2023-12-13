@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "info.h"
+#include "info/info.h"
 #include "utils.h"
 
 #define name(f) call(#f, f) 

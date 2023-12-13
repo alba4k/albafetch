@@ -5,9 +5,9 @@
 
 #define _GNU_SOURCE
 
-#include <stdlib.h>
-#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 struct Config {
     /* Starting from the least significant byte, see the #define statements later
@@ -126,12 +126,5 @@ void parse_config(const char *file, struct Module *modules, char *chunk, bool *d
 void unescape(char *str);
 
 size_t strlen_real(const char *str);
-
-// libcurl stuff
-struct MemoryStruct {
-    char *memory;
-    size_t size;
-};
-size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 #endif // UTILS_H

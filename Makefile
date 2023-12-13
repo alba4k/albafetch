@@ -8,10 +8,24 @@ KERNEL := $(shell uname -s 2> /dev/null)
 OS := $(shell uname -o 2> /dev/null)
 PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
+SRC_INFO := src/info/bios.c src/info/colors.c src/info/cpu.c src/info/date.c\
+			src/info/desktop.c src/info/gpu.c src/info/gtk_theme.c\
+			src/info/host.c src/info/hostname.c src/info/kernel.c\
+			src/info/light_colors.c src/info/local_ip.c\
+			src/info/login_shell.c src/info/memory.c src/info/os.c\
+			src/info/packages.c src/info/public_ip.c src/info/pwd.c\
+			src/info/shell.c src/info/term.c src/info/uptime.c src/info/user.c
+OBJ_INFO := bios.o colors.o cpu.o date.o\
+			desktop.o gpu.o gtk_theme.o\
+			host.o hostname.o kernel.o\
+			light_colors.o local_ip.o\
+			login_shell.o memory.o os.o\
+			packages.o public_ip.o pwd.o\
+			shell.o term.o uptime.o user.o
+
 ifeq ($(KERNEL),Linux)
-	OBJ := info.o main.o queue.o utils.o
-	SRC := src/main.c src/info.c src/queue.c src/utils.c
-	SRC_DEBUG := src/debug.c src/info.c src/queue.c src/utils.c
+	OBJ := main.o queue.o utils.o
+	SRC_DEBUG := src/debug.c src/queue.c src/utils.c $(SRC_INFO)
 	INSTALLPATH := /usr/local/bin
 	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l curl -l pci
@@ -23,28 +37,27 @@ ifeq ($(OS),Android)
 endif
 
 ifeq ($(KERNEL),Darwin)
-	OBJ := info.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
-	SRC := src/main.c src/info.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
-	SRC_DEBUG := src/debug.c src/info.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
+	OBJ := os.o main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
+	SRC_DEBUG := src/debug.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c $(SRC_INFO)
 	INSTALLPATH := /usr/local/bin
 	INCLUDE := -framework Foundation -framework IOKit -l curl
 endif
 
 all: build/$(TARGET) build/debug
 
-build/$(TARGET): $(OBJ)
+build/$(TARGET): $(OBJ) infos
 	mkdir -p build/
-	$(CC) -o build/$(TARGET) $(OBJ) $(INCLUDE) $(CFLAGS)
+	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_INFO) $(INCLUDE) $(CFLAGS)
 
 build/debug: $(SRC_DEBUG)
 	mkdir -p build/
 	$(CC) $(SRC_DEBUG) $(CFLAGS) $(INCLUDE) -o build/debug
 
-main.o: src/main.c src/logos.h src/info.h src/utils.h src/queue.h
+main.o: src/main.c src/logos.h src/info/info.h src/utils.h src/queue.h
 	$(CC) -c src/main.c $(CFLAGS)
 
-info.o: src/info.c src/utils.h src/queue.h src/macos_infos.h src/bsdwrap.h
-	$(CC) -c src/info.c $(CFLAGS)
+infos: $(SRC_INFO) src/utils.h src/queue.h src/macos_infos.h src/bsdwrap.h
+	$(CC) -c $(SRC_INFO) $(CFLAGS)
 
 utils.o: src/utils.c
 	$(CC) -c src/utils.c $(CFLAGS)
