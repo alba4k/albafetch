@@ -9,58 +9,40 @@
   Foundation,
   IOKit,
   self,
-}: let
-  filter = path: type: let
-    path' = toString path;
-    base = baseNameOf path';
+}:
+stdenv.mkDerivation {
+  name = "albafetch";
+  version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
 
-    extensions = [".c" ".h" ".m"];
-    matches = lib.any (suffix: lib.hasSuffix suffix base) extensions;
+  src = lib.cleanSource self;
 
-    isAllowedDir = type == "directory" && base == "src";
-    isMesonFile = base == "meson.build";
-  in
-    matches || isAllowedDir || isMesonFile;
+  buildInputs =
+    [
+      curl.dev
+    ]
+    ++ lib.optional stdenv.isLinux pciutils;
 
-  filterSource = src:
-    lib.cleanSourceWith {
-      src = lib.cleanSource src;
-      inherit filter;
-    };
-in
-  stdenv.mkDerivation {
-    name = "albafetch";
-    version = builtins.substring 0 8 self.lastModifiedDate or "dirty";
+  nativeBuildInputs =
+    [
+      meson
+      ninja
+      pkg-config
+    ]
+    ++ lib.optionals stdenv.isDarwin [
+      Foundation
+      IOKit
+    ];
 
-    src = filterSource self;
+  OBJC =
+    if stdenv.isDarwin
+    then "clang"
+    else "";
 
-    buildInputs =
-      [
-        curl.dev
-      ]
-      ++ lib.optional stdenv.isLinux pciutils;
-
-    nativeBuildInputs =
-      [
-        meson
-        ninja
-        pkg-config
-      ]
-      ++ lib.optionals stdenv.isDarwin [
-        Foundation
-        IOKit
-      ];
-
-    OBJC =
-      if stdenv.isDarwin
-      then "clang"
-      else "";
-
-    meta = with lib; {
-      description = "Faster neofetch alternative, written in C.";
-      homepage = "https://github.com/alba4k/albafetch";
-      license = licenses.mit;
-      maintainers = with maintainers; [getchoo];
-      platforms = platforms.unix;
-    };
-  }
+  meta = with lib; {
+    description = "Faster neofetch alternative, written in C.";
+    homepage = "https://github.com/alba4k/albafetch";
+    license = licenses.mit;
+    maintainers = with maintainers; [getchoo];
+    platforms = platforms.unix;
+  };
+}
