@@ -36,7 +36,7 @@ int file_to_logo(char *file, char *mem) {
 
         config.color[0] = 0;
 
-        char *colors[][2] = {
+        const char *colors[][2] = {
             {"black", "\033[30m"},
             {"red", "\033[31m"},
             {"green", "\033[32m"},
@@ -56,7 +56,7 @@ int file_to_logo(char *file, char *mem) {
             unescape(buffer);
 
             logo[i+2] = mem + i*LINE_LEN;
-            strncpy(logo[i+2], buffer, LINE_LEN);
+            strncpy((char*)logo[i+2], buffer, LINE_LEN);
 
             ++i;
         }
@@ -178,7 +178,7 @@ void print_line(char *line, const size_t maxlen) {
 
                 // this line is a bit weird
                 // ++len <=> escaping == 0
-                len += 1-escaping;
+                len += (size_t)1-escaping;
 
                 /* m is found     and escaping     => escaping = 0
                  * m is found     and not escaping => escaping = 0
@@ -312,7 +312,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
         return;
 
     fseek(fp, 0, SEEK_END);
-    size_t len = ftell(fp);
+    size_t len = (size_t)ftell(fp);
     rewind(fp);
     
     char *conf = malloc(len+1);
@@ -383,7 +383,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     char color[16] = "";
     parse_config_str(conf, "default_color", color, sizeof(color));
     if(color[0]) {
-        char *colors[][2] = {
+        const char *colors[][2] = {
             {"black", "\033[30m"},
             {"red", "\033[31m"},
             {"green", "\033[32m"},
@@ -412,7 +412,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     parse_config_str(conf, "separator_character", config.separator, sizeof(config.separator));
 
     // BOOLEAN OPTIONS (check utils.h)
-    char *booleanOptions[] = {
+    const char *booleanOptions[] = {
         "align_infos",
         "bold",
         "colored_title",
@@ -461,7 +461,13 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
 
     // LABELS
 
-    char *prefixes[][2] = {
+    struct Prefix {
+        char *option;
+        const char *config_name;
+    };
+    
+
+    struct Prefix prefixes[] = {
     //  {config.module_prefix, "module_prefix"}
         {config.separator_prefix, "separator_prefix"},
         {config.spacing_prefix, "spacing_prefix"},
@@ -491,7 +497,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     };
 
     for(size_t i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); ++i)
-        parse_config_str(conf, prefixes[i][1], prefixes[i][0], 64);
+        parse_config_str(conf, prefixes[i].config_name, prefixes[i].option, 64);
 
     // MODULES
     
@@ -561,7 +567,7 @@ void unescape(char *str) {
 }
 
 // get the printed length of a string (not how big it is in memory)
-size_t strlen_real(const char *str) {
+__attribute__((pure)) size_t strlen_real(const char *str) {
     if(str == NULL)
         return 0;
 
@@ -581,7 +587,7 @@ size_t strlen_real(const char *str) {
         }
 
         if(*str != '\033') {
-            len += 1-escaping;
+            len += (size_t)1-escaping;
 
             escaping = (*str != 'm') && escaping;
         }

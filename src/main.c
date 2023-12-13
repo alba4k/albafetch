@@ -26,6 +26,7 @@
 #ifndef LOGIN_NAME_MAX
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
+int a = 0;
 
 /* TODO:
  * print de, shell and terminal versions
@@ -267,7 +268,7 @@ int main(int argc, char **argv) {
 
     if(asking_color) {
         if(asking_color < argc) {
-            char *colors[][2] = {
+            const char *colors[][2] = {
                 {"black", "\033[30m"},
                 {"red", "\033[31m"},
                 {"green", "\033[32m"},

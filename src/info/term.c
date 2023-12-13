@@ -9,9 +9,9 @@
 // get the current terminal
 int term(char *dest) {
     // TODO: print terminal version (using env variables, parsing --version outputs, ...)
-    char *terminal = NULL;
+    const char *terminal = NULL;
 
-    char *terminals[][2] = {
+    const char *terminals[][2] = {
      // {"ENVIRONMENT_VARIABLE", "terminal"},
         {"ALACRITTY_SOCKET", "alacritty"},
         {"KITTY_PID", "kitty"},

@@ -32,7 +32,7 @@ int packages(char *dest) {
                     ++count;
 
             if(count) {
-                snprintf(dest, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (pacman)" : "");
+                snprintf(dest, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (pacman)" : "");
                 done = true;
             }
             closedir(dir);
@@ -44,7 +44,7 @@ int packages(char *dest) {
         strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
         if(pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
             fseek(fp, 0, SEEK_END);
-            size_t len = ftell(fp);
+            size_t len = (size_t)ftell(fp);
             rewind(fp);
 
             char *dpkg_list = malloc(len);
@@ -88,7 +88,7 @@ int packages(char *dest) {
             close(pipes[0]);
 
             if(str[0] != '0' && str[0]) {
-                snprintf(buf, 256 - strlen(buf), "%s%s%s", done ? ", " : "", str, pkg_mgr ? " (rpm)" : "");
+                snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, pkg_mgr ? " (rpm)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -105,7 +105,7 @@ int packages(char *dest) {
                     ++count;
 
             if(count) {
-                snprintf(buf, 256 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (flatpak)" : "");
+                snprintf(buf, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (flatpak)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -133,7 +133,7 @@ int packages(char *dest) {
             close(pipes[0]);
 
             if(str[0] != '0' && str[0]) {
-                snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, pkg_mgr ? " (snap)" : "");
+                snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, pkg_mgr ? " (snap)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -197,7 +197,7 @@ int packages(char *dest) {
         close(pipes[0]);
 
         if(str[0] != '0' && str[0]) {
-            snprintf(buf, 256 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, pkg_mgr ? " (pip)" : "");
+            snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, pkg_mgr ? " (pip)" : "");
             done = true;
             strncat(dest, buf, 256 - strlen(dest));
         }

@@ -1,10 +1,8 @@
-
 #include "info.h"
+#include "../queue.h"
 #include "../utils.h"
 
 #include <string.h>
-
-#include "../queue.h"
 
 #include <stdio.h>
 #include <sys/utsname.h>

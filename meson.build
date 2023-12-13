@@ -8,7 +8,6 @@ project(
 
 
 src = [
-  'src/main.c',
   'src/queue.c',
   'src/utils.c',
   'src/info/bios.c',
@@ -35,35 +34,10 @@ src = [
   'src/info/uptime.c',
   'src/info/user.c',
 ]
+src_debug = ['src/debug.c']
+src_debug += src
+src += 'src/main.c'
 
-src_debug = [
-  'src/debug.c',
-  'src/queue.c',
-  'src/utils.c',
-  'src/info/bios.c',
-  'src/info/colors.c',
-  'src/info/cpu.c',
-  'src/info/date.c',
-  'src/info/desktop.c',
-  'src/info/gpu.c',
-  'src/info/gtk_theme.c',
-  'src/info/host.c',
-  'src/info/hostname.c',
-  'src/info/info.h',
-  'src/info/kernel.c',
-  'src/info/light_colors.c',
-  'src/info/local_ip.c',
-  'src/info/login_shell.c',
-  'src/info/memory.c',
-  'src/info/os.c',
-  'src/info/packages.c',
-  'src/info/public_ip.c',
-  'src/info/pwd.c',
-  'src/info/shell.c',
-  'src/info/term.c',
-  'src/info/uptime.c',
-  'src/info/user.c',
-]
 
 project_dependencies = [
   dependency('libcurl', method: 'pkg-config'),
