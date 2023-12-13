@@ -1,28 +1,34 @@
 {self, ...}: {
   perSystem = {
-    lib,
     pkgs,
     system,
-    self',
+    config,
     ...
-  }: {
-    packages = let
-      armPkgs = pkgs.pkgsCross.aarch64-multiplatform;
+  }: let
+    packageFn = pkgs: (self.overlays.default pkgs pkgs).albafetch;
 
-      fn = pkgs: (self.overlays.default pkgs pkgs).albafetch;
-    in
+    armPkgs = pkgs.pkgsCross.aarch64-multiplatform;
+    albafetch-static = packageFn pkgs.pkgsStatic;
+  in {
+    packages = {
+      albafetch = packageFn pkgs;
+      default = config.packages.albafetch;
+    };
+
+    legacyPackages =
       {
-        albafetch = fn pkgs;
-        default = self'.packages.albafetch;
+        "x86_64-linux" = {
+          albafetch-arm = packageFn armPkgs.pkgsStatic;
+          inherit albafetch-static;
+        };
+
+        "aarch64-linux" = {inherit albafetch-static;};
+
+        "x86_64-darwin" = {
+          albafetch-arm = packageFn armPkgs;
+        };
       }
-      // lib.optionalAttrs (system == "x86_64-linux") {
-        albafetch-arm = fn armPkgs.pkgsStatic;
-      }
-      // lib.optionalAttrs (system == "x86_64-darwin") {
-        albafetch-arm = fn armPkgs;
-      }
-      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-        albafetch-static = fn pkgs.pkgsStatic;
-      };
+      .${system}
+      or {};
   };
 }
