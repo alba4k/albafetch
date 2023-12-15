@@ -2,12 +2,13 @@
 
 #include <string.h>
 
+#include <stdio.h>
+
 #ifdef __APPLE__
 #include "../bsdwrap.h"
-#endif
-
-#include <stdio.h>
+#else
 #include <sys/sysinfo.h>
+#endif // __APPLE__
 
 // print the current uptime
 int uptime(char *dest) {

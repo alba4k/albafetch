@@ -6,10 +6,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/sysinfo.h>
 
 #ifdef __APPLE__
 #include "../macos_infos.h"
+#else
+#include <sys/sysinfo.h>
 #endif // __APPLE__
 
 // get used and total memory
