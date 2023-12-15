@@ -224,7 +224,8 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
     if(len+1 > maxlen) {
         memcpy(dest, ptr, maxlen);
         dest[maxlen-1] = 0;
-    } else
+    }
+    else
         memcpy(dest, ptr, len+1);
 
 

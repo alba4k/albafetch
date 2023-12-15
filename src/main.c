@@ -216,7 +216,8 @@ int main(int argc, char **argv) {
 
             if(!found)
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
-        } else
+        }
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
 
         if(found)

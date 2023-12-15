@@ -45,7 +45,7 @@ run: build/$(TARGET)
 	build/$(TARGET)
 
 debug: build/debug
-	build/debug
+	build/debug --no-pip
 
 install: build/$(TARGET)
 	@install $(INSTALL_FLAGS) build/$(TARGET) $(INSTALLPATH)/$(TARGET) || \

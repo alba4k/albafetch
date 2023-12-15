@@ -11,12 +11,14 @@
 ### Command line arguments
 
 ### Other changes
-* the number of lines a custom ascii art may have was reduced to 39 (from 47) but the maximum lenght of each line got increased to 256B (~66% increase in total size)
+* the number of lines a custom ascii art may have was reduced to 39 (from 47) but the maximum length of each line got increased to 256B (~66% increase in total size)
+* The debug script can now be used with `--no-pip`, this won't print the # of packages installed using pip (because of speed concerns)
 
 ## Bug fixes
 
 ### Noticeable fixes
 * Any portion that might have shown white as `\e[37m` will now use `\e[97m`
+* The amount of packages installed using rpm should now be much faster
 
 ### Technical fixes
 * Reduced the memory usage when not using --ascii (increased when it is used)

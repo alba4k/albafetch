@@ -19,8 +19,7 @@ void call(const char *name, void (*f)(void)) {
 // Most of those aren't even needed
 struct Config config;
 
-int main() {
-
+int main(int argc, char **argv) {
     struct Module {
         int (*func)(char *);
         char *name;
@@ -57,8 +56,11 @@ int main() {
     struct timeval start, end, start_all;
     double time;
 
-    // just setting every option to 1
-    config.options = 0xffffffffffffffff;
+    // just setting every option to 1 (except maybe pkg_pip cause pip is slow af)
+    if(argc > 1)
+        config.options = strcmp(argv[1], "--no-pip") ? 0xffffffffffffffff : 0xffffffffffff7fff;
+    else
+        config.options = 0xffffffffffffffff;
     // these are just defaults
     config.col_block_len = 3;
     strcpy(config.date_format, "%02d/%02d/%d %02d:%02d:%02d");
@@ -75,8 +77,9 @@ int main() {
         time = ((end.tv_sec  - start.tv_sec) * 1e6 +
                  end.tv_usec - start.tv_usec) / 1e3;
 
-        if(!return_value)
+        if(!return_value) {
             printf("\033[1m\033[32m%-12s\033[0m %-40s [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", arr[i].name, mem, time);
+        }
         else {
             printf("\033[1m\033[31m%-12s\033[0m %d                                    "    
                    "[\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", arr[i].name, return_value, time);

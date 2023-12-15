@@ -36,7 +36,7 @@ There are three different types of data that will be parsed:
 All of this means that `AB"CboldDEF"whatever lol"wo"w` will be parsed the exact same way as `bold = "true",` or `bold""`, but I would not recommend this as it makes everything less readable. I might also stop supporting this at any moment, so the specified syntax is the only one that's guaranteed to work.
 I might also make the parser stricter in the future and configs written this way might stop working entirely.
 
-Also, any `~` that you may want to use will not get expanded to `/home/username` and will instead be parsed as it is. If you want to revence your home directory inside of this config file (e.g. to specify the path to a custom ascii art) you will have to do so manually. 
+Also, any `~` that you may want to use will not get expanded to `/home/username` and will instead be parsed as it is. If you want to reference your home directory inside of this config file (e.g. to specify the path to a custom ascii art) you will have to do so manually. 
 
 A specific option that's worth spending some extra time talking about is `ascii_art`. This option expects the path to a file that contains a custom logo. Its syntax is really straight-forward: You can specify up to 39 lines you want to use as logo (which can not be longer than 256 bytes long, including the closing null character. Note that Unicode characters will be bigger than 1B), and eventually a color on the first line. Anything that's not recognized as a color ("colors" are defined as black, red, green, yellow, blue, purple, cyan, gray or white) Will be considered the first line of the logo.
 
@@ -76,8 +76,8 @@ When albafetch parses a file (config or custom ascii art), it will also automati
 | "\\e"        | "\\033" (ANSI escape) |
 | "\\033"      | "\\033" (ANSI escape) |
 | "\\n"        | "\\n" (new line)      |
-| "\\#"        | "#" (not a commment)  |
-| "\\;"        | ";" (not a commment)  |
+| "\\#"        | "#" (not a comment)  |
+| "\\;"        | ";" (not a comment)  |
 | "\\X"        | "X" (everything else) |
 
 Since it might be useful, here are some of the most useful ANSI escape sequences (you can find a more complete list [here](https://stackoverflow.com/a/33206814))
