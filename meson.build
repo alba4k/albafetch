@@ -38,6 +38,8 @@ src_debug = ['src/debug.c']
 src_debug += src
 src += 'src/main.c'
 
+project_dependencies = []
+
 if host_machine.system() == 'linux'
   project_dependencies += dependency('libpci', method: 'pkg-config')
 endif
