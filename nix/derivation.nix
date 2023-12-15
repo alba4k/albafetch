@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  curl,
   meson,
   ninja,
   pciutils,

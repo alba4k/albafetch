@@ -14,13 +14,13 @@
 typedef uint64_t bytes_t;
 typedef uint64_t pages_t;
 
-char *get_gpu_string();
+char *get_gpu_string(void);
 
 /*
  * Gets the used memory int
  */
-bytes_t used_mem_size();
+bytes_t used_mem_size(void);
 
-bytes_t system_mem_size();
+bytes_t system_mem_size(void);
 
 #endif //MACOS_INFOS_H 

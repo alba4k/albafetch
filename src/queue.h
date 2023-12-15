@@ -28,7 +28,7 @@ int dequeue(Queue *q, char *out);
 
 void destroy_queue(Queue *q);
 
-void test_queue();
+void test_queue(void);
 
 void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size);
 

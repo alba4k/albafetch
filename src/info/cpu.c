@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#endif // __APPLE__
+
 // get the cpu name and frequency
 int cpu(char *dest) {
     char *cpu_info;
