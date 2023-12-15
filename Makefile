@@ -22,18 +22,17 @@ ifeq ($(KERNEL),Linux)
 	OBJ := main.o queue.o utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/utils.c
 	INSTALL_FLAGS := -Dm 755
-	INCLUDE := -l curl -l pci
+	INCLUDE := -l pci
 endif
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
-	INCLUDE := -l curl
 endif
 
 ifeq ($(KERNEL),Darwin)
 	OBJ := main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
-	INCLUDE := -framework Foundation -framework IOKit -l curl
+	INCLUDE := -framework Foundation -framework IOKit
 
 	MACOS_INFOS_H := src/macos_infos.h
 	BSDWRAP_H = src/bsdwrap.h
@@ -55,7 +54,7 @@ uninstall:
 	rm $(INSTALLPATH)/$(TARGET)
 
 clean:
-	-rm -rf build *.o
+	-rm -rf *.o
 
 build/$(TARGET): $(OBJ) $(OBJ_INFO)
 	mkdir -p build/

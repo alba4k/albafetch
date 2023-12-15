@@ -15,6 +15,8 @@ int local_ip(char *dest) {
     
     getifaddrs(&addrs);
 
+    struct ifaddrs *first = addrs;
+
     while(addrs) {
         // checking if the ip is valid
        if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
@@ -33,7 +35,7 @@ int local_ip(char *dest) {
         addrs = addrs->ifa_next;
     }
 
-    freeifaddrs(addrs);
+    freeifaddrs(first);
     
     return !done;
 }

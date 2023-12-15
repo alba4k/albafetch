@@ -2,94 +2,70 @@
 
 #include <string.h>
 
+#include <netdb.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/wait.h>
-#include <curl/curl.h>
-
-// libcurl stuff idk
-struct MemoryStruct {
-    char *memory;
-    size_t size;
-};
-
-size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-    size_t realsize = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
-
-    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
-    if(ptr == NULL)
-        return 0;
-
-    mem->memory = ptr;
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-
-    return realsize;
-}
+#include <sys/types.h>
+#include <sys/socket.h>
 
 // get the current public ip
 int public_ip(char *dest) {
-    CURL *curl_handle = curl_easy_init();
-    CURLcode res;
+    // https://stackoverflow.com/a/65362666 - thanks dbush
 
-    // fallback
-    char ip_str[32] = "";
-    int pipes[2];
+    struct addrinfo hints = {0}, *addrs;
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = 0;
 
-    struct MemoryStruct chunk;
-    chunk.memory = malloc(4096);
-    chunk.size = 0;
+    // using this as it is faster than ident.me
+    int rval = getaddrinfo("whatismyip.akamai.com", "80", &hints, &addrs);
+    if (rval != 0)
+        return 1;
 
-    if(!curl_handle) {
-        curl_easy_cleanup(curl_handle);
-        free(chunk.memory);
-
-        goto fallback;
-    }
-
-    curl_easy_setopt(curl_handle, CURLOPT_URL, "ident.me");
-    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void *)&chunk);
-    curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-
-    res = curl_easy_perform(curl_handle);
-
-    if(res != CURLE_OK) {
-        curl_easy_cleanup(curl_handle);
-        free(chunk.memory);
-
-        goto fallback;
-    }
-
-    strncpy(dest, chunk.memory, 256);
-
-    curl_easy_cleanup(curl_handle);
-    free(chunk.memory);
-
-    return 0;
-
-    fallback:
-        if(pipe(pipes))
-            return 1;
+    int socket_fd = socket(addrs->ai_family, addrs->ai_socktype, addrs->ai_protocol);
+    if (socket_fd == -1)
+        return 1;
         
-        if(!fork()) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
+    rval = connect(socket_fd, addrs->ai_addr, addrs->ai_addrlen);
+    if (rval == -1)
+        return 1;
 
-            execlp("curl", "curl", "-s", "ident.me", NULL); 
-        }
-        wait(0);
-        close(pipes[1]);
-        ip_str[read(pipes[0], ip_str, 32) - 1] = 0;
-        close(pipes[0]);
+    char cmd[] = "GET / HTTP/1.1\nHost: whatismyip.akamai.com\n\n";
+    rval = send(socket_fd, cmd, strlen(cmd), 0);
+    if (rval == -1)
+        return 1;
 
-    if(!ip_str[0]) {
+    char buf[1024] = {0};
+    rval = recv(socket_fd, buf, sizeof(buf), 0);
+    if (rval == -1)
+        return 1;
+
+    close(socket_fd);
+
+    /* buf should now look like this:
+     * """
+     * HTTP/1.1 200 OK
+     * [...]
+     * [...]
+     * 
+     * 123.123.123.123
+     * """
+     */
+    char *start = buf, *end;
+    end = strchr(start, '\n');
+    if (strncmp(start, "HTTP/1.1 200 OK", end - start - 1)) {
+        freeaddrinfo(addrs);
         return 1;
     }
 
-    strcpy(dest, ip_str);
+    start = strstr(start, "\n\r\n");
+    if(!start)
+        return 1;
+    start += 3;
+    
+    strncpy(dest, start, 256);
+
+    freeaddrinfo(addrs);
     return 0;
 }

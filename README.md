@@ -39,12 +39,6 @@ Feel free to test any other platform :)
 ## Build dependencies
 These will also install the relative runtime dependencies
 
-* libcurl:
-	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)
-	- On Debian, [libcurl4-gnutls-dev](https://packages.debian.org/stretch/libcurl4-gnutls-dev)
-	- On Fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
-	- On Alpine Linux, [curl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/curl-dev)
-	- In Termux, libcurl
 * libpci:
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci-dev](https://packages.debian.org/buster/libpci-dev)
@@ -57,13 +51,8 @@ These will also install the relative runtime dependencies
 
 ## Runtime dependencies
 I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
-Also, in case albafetch was unable to get the info using those libraries, it'll fall back to `curl` and `lspci` (as system shell commands).
+Also, in case albafetch was unable to get the info using libpci libraries, it'll fall back to `lspci` (as system shell commands).
 
-* libcurl (for dynamically linked binaries):
-	- On Arch Linux, [libcurl-gnutls](https://archlinux.org/packages/core/x86_64/libcurl-gnutls)	
-	- On Debian, [libcurl4](https://packages.debian.org/buster/libcurl4)
-	- On Fedora, [libcurl](https://packages.fedoraproject.org/pkgs/curl/libcurl)
-	- In Termux, libcurl
 * libpci (for dynamically linked binaries):
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci3](https://packages.debian.org/buster/libpci3)

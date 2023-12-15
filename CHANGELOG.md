@@ -23,6 +23,7 @@
 ### Technical fixes
 * Reduced the memory usage when not using --ascii (increased when it is used)
 * `src/info.c` was split up into multiple files (in `src/info/`)
+* libcurl is now not used anymore to get the public ip
 
 ---
 
