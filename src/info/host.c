@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifdef __APPLE__
+#include <sys/sysctl.h>
+#endif // __APPLE__
 #ifdef __ANDROID__
 #include <unistd.h>
 #include <sys/wait.h>
