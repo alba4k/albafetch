@@ -34,7 +34,7 @@ static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
 
 /* EXPORTS */ 
 
-bytes_t system_mem_size() {
+bytes_t system_mem_size(void) {
     uint64_t size;
     int error;
 
@@ -48,7 +48,7 @@ bytes_t system_mem_size() {
     return size;
 }
 
-bytes_t used_mem_size() {
+bytes_t used_mem_size(void) {
     pages_t internal, wired, compressed;
     mach_port_t host = mach_host_self();
 

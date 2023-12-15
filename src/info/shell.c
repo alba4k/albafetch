@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#ifdef __APPLE__
+#include <libgen.h>
+#endif // __APPLE__
+
 // get the parent process name (usually the shell)
 int shell(char *dest) {
     #ifdef __linux__
