@@ -424,7 +424,7 @@ int packages(char *dest) {
         path[0] = 0;
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
-        strncat(path, "/bin/rpm", 256-strlen(path));
+        strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
         if(pkg_rpm && !access(path, F_OK)) {
             if(pipe(pipes))
                 return 1;
@@ -433,7 +433,7 @@ int packages(char *dest) {
                 close(pipes[0]);
                 dup2(pipes[1], STDOUT_FILENO);
 
-                execlp("sh", "sh", "-c", "rpm -qa 2>/dev/null | wc -l", NULL); 
+                execlp("sh", "sh", "-c", "sqlite3 /var/lib/rpm/rpmdb.sqlite 'SELECT count(*) FROM Packages' 2>/dev/null", NULL);
             }
             wait(0);
             close(pipes[1]);
