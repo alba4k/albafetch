@@ -31,7 +31,6 @@ int a = 0;
 /* TODO:
  * print de, shell and terminal versions
  * Windows support? *BSD support?
- * split info.c into multiple files (cpu.c, gpu.c, ...)
  * make ascii dynamically use the available space (aka line by line)
  */
 
@@ -150,7 +149,7 @@ int main(int argc, char **argv) {
     }
 
     // 4 KiB if no ascii logo is specified, 12 if one is provided
-    const size_t mem_size = ascii_file ? 12288 : 4096;
+    const size_t mem_size = ascii_file ? 3*4096 : 4096;
 
     char *mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
@@ -165,10 +164,10 @@ int main(int argc, char **argv) {
      * 5  
      * 6  data          (buffer for every function in info.c)
      * 7  
-     * 8  logo          (when using a custom ascii, used to store
-     * 10 logo           some logo metadata (id, color, length)
-     * 11 logo           and the lines of the logo).
-     * .. logo
+     * 8  logo          when using a custom ascii, used to store
+     * 10 logo          some logo metadata (id, color, length)
+     * 11 logo          and the lines of the logo.
+     * .. logo          16 -> 47 are only allocated when a logo is provided
      * 47 logo
      */
     
