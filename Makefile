@@ -27,6 +27,7 @@ endif
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
+	INCLUDE := 
 endif
 
 ifeq ($(KERNEL),Darwin)

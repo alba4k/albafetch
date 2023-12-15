@@ -6,6 +6,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#ifdef __ANDROID__
+#include <unistd.h>
+#include <sys/wait.h>
+#endif // __ANDROID__
+
 // get the machine name and eventually model version
 int host(char *dest) {
     #ifdef __APPLE__

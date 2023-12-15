@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <sys/utsname.h>
 
+#ifdef __ANDROID__
+#include <unistd.h>
+#include <sys/wait.h>
+#endif // __ANDROID__
+
 // print the operating system name and architecture (uname -m)
 int os(char *dest) {
     struct utsname name;
