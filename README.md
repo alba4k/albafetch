@@ -1,5 +1,7 @@
 # albafetch ~by alba4k
 
+#### Note: to prevent merge conflicts, please open your pull requests to the "development" branch, and check that one out before doing anything. Master is more stagnant and only updated when I know what I'm currently working on works as expected (most of the time).
+
 ![intro](images/albafetch.png)
 
 albafetch is a simple and fast program to display a lot of system information in a neofetch-like layout in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable given that we're talking about a 10k+ lines shell script).
@@ -46,7 +48,7 @@ These will also install the relative runtime dependencies
 * libpci:
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci-dev](https://packages.debian.org/buster/libpci-dev)
-	- On Fedora, [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
+	- On Fedora, [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-devel)
 	- On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils-dev)
 * libc (should already be installed):
 	- On Alpine Linux, [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
