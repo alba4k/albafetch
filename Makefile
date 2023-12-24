@@ -21,6 +21,7 @@ OBJ_INFO := bios.o colors.o cpu.o date.o\
 ifeq ($(KERNEL),Linux)
 	OBJ := main.o queue.o utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/utils.c
+	OBJ_DEBUG := debug.o queue.o utils.o
 	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l pci
 endif
@@ -33,6 +34,7 @@ endif
 ifeq ($(KERNEL),Darwin)
 	OBJ := main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
+	OBJ_DEBUG := debug.o queue.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
 	INCLUDE := -framework Foundation -framework IOKit
 
 	MACOS_INFOS_H := src/macos_infos.h
@@ -61,10 +63,9 @@ build/$(TARGET): $(OBJ) $(OBJ_INFO)
 	mkdir -p build/
 	$(CC) -o build/$(TARGET) $(OBJ) $(OBJ_INFO) $(INCLUDE) $(CFLAGS)
 
-build/debug: src/debug.c queue.o $(OBJ_INFO)
+build/debug: $(OBJ_DEBUG) $(OBJ_INFO)
 	mkdir -p build/
-	$(CC) -c $(SRC_DEBUG) $(CFLAGS)
-	$(CC) debug.o queue.o $(OBJ_INFO) $(CFLAGS) $(INCLUDE) -o build/debug
+	$(CC) $(OBJ_DEBUG) $(OBJ_INFO) $(CFLAGS) $(INCLUDE) -o build/debug
 
 main.o: src/main.c src/logos.h src/info/info.h src/utils.h src/queue.h
 	$(CC) -c src/main.c $(CFLAGS)
@@ -95,6 +96,9 @@ cpu.o: src/info/cpu.c src/info/info.h src/utils.h
 
 date.o: src/info/date.c src/info/info.h src/utils.h
 	$(CC) -c src/info/date.c $(CFLAGS)
+
+debug.o: src/debug.c src/info/info.h src/utils.h
+	$(CC) -c src/debug.c $(CFLAGS)
 
 desktop.o: src/info/desktop.c src/info/info.h src/utils.h
 	$(CC) -c src/info/desktop.c $(CFLAGS)
