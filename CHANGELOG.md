@@ -12,7 +12,8 @@
 
 ### Other changes
 * the number of lines a custom ascii art may have was reduced to 39 (from 47) but the maximum length of each line got increased to 256B (~66% increase in total size)
-* The debug script can now be used with `--no-pip`, this won't print the # of packages installed using pip (because of speed concerns)
+* the buffer size for single lines has been raised to 1024B
+* the debug script can now be used with `--no-pip`, this won't print the # of packages installed using pip (because of speed concerns)
 
 ## Bug fixes
 

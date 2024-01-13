@@ -147,21 +147,8 @@ int main(int argc, char **argv) {
             use_config = false;
     }
 
-    // 4 KiB that will be used for some random stuff
-    char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
-        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    memset(mem, 0, 4096);
-    /* this chunk is divided as following (every line represents 256B):
-     * 0  
-     * 1  
-     * 2  printed       (what should get printed, used for parsing)
-     * 3  printed
-     * 4  printed
-     * 5  
-     * 6  data          (buffer for every function in info.c)
-     * 7  
-     * ...              (7-15 are currently unused)
-     */
+    char data[256] = "";     // output of each module
+    char printed[1024] = ""; // line-by-line output of albafetch
     
     struct Module *modules = malloc(sizeof(struct Module));
     modules->id = NULL;
@@ -390,8 +377,6 @@ int main(int argc, char **argv) {
 
     // I am deeply sorry for the code you're about to see - I hope you like spaghetti
     unsigned line = 2;
-    char *data = mem + 1536;
-    char *printed = mem+512;
     char format[32] = "%s\033[0m%s";
 
     /* getting the terminal width
@@ -496,15 +481,14 @@ int main(int argc, char **argv) {
     // printing every module
     for(struct Module *current = modules->next; current; current = current->next) {
         if(!strcmp(current->id, "separator")) {    // separators are handled differently
-            if(!(printed[0]) || strlen(printed) > 767)
+            if(!printed[0]) // first thing being printed
                 continue;
 
-            // this is the length of the previous printed text
-            const size_t logo_len = strlen(config.logo[line] ? config.logo[line] : config.logo[2]) + config.spacing;
-            const size_t len = (strlen_real(printed
-                                      + (print_logo ? logo_len : 0)
-                                      - strlen_real(current->label))
-                                    / strlen_real(config.separator));
+            // this is the length of the last printed text
+            const size_t len = strlen_real(printed)
+                               - strlen_real(config.separator_prefix)
+                               - strlen(config.logo[2])
+                               - config.spacing;
 
             printed[0] = 0;
 
@@ -519,7 +503,7 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             const size_t separator_len = strlen(config.separator);
-            for(size_t i = 0; i < len && strlen(printed) < 767 - separator_len; ++i)
+            for(size_t i = 0; i < len && strlen(printed) < 1023 - separator_len; ++i)
                 strcat(printed, config.separator);
         }
         else if(!strcmp(current->id, "space")) {  // spacings are handled differently (they don't do shit)
@@ -555,7 +539,7 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             if(title_color)
-                snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s%s%s@%s%s%s",
+                snprintf(printed+strlen(printed), 1024-strlen(printed), "%s%s%s%s@%s%s%s",
                     config.color,
                     bold ? "\033[1m" : "",
                     name,
@@ -565,7 +549,7 @@ int main(int argc, char **argv) {
                     host
                 );
             else
-                snprintf(printed+strlen(printed), 768-strlen(printed), "%s%s@%s",
+                snprintf(printed+strlen(printed), 1024-strlen(printed), "%s%s@%s",
                     "\033[0m",
                     name,
                     host
@@ -582,7 +566,7 @@ int main(int argc, char **argv) {
             }
 
             strcat(printed, config.color);
-            strcat(printed, current->id);
+            strncat(printed, current->id, 1023 - strlen(printed));
         }
         else {
             if((current->func)(data))
@@ -603,7 +587,7 @@ int main(int argc, char **argv) {
             if(current->label[0] && current->func != colors && current->func != light_colors)
                 strcat(label, config.dash);
 
-            snprintf(printed+strlen(printed), 768-strlen(printed), format, label, data);
+            snprintf(printed+strlen(printed), 1024-strlen(printed), format, label, data);
         }
         
         print_line(printed, w.ws_col);
