@@ -77,8 +77,6 @@ struct Config config = {
     "",         // light_colors_prefix
 };
 
-
-
 int main(int argc, char **argv) {
     bool user_is_an_idiot = false; // rtfm and stfu
 
@@ -101,6 +99,7 @@ int main(int argc, char **argv) {
     char config_file[LOGIN_NAME_MAX + 64] = "";
     // path of a custom ascii art
     char *ascii_file = NULL;
+    void *ascii_ptr = NULL;
 
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
@@ -148,14 +147,11 @@ int main(int argc, char **argv) {
             use_config = false;
     }
 
-    // 4 KiB if no ascii logo is specified, 12 if one is provided
-    const size_t mem_size = ascii_file ? 3*4096 : 4096;
-
-    char *mem = mmap(NULL, mem_size, PROT_READ | PROT_WRITE,
+    // 4 KiB that will be used for some random stuff
+    char *mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
         MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-    memset(mem, 0, mem_size);
+    memset(mem, 0, 4096);
     /* this chunk is divided as following (every line represents 256B):
-     * lines from 16 to 47 only exist when a logo is provided via --ascii
      * 0  
      * 1  
      * 2  printed       (what should get printed, used for parsing)
@@ -164,11 +160,7 @@ int main(int argc, char **argv) {
      * 5  
      * 6  data          (buffer for every function in info.c)
      * 7  
-     * 8  logo          when using a custom ascii, used to store
-     * 10 logo          some logo metadata (id, color, length)
-     * 11 logo          and the lines of the logo.
-     * .. logo          16 -> 47 are only allocated when a logo is provided
-     * 47 logo
+     * ...              (7-15 are currently unused)
      */
     
     struct Module *modules = malloc(sizeof(struct Module));
@@ -196,12 +188,11 @@ int main(int argc, char **argv) {
                 return -1;
         }
 
-        parse_config(config_file, modules, mem, &default_bold, default_color, default_logo);
+        parse_config(config_file, modules, &ascii_ptr, &default_bold, default_color, default_logo);
     }
 
-    //char *logo[68];
     if(ascii_file)
-        file_to_logo(ascii_file, mem + 2048);
+        ascii_ptr = file_to_logo(ascii_file);
 
     if(asking_logo) {   // --logo was used
         bool found = false;
@@ -627,6 +618,9 @@ int main(int argc, char **argv) {
         print_line(printed, w.ws_col);
     }
 
+    // memory clean up
+    free(ascii_ptr);
     destroy_array(modules);
+
     return 0;
 }

@@ -6,10 +6,10 @@
 #include "utils.h"
 
 // copy an ascii art from file to mem
-int file_to_logo(char *file, char *mem) {
+void *file_to_logo(char *file) {
     FILE *fp = fopen(file, "r");
     if(!fp)
-        return 1;
+        return NULL;
 
     /* mem is assumed to be a 10 KiB buffer, aka 10240 B.
      * this will be filled in with up to 64 lines,
@@ -22,6 +22,7 @@ int file_to_logo(char *file, char *mem) {
 
     // where the final logo is saved
     static char *logo[LINE_NUM + 1];
+    char *mem = NULL;
 
     char *buffer = NULL;
     size_t len = 0;
@@ -29,6 +30,7 @@ int file_to_logo(char *file, char *mem) {
     int i = 1;
 
     // setting the correct color (or eventually the first line)
+
     line_len = getline(&buffer, &len, fp);  // save the first line to buffer
     if(line_len != (size_t)-1) {            // getline returns -1 in case of error
         if(buffer[line_len-1] == '\n')
@@ -51,7 +53,10 @@ int file_to_logo(char *file, char *mem) {
         for(int j = 0; j < 9; ++j)
             if(!strcmp(buffer, *colors[j]))
                 strcpy(config.color, colors[j][1]);
-            
+
+        mem = malloc(10240);
+        memset(mem, 0, 1024);
+
         if(!config.color[0]) {
             unescape(buffer);
 
@@ -62,7 +67,7 @@ int file_to_logo(char *file, char *mem) {
         }
     }
     else
-        return 1;
+        return mem;
 
     // for every remaining line of the logo...
     while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < LINE_NUM) {
@@ -73,7 +78,7 @@ int file_to_logo(char *file, char *mem) {
 
         logo[i+2] = mem + i*LINE_LEN;
         strncpy(logo[i+2], buffer, LINE_LEN);
-
+        
         ++i;
     }
 
@@ -82,8 +87,8 @@ int file_to_logo(char *file, char *mem) {
     free(buffer);
 
     // set up the logo metadata;
-    logo[0] = "custom"; // logo ID
-    logo[2] = mem;      // the first characters of mem are used for the whitespace
+    logo[0] = "custom";  // logo ID
+    logo[2] = mem;       // the first characters of mem are used for the whitespace
     size_t j;
     for(j = 0; j < strlen_real(logo[3]); ++j) {   // filling in the whitespace
         mem[j] = ' ';
@@ -96,7 +101,7 @@ int file_to_logo(char *file, char *mem) {
     // finally, the logo can be saved
     config.logo = logo;
 
-    return 0;
+    return mem;
 }
 
 // add a module containing id to array
@@ -306,7 +311,7 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
 }
 
 // parse the provided config file
-void parse_config(const char *file, struct Module *modules, char *mem, bool *default_bold, char *default_color, char *default_logo) {
+void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
     if(!fp)
@@ -366,7 +371,7 @@ void parse_config(const char *file, struct Module *modules, char *mem, bool *def
     char path[96] = "";
     parse_config_str(conf, "ascii_art", path, sizeof(path));
     if(path[0])
-        file_to_logo(path, mem + 2048);
+        *ascii_ptr = file_to_logo(path);
     
     // logo
     char logo[32] = "";
@@ -562,8 +567,9 @@ void unescape(char *str) {
                 break;
             default:    // takes care of "\\", "\;" and "\#"
                 memmove(str, str+1, strlen(str));
+                ++str;
+                break;
         }
-        ++str;
     }
 }
 

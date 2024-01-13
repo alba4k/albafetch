@@ -111,7 +111,7 @@ struct Module {
     struct Module *next;    // next module
 };
 
-int file_to_logo(char *file, char *mem);
+void *file_to_logo(char *file);
 
 void add_module(struct Module *array, char *id);
 
@@ -121,7 +121,7 @@ void get_logo_line(char *dest, unsigned *line);
 
 void print_line(char *line, const size_t maxlen);
 
-void parse_config(const char *file, struct Module *modules, char *chunk, bool *default_bold, char *default_color, char *default_logo);
+void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
 
 void unescape(char *str);
 

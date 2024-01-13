@@ -72,7 +72,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Arch Linux
         "arch",
         "\033[36m",
-        "                                    ",
+        "                                     ",
         "\033[36m                  -`                 ",
         "\033[36m                 .o+`                ",
         "\033[36m                `ooo/                ",
