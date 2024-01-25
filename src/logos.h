@@ -3,6 +3,8 @@
 #ifndef LOGOS_H
 #define LOGOS_H
 
+#include <stddef.h>
+
 static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to macOS
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-release

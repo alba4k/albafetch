@@ -13,7 +13,7 @@ int light_colors(char *dest) {
     memset(dest, 0, 256);
     for(int i = 0; i < 8; ++i) {
         sprintf(dest+(6+config.col_block_len)*i, "\033[10%dm", i);
-        for(int i = 0; i < config.col_block_len; ++i)
+        for(int j = 0; j < config.col_block_len; ++j)
             strcat(dest, " ");
     }
 

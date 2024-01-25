@@ -9,9 +9,7 @@
 #include "info/info.h"
 #include "utils.h"
 
-#define name(f) call(#f, f) 
- 
-void call(const char *name, void (*f)(void)) { 
+void call(const char *name, void (*f)(void)) {
   printf("Calling %s()\n", name); 
   f(); 
 } 

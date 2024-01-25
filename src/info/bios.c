@@ -13,7 +13,7 @@ int bios(char *dest) {
     #else
     char *vendor = NULL, *version = NULL;
     FILE *fp = NULL;
-    size_t len = 0;
+    size_t len;
 
     if((fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r"))) {
         fseek(fp, 0, SEEK_END);

@@ -2,11 +2,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <limits.h>
-#include <stdint.h>
 #include <stdbool.h>
 
 #include <sys/ioctl.h>
-#include <sys/mman.h>
 
 #include "info/info.h"
 #include "utils.h"
@@ -382,14 +380,14 @@ int main(int argc, char **argv) {
     /* getting the terminal width
      * I start by using stdout
      * if it is not a terminal (e.g. if the user did albafetch | lolcat) I use stderr
-     * if stderr doesn't work either, I use stdin (albafetch 2>/dev/null | lolcat)"
+     * if stderr doesn't work either, I use stdin (albafetch 2>/dev/null | lolcat)
      * now, let's assume the user is a complete moron and redirects everything. Then I just use an "infinite" width
      */
-    struct winsize w;
-    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1)
-        if(ioctl(STDERR_FILENO, TIOCGWINSZ, &w) == -1)
-            if(ioctl(STDIN_FILENO, TIOCGWINSZ, &w) == -1)
-                w.ws_col = -1;
+    struct winsize win;
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) <= 0)
+        if(ioctl(STDERR_FILENO, TIOCGWINSZ, &win) <= 0)
+            if(ioctl(STDIN_FILENO, TIOCGWINSZ, &win) <= 0)
+                win.ws_col = -1;
 
     struct Info {
         char *id;               // module identifier
@@ -462,18 +460,18 @@ int main(int argc, char **argv) {
             }
 
     if(align) {
-        int current_len;
+        size_t current_len;
         asking_align = 0;
 
         // determining how far the text should be aligned
         for(struct Module *current = modules->next; current; current = current->next) {
             current_len = strlen_real(current->label);
 
-            if(current_len > asking_align)
-                asking_align = current_len;
+            if(current_len > (size_t)asking_align)
+                asking_align = (int)current_len;
         }
 
-        asking_align += strlen_real(config.dash);
+        asking_align += (int)strlen_real(config.dash);
 
         snprintf(format, 32, "%%-%ds\033[0m%%s", asking_align);
     }
@@ -590,7 +588,7 @@ int main(int argc, char **argv) {
             snprintf(printed+strlen(printed), 1024-strlen(printed), format, label, data);
         }
         
-        print_line(printed, w.ws_col);
+        print_line(printed, win.ws_col);
     }
 
     // remaining lines
@@ -599,7 +597,7 @@ int main(int argc, char **argv) {
 
         get_logo_line(printed, &line);
 
-        print_line(printed, w.ws_col);
+        print_line(printed, win.ws_col);
     }
 
     // memory clean up

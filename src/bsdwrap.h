@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef BSDWRAP_H
+#define BSDWRAP_H
+
 #include <stdlib.h>
 #include <sys/sysctl.h>
 
@@ -32,3 +37,5 @@
  */
 
 int sysctl_wrap(void *out, size_t outsize, int domain, int field);
+
+#endif // BSDWRAP_H

@@ -61,7 +61,6 @@ int gpu(char *dest) {
         return 1;
     # else
         // based on https://github.com/pciutils/pciutils/blob/master/example.c
-
         char device_class[256], namebuf[768];
         struct pci_dev *dev;
         struct pci_access *pacc = pci_alloc();		// get the pci_access structure;
@@ -99,8 +98,6 @@ int gpu(char *dest) {
             }
         }
 
-
-
         pci_cleanup(pacc);  // close everything
         // fallback (will only get 1 gpu)
 
@@ -120,7 +117,7 @@ int gpu(char *dest) {
                 dup2(pipes[1], STDOUT_FILENO);
                 execlp("lspci", "lspci", "-mm", NULL);
             }
-            
+
             close(pipes[1]);
             char *lspci = malloc(0x2000);
             
@@ -137,7 +134,7 @@ int gpu(char *dest) {
                 }
             }
 
-            for(int i = 0; i < 4; ++i) {
+            for(int j = 0; j < 4; ++j) {
                 gpus[0] = strchr(gpus[0], '"');
                 if(!gpus[0]) {
                     free(lspci);
@@ -153,7 +150,7 @@ int gpu(char *dest) {
                  */
             }
 
-            char *end = strchr(gpus[0], '"');   // name
+            end = strchr(gpus[0], '"');   // name
             if(!end) {
                 free(lspci);
                 return 1;
@@ -172,34 +169,32 @@ int gpu(char *dest) {
 
     // this next part is just random cleanup
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
-
     dest[0] = 0;    //  yk it's decent a yk it works
-    for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i%3]; ++i) {
+    for(unsigned j = 0; j < sizeof(gpus)/sizeof(gpus[0]) && gpus[j%3]; ++j) {
         if(!(gpu_brand)) {
-            if((end = strstr(gpus[i], "Intel ")))
-                gpus[i] += 6;
-            else if((end = strstr(gpus[i], "AMD ")))
-                gpus[i] += 4;
-            else if((end = strstr(gpus[i], "Apple ")))
-                gpus[i] += 6;
+            if(strstr(gpus[j], "Intel ")
+               || strstr(gpus[j], "Apple "))
+                gpus[j] += 6;
+            else if(strstr(gpus[j], "AMD "))
+                gpus[j] += 4;
         }
 
-        if((end = strchr(gpus[i], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
+        if((end = strchr(gpus[j], '['))) {   // sometimes the gpu is "Architecture [GPU Name]"
             char *ptr = strchr(end, ']');
             if(ptr) {
-                gpus[i] = end+1;
+                gpus[j] = end+1;
                 *ptr = 0;
             }
-        if((end = strstr(gpus[i], " Integrated Graphics Controller")))
+        if((end = strstr(gpus[j], " Integrated Graphics Controller")))
             *end = 0;
-        if((end = strstr(gpus[i], " Rev. ")))
+        if((end = strstr(gpus[j], " Rev. ")))
             *end = 0;
         }
 
         // (finally) writing the GPUs into dest
-        if(i > 0)
+        if(j > 0)
             strncat(dest, ", ", 256-strlen(dest));
-        strncat(dest, gpus[i], 256-strlen(dest));
+        strncat(dest, gpus[j], 256-strlen(dest));
     }
 
     return 0;

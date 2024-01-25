@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include <mach/mach.h>
+#include <stdint.h>
 
 #include "bsdwrap.h"
 

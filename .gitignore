@@ -1,5 +1,6 @@
 *.o
 .vscode
+.idea
 build/
 albafetch.conf.link
 
