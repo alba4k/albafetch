@@ -18,7 +18,10 @@ int os(char *dest) {
     uname(&name);
 
     #ifdef __APPLE__
-        snprintf(dest, 256, "macOS %s", os_arch ? name.machine : "");
+        if(os_arch)
+            snprintf(dest, 256, "macOS (%s)", name.machine);
+        else
+            strncpy(dest, "macOS", 255);
     #else
     #ifdef __ANDROID__
         int pipes[2];
@@ -38,8 +41,12 @@ int os(char *dest) {
         version[read(pipes[0], version, 16) - 1] = 0;
         close(pipes[0]);
 
-        snprintf(dest, 256, "Android %s%s%s", version, version[0] ? " " : "", os_arch ? name.machine : "");
-    #else
+        if(os_arch)
+            snprintf(dest, 256, "Android %s%s(%s)", version, version[0] ? " " : "", name.machine);
+        else
+            snprintf(dest, 256, "Android %s", version);
+
+#else
         FILE *fp = fopen("/etc/os-release", "r");
         if(!fp) {
             fp = fopen("/usr/lib/os-release", "r");
@@ -57,19 +64,23 @@ int os(char *dest) {
         if(!buf[0])
             return 1;
 
-        if(os_name[0] == '"' || os_name[0] == '\'')
-            ++os_name;
-        
         if(!(end = strchr(os_name, '\n')))
             return 1;
         *end = 0;
 
-        if((end = strchr(os_name, '"')))
-            *end = 0;
-        else if((end = strchr(os_name, '\'')))
+        // sometimes we have something like `ID="distro"`. yeah its stupid
+        if(os_name[0] == '"' || os_name[0] == '\'')
+            ++os_name;
+
+        if(!(end = strchr(os_name, '"')))
+            end = strchr(os_name, '\'');
+        if(end)
             *end = 0;
 
-        snprintf(dest, 256, "%s %s", os_name, os_arch ? name.machine : "");
+        if(os_arch)
+            snprintf(dest, 256, "%s (%s)", os_name, name.machine);
+        else
+            strncpy(dest, os_name, 255);
     #endif // __ANDROID__
     #endif // __APPLE__
 
