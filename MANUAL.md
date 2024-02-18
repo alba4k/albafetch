@@ -66,8 +66,7 @@ You can found a list of the accepted modules inside of [the default config](alba
 To parse this section, albafetch first locates a string matching `modules` in the config file, takes the part between the following curly braces, and reads the text between the following pairs of quotation marks.
 As for normal options, this allows some weird formats, like `modules{"module1""module2""module3"}`, but I also invite anyone to consider the parsing of similar strings undefined behavior.
 
-Anything that doesn't match what the parser is looking for will be ignored, but the usage of explicit comments is encouraged:
-Anything between a `;` or an `#` and the end of the line will not be read as part of the config. An exception is made for any `;` or `#` that are preceded by a `\\`, those will count as a simple character.
+Anything that doesn't match what the parser is looking for will be ignored, but the usage of explicit comments is encouraged: whatever stands between a `;` or an `#` and the end of the line will not be read as part of the config. You can, however, still freely use `#` and `;` in your config, as they will **not** be considered when enclosed in a string (between a pair of `"`).
 There is currently no way to use multi-line comments. 
 
 When albafetch parses a file (config or custom ascii art), it will also automatically unescape some escape sequences, like the following table shows:
@@ -76,8 +75,6 @@ When albafetch parses a file (config or custom ascii art), it will also automati
 | "\\e"        | '\\033' (ANSI escape) |
 | "\\033"      | '\\033' (ANSI escape) |
 | "\\n"        | '\\n' (new line)      |
-| "\\#"        | '#' (not a comment)  |
-| "\\;"        | ';' (not a comment)  |
 | "\\X"        | 'X' (everything else) |
 
 Since it might be useful, here are some of the most useful ANSI escape sequences (you can find a more complete list [here](https://stackoverflow.com/a/33206814))

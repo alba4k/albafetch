@@ -328,11 +328,16 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     // remove comments
     char *ptr = conf, *ptr2;
     while((ptr = strchr(ptr, ';'))) {
-        if(ptr != conf) {   // don't want to check ptr[-1] on the first character of the buffer ;)
-            if(ptr[-1] == '\\') {
-                ++ptr;
-                continue;
-            }
+        // when it is between two " (aka the number of " before it is odd)
+        int counter = 0;
+        ptr2 = conf;
+        while((ptr2 = strchr(ptr2, '"')) && ptr2 < ptr) {
+            ++ptr2;
+            ++counter;
+        }
+        if(counter&1) {
+            ++ptr;
+            continue;
         }
 
         ptr2 = strchr(ptr, '\n');
@@ -346,11 +351,16 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     }
     ptr = conf;
     while((ptr = strchr(ptr, '#'))) {
-        if(ptr != conf) {   // same as above
-            if(ptr[-1] == '\\') {
-                ++ptr;
-                continue;
-            }
+        // when it is between two " (aka the number of " before it is odd)
+        int counter = 0;
+        ptr2 = conf;
+        while((ptr2 = strchr(ptr2, '"')) && ptr2 < ptr) {
+            ++ptr2;
+            ++counter;
+        }
+        if(counter&1) {
+            ++ptr;
+            continue;
         }
 
         ptr2 = strchr(ptr, '\n');
@@ -566,7 +576,7 @@ void unescape(char *str) {
                 memmove(str, str+1, strlen(str));
                 *str = '\n';
                 break;
-            default:    // takes care of "\\", "\;" and "\#"
+            default:    // takes care of "\\" and any other sort of "\X"
                 memmove(str, str+1, strlen(str));
                 ++str;
                 break;

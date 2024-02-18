@@ -6,7 +6,7 @@
 
 ### Config syntax
 * any invalid escape sequence like "\X" will now just be reduced to "X"
-* it is now possible to include "#" and ";" in your config without them counting as a comment by escaping them with a "\\"
+* it is now possible to include "#" and ";" in your config without them counting as a comment, as long as they are enclosed between two `"` (which should always be true anyway)
 * `col_block_len` was removed, in favor of `col_block_str`, which contains the entire string that is printed for each color
 * `col_foreground` was added, which controls whether the background or the foreground of `col_block_str` is colored 
 
