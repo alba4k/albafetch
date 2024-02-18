@@ -444,6 +444,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         "loc_docker",
         "pwd_path",
         "kernel_type",
+        "col_foreground",
     };
 
     bool buffer;
@@ -463,7 +464,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
 
     parse_config_str(conf, "date_format", config.date_format, sizeof(config.date_format));
 
-    parse_config_int(conf, "col_block_len", &config.col_block_len, 16);
+    parse_config_str(conf, "col_block_str", config.col_block_str, sizeof(config.col_block_str));
 
     // LABELS
 

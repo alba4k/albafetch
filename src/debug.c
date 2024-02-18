@@ -9,11 +9,6 @@
 #include "info/info.h"
 #include "utils.h"
 
-void call(const char *name, void (*f)(void)) {
-  printf("Calling %s()\n", name); 
-  f(); 
-} 
-
 // Most of those aren't even needed
 struct Config config;
 
@@ -60,7 +55,7 @@ int main(int argc, char **argv) {
     else
         config.options = 0xffffffffffffffff;
     // these are just defaults
-    config.col_block_len = 3;
+    strcpy(config.col_block_str, "   ");
     strcpy(config.date_format, "%02d/%02d/%d %02d:%02d:%02d");
 
     gettimeofday(&start_all, NULL);

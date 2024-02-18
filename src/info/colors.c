@@ -8,11 +8,9 @@
 // show the terminal color configuration
 int colors(char *dest) {
     memset(dest, 0, 256);
-    for(int i = 0; i < 8; ++i) {
-        sprintf(dest+(5+config.col_block_len)*i, "\033[4%dm", i);
-        for(int j = 0; j < config.col_block_len; ++j)
-            strcat(dest, " ");
-    }
+    
+    for(int i = 0; i < 8; ++i)
+        sprintf(dest+strlen(dest), "\033[%s%dm%s", col_foreground ? "3" : "4", i, config.col_block_str);
 
     strcat(dest, "\033[0m");
 

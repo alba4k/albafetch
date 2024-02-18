@@ -35,7 +35,8 @@ struct Config {
     * 21. loc_localhost
     * 22. loc_docker
     * 23. pwd_path
-    * 24. [...]
+    * 24. col_foreground
+    * 25. [...]
     */
     uint64_t options;
 
@@ -47,7 +48,7 @@ struct Config {
 
     int gpu_index;
     char date_format[32];
-    int col_block_len;
+    char col_block_str[24];
 
     char separator_prefix[64];
     char spacing_prefix[64];
@@ -102,6 +103,7 @@ extern struct Config config;
 #define loc_docker      config.options & 0x400000
 #define pwd_path        config.options & 0x800000
 #define kernel_type     config.options & 0x1000000
+#define col_foreground  config.options & 0x2000000
 
 // element of a module linked list
 struct Module {
