@@ -185,11 +185,12 @@ int gpu(char *dest) {
                 gpus[j] = end+1;
                 *ptr = 0;
             }
+        }
+        
         if((end = strstr(gpus[j], " Integrated Graphics Controller")))
             *end = 0;
         if((end = strstr(gpus[j], " Rev. ")))
             *end = 0;
-        }
 
         // (finally) writing the GPUs into dest
         if(j > 0)
