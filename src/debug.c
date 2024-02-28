@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
         {kernel, "kernel"},
         {desktop, "desktop"},
         {gtk_theme, "gtk_theme"},
+        {icon_theme, "icon_theme"},
         {shell, "shell"},
         {login_shell, "login_shell"},
         {term, "term"},

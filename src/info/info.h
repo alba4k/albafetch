@@ -17,6 +17,8 @@ int desktop(char *dest);
 
 int gtk_theme(char *dest);
 
+int icon_theme(char *dest);
+
 int shell(char *dest);
 
 int login_shell(char *dest);

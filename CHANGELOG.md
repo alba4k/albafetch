@@ -3,6 +3,7 @@
 ## New Features
 
 ### Modules
+* `icon_theme`: prints the current icon theme for GTK
 
 ### Config syntax
 * any invalid escape sequence like "\X" will now just be reduced to "X"

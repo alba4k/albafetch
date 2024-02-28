@@ -496,6 +496,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         {config.kernel_prefix, "kernel_prefix"},
         {config.desktop_prefix, "desktop_prefix"},
         {config.gtk_theme_prefix, "gtk_theme_prefix"},
+        {config.icon_theme_prefix, "icon_theme_prefix"},
         {config.shell_prefix, "shell_prefix"},
         {config.login_shell_prefix, "login_shell_prefix"},
         {config.term_prefix, "term_prefix"},

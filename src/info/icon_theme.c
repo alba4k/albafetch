@@ -6,20 +6,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-// get the current GTK Theme
-int gtk_theme(char *dest){ 
+// get the current Icon Theme
+int icon_theme(char *dest){ 
     int pipes[2];
 
-    char *theme = getenv("GTK_THEME");
-
-    // try using GTK_THEME (faster)
-    if(theme) {
-        strncpy(dest, theme, 256);
-
-        return 0;
-    }
-
-    // try using gsettings (fallback)
+    // try using gsettings
     // reading ~/.config/gtk-3.0/settings.ini could also be an option 
     if(!access("/bin/gsettings", F_OK)){
         if(pipe(pipes))
@@ -29,7 +20,7 @@ int gtk_theme(char *dest){
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("gsettings", "gsettings" , "get", "org.gnome.desktop.interface", "gtk-theme", NULL); 
+            execlp("gsettings", "gsettings" , "get", "org.gnome.desktop.interface", "icon-theme", NULL); 
         }
 
         wait(0);

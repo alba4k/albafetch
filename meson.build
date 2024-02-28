@@ -17,6 +17,7 @@ src = [
   'src/info/desktop.c',
   'src/info/gpu.c',
   'src/info/gtk_theme.c',
+  'src/info/icon_theme.c',
   'src/info/host.c',
   'src/info/hostname.c',
   'src/info/info.h',

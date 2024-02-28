@@ -11,7 +11,7 @@ PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 INSTALLPATH := /usr/local/bin
 
 OBJ_INFO := bios.o colors.o cpu.o date.o\
-			desktop.o gpu.o gtk_theme.o\
+			desktop.o gpu.o gtk_theme.o icon_theme.o\
 			host.o hostname.o kernel.o\
 			light_colors.o local_ip.o\
 			login_shell.o memory.o os.o\
@@ -108,6 +108,9 @@ gpu.o: src/info/gpu.c src/info/info.h src/utils.h $(MACOS_INFOS_H)
 
 gtk_theme.o: src/info/gtk_theme.c src/info/info.h
 	$(CC) -c src/info/gtk_theme.c $(CFLAGS)
+
+icon_theme.o: src/info/icon_theme.c src/info/info.h
+	$(CC) -c src/info/icon_theme.c $(CFLAGS)
 
 host.o: src/info/host.c src/info/info.h
 	$(CC) -c src/info/host.c $(CFLAGS)
