@@ -59,6 +59,7 @@ struct Config config = {
     "Desktop",  // desktop_prefix
     "Theme",    // gtk_theme_prefix
     "Icons",    // icon_theme_prefix
+    "Cursor",   // cursor_theme_prefix
     "Shell",    // shell_prefix
     "Login",    // login_shell_prefix
     "Terminal", // term_prefix
@@ -408,6 +409,7 @@ int main(int argc, char **argv) {
         {"desktop", config.desktop_prefix, desktop},
         {"gtk_theme", config.gtk_theme_prefix, gtk_theme},
         {"icon_theme", config.icon_theme_prefix, icon_theme},
+        {"cursor_theme", config.cursor_theme_prefix, cursor_theme},
         {"shell", config.shell_prefix, shell},
         {"login_shell", config.login_shell_prefix, login_shell},
         {"term", config.term_prefix, term},

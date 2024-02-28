@@ -1,7 +1,7 @@
 project(
   'albafetch',
   'c',
-  version : '4.0',
+  version : '4.1',
   default_options : ['warning_level=3'],
   license : 'MIT'
 )
@@ -18,6 +18,7 @@ src = [
   'src/info/gpu.c',
   'src/info/gtk_theme.c',
   'src/info/icon_theme.c',
+  'src/info/cursor_theme.c',
   'src/info/host.c',
   'src/info/hostname.c',
   'src/info/info.h',

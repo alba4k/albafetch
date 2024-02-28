@@ -12,7 +12,7 @@ INSTALLPATH := /usr/local/bin
 
 OBJ_INFO := bios.o colors.o cpu.o date.o\
 			desktop.o gpu.o gtk_theme.o icon_theme.o\
-			host.o hostname.o kernel.o\
+			cursor_theme.o host.o hostname.o kernel.o\
 			light_colors.o local_ip.o\
 			login_shell.o memory.o os.o\
 			packages.o public_ip.o pwd.o\
@@ -111,6 +111,9 @@ gtk_theme.o: src/info/gtk_theme.c src/info/info.h
 
 icon_theme.o: src/info/icon_theme.c src/info/info.h
 	$(CC) -c src/info/icon_theme.c $(CFLAGS)
+
+cursor_theme.o: src/info/cursor_theme.c src/info/info.h
+	$(CC) -c src/info/cursor_theme.c $(CFLAGS)
 
 host.o: src/info/host.c src/info/info.h
 	$(CC) -c src/info/host.c $(CFLAGS)

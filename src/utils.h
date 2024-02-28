@@ -61,6 +61,7 @@ struct Config {
     char desktop_prefix[64];
     char gtk_theme_prefix[64];
     char icon_theme_prefix[64];
+    char cursor_theme_prefix[64];
     char shell_prefix[64];
     char login_shell_prefix[64];
     char term_prefix[64];

@@ -4,6 +4,7 @@
 
 ### Modules
 * `icon_theme`: prints the current icon theme for GTK
+* `cursor_theme`: prints the current cursor theme for GTK
 
 ### Config syntax
 * any invalid escape sequence like "\X" will now just be reduced to "X"
