@@ -386,10 +386,12 @@ int main(int argc, char **argv) {
      * now, let's assume the user is a complete moron and redirects everything. Then I just use an "infinite" width
      */
     struct winsize win;
-    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) <= 0)
-        if(ioctl(STDERR_FILENO, TIOCGWINSZ, &win) <= 0)
-            if(ioctl(STDIN_FILENO, TIOCGWINSZ, &win) <= 0)
-                win.ws_col = -1;
+    win.ws_col = 0;
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &win))
+        if(ioctl(STDERR_FILENO, TIOCGWINSZ, &win))
+            ioctl(STDIN_FILENO, TIOCGWINSZ, &win);
+    if(win.ws_col == 0)
+        win.ws_col = -1;
 
     struct Info {
         char *id;               // module identifier
