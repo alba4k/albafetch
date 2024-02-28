@@ -199,8 +199,7 @@ void print_line(char *line, const size_t maxlen) {
 
 // a return code of 0 means that the option was parsed successfully
 int parse_config_str(const char* source, const char *field, char *dest, const size_t maxlen) {
-    char *ptr;
-    char *end;
+    char *ptr, *end;
 
     // looks for the keyword
     ptr = strstr(source, field);
@@ -241,8 +240,7 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 
 // a return code of 0 means that the option was parsed successfully
 int parse_config_int(const char *source, const char *field, int *dest, const unsigned max) {
-    char *ptr;
-    char *end;
+    char *ptr, *end;
 
     // looks for the keyword
     ptr = strstr(source, field);
@@ -279,8 +277,7 @@ int parse_config_int(const char *source, const char *field, int *dest, const uns
 
 // a return code of 0 means that the option was parsed successfully
 int parse_config_bool(const char *source, const char *field, bool *dest) {
-    char *ptr;
-    char *end;
+    char *ptr, *end;
 
     // looks for the keyword
     ptr = strstr(source, field);
@@ -310,27 +307,13 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
     return 0;
 }
 
-// parse the provided config file
-void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
-    FILE *fp = fopen(file, "r");
-
-    if(!fp)
-        return;
-
-    fseek(fp, 0, SEEK_END);
-    size_t len = (size_t)ftell(fp);
-    rewind(fp);
-    
-    char *conf = malloc(len+1);
-    conf[fread(conf, 1, len, fp)] = 0;
-    fclose(fp);
-
-    // remove comments
-    char *ptr = conf, *ptr2;
-    while((ptr = strchr(ptr, ';'))) {
+// remove comments, aka from start to the end of the line
+void uncomment(char *str, const char start) {
+    char *ptr = str, *ptr2;
+    while((ptr = strchr(ptr, start))) {
         // when it is between two " (aka the number of " before it is odd)
         int counter = 0;
-        ptr2 = conf;
+        ptr2 = str;
         while((ptr2 = strchr(ptr2, '"')) && ptr2 < ptr) {
             ++ptr2;
             ++counter;
@@ -349,30 +332,31 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
 
         memmove(ptr, ptr2+1, strlen(ptr2));
     }
-    ptr = conf;
-    while((ptr = strchr(ptr, '#'))) {
-        // when it is between two " (aka the number of " before it is odd)
-        int counter = 0;
-        ptr2 = conf;
-        while((ptr2 = strchr(ptr2, '"')) && ptr2 < ptr) {
-            ++ptr2;
-            ++counter;
-        }
-        if(counter&1) {
-            ++ptr;
-            continue;
-        }
+}
 
-        ptr2 = strchr(ptr, '\n');
+// parse the provided config file
+void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
+    FILE *fp = fopen(file, "r");
 
-        if(!ptr2) {
-            *ptr = 0;
-            break;
-        }
+    if(!fp)
+        return;
 
-        memmove(ptr, ptr2+1, strlen(ptr2));
-    }
+    fseek(fp, 0, SEEK_END);
+    size_t len = (size_t)ftell(fp);
+    rewind(fp);
+    
+    char *conf = malloc(len+1);
+    conf[fread(conf, 1, len, fp)] = 0;
+    fclose(fp);
 
+    // used later
+    char *ptr, *ptr2;
+
+    // remove comments
+    uncomment(conf, '#');
+    uncomment(conf, ';');
+
+    // handle escape sequences
     unescape(conf);
 
     // GENERAL OPTIONS
@@ -428,6 +412,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     parse_config_str(conf, "separator_character", config.separator, sizeof(config.separator));
 
     // BOOLEAN OPTIONS (check utils.h)
+
     const char *booleanOptions[] = {
         "align_infos",
         "bold",
@@ -483,7 +468,6 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         const char *config_name;
     };
     
-
     struct Prefix prefixes[] = {
     //  {config.module_prefix, "module_prefix"}
         {config.separator_prefix, "separator_prefix"},
@@ -619,4 +603,3 @@ __attribute__((pure)) size_t strlen_real(const char *str) {
 
     return len;
 }
-
