@@ -103,8 +103,12 @@ int host(char *dest) {
             strncpy(dest, name, 256);
         else if(version && version_defined)
             strncpy(dest, version, 256);
-        else
+        else {
+            free(name);
+            free(version);
+
             return 1;
+        }
 
         free(name);
         free(version);
