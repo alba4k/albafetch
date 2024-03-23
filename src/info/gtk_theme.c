@@ -8,8 +8,6 @@
 
 // get the current GTK Theme
 int gtk_theme(char *dest){ 
-    int pipes[2];
-
     char *theme = getenv("GTK_THEME");
 
     // try using GTK_THEME (faster)
@@ -22,6 +20,8 @@ int gtk_theme(char *dest){
     // try using gsettings (fallback)
     // reading ~/.config/gtk-3.0/settings.ini could also be an option 
     if(!access("/bin/gsettings", F_OK)){
+        int pipes[2];
+
         if(pipe(pipes))
             return 1;
 
