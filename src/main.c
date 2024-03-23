@@ -30,6 +30,8 @@ int a = 0;
  * print de, shell and terminal versions
  * Windows support? *BSD support?
  * make ascii dynamically use the available space (aka line by line)
+ * start using gtk for theme and icons
+ * display resolution
  */
 
 // This contains the default config values
