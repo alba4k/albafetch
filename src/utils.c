@@ -439,7 +439,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         "loc_docker",
         "pwd_path",
         "kernel_type",
-        "col_foreground",
+        "col_background",
     };
 
     bool buffer;
