@@ -10,6 +10,7 @@ PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 INSTALLPATH := /usr/local/bin
 DATAPATH := /usr/local/share
 CONFIGPATH := /etc/xdg
+PKGNAME := albafetch
 
 OBJ_INFO := obj/bios.o obj/colors.o obj/cpu.o obj/date.o\
 			obj/desktop.o obj/gpu.o obj/gtk_theme.o obj/icon_theme.o\
@@ -51,22 +52,22 @@ debug: build/debug
 	build/debug --no-pip
 
 install: build/albafetch
-	mkdir -p $(INSTALLPATH) $(DATAPATH)/licenses/albafetch $(DATAPATH)/doc/albafetch $(CONFIGPATH)
+	mkdir -p $(INSTALLPATH) $(DATAPATH)/licenses/$(PKGNAME) $(DATAPATH)/doc/$(PKGNAME) $(CONFIGPATH)
 
 	install -Dm755 build/albafetch $(INSTALLPATH)/albafetch
 
-	install -Dm644 LICENSE $(DATAPATH)/licenses/albafetch/LICENSE
-	install -Dm644 README.md $(DATAPATH)/doc/albafetch/README.md
-	install -Dm644 MANUAL.md $(DATAPATH)/doc/albafetch/MANUAL.md
+	install -Dm644 LICENSE $(DATAPATH)/licenses/$(PKGNAME)/LICENSE
+	install -Dm644 README.md $(DATAPATH)/doc/$(PKGNAME)/README.md
+	install -Dm644 MANUAL.md $(DATAPATH)/doc/$(PKGNAME)/MANUAL.md
 
 	install -Dm644 albafetch.conf $(CONFIGPATH)/albafetch.conf
 
 uninstall:
 	rm $(INSTALLPATH)/albafetch
 
-	rm $(DATAPATH)/licenses/albafetch/LICENSE
-	rm $(DATAPATH)/doc/albafetch/README.md
-	rm $(DATAPATH)/doc/albafetch/MANUAL.md
+	rm $(DATAPATH)/licenses/$(PKGNAME)/LICENSE
+	rm $(DATAPATH)/doc/$(PKGNAME)/README.md
+	rm $(DATAPATH)/doc/$(PKGNAME)/MANUAL.md
 
 	rm $(CONFIGPATH)/albafetch.conf
 
