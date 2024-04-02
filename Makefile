@@ -51,7 +51,7 @@ debug: build/debug
 	build/debug --no-pip
 
 install: build/albafetch
-	mkdir -p $(INSTALLPATH) $(DATAPATH)/doc $(DATAPATH)/licenses/albafetch $(DATAPATH)/doc/albafetch $(CONFIGPATH)
+	mkdir -p $(INSTALLPATH) $(DATAPATH)/licenses/albafetch $(DATAPATH)/doc/albafetch $(CONFIGPATH)
 
 	install -Dm755 build/albafetch $(INSTALLPATH)/albafetch
 
