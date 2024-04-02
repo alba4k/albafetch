@@ -1,7 +1,6 @@
-obj/*.o
 .vscode
 .idea
-build/
+build
 albafetch.conf.link
 
 # nix stuff
