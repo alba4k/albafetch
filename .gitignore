@@ -1,4 +1,4 @@
-*.o
+obj/*.o
 .vscode
 .idea
 build/
@@ -8,3 +8,4 @@ albafetch.conf.link
 .direnv/
 result*
 repl-result-out*
+

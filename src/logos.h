@@ -6,6 +6,12 @@
 #include <stddef.h>
 
 static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1] to macOS
+    {   // Empty Logo
+        "none",
+        "",
+        "",
+        NULL
+    },
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-release
         "\033[90m",                                             // default color for the printed text
@@ -24,7 +30,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
         "\033[33m  #####\033[90m#######\033[33m#####  ",
         NULL                                                    // the logo is terminated by NULL
     },
-    {   // MacOS X
+    {   // macOS
         "apple",
         "\033[35m",
         "                              ",

@@ -10,18 +10,18 @@ PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
 INSTALLPATH := /usr/local/bin
 
-OBJ_INFO := bios.o colors.o cpu.o date.o\
-			desktop.o gpu.o gtk_theme.o icon_theme.o\
-			cursor_theme.o host.o hostname.o kernel.o\
-			light_colors.o local_ip.o\
-			login_shell.o memory.o os.o\
-			packages.o public_ip.o pwd.o\
-			shell.o term.o uptime.o user.o
+OBJ_INFO := obj/bios.o obj/colors.o obj/cpu.o obj/date.o\
+			obj/desktop.o obj/gpu.o obj/gtk_theme.o obj/icon_theme.o\
+			obj/cursor_theme.o obj/host.o obj/hostname.o obj/kernel.o\
+			obj/light_colors.o obj/local_ip.o\
+			obj/login_shell.o obj/memory.o obj/os.o\
+			obj/packages.o obj/public_ip.o obj/pwd.o\
+			obj/shell.o obj/term.o obj/uptime.o obj/user.o
 
 ifeq ($(KERNEL),Linux)
-	OBJ := main.o queue.o utils.o
+	OBJ := obj/main.o obj/queue.o obj/utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/utils.c
-	OBJ_DEBUG := debug.o queue.o utils.o
+	OBJ_DEBUG := obj/debug.o obj/queue.o obj/utils.o
 	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l pci
 endif
@@ -32,9 +32,9 @@ ifeq ($(OS),Android)
 endif
 
 ifeq ($(KERNEL),Darwin)
-	OBJ := main.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
+	OBJ := obj/main.o obj/macos_infos.o obj/bsdwrap.o obj/macos_gpu_string.o obj/utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
-	OBJ_DEBUG := debug.o queue.o macos_infos.o bsdwrap.o macos_gpu_string.o utils.o
+	OBJ_DEBUG := obj/debug.o obj/queue.o obj/macos_infos.o obj/bsdwrap.o obj/macos_gpu_string.o obj/utils.o
 	INCLUDE := -framework Foundation -framework IOKit
 
 	MACOS_INFOS_H := src/macos_infos.h
@@ -57,7 +57,7 @@ uninstall:
 	rm $(INSTALLPATH)/$(TARGET)
 
 clean:
-	-rm -rf *.o
+	-rm -rf obj/*.o
 
 build/$(TARGET): $(OBJ) $(OBJ_INFO)
 	mkdir -p build/
@@ -67,95 +67,95 @@ build/debug: $(OBJ_DEBUG) $(OBJ_INFO)
 	mkdir -p build/
 	$(CC) $(OBJ_DEBUG) $(OBJ_INFO) $(CFLAGS) $(INCLUDE) -o build/debug
 
-main.o: src/main.c src/logos.h src/info/info.h src/utils.h src/queue.h
-	$(CC) -c src/main.c $(CFLAGS)
+obj/main.o: src/main.c src/logos.h src/info/info.h src/utils.h src/queue.h
+	$(CC) -c src/main.c $(CFLAGS) -o obj/main.o
 
-utils.o: src/utils.c
-	$(CC) -c src/utils.c $(CFLAGS)
+obj/utils.o: src/utils.c
+	$(CC) -c src/utils.c $(CFLAGS) -o obj/utils.o
 
-bsdwrap.o: src/bsdwrap.c
-	$(CC) -c src/bsdwrap.c $(CFLAGS)
+obj/bsdwrap.o: src/bsdwrap.c
+	$(CC) -c src/bsdwrap.c $(CFLAGS) -o obj/bsdwrap.o
 
-macos_infos.o: src/macos_infos.c
-	$(CC) -c src/macos_infos.c $(CFLAGS)
+obj/macos_infos.o: src/macos_infos.c
+	$(CC) -c src/macos_infos.c $(CFLAGS) -o obj/macos_infos.o
 
-queue.o: src/queue.c src/logos.h
-	$(CC) -c src/queue.c $(CFLAGS)
+obj/queue.o: src/queue.c src/logos.h
+	$(CC) -c src/queue.c $(CFLAGS) -o obj/queue.o
 
-macos_gpu_string.o: src/macos_gpu_string.m
-	$(CC) -c src/macos_gpu_string.m $(CFLAGS)
+obj/macos_gpu_string.o: src/macos_gpu_string.m
+	$(CC) -c src/macos_gpu_string.m $(CFLAGS) -o obj/macos_gpu_string.o
 
-bios.o: src/info/bios.c src/info/info.h
-	$(CC) -c src/info/bios.c $(CFLAGS)
+obj/bios.o: src/info/bios.c src/info/info.h
+	$(CC) -c src/info/bios.c $(CFLAGS) -o obj/bios.o
 
-colors.o: src/info/colors.c src/info/info.h src/utils.h
-	$(CC) -c src/info/colors.c $(CFLAGS)
+obj/colors.o: src/info/colors.c src/info/info.h src/utils.h
+	$(CC) -c src/info/colors.c $(CFLAGS) -o obj/colors.o
 
-cpu.o: src/info/cpu.c src/info/info.h src/utils.h
-	$(CC) -c src/info/cpu.c $(CFLAGS)
+obj/cpu.o: src/info/cpu.c src/info/info.h src/utils.h
+	$(CC) -c src/info/cpu.c $(CFLAGS) -o obj/cpu.o
 
-date.o: src/info/date.c src/info/info.h src/utils.h
-	$(CC) -c src/info/date.c $(CFLAGS)
+obj/date.o: src/info/date.c src/info/info.h src/utils.h
+	$(CC) -c src/info/date.c $(CFLAGS) -o obj/date.o
 
-debug.o: src/debug.c src/info/info.h src/utils.h
-	$(CC) -c src/debug.c $(CFLAGS)
+obj/debug.o: src/debug.c src/info/info.h src/utils.h
+	$(CC) -c src/debug.c $(CFLAGS) -o obj/debug.o
 
-desktop.o: src/info/desktop.c src/info/info.h src/utils.h
-	$(CC) -c src/info/desktop.c $(CFLAGS)
+obj/desktop.o: src/info/desktop.c src/info/info.h src/utils.h
+	$(CC) -c src/info/desktop.c $(CFLAGS) -o obj/desktop.o
 
-gpu.o: src/info/gpu.c src/info/info.h src/utils.h $(MACOS_INFOS_H)
-	$(CC) -c src/info/gpu.c $(CFLAGS)
+obj/gpu.o: src/info/gpu.c src/info/info.h src/utils.h $(MACOS_INFOS_H)
+	$(CC) -c src/info/gpu.c $(CFLAGS) -o obj/gpu.o
 
-gtk_theme.o: src/info/gtk_theme.c src/info/info.h
-	$(CC) -c src/info/gtk_theme.c $(CFLAGS)
+obj/gtk_theme.o: src/info/gtk_theme.c src/info/info.h
+	$(CC) -c src/info/gtk_theme.c $(CFLAGS) -o obj/gtk_theme.o
 
-icon_theme.o: src/info/icon_theme.c src/info/info.h
-	$(CC) -c src/info/icon_theme.c $(CFLAGS)
+obj/icon_theme.o: src/info/icon_theme.c src/info/info.h
+	$(CC) -c src/info/icon_theme.c $(CFLAGS) -o obj/icon_theme.o
 
-cursor_theme.o: src/info/cursor_theme.c src/info/info.h
-	$(CC) -c src/info/cursor_theme.c $(CFLAGS)
+obj/cursor_theme.o: src/info/cursor_theme.c src/info/info.h
+	$(CC) -c src/info/cursor_theme.c $(CFLAGS) -o obj/cursor_theme.o
 
-host.o: src/info/host.c src/info/info.h
-	$(CC) -c src/info/host.c $(CFLAGS)
+obj/host.o: src/info/host.c src/info/info.h
+	$(CC) -c src/info/host.c $(CFLAGS) -o obj/host.o
 
-hostname.o: src/info/hostname.c src/info/info.h
-	$(CC) -c src/info/hostname.c $(CFLAGS)
+obj/hostname.o: src/info/hostname.c src/info/info.h
+	$(CC) -c src/info/hostname.c $(CFLAGS) -o obj/hostname.o
 
-kernel.o: src/info/kernel.c src/info/info.h src/utils.h
-	$(CC) -c src/info/kernel.c $(CFLAGS)
+obj/kernel.o: src/info/kernel.c src/info/info.h src/utils.h
+	$(CC) -c src/info/kernel.c $(CFLAGS) -o obj/kernel.o
 
-light_colors.o: src/info/light_colors.c src/info/info.h src/utils.h
-	$(CC) -c src/info/light_colors.c $(CFLAGS)
+obj/light_colors.o: src/info/light_colors.c src/info/info.h src/utils.h
+	$(CC) -c src/info/light_colors.c $(CFLAGS) -o obj/light_colors.o
 
-local_ip.o: src/info/local_ip.c src/info/info.h src/utils.h
-	$(CC) -c src/info/local_ip.c $(CFLAGS)
+obj/local_ip.o: src/info/local_ip.c src/info/info.h src/utils.h
+	$(CC) -c src/info/local_ip.c $(CFLAGS) -o obj/local_ip.o
 
-login_shell.o: src/info/login_shell.c src/info/info.h src/utils.h
-	$(CC) -c src/info/login_shell.c $(CFLAGS)
+obj/login_shell.o: src/info/login_shell.c src/info/info.h src/utils.h
+	$(CC) -c src/info/login_shell.c $(CFLAGS) -o obj/login_shell.o
 
-memory.o: src/info/memory.c src/info/info.h src/utils.h src/queue.h $(MACOS_INFOS_H)
-	$(CC) -c src/info/memory.c $(CFLAGS)
+obj/memory.o: src/info/memory.c src/info/info.h src/utils.h src/queue.h $(MACOS_INFOS_H)
+	$(CC) -c src/info/memory.c $(CFLAGS) -o obj/memory.o
 
-os.o: src/info/os.c src/info/info.h src/utils.h src/queue.h
-	$(CC) -c src/info/os.c $(CFLAGS)
+obj/os.o: src/info/os.c src/info/info.h src/utils.h src/queue.h
+	$(CC) -c src/info/os.c $(CFLAGS) -o obj/os.o
 
-packages.o: src/info/packages.c src/info/info.h src/utils.h
-	$(CC) -c src/info/packages.c $(CFLAGS)
+obj/packages.o: src/info/packages.c src/info/info.h src/utils.h
+	$(CC) -c src/info/packages.c $(CFLAGS) -o obj/packages.o
 
-public_ip.o: src/info/public_ip.c src/info/info.h
-	$(CC) -c src/info/public_ip.c $(CFLAGS)
+obj/public_ip.o: src/info/public_ip.c src/info/info.h
+	$(CC) -c src/info/public_ip.c $(CFLAGS) -o obj/public_ip.o
 
-pwd.o: src/info/pwd.c src/info/info.h src/utils.h
-	$(CC) -c src/info/pwd.c $(CFLAGS)
+obj/pwd.o: src/info/pwd.c src/info/info.h src/utils.h
+	$(CC) -c src/info/pwd.c $(CFLAGS) -o obj/pwd.o
 
-shell.o: src/info/shell.c src/info/info.h src/utils.h
-	$(CC) -c src/info/shell.c $(CFLAGS)
+obj/shell.o: src/info/shell.c src/info/info.h src/utils.h
+	$(CC) -c src/info/shell.c $(CFLAGS) -o obj/shell.o
 
-term.o: src/info/term.c src/info/info.h src/utils.h
-	$(CC) -c src/info/term.c $(CFLAGS)
+obj/term.o: src/info/term.c src/info/info.h src/utils.h
+	$(CC) -c src/info/term.c $(CFLAGS) -o obj/term.o
 
-uptime.o: src/info/uptime.c src/info/info.h $(BSDWRAP_H)
-	$(CC) -c src/info/uptime.c $(CFLAGS)
+obj/uptime.o: src/info/uptime.c src/info/info.h $(BSDWRAP_H)
+	$(CC) -c src/info/uptime.c $(CFLAGS) -o obj/uptime.o
 
-user.o: src/info/user.c src/info/info.h
-	$(CC) -c src/info/user.c $(CFLAGS)
+obj/user.o: src/info/user.c src/info/info.h
+	$(CC) -c src/info/user.c $(CFLAGS) -o obj/user.o

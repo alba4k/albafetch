@@ -19,6 +19,7 @@
 * the buffer size for single lines has been raised to 1024B
 * the debug script can now be used with `--no-pip`, this won't print the # of packages installed using pip (because of speed concerns)
 * the cpu architecture will now be printed in brackets (eg: `Arch Linux x86_64` -> `Arch Linux (x86_64)`)
+* using `--logo none` will prevent any logo from being displayed
 
 ## Bug fixes
 

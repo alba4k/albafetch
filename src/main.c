@@ -332,7 +332,7 @@ int main(int argc, char **argv) {
         
         printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
                "\t\t\t   [alpine, android, apple, arch, arch_small, debian, endeavouros, fedora]\n"
-               "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, parrot, pop, ubuntu, windows]\n",
+               "\t\t\t   [gentoo, linux, linuxmint, manjaro, neon, none, parrot, pop, ubuntu, windows]\n",
                config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
         printf("\t%s%s--ascii\033[0m:\t Specifies a file containing a custom ascii art to use as logo (default: none)\n"
