@@ -6,10 +6,27 @@
 
 albafetch is a simple and fast program to display a lot of system information in a neofetch-like layout in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable given that we're talking about a 10k+ lines shell script).
 
+<details>
+
+<summary>Preview</summary>
+This is what albafetch will likely look like by default:
+
+![default](images/albafetch_demo_default.png)
+
+And this is what [my configuration](https://github.com/alba4k/.dotfiles/blob/master/.config/albafetch/albafetch.conf) looks like
+![custom](images/albafetch_demo.png)
+
+</details>
+
 Here is a time comparison (exact execution times change between machines and runs):
+<details>
+
+<summary>Time comparison</summary>
 
 ![neofetch](images/time_neofetch.png)
 ![albafetch](images/time_albafetch.png)
+
+</details>
 
 You will find a lot of useful usage and configuration related info inside of the [user manual](MANUAL.md) and a small list of the things I changed since the last release in the [changelog](CHANGELOG.md).
 
