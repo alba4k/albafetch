@@ -30,7 +30,8 @@ endif
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
-	INCLUDE := 
+	DATAPATH := $(PREFIX)/etc
+	DATAPATH := $(PREFIX)/share
 endif
 
 ifeq ($(KERNEL),Darwin)
