@@ -493,8 +493,10 @@ int main(int argc, char **argv) {
             // this is the length of the last printed text
             const size_t len = strlen_real(printed)
                                - strlen_real(config.separator_prefix)
-                               - strlen(config.logo[2])
-                               - config.spacing;
+                               - (print_logo
+                                  ? strlen(config.logo[2])
+                                    + config.spacing
+                                  : 0);
 
             printed[0] = 0;
 
@@ -509,7 +511,7 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             const size_t separator_len = strlen(config.separator);
-            for(size_t i = 0; i < len && strlen(printed) < 1023 - separator_len; ++i)
+            for(size_t i = 0; i < len && strlen(printed) < 1023 - separator_len*i; ++i)
                 strcat(printed, config.separator);
         }
         else if(!strcmp(current->id, "space")) {  // spacings are handled differently (they don't do shit)
