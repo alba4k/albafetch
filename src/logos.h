@@ -105,7 +105,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Arch Linux (small version)
         "arch_small",
         "\033[36m",
-        "\033[36m              ",
+        "              ",
         "\033[36m      /\\      ",
         "\033[36m     /  \\     ",
         "\033[36m    /\\   \\    ",
@@ -243,7 +243,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Mageia
         "mageia",
         "\033[36m",
-        "                            ",
+        "                        ",
         "\033[36m        .°°.            ",
         "\033[36m         °°   .°°.      ",
         "\033[36m         .°°°. °°       ",
@@ -431,7 +431,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Garuda Linux
         "garuda",
         "\033[35m",
-        "\033[0m                                                    ",
+        "                                                    ",
         "\033[0m                 __,,,,,,,_                      ",
         "\033[0m           _╓╗╣╫╠╠╠╠╠╠╠╠╠╠╠╠╠╕╗╗┐_               ",
         "\033[0m        ╥╢╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╥,            ",
@@ -458,7 +458,7 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Alpine Linux
         "alpine",
         "\033[34m",
-        "\033[34m                                        ",
+        "                                        ",
         "\033[34m       .hddddddddddddddddddddddh.       ",
         "\033[34m      :dddddddddddddddddddddddddd:      ",
         "\033[34m     /dddddddddddddddddddddddddddd/     ",
