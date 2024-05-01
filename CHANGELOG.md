@@ -15,11 +15,12 @@
 ### Command line arguments
 
 ### Other changes
-* the number of lines a custom ascii art may have was reduced to 39 (from 47) but the maximum length of each line got increased to 256B (~66% increase in total size)
+* the number of lines a custom ascii art may have was reduced to 40 (from 47) but the maximum length of each line got increased to 256B (~70% increase in total size)
 * the buffer size for single lines has been raised to 1024B
 * the debug script can now be used with `--no-pip`, this won't print the # of packages installed using pip (because of speed concerns)
 * the cpu architecture will now be printed in brackets (eg: `Arch Linux x86_64` -> `Arch Linux (x86_64)`)
 * using `--logo none` will prevent any logo from being displayed
+* added a logo for [Mageia](https://mageia.org)
 
 ## Bug fixes
 
@@ -31,6 +32,7 @@
 * Reduced the memory usage when not using --ascii (increased when it is used)
 * `src/info.c` was split up into multiple files (in `src/info/`)
 * libcurl is now not used anymore to get the public ip
+* the length of logos is calculated on the fly, resulting in lower memory usage
 
 ---
 

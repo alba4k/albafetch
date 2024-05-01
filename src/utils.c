@@ -27,47 +27,46 @@ void *file_to_logo(char *file) {
     char *buffer = NULL;
     size_t len = 0;
     size_t line_len;
-    int i = 1;
+    int i = 0;
 
     // setting the correct color (or eventually the first line)
 
     line_len = getline(&buffer, &len, fp);  // save the first line to buffer
-    if(line_len != (size_t)-1) {            // getline returns -1 in case of error
-        if(buffer[line_len-1] == '\n')
-            buffer[line_len-1] = 0;
+    if(line_len == (size_t)-1)              // getline returns -1 in case of error
+        return NULL;
 
-        config.color[0] = 0;
+    if(buffer[line_len-1] == '\n')
+        buffer[line_len-1] = 0;
 
-        const char *colors[][2] = {
-            {"black", "\033[30m"},
-            {"red", "\033[31m"},
-            {"green", "\033[32m"},
-            {"yellow", "\033[33m"},
-            {"blue", "\033[34m"},
-            {"purple", "\033[35m"},
-            {"cyan", "\033[36m"},
-            {"gray", "\033[90m"},
-            {"white", "\033[37m"},
-        };
+    config.color[0] = 0;
 
-        for(int j = 0; j < 9; ++j)
-            if(!strcmp(buffer, *colors[j]))
-                strcpy(config.color, colors[j][1]);
+    const char *colors[][2] = {
+        {"black", "\033[30m"},
+        {"red", "\033[31m"},
+        {"green", "\033[32m"},
+        {"yellow", "\033[33m"},
+        {"blue", "\033[34m"},
+        {"purple", "\033[35m"},
+        {"cyan", "\033[36m"},
+        {"gray", "\033[90m"},
+        {"white", "\033[37m"},
+    };
 
-        mem = malloc(10240);
-        memset(mem, 0, 1024);
+    for(int j = 0; j < 9; ++j)
+        if(!strcmp(buffer, *colors[j]))
+            strcpy(config.color, colors[j][1]);
 
-        if(!config.color[0]) {
-            unescape(buffer);
+    mem = malloc(10240);
+    memset(mem, 0, 1024);
 
-            logo[i+2] = mem + i*LINE_LEN;
-            strncpy((char*)logo[i+2], buffer, LINE_LEN);
+    if(config.color[0] == 0) {
+        unescape(buffer);
 
-            ++i;
-        }
+        logo[i+2] = mem + i*LINE_LEN;
+        strncpy((char*)logo[i+2], buffer, LINE_LEN);
+
+        ++i;
     }
-    else
-        return mem;
 
     // for every remaining line of the logo...
     while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < LINE_NUM) {
@@ -88,12 +87,6 @@ void *file_to_logo(char *file) {
 
     // set up the logo metadata;
     logo[0] = "custom";  // logo ID
-    logo[2] = mem;       // the first characters of mem are used for the whitespace
-    size_t j;
-    for(j = 0; j < strlen_real(logo[3]); ++j) {   // filling in the whitespace
-        mem[j] = ' ';
-    }
-    mem[j+1] = 0;
     
     // the array of lines is NULL-terminated;
     logo[i+2] = NULL;
@@ -145,8 +138,10 @@ void get_logo_line(char *dest, unsigned *line) {
         ++(*line);
         strcat(dest, config.logo[*line]);
     }
-    else
-        strcat(dest, config.logo[2]);
+    else {
+        for(size_t i = 0; i < strlen_real(config.logo[2]); ++i)
+            strcat(dest, " ");
+    }
 }
 
 // print no more than maxlen visible characters of line

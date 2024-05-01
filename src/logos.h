@@ -15,7 +15,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Linux - default logo
         "linux",                                                // this first line contains the distro ID, taken from /etc/os-release
         "\033[90m",                                             // default color for the printed text
-        "                     ",                                // numbers of spaces to use when ran out of lines (whitespace)
         "\033[90m        #####        ",                        // just the logo
         "\033[90m       #######       ",
         "\033[90m       ##\033[37mO\033[90m#\033[37mO\033[90m##       ",
@@ -33,7 +32,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // macOS
         "apple",
         "\033[35m",
-        "                              ",
         "\033[32m                    'c.       ",
         "\033[32m                 ,xNMM.       ",
         "\033[32m               .OMMMMo        ",
@@ -56,7 +54,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Android
         "android",
         "\033[32m",
-        "                                ",
         "\033[32m         -o          o-         ",
         "\033[32m          +hydNNNNdyh+          ",
         "\033[32m        +mMMMMMMMMMMMMm+        ",
@@ -80,7 +77,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Arch Linux
         "arch",
         "\033[36m",
-        "                                     ",
         "\033[36m                  -`                 ",
         "\033[36m                 .o+`                ",
         "\033[36m                `ooo/                ",
@@ -105,7 +101,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Arch Linux (small version)
         "arch_small",
         "\033[36m",
-        "              ",
         "\033[36m      /\\      ",
         "\033[36m     /  \\     ",
         "\033[36m    /\\   \\    ",
@@ -118,7 +113,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Debian
         "debian",
         "\033[31m",
-        "                            ",
         "\033[31m       _,met$$$$$gg.        ",
         "\033[31m    ,g$$$$$$$$$$$$$$$P.     ",
         "\033[31m  ,g$$P\"     \"\"\"Y$$.\".      ",
@@ -141,7 +135,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Linux Mint
         "linuxmint",
         "\033[32m",
-        "                                        ",
         "\033[37m             ...-:::::-...              ",
         "\033[37m          .-MMMMMMMMMMMMMMM-.           ",
         "\033[37m      .-MMMM\033[32m`..-:::::::-..`\033[37mMMMM-.       ",
@@ -166,7 +159,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Endeavour OS
         "endeavouros",
         "\033[35m",
-        "                                        ",
         "\033[31m                     ./\033[35mo\033[34m.               ",
         "\033[31m                   ./\033[35msssso\033[34m-             ",
         "\033[31m                 `:\033[35mosssssss+\033[34m-           ",
@@ -187,7 +179,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Ubuntu
         "ubuntu",
         "\033[31m",
-        "                                        ",
         "\033[31m            .-/+oossssoo+/-.            ",
         "\033[31m        `:+ssssssssssssssssss+:`        ",
         "\033[31m      -+ssssssssssssssssssyyssss+-      ",
@@ -213,7 +204,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Parrot OS
         "parrot",
         "\033[36m",
-        "                                       ",
         "\033[36m  `:oho/-`                             ",
         "\033[36m`mMMMMMMMMMMMNmmdhy-                   ",
         "\033[36m dMMMMMMMMMMMMMMMMMMs`                 ",
@@ -243,7 +233,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Mageia
         "mageia",
         "\033[36m",
-        "                        ",
         "\033[36m        .°°.            ",
         "\033[36m         °°   .°°.      ",
         "\033[36m         .°°°. °°       ",
@@ -268,7 +257,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Manjaro Linux
         "manjaro",
         "\033[32m",
-        "                            ",
         "\033[32m██████████████████  ████████",
         "\033[32m██████████████████  ████████",
         "\033[32m██████████████████  ████████",
@@ -288,7 +276,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Fedora
         "fedora",
         "\033[34m",
-        "                                  ",
         "\033[34m          /:-------------:\\       ",
         "\033[34m       :-------------------::     ",
         "\033[34m     :-----------\033[39m/shhOHbmp\033[34m---:\\   ",
@@ -311,7 +298,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // KDE Neon
         "neon",
         "\033[32m",
-        "                                        ",
         "\033[32m             `..---+/---..`             ",
         "\033[32m         `---.``   ``   `.---.`         ",
         "\033[32m      .--.`        ``        `-:-.      ",
@@ -336,7 +322,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Pop!_OS
         "pop",
         "\033[36m",
-        "                                       ",
         "\033[36m             /////////////             ",
         "\033[36m         /////////////////////         ",
         "\033[36m      ///////\033[39m*767\033[36m////////////////      ",
@@ -362,7 +347,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Gentoo
         "gentoo",
         "\033[35m",
-        "                                ",
         "\033[35m         -/oyddmdhs+:.             ",
         "\033[35m    -o\033[97mdNMMMMMMMMNNmhy+\033[35m-`           ",
         "\033[35m   -y\033[97mNMMMMMMMMMMMNNNmmdhy\033[35m+-        ",
@@ -386,7 +370,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Windows
         "windows",
         "\033[34m",
-        "                                     ",
         "\033[31m        ,.=:!!t3Z3z.,                ",
         "\033[31m       :tt:::tt333EE3                ",
         "\033[31m       Et:::ztt33EEEL \033[32m@Ee.,      .., ",
@@ -408,7 +391,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // ElementaryOS
         "elementary",
         "\033[34m",
-        "                                    ",
         "\033[0m         eeeeeeeeeeeeeeeee          ",
         "\033[37m      eeeeeeeeeeeeeeeeeeeeeee       ",
         "\033[37m    eeeee  eeeeeeeeeeee   eeeee     ",
@@ -431,7 +413,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Garuda Linux
         "garuda",
         "\033[35m",
-        "                                                    ",
         "\033[0m                 __,,,,,,,_                      ",
         "\033[0m           _╓╗╣╫╠╠╠╠╠╠╠╠╠╠╠╠╠╕╗╗┐_               ",
         "\033[0m        ╥╢╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╥,            ",
@@ -458,7 +439,6 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
     {   // Alpine Linux
         "alpine",
         "\033[34m",
-        "                                        ",
         "\033[34m       .hddddddddddddddddddddddh.       ",
         "\033[34m      :dddddddddddddddddddddddddd:      ",
         "\033[34m     /dddddddddddddddddddddddddddd/     ",

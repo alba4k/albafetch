@@ -494,7 +494,7 @@ int main(int argc, char **argv) {
             const size_t len = strlen_real(printed)
                                - strlen_real(config.separator_prefix)
                                - (print_logo
-                                  ? strlen(config.logo[2])
+                                  ? strlen_real(config.logo[2])
                                     + config.spacing
                                   : 0);
 
