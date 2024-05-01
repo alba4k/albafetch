@@ -72,12 +72,12 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
-        if(pkg_rpm && !access(path, F_OK)) {
+        if(pkg_rpm && access(path, F_OK) == 0) {
             int stderr_pipes[2];
             if(pipe(pipes) || pipe(stderr_pipes))
                 return 1;
 
-            if(!fork()) {
+            if(fork() == 0) {
                 close(pipes[0]);
                 close(stderr_pipes[0]);
                 dup2(pipes[1], STDOUT_FILENO);
@@ -121,11 +121,11 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/snap", 256-strlen(path));
-        if(pkg_snap && !access(path, F_OK)) {
+        if(pkg_snap && access(path, F_OK) == 0) {
             if(pipe(pipes))
                 return 1;
 
-            if(!fork()) {
+            if(fork() == 0) {
                 close(pipes[0]);
                 dup2(pipes[1], STDOUT_FILENO);
 
@@ -144,11 +144,11 @@ int packages(char *dest) {
             }
         }
     #endif
-    if(pkg_brew && (!access("/usr/local/bin/brew", F_OK) || !access("/opt/homebrew/bin/brew", F_OK) || !access("/bin/brew", F_OK))) {
+    if(pkg_brew && (access("/usr/local/bin/brew", F_OK) == 0 || access("/opt/homebrew/bin/brew", F_OK) == 0 || access("/bin/brew", F_OK) == 0)) {
         if(pipe(pipes))
             return 1;
 
-        if(!fork()) {
+        if(fork() == 0) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
             execlp("brew", "brew", "--cellar", NULL); 
@@ -185,11 +185,11 @@ int packages(char *dest) {
     if(getenv("PREFIX"))
         strncpy(path, getenv("PREFIX"), 255);
     strncat(path, "/bin/pip", 256-strlen(path));
-    if(pkg_pip && !access(path, F_OK)) {
+    if(pkg_pip && access(path, F_OK) == 0) {
         if(pipe(pipes))
             return 1;
 
-        if(!fork()) {
+        if(fork() == 0) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 

@@ -19,9 +19,9 @@ int desktop(char *dest) {
                             getenv("GNOME_DESKTOP_SESSION_ID") ? "GNOME" :
                             getenv("MATE_DESKTOP_SESSION_ID") ? "MATE" :
                             getenv("TDE_FULL_SESSION") ? "Trinity" :
-                            // !strcmp("linux", getenv("TERM")) ? "none" :      // running in tty
+                            // strcmp("linux", getenv("TERM") == 0 ? "none" :      // running in tty
                             NULL;
-        if(!desktop)
+        if(desktop == NULL)
             return 1;
 
         strcpy(dest, desktop);
@@ -30,7 +30,7 @@ int desktop(char *dest) {
             if(getenv("WAYLAND_DISPLAY"))
                 strncat(dest, " (Wayland)", 255-strlen(dest));
             else if((desktop = getenv("XDG_SESSION_TYPE"))) {
-                if(!desktop[0])
+                if(desktop[0] == 0)
                     return 0;
                 desktop[0] = toupper(desktop[0]);
                 

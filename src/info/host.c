@@ -26,7 +26,7 @@ int host(char *dest) {
 
         if(pipe(pipes))
             return 1;
-        if(!fork()) {
+        if(fork() == 0) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
@@ -40,7 +40,7 @@ int host(char *dest) {
 
         if(pipe(pipes))
             return 1;
-        if(!fork()) {
+        if(fork() == 0) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
@@ -52,7 +52,7 @@ int host(char *dest) {
         model[read(pipes[0], model, 64) - 1] = 0;
         close(pipes[0]);
 
-        if(!(brand[0] || model[0]))
+        if((brand[0] || model[0]) == 0)
             return 1;
 
         snprintf(dest, 256, "%s%s%s", brand, brand[0] ? " ": "", model);
@@ -90,10 +90,10 @@ int host(char *dest) {
 
         for(unsigned long i = 0; i < sizeof(errors)/sizeof(errors[0]); ++i) {
             if(name)
-                if(!strcmp(name, errors[i]))
+                if(strcmp(name, errors[i]) == 0)
                     name_defined = false;
             if(version)
-                if(!strcmp(version, errors[i]))
+                if(strcmp(version, errors[i]) == 0)
                     version_defined = false;
         }
 

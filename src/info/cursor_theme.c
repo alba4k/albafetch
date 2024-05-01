@@ -12,11 +12,11 @@ int cursor_theme(char *dest){
 
     // try using gsettings
     // reading ~/.config/gtk-3.0/settings.ini could also be an option 
-    if(!access("/bin/gsettings", F_OK)){
+    if(access("/bin/gsettings", F_OK) == 0){
         if(pipe(pipes))
             return 1;
-
-        if(!fork()) {
+            
+        if(fork() == 0) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 

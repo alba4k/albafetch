@@ -26,12 +26,12 @@ int term(char *dest) {
         if(getenv(terminals[i][0]))
             terminal = terminals[i][1];
 
-    if(!terminal) {
+    if(terminal == NULL) {
         terminal = getenv("TERM");
-        if(!terminal)
+        if(terminal == NULL)
             return 1;
         
-        if(!strcmp(terminal, "xterm-kitty"))
+        if(strcmp(terminal, "xterm-kitty") == 0)
             terminal = "kitty";
     }
 

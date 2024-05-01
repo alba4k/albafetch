@@ -29,7 +29,7 @@ int os(char *dest) {
 
         if(pipe(pipes))
             return 1;
-        if(!fork()) {
+        if(fork() == 0) {
             close(pipes[0]);
             dup2(pipes[1], STDOUT_FILENO);
 
@@ -48,9 +48,9 @@ int os(char *dest) {
 
 #else
         FILE *fp = fopen("/etc/os-release", "r");
-        if(!fp) {
+        if(fp == NULL) {
             fp = fopen("/usr/lib/os-release", "r");
-            if(!fp)
+            if(fp == NULL)
                 return 1;
         }
 
@@ -61,10 +61,10 @@ int os(char *dest) {
         read_after_sequence(fp, "PRETTY_NAME", buf, 64);
         fclose(fp);
 
-        if(!buf[0])
+        if(buf[0] == 0)
             return 1;
 
-        if(!(end = strchr(os_name, '\n')))
+        if((end = strchr(os_name, '\n')) == 0)
             return 1;
         *end = 0;
 
@@ -72,7 +72,7 @@ int os(char *dest) {
         if(os_name[0] == '"' || os_name[0] == '\'')
             ++os_name;
 
-        if(!(end = strchr(os_name, '"')))
+        if((end = strchr(os_name, '"')) == 0)
             end = strchr(os_name, '\'');
         if(end)
             *end = 0;

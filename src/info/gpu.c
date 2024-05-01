@@ -25,15 +25,15 @@ int gpu(char *dest) {
         struct utsname name;
         uname(&name);
 
-        if(!strcmp(name.machine, "x86_64"))
+        if(strcmp(name.machine, "x86_64") == 0
             gpus[0] = get_gpu_string();  // only works on x64
-        if(!gpus[0] || strcmp(name.machine, "x86_64")) {     // fallback
+        if(gpus[0] == 0 || strcmp(name.machine, "x86_64")) {     // fallback
             char buf[1024];
             int pipes[2];
             if(pipe(pipes))
                 return 1;
 
-            if(!fork()) {
+            if(fork() == 0) {
                 dup2(pipes[1], STDOUT_FILENO);
                 close(pipes[0]);
                 close(pipes[1]);
@@ -48,11 +48,11 @@ int gpu(char *dest) {
                 return 1;
 
             gpus[0] = strstr(buf, "Chipset Model: ");
-            if(!gpus[0])
+            if(gpus[0] == 0)
                 return 1;
             gpus[0] += 15;
             char *end = strchr(gpus[0], '\n');
-            if(!end)
+            if(end == NULL)
                 return 1;
             *end = 0;
         }
@@ -74,7 +74,7 @@ int gpu(char *dest) {
             pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	// fill in header info
 
             pci_lookup_name(pacc, device_class, 256, PCI_LOOKUP_CLASS, dev->device_class);
-            if(!strcmp(device_class, "VGA compatible controller") || !strcmp(device_class, "3D controller")) {
+            if(strcmp(device_class, "VGA compatible controller") == 0 || strcmp(device_class, "3D controller") == 0) {
                 // look up the full name of the device
                 if(config.gpu_index == 0) {
                     gpus[i] = pci_lookup_name(pacc, namebuf+i*256, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
@@ -103,7 +103,7 @@ int gpu(char *dest) {
 
         char gpu[256];
 
-        if(!gpus[0]) {
+        if(gpus[0] == 0) {
             if(config.gpu_index != 0)   // lol why would you choose a non-existing GPU
                 return 1;
 
@@ -112,7 +112,7 @@ int gpu(char *dest) {
             if(pipe(pipes))
                 return 1;
 
-            if(!fork()) {
+            if(fork() == 0) {
                 close(pipes[0]);
                 dup2(pipes[1], STDOUT_FILENO);
                 execlp("lspci", "lspci", "-mm", NULL);
@@ -126,9 +126,9 @@ int gpu(char *dest) {
             close(pipes[0]);
 
             gpus[0] = strstr(lspci, "3D");
-            if(!gpus[0]) {
+            if(gpus[0] == 0) {
                 gpus[0] = strstr(lspci, "VGA");
-                if(!gpus[0]) {
+                if(gpus[0] == 0) {
                     free(lspci);
                     return 1;
                 }
@@ -136,7 +136,7 @@ int gpu(char *dest) {
 
             for(int j = 0; j < 4; ++j) {
                 gpus[0] = strchr(gpus[0], '"');
-                if(!gpus[0]) {
+                if(gpus[0] == 0) {
                     free(lspci);
                     return 1;
                 }
@@ -151,7 +151,7 @@ int gpu(char *dest) {
             }
 
             end = strchr(gpus[0], '"');   // name
-            if(!end) {
+            if(end == NULL) {
                 free(lspci);
                 return 1;
             }
@@ -164,14 +164,14 @@ int gpu(char *dest) {
     # endif // __ANDROID__
     #endif // __APPLE__
 
-    if(!gpus[0])
+    if(gpus[0] == 0)
         return 1;
 
     // this next part is just random cleanup
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
     dest[0] = 0;    //  yk it's decent a yk it works
     for(unsigned j = 0; j < sizeof(gpus)/sizeof(gpus[0]) && gpus[j%3]; ++j) {
-        if(!(gpu_brand)) {
+        if((gpu_brand) == 0) {
             if(strstr(gpus[j], "Intel ")
                || strstr(gpus[j], "Apple "))
                 gpus[j] += 6;

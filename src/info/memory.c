@@ -19,7 +19,7 @@ int memory(char *dest) {
         bytes_t usedram = used_mem_size();
         bytes_t totalram = system_mem_size();
 
-        if(!usedram || !totalram) { 
+        if(usedram == 0 || totalram == 0) { 
             return 1;
         }
 
@@ -35,7 +35,7 @@ int memory(char *dest) {
 
         FILE *fp = fopen("/proc/meminfo", "r");
 
-        if(!fp)
+        if(fp == NULL)
             return 1;
 
         char buf[256];
@@ -44,13 +44,13 @@ int memory(char *dest) {
         read_after_sequence(fp, "Cached:", buf, 256);
         fclose(fp);
 
-        if(!(buf[0]))
+        if(buf[0] == 0)
             return 1;
         cachedram += 2;
 
         char *end = strstr(cachedram, " kB");
         
-        if(!end)
+        if(end == NULL)
             return 1;
         
         *end = 0;

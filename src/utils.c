@@ -8,7 +8,7 @@
 // copy an ascii art from file to mem
 void *file_to_logo(char *file) {
     FILE *fp = fopen(file, "r");
-    if(!fp)
+    if(fp == NULL)
         return NULL;
 
     /* mem is assumed to be a 10 KiB buffer, aka 10240 B.
@@ -53,7 +53,7 @@ void *file_to_logo(char *file) {
     };
 
     for(int j = 0; j < 9; ++j)
-        if(!strcmp(buffer, *colors[j]))
+        if(strcmp(buffer, *colors[j]) == 0)
             strcpy(config.color, colors[j][1]);
 
     mem = malloc(10240);
@@ -131,7 +131,7 @@ void destroy_array(struct Module *array) {
 
 // print a certain line of the logo
 void get_logo_line(char *dest, unsigned *line) {
-    if(!config.logo || !dest || *line < 2)
+    if(config.logo == NULL || dest == NULL || *line < 2)
         return;
         
     if(config.logo[(*line)+1]) {
@@ -198,22 +198,22 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 
     // looks for the keyword
     ptr = strstr(source, field);
-    if(!ptr)
+    if(ptr == NULL)
         return 1;
 
     // looks for the opening "
     ptr = strchr(ptr, '"');
-    if(!ptr)
+    if(ptr == NULL)
         return 1;
 
     // checks whether the string continues after
     ++ptr;
-    if(!(*ptr))
+    if(*ptr == 0)
         return 1;
 
     // looks for the closing "
     end = strchr(ptr, '"');
-    if(!end)
+    if(end == NULL)
         return 1;
 
     // copies the option
@@ -239,22 +239,22 @@ int parse_config_int(const char *source, const char *field, int *dest, const uns
 
     // looks for the keyword
     ptr = strstr(source, field);
-    if(!ptr)
+    if(ptr == NULL)
         return 1;
 
     // looks for the opening "
     ptr = strchr(ptr, '"');
-    if(!ptr)
+    if(ptr == NULL)
         return 1;
         
     // checks whether the string continues after
     ++ptr;
-    if(!(*ptr))
+    if(*ptr == 0)
         return 1;
 
     // looks for the closing "
     end = strchr(ptr, '"');
-    if(!end)
+    if(end == NULL)
         return 1;
 
     // copies the option
@@ -276,22 +276,22 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
 
     // looks for the keyword
     ptr = strstr(source, field);
-    if(!ptr)
+    if(ptr == NULL)
         return 1;
 
     // looks for the opening "
     ptr = strchr(ptr, '"');
-    if(!ptr)
+    if(ptr == NULL)
         return 1;
         
     // checks whether the string continues after
     ++ptr;
-    if(!(*ptr))
+    if(*ptr == 0)
         return 1;
 
     // looks for the closing "
     end = strchr(ptr, '"');
-    if(!end)
+    if(end == NULL)
         return 1;
 
     // copies the option
@@ -320,7 +320,7 @@ void uncomment(char *str, const char start) {
 
         ptr2 = strchr(ptr, '\n');
         
-        if(!ptr2) {
+        if(ptr2 == NULL) {
             *ptr = 0;
             break;
         }
@@ -333,7 +333,7 @@ void uncomment(char *str, const char start) {
 void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
-    if(!fp)
+    if(fp == NULL)
         return;
 
     fseek(fp, 0, SEEK_END);
@@ -367,7 +367,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     parse_config_str(conf, "logo", logo, sizeof(logo));
     if(logo[0]) {
         for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
-            if(!strcmp(logos[i][0], logo)) {
+            if(strcmp(logos[i][0], logo) == 0) {
                 config.logo = logos[i];
                 strcpy(default_logo, logos[i][0]);
                 strcpy(config.color, logos[i][1]);
@@ -391,7 +391,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         };
 
         for(int i = 0; i < 9; ++i)
-            if(!strcmp(color, *colors[i])) {
+            if(strcmp(color, *colors[i]) == 0) {
                 strcpy(config.color, colors[i][1]);
                 strcpy(default_color, colors[i][1]);
             }
@@ -439,7 +439,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
 
     bool buffer;
     for(size_t i = 0; i < sizeof(booleanOptions)/sizeof(booleanOptions[0]); ++i) {
-        if(!parse_config_bool(conf, booleanOptions[i], &buffer)) {
+        if(parse_config_bool(conf, booleanOptions[i], &buffer) == 0) {
             if(buffer)
                 config.options |= ((uint64_t)1 << i);
             else
@@ -500,19 +500,19 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     // MODULES
     
     ptr = strstr(conf, "modules");
-    if(!ptr) {
+    if(ptr == NULL) {
         free(conf);
         return;
     }
 
     ptr2 = strchr(ptr, '{');
-    if(!ptr2) {
+    if(ptr2 == NULL) {
         free(conf);
         return;
     }
 
     char *end = strchr(ptr2, '}');
-    if(!end) {
+    if(end == NULL) {
         free(conf);
         return;
     }
@@ -522,7 +522,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         ++ptr;
 
         ptr2 = strchr(ptr, '"');
-        if(!ptr2) {
+        if(ptr2 == NULL) {
             free(conf);
             return;
         }
@@ -580,7 +580,7 @@ __attribute__((pure)) size_t strlen_real(const char *str) {
             break;
 
         // unicode continuation byte 0x10xxxxxx
-        if(*str & 0x80 && !(*str & 0x40)) {
+        if(*str & 0x80 && (*str & 0x40) == 0) {
             ++str;
             continue;
         }

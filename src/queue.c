@@ -1,5 +1,6 @@
 #include "queue.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -83,7 +84,7 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
     Queue *q = queue_with_size(3 * seq_size);
     int ch;
     int error;
-    int found = 0;
+    bool found = false;
     char elem;
 
     while((ch = fgetc(fp)) != EOF) {
@@ -94,8 +95,8 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
 
         assert(q->size == seq_size);   // Window is of correct width
 
-        if(!strncmp((char *)q->data + q->offset, seq, seq_size)) {
-            found = 1;
+        if(strncmp((char *)q->data + q->offset, seq, seq_size) == 0) {
+            found = true;
             break;
         }
         
@@ -108,7 +109,7 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
 
     destroy_queue(q);
 
-    if(!found) {
+    if(found == false) {
         buffer[0] = 0;  // make buffer an empty string if the sequence is not found
     }
 

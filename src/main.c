@@ -105,13 +105,13 @@ int main(int argc, char **argv) {
 
     // parsing the command args
     for(int i = 1; i < argc; ++i) {
-        if(!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
+        if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
             asking_help = true;
-        else if(!strcmp(argv[i], "-c") || !strcmp(argv[i], "--color"))
+        else if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--color") == 0)
             asking_color = i+1;
-        else if(!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bold"))
+        else if(strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--bold") == 0)
             asking_bold = i+1;
-        else if(!strcmp(argv[i], "--ascii")) {
+        else if(strcmp(argv[i], "--ascii") == 0) {
             if(i+1 >= argc) {   // is there such an arg?
                 fputs("\033[31m\033[1mERROR\033[0m: --ascii requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
@@ -125,11 +125,11 @@ int main(int argc, char **argv) {
             ascii_file = argv[i+1];
             continue;
         }
-        else if(!strcmp(argv[i], "-l") || !strcmp(argv[i], "--logo"))
+        else if(strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--logo") == 0)
             asking_logo = i+1;
-        else if(!strcmp(argv[i], "--align") || !strcmp(argv[i], "-a"))
+        else if(strcmp(argv[i], "--align") == 0 || strcmp(argv[i], "-a") == 0)
             asking_align = i+1;
-        else if(!strcmp(argv[i], "--config") && use_config) {
+        else if(strcmp(argv[i], "--config") == 0 && use_config) {
             if(i+1 >= argc) {   // is there such an arg?
                 fputs("\033[31m\033[1mERROR\033[0m: --config requires an extra argument!\n", stderr);
                 user_is_an_idiot = true;
@@ -143,9 +143,9 @@ int main(int argc, char **argv) {
             strncpy(config_file, argv[i+1], sizeof(config_file)-1);
             continue;
         }
-        else if(!strcmp(argv[i], "--no-logo"))
+        else if(strcmp(argv[i], "--no-logo") == 0)
             print_logo = false;
-        else if(!strcmp(argv[i], "--no-config"))
+        else if(strcmp(argv[i], "--no-config") == 0)
             use_config = false;
     }
 
@@ -159,7 +159,7 @@ int main(int argc, char **argv) {
     // albafetch will first parse ~/.config/albafetch.conf
     // ~/.config/albafetch/albafetch.conf if the former is not found
     if(use_config) {    // --no-config was not used
-        if(!config_file[0]) {   // --config was not used, using the default path
+        if(config_file[0] == 0) {   // --config was not used, using the default path
             char *home = getenv("HOME");
             char *config_home = getenv("XDG_CONFIG_HOME");
 
@@ -188,12 +188,12 @@ int main(int argc, char **argv) {
         if(asking_logo < argc) {
             // find the matching logo
             for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
-                if(!strcmp(logos[i][0], argv[asking_logo])) {
+                if(strcmp(logos[i][0], argv[asking_logo]) == 0) {
                     config.logo = logos[i];
                     found = true;
                 }
 
-            if(!found)
+            if(found == false)
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
         }
         else
@@ -204,7 +204,7 @@ int main(int argc, char **argv) {
         else
             user_is_an_idiot = true;
     }
-    if(!config.logo) {  // get a logo based on the OS (--logo was not used and no logo was set by the config)
+    if(config.logo == NULL) {  // get a logo based on the OS (--logo was not used and no logo was set by the config)
         #ifdef __APPLE__
             config.logo = logos[1];
         #else
@@ -214,13 +214,13 @@ int main(int argc, char **argv) {
             config.logo = logos[0];
             FILE *fp = fopen("/etc/os-release", "r");
 
-            if(!fp)
+            if(fp == NULL)
                 fp = fopen("/usr/lib/os-release", "r");
 
             if(fp) {
                 char os_id[48];
                 read_after_sequence(fp, "\nID", os_id, 48);
-                if(!os_id[0])
+                if(os_id[0] == 0)
                     read_after_sequence(fp, "ID", os_id, 48);
                 fclose(fp);
 
@@ -229,12 +229,12 @@ int main(int argc, char **argv) {
                     *end = 0;
 
                 // because Arch Linux ARM has to be special for some reason
-                if(!strcmp(os_id, "archarm"))
+                if(strcmp(os_id, "archarm") == 0)
                     strcpy(os_id, "arch");
 
                 // find the matching logo
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
-                    if(!strcmp(logos[i][0], os_id)) {
+                    if(strcmp(logos[i][0], os_id) == 0) {
                         config.logo = logos[i];
                         break;
                     }
@@ -261,7 +261,7 @@ int main(int argc, char **argv) {
             };
 
             for(int j = 0; j < 9; ++j)
-                if(!strcmp(argv[asking_color], *colors[j])) {
+                if(strcmp(argv[asking_color], *colors[j]) == 0) {
                     strcpy(config.color, colors[j][1]);
                     goto color_done;
                 }
@@ -279,11 +279,11 @@ int main(int argc, char **argv) {
     if(asking_bold) {
         if(asking_bold < argc) {
             // modifying the 2nd least significant bit of options
-            if(!strcmp(argv[asking_bold], "on")) {
+            if(strcmp(argv[asking_bold], "on") == 0) {
                 config.options |= ((uint64_t)1 << 1);
                 goto bold_done;
             }
-            else if(!strcmp(argv[asking_bold], "off")) {
+            else if(strcmp(argv[asking_bold], "off") == 0) {
                 config.options &= ~((uint64_t)1 << 1);
                 goto bold_done;
             }
@@ -358,11 +358,11 @@ int main(int argc, char **argv) {
 
     if(asking_align) {
         if(asking_align < argc) {
-            if(!strcmp(argv[asking_align], "on")) {
+            if(strcmp(argv[asking_align], "on") == 0) {
                 config.options |= (uint64_t)1;
                 goto align_done;
             }
-            else if(!strcmp(argv[asking_align], "off")) {
+            else if(strcmp(argv[asking_align], "off") == 0) {
                 config.options &= ~((uint64_t)1);
                 goto align_done;
             }
@@ -432,7 +432,7 @@ int main(int argc, char **argv) {
     };
 
     // this sets the default module order in case it was not set in a config file
-    if(!modules->next) {
+    if(modules->next == NULL) {
         char *default_order[] = {
             "title",
             "separator",
@@ -462,7 +462,7 @@ int main(int argc, char **argv) {
     // I prefer doing it here than in add_module as this part only runs when it's needed
     for(struct Module *current = modules->next; current; current = current->next)
         for(size_t i = 0; i < sizeof(module_table)/sizeof(module_table[0]); ++i)
-            if(!strcmp(module_table[i].id, current->id)) {
+            if(strcmp(module_table[i].id, current->id) == 0) {
                 current->label = module_table[i].label;
                 current->func = module_table[i].func;
             }
@@ -486,8 +486,8 @@ int main(int argc, char **argv) {
     
     // printing every module
     for(struct Module *current = modules->next; current; current = current->next) {
-        if(!strcmp(current->id, "separator")) {    // separators are handled differently
-            if(!printed[0]) // first thing being printed
+        if(strcmp(current->id, "separator") == 0) {    // separators are handled differently
+            if(printed[0] == 0) // first thing being printed
                 continue;
 
             // this is the length of the last printed text
@@ -514,7 +514,7 @@ int main(int argc, char **argv) {
             for(size_t i = 0; i < len && strlen(printed) < 1023 - separator_len*i; ++i)
                 strcat(printed, config.separator);
         }
-        else if(!strcmp(current->id, "space")) {  // spacings are handled differently (they don't do shit)
+        else if(strcmp(current->id, "space") == 0) {  // spacings are handled differently (they don't do shit)
             printed[0] = 0;
 
             if(print_logo) {
@@ -527,7 +527,7 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strcat(printed, current->label);
         }
-        else if(!strcmp(current->id, "title")) {    // titles are handled differently
+        else if(strcmp(current->id, "title") == 0) {    // titles are handled differently
             char name[256];
             char host[256];
 

@@ -52,7 +52,7 @@ int public_ip(char *dest) {
 
 
     start = strstr(start, "\n\r\n");
-    if(!start)
+    if(start == NULL)
         goto error;
 
     start += 3;
