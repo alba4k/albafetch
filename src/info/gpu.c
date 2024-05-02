@@ -25,7 +25,7 @@ int gpu(char *dest) {
         struct utsname name;
         uname(&name);
 
-        if(strcmp(name.machine, "x86_64") == 0
+        if(strcmp(name.machine, "x86_64") == 0)
             gpus[0] = get_gpu_string();  // only works on x64
         if(gpus[0] == 0 || strcmp(name.machine, "x86_64")) {     // fallback
             char buf[1024];
