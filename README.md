@@ -223,7 +223,7 @@ Almost everything included in this program is written in C.
 
 If you want to, you can directly modify the source code contained in this repository and recompile the program afterwards to get some features you might want or need.
 
-New logos can be added in [`src/logos.h`](src/logos.h) (be careful to follow the format), new infos in [`src/info.c`](src/info.c) and [`src/info.h`](src/info.h). You will also need to edit [`src/main.c`](src/main.c) afterwards to fully enable the new features.
+New logos can be added in [`src/logos.h`](src/logos.h) (be careful to follow the format), new infos in `src/info` and [`src/info/info.h`](src/info/info.h). Config options are mainly parsed in [`src/utils.c`](src/utils.c). You will also need to edit [`src/main.c`](src/main.c) afterwards to fully enable the new features.
 
 Don't mind opening a pull request if you think some of the changes you made should be in the public version, just try to follow the coding style that I used in the rest of the project.
 
