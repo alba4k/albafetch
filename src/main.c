@@ -217,20 +217,33 @@ int main(int argc, char **argv) {
             if(fp == NULL)
                 fp = fopen("/usr/lib/os-release", "r");
 
-            if(fp) {
+            if(fp != NULP) {
                 char os_id[48];
+		// check with a newline first
                 read_after_sequence(fp, "\nID", os_id, 48);
                 if(os_id[0] == 0)
                     read_after_sequence(fp, "ID", os_id, 48);
                 fclose(fp);
 
                 char *end = strchr(os_id, '\n');
-                if(end)
+                if(end != NULL)
                     *end = 0;
 
                 // because Arch Linux ARM has to be special for some reason
                 if(strcmp(os_id, "archarm") == 0)
-                    strcpy(os_id, "arch");
+                    os_id[5] = 0;
+
+		// clean up because of some distros randomly using " or ' when they shouldnt be
+		if(os_id[0] == '\'' || os_id[0] == '"') {
+			++os_id;
+
+			end = strchr(os_id, '\'');
+			if(end == NULL)
+				end = strchr(os_id, '"');
+
+			if(end != NULL)
+				end[0] = 0;
+		}
 
                 // find the matching logo
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
