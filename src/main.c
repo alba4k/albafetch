@@ -217,7 +217,7 @@ int main(int argc, char **argv) {
             if(fp == NULL)
                 fp = fopen("/usr/lib/os-release", "r");
 
-            if(fp != NULP) {
+            if(fp != NULL) {
                 char os_id[48];
 		// check with a newline first
                 read_after_sequence(fp, "\nID", os_id, 48);
@@ -235,7 +235,7 @@ int main(int argc, char **argv) {
 
 		// clean up because of some distros randomly using " or ' when they shouldnt be
 		if(os_id[0] == '\'' || os_id[0] == '"') {
-			++os_id;
+			memmove(os_id, os_id+1, strlen(os_id));
 
 			end = strchr(os_id, '\'');
 			if(end == NULL)
