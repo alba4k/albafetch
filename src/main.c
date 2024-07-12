@@ -32,6 +32,7 @@ int a = 0;
  * make ascii dynamically use the available space (aka line by line)
  * start using gtk for theme and icons
  * display resolution
+ * storage
  */
 
 // This contains the default config values

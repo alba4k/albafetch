@@ -66,7 +66,7 @@ bytes_t system_mem_size(void) {
 }
 
 bytes_t used_mem_size(void) {
-#if defined(__i386__) || defined(__ppc__)
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1090
     pages_t active, wired, inactive;
     mach_port_t host = mach_host_self();
 
