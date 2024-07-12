@@ -9,6 +9,7 @@
 
 #include <mach/mach.h>
 #include <stdint.h>
+#include <AvailabilityMacros.h>
 
 #include "bsdwrap.h"
 
