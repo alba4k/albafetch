@@ -17,7 +17,7 @@ static vm_size_t page_size(mach_port_t host) {
  * Original source: 
  * https://opensource.apple.com/source/system_cmds/system_cmds-496/vm_stat.tproj/vm_stat.c.auto.html
  */
-#if defined(__i386__) || defined(__ppc__)
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1090
 static int get_stats(struct vm_statistics *stat, mach_port_t host) {
     int error;
 
