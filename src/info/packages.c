@@ -74,7 +74,7 @@ int packages(char *dest) {
         strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
         if(pkg_rpm && access(path, F_OK) == 0) {
             int stderr_pipes[2];
-            if(pipe(pipes) || pipe(stderr_pipes))
+            if(pipe(pipes) != 0 || pipe(stderr_pipes) != 0)
                 return 1;
 
             if(fork() == 0) {

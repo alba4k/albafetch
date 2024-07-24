@@ -33,6 +33,7 @@ int a = 0;
  * start using gtk for theme and icons
  * display resolution
  * storage
+ * fix sqlite usage in packages for rpm
  */
 
 // This contains the default config values
@@ -231,8 +232,11 @@ int main(int argc, char **argv) {
                     *end = 0;
 
                 // because Arch Linux ARM has to be special for some reason
+                // edit: fedora asahi too, yay
                 if(strcmp(os_id, "archarm") == 0)
                     os_id[5] = 0;
+                else if(strcmp(os_id, "fedora-asahi-remix") == 0)
+                    os_id[6] = 0;
 
 		// clean up because of some distros randomly using " or ' when they shouldnt be
 		if(os_id[0] == '\'' || os_id[0] == '"') {
