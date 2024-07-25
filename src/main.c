@@ -396,7 +396,7 @@ int main(int argc, char **argv) {
     }
 
     // I am deeply sorry for the code you're about to see - I hope you like spaghetti
-    unsigned line = 2;
+    unsigned line = 1;
     char format[32] = "%s\033[0m%s";
 
     /* getting the terminal width
@@ -622,7 +622,7 @@ int main(int argc, char **argv) {
     // remaining lines
     while(config.logo[line+1] && print_logo) {
         printed[0] = 0;
-
+        
         get_logo_line(printed, &line);
 
         print_line(printed, win.ws_col);

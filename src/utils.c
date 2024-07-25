@@ -131,7 +131,7 @@ void destroy_array(struct Module *array) {
 
 // print a certain line of the logo
 void get_logo_line(char *dest, unsigned *line) {
-    if(config.logo == NULL || dest == NULL || *line < 2)
+    if(config.logo == NULL || dest == NULL || *line < 1)
         return;
         
     if(config.logo[(*line)+1]) {
