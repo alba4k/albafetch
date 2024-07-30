@@ -30,7 +30,7 @@ endif
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
-	DATAPATH := $(PREFIX)/etc
+	CONFIGPATH := $(PREFIX)/etc
 	DATAPATH := $(PREFIX)/share
 	INCLUDE := 
 endif
