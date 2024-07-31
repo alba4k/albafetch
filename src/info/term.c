@@ -13,13 +13,14 @@ int term(char *dest) {
 
     const char *terminals[][2] = {
      // {"ENVIRONMENT_VARIABLE", "terminal"},
-        {"ALACRITTY_SOCKET", "alacritty"},
-        {"KITTY_PID", "kitty"},
-        {"VSCODE_INJECTION", "vscode"},
-        {"TERMUX_VERSION", "termux"},
-        {"KONSOLE_VERSION", "konsole"},
-        {"GNOME_TERMINAL_SCREEN", "gnome-terminal"},
-        {"WT_SESSION", "windows terminal"},
+        {"ALACRITTY_SOCKET", "Alacritty"},
+        {"KITTY_PID", "Kitty"},
+        {"VSCODE_INJECTION", "VS Code"},
+        {"TERMUX_VERSION", "Termux"},
+        {"KONSOLE_VERSION", "Konsole"},
+        {"GNOME_TERMINAL_SCREEN", "GNOME Terminal"},
+        {"WT_SESSION", "Windows Terminal"},
+        {"TERMINATOR_UUID", "Terminator"}
     };
 
     for(size_t i = 0; i < sizeof(terminals)/sizeof(terminals[0]); ++i)
@@ -27,12 +28,14 @@ int term(char *dest) {
             terminal = terminals[i][1];
 
     if(terminal == NULL) {
-        terminal = getenv("TERM");
+        terminal = getenv("TERM_PROGRAM");
+        if(terminal == NULL)
+            getenv("TERM");
         if(terminal == NULL)
             return 1;
         
         if(strcmp(terminal, "xterm-kitty") == 0)
-            terminal = "kitty";
+            terminal = "Kitty";
     }
 
     if(term_ssh && getenv("SSH_CONNECTION"))

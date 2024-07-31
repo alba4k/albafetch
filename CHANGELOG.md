@@ -27,6 +27,7 @@
 ### Noticeable fixes
 * Any portion that might have shown white as `\e[37m` will now use `\e[97m`
 * The amount of packages installed using rpm should now be much faster
+* Logo wuoldn't print correctly on EndeavourOS and Asahi Fedora
 
 ### Technical fixes
 * Reduced the memory usage when not using --ascii (increased when it is used)
