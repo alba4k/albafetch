@@ -21,6 +21,8 @@
 * the cpu architecture will now be printed in brackets (eg: `Arch Linux x86_64` -> `Arch Linux (x86_64)`)
 * using `--logo none` will prevent any logo from being displayed
 * added a logo for [Mageia](https://mageia.org)
+* Terminator will now be shown as terminal
+* Trying to use TERM_PROGRAM to find the terminal name
 
 ## Bug fixes
 
@@ -28,6 +30,7 @@
 * Any portion that might have shown white as `\e[37m` will now use `\e[97m`
 * The amount of packages installed using rpm should now be much faster
 * Logo wuoldn't print correctly on EndeavourOS and Asahi Fedora
+* not printing "None" as model version (VMware VMs)
 
 ### Technical fixes
 * Reduced the memory usage when not using --ascii (increased when it is used)

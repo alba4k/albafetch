@@ -83,8 +83,8 @@ int host(char *dest) {
             fclose(fp);
         }
 
-        // filtering out some shitty defaults because the file can't just be empty
-        const char *errors[] = {"System Product Name", "System Version", "To Be Filled By O.E.M.", ""};
+        // filtering out some shitty defaults because the file can't just be empty"
+        const char *errors[] = {"System Product Name", "System Version", "To Be Filled By O.E.M.", "None", ""};
         bool name_defined = true;
         bool version_defined = true;
 
