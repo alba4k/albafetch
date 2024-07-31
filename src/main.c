@@ -221,10 +221,12 @@ int main(int argc, char **argv) {
 
             if(fp != NULL) {
                 char os_id[48];
-		// check with a newline first
+		    // check with a newline first
                 read_after_sequence(fp, "\nID", os_id, 48);
-                if(os_id[0] == 0)
+                if(os_id[0] == 0) {
+                    rewind(fp);
                     read_after_sequence(fp, "ID", os_id, 48);
+                }
                 fclose(fp);
 
                 char *end = strchr(os_id, '\n');
@@ -238,17 +240,17 @@ int main(int argc, char **argv) {
                 else if(strcmp(os_id, "fedora-asahi-remix") == 0)
                     os_id[6] = 0;
 
-		// clean up because of some distros randomly using " or ' when they shouldnt be
-		if(os_id[0] == '\'' || os_id[0] == '"') {
-			memmove(os_id, os_id+1, strlen(os_id));
+                // clean up because of some distros randomly using " or ' when they shouldnt be
+                if(os_id[0] == '\'' || os_id[0] == '"') {
+                    memmove(os_id, os_id+1, strlen(os_id));
 
-			end = strchr(os_id, '\'');
-			if(end == NULL)
-				end = strchr(os_id, '"');
+                    end = strchr(os_id, '\'');
+                    if(end == NULL)
+                        end = strchr(os_id, '"');
 
-			if(end != NULL)
-				end[0] = 0;
-		}
+                    if(end != NULL)
+                        *end = 0;
+                }
 
                 // find the matching logo
                 for(size_t i = 0; i < sizeof(logos)/sizeof(*logos); ++i)
