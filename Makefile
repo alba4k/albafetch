@@ -15,7 +15,7 @@ PKGNAME := albafetch
 OBJ_INFO := obj/bios.o obj/colors.o obj/cpu.o obj/date.o\
 			obj/desktop.o obj/gpu.o obj/gtk_theme.o obj/icon_theme.o\
 			obj/cursor_theme.o obj/host.o obj/hostname.o obj/kernel.o\
-			obj/light_colors.o obj/local_ip.o\
+			obj/light_colors.o obj/local_ip.o obj/battery.o\
 			obj/login_shell.o obj/memory.o obj/os.o\
 			obj/packages.o obj/public_ip.o obj/pwd.o\
 			obj/shell.o obj/term.o obj/uptime.o obj/user.o
@@ -83,6 +83,9 @@ build/albafetch: $(OBJ) $(OBJ_INFO)
 build/debug: $(OBJ_DEBUG) $(OBJ_INFO)
 	mkdir -p build/
 	$(CC) $(OBJ_DEBUG) $(OBJ_INFO) $(CFLAGS) $(INCLUDE) -o build/debug
+
+obj/battery.o: src/info/battery.c src/info/info.h
+	$(CC) -c src/info/battery.c $(CFLAGS) -o obj/battery.o
 
 obj/bios.o: src/info/bios.c src/info/info.h
 	$(CC) -c src/info/bios.c $(CFLAGS) -o obj/bios.o

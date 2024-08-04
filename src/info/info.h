@@ -47,6 +47,8 @@ int pwd(char *dest);
 
 int date(char *dest);
 
+int battery(char *dest);
+
 int colors(char *dest);
 
 int light_colors(char *dest);

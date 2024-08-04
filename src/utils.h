@@ -75,6 +75,7 @@ struct Config {
     char loc_prefix[64];
     char pwd_prefix[64];
     char date_prefix[64];
+    char bat_prefix[64];
     char colors_prefix[64];
     char light_colors_prefix[64];
 };
@@ -106,6 +107,7 @@ extern struct Config config;
 #define pwd_path        config.options & 0x800000
 #define kernel_type     config.options & 0x1000000
 #define col_background  config.options & 0x2000000
+#define bat_status      config.options & 0x4000000
 
 // element of a module linked list
 struct Module {

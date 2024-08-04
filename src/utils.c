@@ -11,7 +11,8 @@ void *file_to_logo(char *file) {
     if(fp == NULL)
         return NULL;
 
-    /* mem is assumed to be a 10 KiB buffer, aka 10240 B.
+    /* 
+     * mem is assumed to be a 10 KiB buffer, aka 10240 B.
      * this will be filled in with up to 64 lines,
      * each of which can be up to 160 bytes long.
      * (LINE_LEN * LINE_NUM) should equal this size.
@@ -435,6 +436,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         "pwd_path",
         "kernel_type",
         "col_background",
+        "bat_status"
     };
 
     bool buffer;
@@ -490,6 +492,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         {config.loc_prefix, "loc_prefix"},
         {config.pwd_prefix, "pwd_prefix"},
         {config.date_prefix, "date_prefix"},
+        {config.bat_prefix, "bat_prefix"},
         {config.colors_prefix, "colors_prefix"},
         {config.light_colors_prefix, "colors_light_prefix"},
     };

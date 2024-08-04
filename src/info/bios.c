@@ -7,10 +7,6 @@
 
 // get the current BIOS vendor and version (Linux only!)
 int bios(char *dest) {
-    #ifdef __APPLE__
-        (void)dest; // avoid unused parameter warning - lmao
-        return 1;
-    #else
     char *vendor = NULL, *version = NULL;
     FILE *fp = NULL;
     size_t len;
@@ -37,11 +33,11 @@ int bios(char *dest) {
         fclose(fp);
     }
 
-    if(vendor && version)
+    if(vendor != NULL && version != NULL)
         snprintf(dest, 256, "%s %s", vendor, version);
-    else if(vendor)
+    else if(vendor != NULL)
         strncpy(dest, vendor, 256);
-    else if(version)
+    else if(version != NULL)
         strncpy(dest, version, 256);
     else
         return 1;
@@ -50,5 +46,4 @@ int bios(char *dest) {
     free(version);
     
     return 0;
-    #endif
 }

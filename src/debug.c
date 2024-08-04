@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
         {local_ip, "local_ip"},
         {pwd, "pwd"},
         {date, "date"},
+        {battery, "battery"},
         {colors, "colors"},
         {light_colors, "light_colors"}
     };

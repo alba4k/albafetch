@@ -10,6 +10,7 @@ project(
 src = [
   'src/queue.c',
   'src/utils.c',
+  'src/info/battery.c',
   'src/info/bios.c',
   'src/info/colors.c',
   'src/info/cpu.c',

@@ -42,8 +42,8 @@ int a = 0;
 // This contains the default config values
 struct Config config = {
     // Default values for boolean options (least to most significant bit)
-    // 0111 0101 1111 1110 1111 1001 0100 ...
-    0x29f7fae,
+    // 0111 0101 1111 1110 1111 1001 0110 ...
+    0x69f7fae,
 
     NULL,   // logo
     "",     // color
@@ -80,6 +80,7 @@ struct Config config = {
     "Local IP", // loc_prefix
     "Directory",// pwd_prefix
     "Date",     // date_prefix
+    "Battery",  // bat_prefix
     "",         // colors_prefix
     "",         // light_colors_prefix
 };
@@ -450,6 +451,7 @@ int main(int argc, char **argv) {
         {"local_ip", config.loc_prefix, local_ip},
         {"pwd", config.pwd_prefix, pwd},
         {"date", config.date_prefix, date},
+        {"battery", config.bat_prefix, battery},
         {"colors", config.colors_prefix, colors},
         {"light_colors", config.light_colors_prefix, light_colors},
     };
