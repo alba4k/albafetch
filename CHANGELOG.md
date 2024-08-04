@@ -21,6 +21,7 @@
 * the cpu architecture will now be printed in brackets (eg: `Arch Linux x86_64` -> `Arch Linux (x86_64)`)
 * using `--logo none` will prevent any logo from being displayed
 * added a logo for [Mageia](https://mageia.org)
+* added a logo for [NixOS](https://nixos.org)
 * Terminator will now be shown as terminal
 * Trying to use TERM_PROGRAM to find the terminal name
 
