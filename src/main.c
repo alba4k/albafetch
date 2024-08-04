@@ -36,7 +36,6 @@ int a = 0;
  * fix sqlite usage in packages for rpm
  * steam installed packages (off by default)
  * cpu temp (off by default)
- * battery percentage
  */
 
 // This contains the default config values
