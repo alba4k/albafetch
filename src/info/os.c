@@ -27,7 +27,7 @@ int os(char *dest) {
         int pipes[2];
         char version[16];
 
-        if(pipe(pipes))
+        if(pipe(pipes) != 0)
             return 1;
         if(fork() == 0) {
             close(pipes[0]);

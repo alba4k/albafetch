@@ -41,6 +41,9 @@
 * libcurl is now not used anymore to get the public ip
 * the length of logos is calculated on the fly, resulting in lower memory usage
 
+## Dependencies
+* Termux API is needed to get battery info on Android
+
 ---
 
 ##### © Aaron Blasko
