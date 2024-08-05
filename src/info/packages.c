@@ -16,7 +16,6 @@ int packages(char *dest) {
     DIR *dir;
     struct dirent *entry;
     unsigned count = 0;
-    int pipes[2];
     bool done = false;
 
     #ifndef __APPLE__   // package managers that won't run on macOS

@@ -37,9 +37,6 @@ src = [
   'src/info/uptime.c',
   'src/info/user.c',
 ]
-src_debug = ['src/debug.c']
-src_debug += src
-src += 'src/main.c'
 
 project_dependencies = []
 
@@ -55,12 +52,11 @@ if host_machine.system() == 'darwin'
     'src/bsdwrap.c',
     'src/macos_gpu_string.m',
   ]
-  src_debug += [
-    'src/macos_infos.c',
-    'src/bsdwrap.c',
-    'src/macos_gpu_string.m',
-  ]
 endif
+
+src_debug = ['src/debug.c']
+src_debug += src
+src += 'src/main.c'
 
 build_args = [
   '-Wall',
