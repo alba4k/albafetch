@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+#include <sys/wait.h>
+
 #include "logos.h"
 #include "utils.h"
 
@@ -566,6 +569,34 @@ void unescape(char *str) {
                 break;
         }
     }
+}
+
+int exec_cmd(char *buf, size_t len, char *const *argv) {
+    int stderr_pipes[2];
+    int stdout_pipes[2];
+
+    if(pipe(stdout_pipes) != 0 || pipe(stderr_pipes) != 0)
+        return 1;
+
+    if(fork() == 0) {
+        close(stdout_pipes[0]);
+        close(stderr_pipes[0]);
+        dup2(stdout_pipes[1], STDOUT_FILENO);
+        dup2(stderr_pipes[1], STDERR_FILENO);
+
+        execvp(argv[0], argv);
+    }
+
+    wait(0);
+
+    close(stderr_pipes[0]);
+    close(stderr_pipes[1]);
+
+    close(stdout_pipes[1]);
+    buf[read(stdout_pipes[0], buf, len) - 1] = 0;
+    close(stdout_pipes[0]);
+
+    return 0;
 }
 
 // get the printed length of a string (not how big it is in memory)

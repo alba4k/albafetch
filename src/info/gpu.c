@@ -29,23 +29,8 @@ int gpu(char *dest) {
             gpus[0] = get_gpu_string();  // only works on x64
         if(gpus[0] == 0 || strcmp(name.machine, "x86_64")) {     // fallback
             char buf[1024];
-            int pipes[2];
-            if(pipe(pipes))
-                return 1;
-
-            if(fork() == 0) {
-                dup2(pipes[1], STDOUT_FILENO);
-                close(pipes[0]);
-                close(pipes[1]);
-                execlp("/usr/sbin/system_profiler", "system_profiler", "SPDisplaysDataType", NULL);
-            }
-            close(pipes[1]);
-            wait(0);
-            size_t bytes = read(pipes[0], buf, 1024);
-            close(pipes[0]);
-
-            if(bytes < 1)
-                return 1;
+            char *args[] = {"/usr/sbin/system_profiler", "SPDisplaysDataType", NULL};
+            exec_cmd(buf, 1024, args);
 
             gpus[0] = strstr(buf, "Chipset Model: ");
             if(gpus[0] == 0)
@@ -99,31 +84,18 @@ int gpu(char *dest) {
         }
 
         pci_cleanup(pacc);  // close everything
+
         // fallback (will only get 1 gpu)
 
         char gpu[256];
 
         if(gpus[0] == 0) {
-            if(config.gpu_index != 0)   // lol why would you choose a non-existing GPU
+            if(config.gpu_index > 1)   // lol why would you choose a non-existing GPU
                 return 1;
 
-            int pipes[2];
-
-            if(pipe(pipes))
-                return 1;
-
-            if(fork() == 0) {
-                close(pipes[0]);
-                dup2(pipes[1], STDOUT_FILENO);
-                execlp("lspci", "lspci", "-mm", NULL);
-            }
-
-            close(pipes[1]);
             char *lspci = malloc(0x2000);
-            
-            wait(NULL);
-            lspci[read(pipes[0], lspci, 0x2000)] = 0;
-            close(pipes[0]);
+            char *args[] = {"lspci", "-mm", NULL};
+            exec_cmd(lspci, 0x2000, args);
 
             gpus[0] = strstr(lspci, "3D");
             if(gpus[0] == 0) {

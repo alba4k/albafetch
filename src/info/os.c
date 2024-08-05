@@ -24,22 +24,9 @@ int os(char *dest) {
             strncpy(dest, "macOS", 255);
     #else
     #ifdef __ANDROID__
-        int pipes[2];
         char version[16];
-
-        if(pipe(pipes) != 0)
-            return 1;
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-
-            execlp("getprop", "getprop", "ro.build.version.release", NULL); 
-        }
-
-        wait(0);
-        close(pipes[1]);
-        version[read(pipes[0], version, 16) - 1] = 0;
-        close(pipes[0]);
+        char *args[] = {"getprop", "ro.build.version.release", NULL},
+        exec_cmd(version, 16, args);
 
         if(os_arch)
             snprintf(dest, 256, "Android %s%s(%s)", version, version[0] ? " " : "", name.machine);

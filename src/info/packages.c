@@ -73,24 +73,8 @@ int packages(char *dest) {
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
         if(pkg_rpm && access(path, F_OK) == 0) {
-            int stderr_pipes[2];
-            if(pipe(pipes) != 0 || pipe(stderr_pipes) != 0)
-                return 1;
-
-            if(fork() == 0) {
-                close(pipes[0]);
-                close(stderr_pipes[0]);
-                dup2(pipes[1], STDOUT_FILENO);
-                dup2(stderr_pipes[1], STDERR_FILENO);
-
-                execlp("sqlite3", "sqlite3", path, "SELECT count(*) FROM Packages", NULL); 
-            }
-            wait(0);
-            close(stderr_pipes[0]);
-            close(stderr_pipes[1]);
-            close(pipes[1]);
-            str[read(pipes[0], str, 16) - 1] = 0;
-            close(pipes[0]);
+            char *args[] = {"sqlite3", path, "SELECT count(*) FROM Packages", NULL};
+            exec_cmd(str, 16, args);
 
             if(str[0] != '0' && str[0]) {
                 snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, pkg_mgr ? " (rpm)" : "");
@@ -122,20 +106,8 @@ int packages(char *dest) {
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/snap", 256-strlen(path));
         if(pkg_snap && access(path, F_OK) == 0) {
-            if(pipe(pipes))
-                return 1;
-
-            if(fork() == 0) {
-                close(pipes[0]);
-                dup2(pipes[1], STDOUT_FILENO);
-
-                execlp("sh", "sh", "-c", "snap list 2>/dev/null | wc -l", NULL); 
-            }
-
-            wait(0);
-            close(pipes[1]);
-            str[read(pipes[0], str, 16) - 1] = 0;
-            close(pipes[0]);
+            char *args[] = {"sh", "-c", "snap list 2>/dev/null | wc -l", NULL};
+            exec_cmd(str, 16, args);
 
             if(str[0] != '0' && str[0]) {
                 snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, pkg_mgr ? " (snap)" : "");
@@ -145,21 +117,8 @@ int packages(char *dest) {
         }
     #endif
     if(pkg_brew && (access("/usr/local/bin/brew", F_OK) == 0 || access("/opt/homebrew/bin/brew", F_OK) == 0 || access("/bin/brew", F_OK) == 0)) {
-        if(pipe(pipes))
-            return 1;
-
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-            execlp("brew", "brew", "--cellar", NULL); 
-        }
-
-        close(pipes[1]);
-
-        wait(0);
-
-        str[read(pipes[0], str, 128) - 1] = 0;
-        close(pipes[0]);
+        char *args[] = {"brew", "--cellar", NULL};
+        exec_cmd(str, 16, args);
 
         if(str[0]) {
             if((dir = opendir(str))) {
@@ -186,21 +145,9 @@ int packages(char *dest) {
         strncpy(path, getenv("PREFIX"), 255);
     strncat(path, "/bin/pip", 256-strlen(path));
     if(pkg_pip && access(path, F_OK) == 0) {
-        if(pipe(pipes))
-            return 1;
-
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-
-            execlp("sh", "sh", "-c", "pip list 2>/dev/null | wc -l", NULL); 
-        }
-
-        wait(0);
-        close(pipes[1]);
-        str[read(pipes[0], str, 16) - 1] = 0;
-        close(pipes[0]);
-
+        char *args[] = {"sh", "-c", "pip list 2>/dev/null | wc -l", NULL};
+        exec_cmd(str, 16, args);
+        
         if(str[0] != '0' && str[0]) {
             snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, pkg_mgr ? " (pip)" : "");
             done = true;

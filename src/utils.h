@@ -131,6 +131,8 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
 
 void unescape(char *str);
 
+int exec_cmd(char *buf, size_t len, char *const *argv);
+
 size_t strlen_real(const char *str);
 
 #endif // UTILS_H

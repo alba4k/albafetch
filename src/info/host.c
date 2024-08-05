@@ -1,4 +1,5 @@
 #include "info.h"
+#include "../utils.h"
 
 #include <string.h>
 
@@ -21,41 +22,18 @@ int host(char *dest) {
         sysctlbyname("hw.model", dest, &BUF_SIZE, NULL, 0);
     #else
     #ifdef __ANDROID__
-        int pipes[2];
         char brand[64], model[64];
+        char *brand_args[] = {"getprop", "ro.product.brand", NULL};
+        char *model_args[] = {"getprop", "ro.product.model", NULL};
 
-        if(pipe(pipes))
-            return 1;
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
 
-            execlp("getprop", "getprop", "ro.product.brand", NULL); 
-        }
-
-        wait(0);
-        close(pipes[1]);
-        brand[read(pipes[0], brand, 64) - 1] = 0;
-        close(pipes[0]);
-
-        if(pipe(pipes))
-            return 1;
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-
-            execlp("getprop", "getprop", "ro.product.model", NULL); 
-        }
-
-        wait(0);
-        close(pipes[1]);
-        model[read(pipes[0], model, 64) - 1] = 0;
-        close(pipes[0]);
+        exec_cmd(brand, 64, brand_args);
+        exec_cmd(model, 64, model_args);
 
         if((brand[0] || model[0]) == 0)
             return 1;
 
-        snprintf(dest, 256, "%s%s%s", brand, brand[0] ? " ": "", model);
+        snprintf(dest, 256, "%s%s%s", brand, brand[0] ? " " : "", model);
     #else
         char *name = NULL, *version = NULL;
         FILE *fp = NULL;

@@ -1,4 +1,5 @@
 #include "info.h"
+#include "../utils.h"
 
 #include <string.h>
 
@@ -20,33 +21,23 @@ int gtk_theme(char *dest){
     // try using gsettings (fallback)
     // reading ~/.config/gtk-3.0/settings.ini could also be an option 
     if(access("/bin/gsettings", F_OK) == 0){
-        int pipes[2];
-
-        if(pipe(pipes))
-            return 1;
-
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-
-            execlp("gsettings", "gsettings" , "get", "org.gnome.desktop.interface", "gtk-theme", NULL); 
-        }
-
-        wait(0);
-        close(pipes[1]);
-        dest[read(pipes[0], dest, 256) - 1] = 0;
-        close(pipes[0]);
+        char buf[256] = "";
+        char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "gtk-theme", NULL};
+        exec_cmd(buf, 256, args);
 
         // cleanup
-        if(dest[0] == '\'') {
-            strcpy(dest, dest+1);
+        if(buf[0] != 0) {
+            if(buf[0] == '\'') {
+                strcpy(buf, buf+1);
 
-            char *ptr = strchr(dest, '\'');
-            if(ptr)
-                *ptr = 0;
+                char *ptr = strchr(buf, '\'');
+                if(ptr)
+                    *ptr = 0;
+            }
+
+            strncpy(dest, buf, 256);
+            return 0;
         }
-
-        return 0;
     }
 
     return 1;

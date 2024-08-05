@@ -5,35 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __ANDROID__
-#include <unistd.h>
-#include <sys/wait.h>
-#include <ctype.h>
-#endif // __ANDROID__
-
-
 // get the battery percentage and status (Linux only!)
 int battery(char *dest) {
     char capacity[5] = "";
     char status[20] = "";
     
     #ifdef __ANDROID__  // relies on termux api
-        int pipes[2];
         char buf[256];
-
-        if(pipe(pipes) != 0)
-            return 1;
-        if(fork() == 0) {
-            close(pipes[0]);
-            dup2(pipes[1], STDOUT_FILENO);
-
-            execlp("termux-battery-status", "termux-battery-status", NULL); 
-        }
-
-        wait(0);
-        close(pipes[1]);
-        buf[read(pipes[0], buf, 256) - 1] = 0;
-        close(pipes[0]);
+        char *args[] = {"termux-battery-status", NULL}
+        exec_cmd(buf, 256, args);
 
         char *ptr = strstr(buf, "percentage");
         char *ptr2 = strstr(buf, "status");
@@ -47,7 +27,6 @@ int battery(char *dest) {
                 strncpy(capacity, ptr, 5);
             }
         }
-
 
         if(ptr2 != NULL) {
             ptr2 += 10;
