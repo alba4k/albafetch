@@ -42,8 +42,8 @@ ifeq ($(KERNEL),Darwin)
 	OBJ_DEBUG := obj/debug.o obj/queue.o obj/macos_infos.o obj/bsdwrap.o obj/macos_gpu_string.o obj/utils.o
 	INCLUDE := -framework Foundation -framework IOKit
 
-	INSTALLCMD := install
-	CONFIGCMD := install
+	INSTALLCMD := install -D
+	CONFIGCMD := install -D
 
 	MACOS_INFOS_H := src/macos_infos.h
 	BSDWRAP_H = src/bsdwrap.h
@@ -58,8 +58,6 @@ debug: build/debug
 	build/debug --no-pip
 
 install: build/albafetch
-	mkdir -p $(INSTALLPATH) $(CONFIGPATH)
-
 	$(INSTALLCMD) build/albafetch $(INSTALLPATH)/albafetch
 
 	$(CONFIGCMD) albafetch.conf $(CONFIGPATH)/albafetch.conf
