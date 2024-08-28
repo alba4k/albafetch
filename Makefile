@@ -8,9 +8,11 @@ OS := $(shell uname -o 2> /dev/null)
 PACMAN := $(shell ls /bin/pacman 2> /dev/null)
 
 INSTALLPATH := /usr/local/bin
-DATAPATH := /usr/local/share
 CONFIGPATH := /etc/xdg
 PKGNAME := albafetch
+
+INSTALLCMD := install -Dm755
+CONFIGCMD := install -Dm644
 
 OBJ_INFO := obj/bios.o obj/colors.o obj/cpu.o obj/date.o\
 			obj/desktop.o obj/gpu.o obj/gtk_theme.o obj/icon_theme.o\
@@ -31,7 +33,6 @@ endif
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
 	CONFIGPATH := $(PREFIX)/etc
-	DATAPATH := $(PREFIX)/share
 	INCLUDE := 
 endif
 
@@ -40,6 +41,9 @@ ifeq ($(KERNEL),Darwin)
 	SRC_DEBUG := src/debug.c src/queue.c src/macos_infos.c src/bsdwrap.c src/macos_gpu_string.m src/utils.c
 	OBJ_DEBUG := obj/debug.o obj/queue.o obj/macos_infos.o obj/bsdwrap.o obj/macos_gpu_string.o obj/utils.o
 	INCLUDE := -framework Foundation -framework IOKit
+
+	INSTALLCMD := install
+	CONFIGCMD := install
 
 	MACOS_INFOS_H := src/macos_infos.h
 	BSDWRAP_H = src/bsdwrap.h
@@ -54,22 +58,14 @@ debug: build/debug
 	build/debug --no-pip
 
 install: build/albafetch
-	mkdir -p $(INSTALLPATH) $(DATAPATH)/licenses/$(PKGNAME) $(DATAPATH)/doc/$(PKGNAME) $(CONFIGPATH)
+	mkdir -p $(INSTALLPATH) $(CONFIGPATH)
 
-	install -Dm755 build/albafetch $(INSTALLPATH)/albafetch
+	$(INSTALLCMD) build/albafetch $(INSTALLPATH)/albafetch
 
-	install -Dm644 LICENSE $(DATAPATH)/licenses/$(PKGNAME)/LICENSE
-	install -Dm644 README.md $(DATAPATH)/doc/$(PKGNAME)/README.md
-	install -Dm644 MANUAL.md $(DATAPATH)/doc/$(PKGNAME)/MANUAL.md
-
-	install -Dm644 albafetch.conf $(CONFIGPATH)/albafetch.conf
+	$(CONFIGCMD) albafetch.conf $(CONFIGPATH)/albafetch.conf
 
 uninstall:
 	rm $(INSTALLPATH)/albafetch
-
-	rm $(DATAPATH)/licenses/$(PKGNAME)/LICENSE
-	rm $(DATAPATH)/doc/$(PKGNAME)/README.md
-	rm $(DATAPATH)/doc/$(PKGNAME)/MANUAL.md
 
 	rm $(CONFIGPATH)/albafetch.conf
 
