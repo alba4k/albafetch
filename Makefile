@@ -42,8 +42,8 @@ ifeq ($(KERNEL),Darwin)
 	INCLUDE := -framework Foundation -framework IOKit
 
 	INSTALLFLAGS := -m755
-	CONFIGPATH := ~/.config/
 	CONFIGFLAGS := -m644
+	CONFIGPATH := ~/.config/
 
 	MACOS_INFOS_H := src/macos_infos.h
 	BSDWRAP_H = src/bsdwrap.h
