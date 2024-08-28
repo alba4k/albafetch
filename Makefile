@@ -58,6 +58,8 @@ debug: build/debug
 	build/debug --no-pip
 
 install: build/albafetch
+	mkdir -p $(INSTALLPATH) $(CONFIGPATH)
+
 	install $(INSTALLFLAGS) build/albafetch $(INSTALLPATH)/albafetch
 
 	install $(CONFIGFLAGS) albafetch.conf $(CONFIGPATH)/albafetch.conf
