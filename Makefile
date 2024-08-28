@@ -11,8 +11,8 @@ INSTALLPATH := /usr/local/bin
 CONFIGPATH := /etc/xdg
 PKGNAME := albafetch
 
-INSTALLCMD := install -Dm755
-CONFIGCMD := install -Dm644
+INSTALLFLAGS := install -Dm755
+CONFIGFLAGS := install -Dm644
 
 OBJ_INFO := obj/bios.o obj/colors.o obj/cpu.o obj/date.o\
 			obj/desktop.o obj/gpu.o obj/gtk_theme.o obj/icon_theme.o\
@@ -26,7 +26,6 @@ ifeq ($(KERNEL),Linux)
 	OBJ := obj/main.o obj/queue.o obj/utils.o
 	SRC_DEBUG := src/debug.c src/queue.c src/utils.c
 	OBJ_DEBUG := obj/debug.o obj/queue.o obj/utils.o
-	INSTALL_FLAGS := -Dm 755
 	INCLUDE := -l pci
 endif
 
@@ -42,8 +41,8 @@ ifeq ($(KERNEL),Darwin)
 	OBJ_DEBUG := obj/debug.o obj/queue.o obj/macos_infos.o obj/bsdwrap.o obj/macos_gpu_string.o obj/utils.o
 	INCLUDE := -framework Foundation -framework IOKit
 
-	INSTALLCMD := install -D
-	CONFIGCMD := install -D
+	INSTALLFLAGS := -m755
+	CONFIGFLAGS := -m644
 
 	MACOS_INFOS_H := src/macos_infos.h
 	BSDWRAP_H = src/bsdwrap.h
@@ -58,9 +57,9 @@ debug: build/debug
 	build/debug --no-pip
 
 install: build/albafetch
-	$(INSTALLCMD) build/albafetch $(INSTALLPATH)/albafetch
+	install $(INSTALLFLAGS) build/albafetch $(INSTALLPATH)/albafetch
 
-	$(CONFIGCMD) albafetch.conf $(CONFIGPATH)/albafetch.conf
+	install $(CONFIGFLAGS) albafetch.conf $(CONFIGPATH)/albafetch.conf
 
 uninstall:
 	rm $(INSTALLPATH)/albafetch
