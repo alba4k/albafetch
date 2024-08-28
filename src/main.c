@@ -173,13 +173,14 @@ int main(int argc, char **argv) {
                 if(access(config_file, F_OK))
                     snprintf(config_file, sizeof(config_file), "%s/albafetch/albafetch.conf", config_home);
             }
-            else if(home) {  // is HOME set?
+            if(home && access(config_file, F_OK)) {  // is HOME set?
                 snprintf(config_file, sizeof(config_file), "%s/.config/albafetch.conf", home);
                 if(access(config_file, F_OK))
                     snprintf(config_file, sizeof(config_file), "%s/.config/albafetch/albafetch.conf", home);
             }
-            else    // WHY TF WOULD HOME NOT BE SET???
-                return -1;
+            if(access(config_file, F_OK)) {
+                strcpy(config_file, "/etc/xdg/albafetch.conf");
+            }
         }
 
         parse_config(config_file, modules, &ascii_ptr, &default_bold, default_color, default_logo);

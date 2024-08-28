@@ -30,7 +30,7 @@ int term(char *dest) {
     if(terminal == NULL) {
         terminal = getenv("TERM_PROGRAM");
         if(terminal == NULL)
-            getenv("TERM");
+            terminal = getenv("TERM");
         if(terminal == NULL)
             return 1;
         

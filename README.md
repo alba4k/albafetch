@@ -64,7 +64,7 @@ These will also install the relative runtime dependencies
 * libc (should already be installed):
 	- On Alpine Linux, [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
 * A build system:
-	- Make and meson are already set up, more details are found [here](#compilation). I am using gcc, but clang may also be used (when using make, append `CC=clang` or any other c compiler)
+	- Make and meson are already set up, more details are found [here](#compilation).
 
 ## Runtime dependencies
 I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
@@ -80,7 +80,7 @@ Also, in case albafetch was unable to get the info using libpci libraries, it'll
 
 ## Using the Makefile
 
-This will need gcc (`make CC=[compiler]` for other compilers, which should accept the same flags as gcc, e.g. clang) and make
+This will need you to have a C compiler installed and will still use meson under the hood.
 
 ```shell
 $ git clone https://github.com/alba4k/albafetch
@@ -102,11 +102,10 @@ $ make debug
 If you prefer to build with meson/ninja, you can use these commands:
 
 ```sh
-meson setup build
-meson compile -C build
+$ meson setup build
+$ meson compile -C build
+$ build/debug
 ```
-
-Like `make`, an executable file with appear in `build/` if compilation succeeds
 
 ## Using nix
 
@@ -193,12 +192,13 @@ Please note that albafetch currently won't run on Windows (despite `albafetch --
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
 
+$ make
 # make install
 ```
 
-`make install` needs elevated privileges on Linux (e.g. `sudo` or a root shell) to write to `/usr/bin`, while `/usr/local/bin` can be accessed as a normal user on macOS.
+`make install` needs elevated privileges on Linux (e.g. `sudo` or a root shell) to write to `/usr/bin`, while `/usr/local/bin` can be accessed as a normal user *on macOS*.
 
-Alternatively, you may prefer meson to do this:
+Alternatively, you may prefer meson to perform the installation:
 
 ```
 $ git clone https://github.com/alba4k/albafetch
@@ -212,7 +212,7 @@ Meson will install the executable to `/usr/local/bin`, which you may or may not 
 
 # Configuration
 
-albafetch can be customized using a config file, usually `~/.config/albafetch.conf`.
+albafetch can be customized using a config file, usually `~/.config/albafetch.conf` for your user or `/etc/xdg/albafetch.conf`.
 
 You can find an example configuration file (which only provides the default values of every option) [here](albafetch.conf).
 Although this file includes some short comments on how the various options work, I highly recommend checking out the [user manual](MANUAL.md) for a deeper understanding of the way this config file works.
