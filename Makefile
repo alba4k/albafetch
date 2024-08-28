@@ -11,8 +11,8 @@ INSTALLPATH := /usr/local/bin
 CONFIGPATH := /etc/xdg
 PKGNAME := albafetch
 
-INSTALLFLAGS := install -Dm755
-CONFIGFLAGS := install -Dm644
+INSTALLFLAGS := -Dm755
+CONFIGFLAGS := -Dm644
 
 OBJ_INFO := obj/bios.o obj/colors.o obj/cpu.o obj/date.o\
 			obj/desktop.o obj/gpu.o obj/gtk_theme.o obj/icon_theme.o\
