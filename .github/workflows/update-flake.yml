@@ -21,7 +21,7 @@ jobs:
         with:
           github_access_token: ${{ github.token }}
 
-      - uses: DeterminateSystems/update-flake-lock@v23
+      - uses: DeterminateSystems/update-flake-lock@v24
         id: update
         with:
           commit-msg: "flake: update inputs" 
