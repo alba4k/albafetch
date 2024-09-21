@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #ifdef __APPLE__
-#include "../macos_infos.h"
+#include "../macos/macos_infos.h"
 #else
 #include <sys/sysinfo.h>
 #endif // __APPLE__

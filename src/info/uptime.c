@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #ifdef __APPLE__
-#include "../bsdwrap.h"
+#include "../macos/bsdwrap.h"
 #else
 #include <sys/sysinfo.h>
 #endif // __APPLE__

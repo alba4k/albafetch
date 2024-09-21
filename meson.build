@@ -48,9 +48,9 @@ if host_machine.system() == 'darwin'
   project_dependencies += dependency('appleframeworks', modules : ['foundation', 'iokit'])
   add_languages('objc')
   src += [
-    'src/macos_infos.c',
-    'src/bsdwrap.c',
-    'src/macos_gpu_string.m',
+    'src/macos/macos_infos.c',
+    'src/macos/bsdwrap.c',
+    'src/macos/macos_gpu_string.m',
   ]
 endif
 

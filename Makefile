@@ -1,13 +1,12 @@
 .PHONY: build/albafetch
 
-OS := $(shell uname -o 2> /dev/null)
-
 INSTALLPATH := /usr/local/bin
 CONFIGPATH := /etc/xdg
-PKGNAME := albafetch
 
 INSTALLFLAGS := -Dm755
 CONFIGFLAGS := -Dm644
+
+OS := $(shell uname -o 2> /dev/null)
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
@@ -18,12 +17,7 @@ ifeq ($(OS),Darwin)
 	INSTALLFLAGS := -m755
 	CONFIGFLAGS := -m644
 	CONFIGPATH := ~/.config/
-
-	MACOS_INFOS_H := src/macos_infos.h
-	BSDWRAP_H = src/bsdwrap.h
 endif
-
-all: build/albafetch build/debug
 
 run: build/albafetch
 	build/albafetch
