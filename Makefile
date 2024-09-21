@@ -41,7 +41,9 @@ clean:
 	meson setup build --wipe
 
 build/albafetch:
+	meson setup build
 	meson compile -C build
 
 build/debug: 
+	meson setup build
 	meson compile -C build
