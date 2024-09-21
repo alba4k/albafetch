@@ -337,7 +337,7 @@ int main(int argc, char **argv) {
         // it won't be used anyway lol
         destroy_array(modules);
 
-        printf("%s%salbafetch\033[0m - a system fetch utility (v4.2)\n",
+        printf("%s%salbafetch\033[0m - a system fetch utility (v4.2.1)\n",
                config.color, bold ? "\033[1m" : "");
 
         printf("\n%s%sFLAGS\033[0m:\n",
