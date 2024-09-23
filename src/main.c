@@ -11,7 +11,7 @@
 #include "utils.h"
 #include "logos.h"
 #include "queue.h"
-ciao
+
 // idk hy but this is sometimes not defined
 #ifndef HOST_NAME_MAX
     #ifdef _POSIX_HOST_NAME_MAX
@@ -25,7 +25,6 @@ ciao
 #ifndef LOGIN_NAME_MAX
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
-int a = 0;
 
 /* TODO:
  * print de, shell and terminal versions
