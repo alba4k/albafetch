@@ -19,10 +19,21 @@ ifeq ($(OS),Darwin)
 	CONFIGPATH := ~/.config/
 endif
 
-run: build/albafetch
+all: compile
+
+build:
+	meson setup build
+
+clean:
+	meson setup build --wipe
+
+compile: build
+	meson compile -C build
+
+run: compile
 	build/albafetch
 
-debug: build/debug
+debug: compile
 	build/debug --no-pip
 
 install: build/albafetch
@@ -36,14 +47,3 @@ uninstall:
 	rm $(INSTALLPATH)/albafetch
 
 	rm $(CONFIGPATH)/albafetch.conf
-
-clean:
-	meson setup build --wipe
-
-build/albafetch:
-	meson setup build
-	meson compile -C build
-
-build/debug: 
-	meson setup build
-	meson compile -C build

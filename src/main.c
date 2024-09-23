@@ -11,8 +11,8 @@
 #include "utils.h"
 #include "logos.h"
 #include "queue.h"
-
-// idk why but this is sometimes not defined
+ciao
+// idk hy but this is sometimes not defined
 #ifndef HOST_NAME_MAX
     #ifdef _POSIX_HOST_NAME_MAX
         #define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
