@@ -1,6 +1,8 @@
 #include "info.h"
 #include "../utils.h"
 
+#define _GNU_SOURCE
+
 #include <string.h>
 
 #include <stdlib.h>
