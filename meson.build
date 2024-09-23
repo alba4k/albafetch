@@ -62,7 +62,7 @@ build_args = [
   '-Wall',
   '-Wextra',
   '-Ofast',
-  '-std=c99',
+  '-std=gnu99',
 ]
 
 debug_args = ['-g']
