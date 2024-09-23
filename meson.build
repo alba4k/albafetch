@@ -62,13 +62,11 @@ build_args = [
   '-Wall',
   '-Wextra',
   '-Ofast',
+  '-std=c99',
 ]
-debug_args = [
-  '-Wall',
-  '-Wextra',
-  '-Ofast',
-  '-g',
-]
+
+debug_args = ['-g']
+debug_args += build_args
 
 executable(
   meson.project_name(),
