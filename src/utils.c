@@ -1,12 +1,14 @@
+#include "logos.h"
+#include "utils.h"
+
+#define _GNU_SOURCE
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <unistd.h>
 #include <sys/wait.h>
-
-#include "logos.h"
-#include "utils.h"
 
 // copy an ascii art from file to mem
 void *file_to_logo(char *file) {
@@ -152,6 +154,7 @@ void get_logo_line(char *dest, unsigned *line) {
 void print_line(char *line, const size_t maxlen) {
     if(bold)
         fputs("\033[1m", stdout);
+    fputs(config.color, stdout);
 
     bool escaping = false;
     int unicode = 0;
