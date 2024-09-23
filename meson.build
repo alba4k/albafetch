@@ -63,6 +63,12 @@ build_args = [
   '-Wextra',
   '-Ofast',
 ]
+debug_args = [
+  '-Wall',
+  '-Wextra',
+  '-Ofast',
+  '-g',
+]
 
 executable(
   meson.project_name(),
@@ -77,6 +83,6 @@ executable(
   src_debug,
   dependencies : project_dependencies,
   install : false,
-  c_args : build_args
+  c_args : debug_args
 )
 
