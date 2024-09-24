@@ -17,6 +17,7 @@ endif
 ifeq ($(OS),Darwin)
 	INSTALLFLAGS := -m755
 	CONFIGFLAGS := -m644
+	INSTALLPATH := $(PREFIX)/bin
 	CONFIGPATH := ~/.config/
 
 	MACOS_INFOS_H := src/macos_infos.h
