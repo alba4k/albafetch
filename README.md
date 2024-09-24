@@ -1,14 +1,14 @@
 # albafetch by alba4k
 
-![intro](images/albafetch.png)
+![Intro](images/albafetch.png)
 
-**albafetch** is a lightweight and fast tool designed to display system information in a [neofetch](https://github.com/dylanaraps/neofetch)-like format but with significantly better performance. It was developed both as a personal challenge and to address neofetch’s slowness, understandable given its 10k+ lines of shell script.
+**albafetch** is a lightweight and fast tool designed to display system information in a [neofetch](https://github.com/dylanaraps/neofetch)-like format, but with significantly better performance. It was developed as both a personal challenge and to address neofetch’s slowness, which is understandable given its 10k+ lines of shell script.
 
 > **Important Note**: To avoid merge conflicts, please submit your pull requests to the `development` branch. Ensure you check out this branch before making any changes. The `master` branch is more stable and is updated less frequently, primarily when major features or fixes have been thoroughly tested.
 
 ---
 
-## Table of Contents
+## 📚 Table of Contents
 
 1. [Introduction](#introduction)
 2. [Dependencies](#dependencies)
@@ -27,7 +27,7 @@
 
 ---
 
-## Introduction
+## 🚀 Introduction
 
 **albafetch** provides detailed system information in under a second, making it much faster than comparable tools. Below is a preview of the tool's default appearance and a comparison of its execution time versus neofetch.
 
@@ -35,21 +35,21 @@
   <summary>Preview</summary>
   This is the default look of albafetch:
 
-  ![default](images/albafetch_demo_default.png)
+  ![Default](images/albafetch_demo_default.png)
 
   Here's what it looks like with my custom configuration:
   
-  ![custom](images/albafetch_demo.png)
+  ![Custom](images/albafetch_demo.png)
 </details>
 
 <details>
   <summary>Time Comparison</summary>
 
   Neofetch:
-  ![neofetch](images/time_neofetch.png)
+  ![Neofetch](images/time_neofetch.png)
 
   Albafetch:
-  ![albafetch](images/time_albafetch.png)
+  ![Albafetch](images/time_albafetch.png)
 
 </details>
 
@@ -59,11 +59,11 @@ You can find more detailed usage and configuration information in the [User Manu
 
 ---
 
-## Dependencies
+## 🛠️ Dependencies
 
 ### Build Dependencies
 
-The following packages are needed to build **albafetch**, and they will also include necessary runtime dependencies:
+The following packages are needed to build **albafetch**, which will also include necessary runtime dependencies:
 
 - **libpci**:
   - Arch Linux: [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
@@ -90,7 +90,7 @@ These dependencies are required at runtime, but **albafetch** may function witho
 
 ---
 
-## Compilation
+## ⚙️ Compilation
 
 ### Using the Makefile
 
@@ -134,7 +134,7 @@ $ nix build .#albafetch-arm  # cross-compile from x86_64 to ARM (x86_64 only)
 
 ---
 
-## Installation
+## 📦 Installation
 
 ### For Arch Linux
 
@@ -180,7 +180,7 @@ Meson installs to `/usr/local/bin`, whereas Make installs to `/usr/bin`.
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
 You can customize **albafetch** through a configuration file, typically located at `~/.config/albafetch.conf` or `/etc/xdg/albafetch.conf`. An example config file is available [here](albafetch.conf).
 
@@ -188,7 +188,7 @@ For more detailed explanations of configuration options, consult the [User Manua
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! The project is mainly written in C, and new features, improvements, or bug fixes are appreciated.
 
@@ -206,5 +206,3 @@ All contributions, whether new features or typo corrections, are valued.
 ---
 
 ###### © 2024 Aaron Blasko
-
----
