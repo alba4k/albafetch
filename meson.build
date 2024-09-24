@@ -6,7 +6,6 @@ project(
   license : 'MIT'
 )
 
-
 src = [
   'src/queue.c',
   'src/utils.c',
@@ -54,19 +53,17 @@ if host_machine.system() == 'darwin'
   ]
 endif
 
-src_debug = ['src/debug.c']
-src_debug += src
+src_debug = src + ['src/debug.c']
 src += 'src/main.c'
 
 build_args = [
   '-Wall',
   '-Wextra',
   '-Ofast',
-  '-std=c99',
+  '-std=gnu99',
 ]
 
-debug_args = ['-g']
-debug_args += build_args
+debug_args = build_args + ['-g']
 
 executable(
   meson.project_name(),

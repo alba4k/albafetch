@@ -1,6 +1,7 @@
 .PHONY: build/albafetch
 
 OS := $(shell uname -o 2> /dev/null)
+KERNEL := $(shell uname -s 2> /dev/null)
 
 INSTALLPATH := /usr/local/bin
 CONFIGPATH := /etc/xdg
@@ -14,7 +15,7 @@ ifeq ($(OS),Android)
 	CONFIGPATH := $(PREFIX)/etc
 endif
 
-ifeq ($(OS),Darwin)
+ifeq ($(KERNEL),Darwin)
 	INSTALLFLAGS := -m755
 	CONFIGFLAGS := -m644
 	INSTALLPATH := $(PREFIX)/bin

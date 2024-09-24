@@ -28,7 +28,7 @@ int gtk_theme(char *dest){
         // cleanup
         if(buf[0] != 0) {
             if(buf[0] == '\'') {
-                strcpy(buf, buf+1);
+                memmove(buf, buf+1, strlen(buf));
 
                 char *ptr = strchr(buf, '\'');
                 if(ptr)

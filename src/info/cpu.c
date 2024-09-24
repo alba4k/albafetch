@@ -54,8 +54,8 @@ int cpu(char *dest) {
 
     cpu_info = strstr(cpu_info, "model name");
     if(cpu_info == NULL) {
+        free(buf);
         return 1;
-        free(cpu_info);
     }
 
     cpu_info += 13;
@@ -66,8 +66,8 @@ int cpu(char *dest) {
     else {
         end = strchr(cpu_info, '\n');
         if(end == NULL) {
+            free(buf);
             return 1;
-            free(cpu_info);
         }
             
         *end = 0;

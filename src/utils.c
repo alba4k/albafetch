@@ -1,8 +1,6 @@
 #include "logos.h"
 #include "utils.h"
 
-#define _GNU_SOURCE
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
