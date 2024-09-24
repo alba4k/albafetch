@@ -1,236 +1,210 @@
-# albafetch ~by alba4k
-
-#### Note: to prevent merge conflicts, please open your pull requests to the "development" branch, and check that one out before doing anything. Master is more stagnant and only updated when I know what I'm currently working on works as expected (most of the time).
+# albafetch by alba4k
 
 ![intro](images/albafetch.png)
 
-albafetch is a simple and fast program to display a lot of system information in a neofetch-like layout in way less than a second. I decided to make this as a challenge for myself and since I found neofetch too slow (which is understandable given that we're talking about a 10k+ lines shell script).
+**albafetch** is a lightweight and fast tool designed to display system information in a [neofetch](https://github.com/dylanaraps/neofetch)-like format but with significantly better performance. It was developed both as a personal challenge and to address neofetch’s slowness, understandable given its 10k+ lines of shell script.
+
+> **Important Note**: To avoid merge conflicts, please submit your pull requests to the `development` branch. Ensure you check out this branch before making any changes. The `master` branch is more stable and is updated less frequently, primarily when major features or fixes have been thoroughly tested.
+
+---
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+2. [Dependencies](#dependencies)
+   - [Build Dependencies](#build-dependencies)
+   - [Runtime Dependencies](#runtime-dependencies)
+3. [Compilation](#compilation)
+   - [Using Makefile](#using-the-makefile)
+   - [Using Meson](#using-meson)
+   - [Using Nix](#using-nix)
+4. [Installation](#installation)
+   - [Arch Linux](#for-arch-linux)
+   - [NixOS](#for-nixos)
+   - [Manual Installation](#manual-installation)
+5. [Configuration](#configuration)
+6. [Contributing](#contributing)
+
+---
+
+## Introduction
+
+**albafetch** provides detailed system information in under a second, making it much faster than comparable tools. Below is a preview of the tool's default appearance and a comparison of its execution time versus neofetch.
 
 <details>
+  <summary>Preview</summary>
+  This is the default look of albafetch:
 
-<summary>Preview</summary>
-This is what albafetch will likely look like by default:
+  ![default](images/albafetch_demo_default.png)
 
-![default](images/albafetch_demo_default.png)
+  Here's what it looks like with my custom configuration:
+  
+  ![custom](images/albafetch_demo.png)
+</details>
 
-And this is what [my configuration](https://github.com/alba4k/.dotfiles/blob/master/.config/albafetch/albafetch.conf) looks like
-![custom](images/albafetch_demo.png)
+<details>
+  <summary>Time Comparison</summary>
+
+  Neofetch:
+  ![neofetch](images/time_neofetch.png)
+
+  Albafetch:
+  ![albafetch](images/time_albafetch.png)
 
 </details>
 
-Here is a time comparison (exact execution times change between machines and runs):
-<details>
+The tool currently supports various GNU/Linux distributions, macOS (both x64 and arm64), and Android (tested on Termux). You’re welcome to test it on other platforms.
 
-<summary>Time comparison</summary>
+You can find more detailed usage and configuration information in the [User Manual](MANUAL.md), and recent changes in the [Changelog](CHANGELOG.md).
 
-![neofetch](images/time_neofetch.png)
-![albafetch](images/time_albafetch.png)
+---
 
-</details>
+## Dependencies
 
-You will find a lot of useful usage and configuration related info inside of the [user manual](MANUAL.md) and a small list of the things I changed since the last release in the [changelog](CHANGELOG.md).
+### Build Dependencies
 
-It currently supports a lot of GNU/Linux distributions, macOS (both x64 and arm64 macs) and even Android (only tested in Termux).
-Feel free to test any other platform :)
+The following packages are needed to build **albafetch**, and they will also include necessary runtime dependencies:
 
-## Table of contents
-1. [Dependencies](#dependencies)
-	* [For building](#build-dependencies)
-	* [At runtime](#runtime-dependencies)
-2. [Compilation](#compilation)
-	* [make](#using-the-makefile)
-	* [meson](#using-meson)
-	* [nix](#using-nix)
-3. [Installation](#installation)
-	* [Arch BTW](#for-arch-linux)
-	* [NixOS](#for-nixos)
-	* [Manually](#manual-installation)
-4. [Configuration](#configuration)
-	> [example config](albafetch.conf)
-5. [Contributing](#contributing)
-	
+- **libpci**:
+  - Arch Linux: [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
+  - Debian: [libpci-dev](https://packages.debian.org/buster/libpci-dev)
+  - Fedora: [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-devel)
+  - Alpine Linux: [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils-dev)
 
+- **libc** (likely already installed):
+  - Alpine Linux: [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
 
-# Dependencies
+- **Build systems**: 
+  - **Make** and **Meson** are supported. For more details, see the [compilation section](#compilation).
 
-## Build dependencies
-These will also install the relative runtime dependencies
+### Runtime Dependencies
 
-* libpci:
-	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
-	- On Debian, [libpci-dev](https://packages.debian.org/buster/libpci-dev)
-	- On Fedora, [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-devel)
-	- On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils-dev)
-* libc (should already be installed):
-	- On Alpine Linux, [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
-* A build system:
-	- Make and meson are already set up, more details are found [here](#compilation).
+These dependencies are required at runtime, but **albafetch** may function without them by checking their presence dynamically.
 
-## Runtime dependencies
-I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
-Also, in case albafetch was unable to get the info using libpci libraries, it'll fall back to `lspci` (as system shell commands).
+- **libpci** for dynamically linked binaries:
+  - Arch Linux: [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
+  - Debian: [libpci3](https://packages.debian.org/buster/libpci3)
+  - Fedora: [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
+  
+- A `sh` binary must be available in your system’s `PATH`. This is generally fulfilled on all UNIX-like systems.
 
-* libpci (for dynamically linked binaries):
-	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
-	- On Debian, [libpci3](https://packages.debian.org/buster/libpci3)
-	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
-* there must be a `sh` binary in your PATH. This should already be satisfied on any UNIX-like system
+---
 
-# Compilation
+## Compilation
 
-## Using the Makefile
+### Using the Makefile
 
-This will need you to have a C compiler installed and will still use meson under the hood.
+Ensure you have a C compiler installed. **albafetch** uses Meson under the hood, even when using the Makefile.
 
-```shell
+```bash
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
 $ make
 ```
 
-An executable file should appear as `build/albafetch` if the compilation succeeds.
+If the compilation succeeds, the executable will appear as `build/albafetch`.
 
-### Debug builds
-It is possible to build a debug binary (`build/debug`) that will test every single function and make sure it runs correctly. This can be done by running
+#### Debug Builds
 
-```sh
+To build a debug binary (`build/debug`), which tests all functions, run:
+
+```bash
 $ make debug
 ```
 
-## Using meson
+### Using Meson
 
-If you prefer to build with meson/ninja, you can use these commands:
+For those who prefer Meson and Ninja:
 
-```sh
+```bash
 $ meson setup build
 $ meson compile -C build
-$ build/debug
+$ build/albafetch
 ```
 
-## Using nix
+### Using Nix
 
-Building with nix can make compiling in some ways much easier, such as when compiling statically
-or cross compiling. A few convenience outputs are included:
+With Nix, compiling becomes simpler, especially for static builds or cross-compilation. Some preset outputs are available:
 
-```sh
-nix build .#albafetch # regular, dynamically linked build
-nix build .#albafetch-static # statically linked build (only available on linux)
-nix build .#albafetch-arm # cross compiling from x86_64 to arm (only available on x86_64)
+```bash
+$ nix build .#albafetch  # regular dynamically linked build
+$ nix build .#albafetch-static  # statically linked build (Linux only)
+$ nix build .#albafetch-arm  # cross-compile from x86_64 to ARM (x86_64 only)
 ```
 
-# Installation
+---
 
-## For Arch Linux
-An AUR package is available, [albafetch-git](https://aur.archlinux.org/packages/albafetch-git).
-There are three packages on the AUR that provide albafetch:
-* [albafetch](https://aur.archlinux.org/packages/albafetch-) will compile the source code of the latest release
-* [albafetch-bin](https://aur.archlinux.org/packages/albafetch-bin) will install a pre-compiled binary from the latest release
-* [albafetch-git](https://aur.archlinux.org/packages/albafetch-git) will compile the source of the latest commit in master
+## Installation
 
-You can find more information on how to install packages from the AUR in the [Arch Wiki](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages)
+### For Arch Linux
 
-## For NixOS
+You can install **albafetch** from the Arch User Repository (AUR). Three AUR packages are available:
 
-`nix profile`:
+- [albafetch](https://aur.archlinux.org/packages/albafetch) – builds the latest release.
+- [albafetch-bin](https://aur.archlinux.org/packages/albafetch-bin) – installs pre-built binaries.
+- [albafetch-git](https://aur.archlinux.org/packages/albafetch-git) – builds the latest commit from `master`.
 
-```sh
+Refer to the [Arch Wiki](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages) for instructions on installing AUR packages.
+
+### For NixOS
+
+Install **albafetch** using `nix profile` or `nix-env`:
+
+```bash
 $ nix profile install .#albafetch
+$ nix-env -iA packages.<platform>.albafetch
 ```
 
-`nix-env`:
+For Flake-based installations, see the provided example in the `README`.
 
-```sh
-$ nix-env -iA packages.<your platform>.albafetch # platform examples: x86_64-linux, aarch64-linux, aarch64-darwin
-```
+### Manual Installation
 
-Using the overlay (Flake):
+If your OS is not covered, you can manually compile and install **albafetch**:
 
-```nix
-{
-  inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-    albafetch = {
-      url = "github:alba4k/albafetch";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
-
-  outputs = {nixpkgs, albafetch, ...}: {
-    nixosConfigurations.host = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./configuration.nix
-        {
-          nixpkgs.overlays = [albafetch.overlays.default];
-          environment.systemPackages = [pkgs.albafetch];
-        }
-      ];
-    };
-  };
-}
-```
-
-Using the overlay (`builtins.fetchTarball`):
-
-```nix
-{pkgs, ...}: {
-  nixpkgs.overlays = [(import (builtins.fetchTarball "https://github.com/alba4k/albafetch/master.tar.gz")).overlays.default];
-  environment.systemPackages = with pkgs; [
-    albafetch
-  ];
-}
-```
-
-## Manual installation
-
-What if your OS is not included in the ones mentioned?
-In this case, you can either compile the source code yourself and install albafetch manually, or you can grab an executable from the [latest release](https://github.com/alba4k/albafetch/releases/latest).
-
-Please note that albafetch currently won't run on Windows (despite `albafetch --logo windows` being an option), but I'm planning to eventually add support (sooner or later). Feel free to help :)
-
-```
+```bash
 $ git clone https://github.com/alba4k/albafetch
 $ cd albafetch
-
 $ make
-# make install
+$ sudo make install
 ```
 
-`make install` needs elevated privileges on Linux (e.g. `sudo` or a root shell) to write to `/usr/bin`, while `/usr/local/bin` can be accessed as a normal user *on macOS*.
+Alternatively, you can use Meson for installation:
 
-Alternatively, you may prefer meson to perform the installation:
-
-```
-$ git clone https://github.com/alba4k/albafetch
-$ cd albafetch
+```bash
 $ meson setup build
 $ meson compile -C build
 $ meson install -C build
 ```
 
-Meson will install the executable to `/usr/local/bin`, which you may or may not want (executables in this directory are ran instead of ones in `/usr/bin`).
-
-# Configuration
-
-albafetch can be customized using a config file, usually `~/.config/albafetch.conf` for your user or `/etc/xdg/albafetch.conf`.
-
-You can find an example configuration file (which only provides the default values of every option) [here](albafetch.conf).
-Although this file includes some short comments on how the various options work, I highly recommend checking out the [user manual](MANUAL.md) for a deeper understanding of the way this config file works.
-
-# Contributing
-
-Almost everything included in this program is written in C.
-
-If you want to, you can directly modify the source code contained in this repository and recompile the program afterwards to get some features you might want or need.
-
-New logos can be added in [`src/logos.h`](src/logos.h) (be careful to follow the format), new infos in `src/info` and [`src/info/info.h`](src/info/info.h). Config options are mainly parsed in [`src/utils.c`](src/utils.c). You will also need to edit [`src/main.c`](src/main.c) afterwards to fully enable the new features.
-
-Don't mind opening a pull request if you think some of the changes you made should be in the public version, just try to follow the coding style that I used in the rest of the project.
-
-Any contribution, even just a fix of a typo, is highly appreciated.
+Meson installs to `/usr/local/bin`, whereas Make installs to `/usr/bin`.
 
 ---
 
-###### © Aaron Blasko
+## Configuration
 
-###### Initially started in March 2022
+You can customize **albafetch** through a configuration file, typically located at `~/.config/albafetch.conf` or `/etc/xdg/albafetch.conf`. An example config file is available [here](albafetch.conf).
+
+For more detailed explanations of configuration options, consult the [User Manual](MANUAL.md).
+
+---
+
+## Contributing
+
+Contributions are welcome! The project is mainly written in C, and new features, improvements, or bug fixes are appreciated.
+
+To contribute:
+
+1. Fork the repository.
+2. Make your changes in the appropriate files:
+   - Add new logos in [`src/logos.h`](src/logos.h).
+   - Modify system information retrieval in [`src/info/`](src/info).
+   - Config parsing is handled in [`src/utils.c`](src/utils.c).
+3. Submit a pull request against the `development` branch.
+
+All contributions, whether new features or typo corrections, are valued.
+
+---
+
+###### © 2024 Aaron Blasko
+
+---
