@@ -9,7 +9,7 @@
 
 #ifdef __APPLE__
 #include <sys/utsname.h>
-#include "../macos_infos.h"
+#include "../macos/macos_infos.h"
 #else
 #ifndef __ANDROID__
 #include <pci/pci.h>

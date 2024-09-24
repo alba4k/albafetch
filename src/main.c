@@ -6,6 +6,7 @@
 
 #include <sys/ioctl.h>
 
+#include "config.h"
 #include "info/info.h"
 #include "utils.h"
 #include "logos.h"
@@ -20,7 +21,7 @@
     #endif
 #endif
 
-// Not sure if this 
+// Not sure if this makes sense
 #ifndef LOGIN_NAME_MAX
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
@@ -35,6 +36,7 @@
  * fix sqlite usage in packages for rpm
  * steam installed packages (off by default)
  * cpu temp (off by default)
+ * rewrite config parsing and make it decent
  */
 
 // This contains the default config values
