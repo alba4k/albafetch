@@ -3,6 +3,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "../utils.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 
 struct Config {
@@ -106,14 +109,6 @@ extern struct Config config;
 #define col_background  config.options & 0x2000000
 #define bat_status      config.options & 0x4000000
 
-// element of a module linked list
-struct Module {
-    char *id;               // module identifier
-    char *label;            // module label
-    int (*func)(char *);    // function to run
-    struct Module *next;    // next module
-};
-
-int parse_config(const char *file);
+void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
 
 #endif // CONFIG_H

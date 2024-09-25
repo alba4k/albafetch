@@ -1,5 +1,5 @@
 #include "info.h"
-#include "../utils.h"
+#include "../config/config.h"
 
 #define _GNU_SOURCE
 

@@ -1,15 +1,15 @@
 #include "info.h"
 #include "../queue.h"
-#include "../utils.h"
-
-#include <string.h>
+#include "../config/config.h"
 
 #include <stdio.h>
-#include <sys/utsname.h>
 
 #ifdef __ANDROID__
 #include <unistd.h>
 #include <sys/wait.h>
+#else
+#include <string.h>
+#include <sys/utsname.h>
 #endif // __ANDROID__
 
 // print the operating system name and architecture (uname -m)

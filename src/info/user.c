@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <pwd.h>
 
-
 // print the current user
 int user(char *dest) {
     struct passwd *pw;

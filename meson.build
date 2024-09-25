@@ -6,10 +6,11 @@ project(
   license : 'MIT'
 )
 
-
 src = [
   'src/queue.c',
   'src/utils.c',
+  'src/config/config.c',
+  'src/config/parsing.c',
   'src/info/battery.c',
   'src/info/bios.c',
   'src/info/colors.c',
@@ -62,7 +63,7 @@ build_args = [
   '-Wall',
   '-Wextra',
   '-Ofast',
-  '-std=c99',
+  '-std=gnu99',
 ]
 
 debug_args = ['-g']
