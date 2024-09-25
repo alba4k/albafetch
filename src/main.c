@@ -6,7 +6,7 @@
 
 #include <sys/ioctl.h>
 
-#include "config.h"
+// #include "config/config.h"
 #include "info/info.h"
 #include "utils.h"
 #include "logos.h"

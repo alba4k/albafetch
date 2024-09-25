@@ -36,6 +36,7 @@ struct Config {
     * 22. loc_docker
     * 23. pwd_path
     * 24. col_background
+    * 25. bat_status
     * 25. [...]
     */
     uint64_t options;
