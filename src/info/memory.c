@@ -1,6 +1,6 @@
 #include "info.h"
 #include "../queue.h"
-#include "../utils.h"
+#include "../config/config.h"
 
 #include <string.h>
 
@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #ifdef __APPLE__
-#include "../macos_infos.h"
+#include "../macos/macos_infos.h"
 #else
 #include <sys/sysinfo.h>
 #endif // __APPLE__

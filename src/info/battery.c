@@ -1,5 +1,5 @@
 #include "info.h"
-#include "../utils.h"
+#include "../config/config.h"
 
 #include <stdbool.h>
 #include <stdio.h>

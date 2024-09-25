@@ -2,6 +2,7 @@
 .idea
 build
 albafetch.conf.link
+debian/albafetch*
 
 # nix stuff
 .direnv/

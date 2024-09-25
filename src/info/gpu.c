@@ -1,4 +1,5 @@
 #include "info.h"
+#include "../config/config.h"
 #include "../utils.h"
 
 #include <string.h>
@@ -9,7 +10,7 @@
 
 #ifdef __APPLE__
 #include <sys/utsname.h>
-#include "../macos_infos.h"
+#include "../macos/macos_infos.h"
 #else
 #ifndef __ANDROID__
 #include <pci/pci.h>

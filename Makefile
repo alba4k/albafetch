@@ -1,14 +1,15 @@
-.PHONY: build/albafetch
+.PHONY: compile
 
 OS := $(shell uname -o 2> /dev/null)
 KERNEL := $(shell uname -s 2> /dev/null)
 
 INSTALLPATH := /usr/local/bin
 CONFIGPATH := /etc/xdg
-PKGNAME := albafetch
 
 INSTALLFLAGS := -Dm755
 CONFIGFLAGS := -Dm644
+
+OS := $(shell uname -o 2> /dev/null)
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
@@ -20,9 +21,6 @@ ifeq ($(KERNEL),Darwin)
 	CONFIGFLAGS := -m644
 	INSTALLPATH := $(PREFIX)/bin
 	CONFIGPATH := ~/.config/
-
-	MACOS_INFOS_H := src/macos_infos.h
-	BSDWRAP_H = src/bsdwrap.h
 endif
 
 all: compile
@@ -41,6 +39,10 @@ run: compile
 
 debug: compile
 	build/debug --no-pip
+
+deb: compile
+	cd debian; \
+	./makedeb.sh
 
 install: build/albafetch
 	mkdir -p $(INSTALLPATH) $(CONFIGPATH)

@@ -1,5 +1,4 @@
 #include "info.h"
-#include "../utils.h"
 
 #include <string.h>
 
@@ -11,6 +10,8 @@
 #include <sys/sysctl.h>
 #endif // __APPLE__
 #ifdef __ANDROID__
+#include "../utils.h"
+
 #include <unistd.h>
 #include <sys/wait.h>
 #endif // __ANDROID__

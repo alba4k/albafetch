@@ -1,13 +1,15 @@
 #include "info.h"
-#include "../utils.h"
+#include "../config/config.h"
 
 #include <string.h>
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <libgen.h>
-#include <unistd.h>
+#include <stdlib.h>
 
+#ifdef __linux__
+#include <stdio.h>
+#include <unistd.h>
+#endif // __linux__
 
 // get the parent process name (usually the shell)
 int shell(char *dest) {
@@ -33,10 +35,12 @@ int shell(char *dest) {
     #endif
 
     char *shell = getenv("SHELL");
-    if(shell && shell[0]) {
-        strncpy(dest, shell_path ? shell : basename(shell), 256);
-        return 0;
-    }
+    if(shell == NULL)
+        return 1;
+    if(shell[0] == 0)
+        return 1;
+    
+    strncpy(dest, shell_path ? shell : basename(shell), 256);
 
-    return 1;
+    return 0;
 }

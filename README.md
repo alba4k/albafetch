@@ -44,12 +44,11 @@ Feel free to test any other platform :)
 3. [Installation](#installation)
 	* [Arch BTW](#for-arch-linux)
 	* [NixOS](#for-nixos)
+  * [MacPorts](#for-older-macos-versions)
 	* [Manually](#manual-installation)
 4. [Configuration](#configuration)
 	> [example config](albafetch.conf)
 5. [Contributing](#contributing)
-	
-
 
 # Dependencies
 
@@ -129,6 +128,20 @@ There are three packages on the AUR that provide albafetch:
 
 You can find more information on how to install packages from the AUR in the [Arch Wiki](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages)
 
+## For Debian
+You can create a DEB package from the repo itself
+
+This can be done via a guided procedure
+
+```
+$ git clone https://github.com/alba4k/albafetch
+$ cd albafetch
+
+$ make deb
+```
+
+This will create a deb package for you and ask if you want to install it.
+
 ## For NixOS
 
 `nix profile`:
@@ -179,6 +192,17 @@ Using the overlay (`builtins.fetchTarball`):
     albafetch
   ];
 }
+```
+
+## For older macOS versions
+
+On older macOS (~11 and lower) versions, albafetch likely won't build natively.
+
+You can, however, install albafetch on those using the [package](https://ports.macports.org/port/albafetch) on MacPorts
+
+This can be easily done with the following
+```
+# port install albafetch 
 ```
 
 ## Manual installation

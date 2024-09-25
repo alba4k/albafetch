@@ -9,6 +9,8 @@ project(
 src = [
   'src/queue.c',
   'src/utils.c',
+  'src/config/config.c',
+  'src/config/parsing.c',
   'src/info/battery.c',
   'src/info/bios.c',
   'src/info/colors.c',
@@ -47,9 +49,9 @@ if host_machine.system() == 'darwin'
   project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'])
   add_languages('objc')
   src += [
-    'src/macos_infos.c',
-    'src/bsdwrap.c',
-    'src/macos_gpu_string.m',
+    'src/macos/macos_infos.c',
+    'src/macos/bsdwrap.c',
+    'src/macos/macos_gpu_string.m',
   ]
 endif
 

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include "config/config.h"
 #include "info/info.h"
 #include "utils.h"
 
