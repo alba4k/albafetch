@@ -50,7 +50,6 @@ Feel free to test any other platform :)
 	> [example config](albafetch.conf)
 5. [Contributing](#contributing)
 
-
 # Dependencies
 
 ## Build dependencies
@@ -128,6 +127,20 @@ There are three packages on the AUR that provide albafetch:
 * [albafetch-git](https://aur.archlinux.org/packages/albafetch-git) will compile the source of the latest commit in master
 
 You can find more information on how to install packages from the AUR in the [Arch Wiki](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages)
+
+## For Debian
+You can create a DEB package from the repo itself
+
+This can be done via a guided procedure
+
+```
+$ git clone https://github.com/alba4k/albafetch
+$ cd albafetch
+
+$ make deb
+```
+
+This will create a deb package for you and ask if you want to install it.
 
 ## For NixOS
 

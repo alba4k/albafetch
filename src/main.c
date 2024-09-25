@@ -113,6 +113,10 @@ int main(int argc, char **argv) {
     for(int i = 1; i < argc; ++i) {
         if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
             asking_help = true;
+        if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
+            puts("4.2.1");
+            return 0;
+        }
         else if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--color") == 0)
             asking_color = i+1;
         else if(strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--bold") == 0)
@@ -336,13 +340,16 @@ int main(int argc, char **argv) {
         // it won't be used anyway lol
         destroy_array(modules);
 
-        printf("%s%salbafetch\033[0m - a system fetch utility (v4.2.1)\n",
+        printf("%s%salbafetch\033[0m - a system fetch utility\n",
                config.color, bold ? "\033[1m" : "");
 
         printf("\n%s%sFLAGS\033[0m:\n",
                config.color, bold ? "\033[1m" : "");
 
         printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n",
+               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "");
+
+        printf("\t%s%s-v\033[0m,%s%s --version\033[0m:\t Print the version and exit\n",
                config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "");
 
         printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"

@@ -1,4 +1,4 @@
-.PHONY: build/albafetch
+.PHONY: compile
 
 INSTALLPATH := /usr/local/bin
 CONFIGPATH := /etc/xdg
@@ -35,6 +35,10 @@ run: compile
 
 debug: compile
 	build/debug --no-pip
+
+deb: compile
+	cd debian; \
+	./makedeb.sh
 
 install: build/albafetch
 	mkdir -p $(INSTALLPATH) $(CONFIGPATH)
