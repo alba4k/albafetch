@@ -44,11 +44,11 @@ Feel free to test any other platform :)
 3. [Installation](#installation)
 	* [Arch BTW](#for-arch-linux)
 	* [NixOS](#for-nixos)
+  * [MacPorts](#for-older-macos-versions)
 	* [Manually](#manual-installation)
 4. [Configuration](#configuration)
 	> [example config](albafetch.conf)
 5. [Contributing](#contributing)
-	
 
 
 # Dependencies
@@ -179,6 +179,17 @@ Using the overlay (`builtins.fetchTarball`):
     albafetch
   ];
 }
+```
+
+## For older macOS versions
+
+On older macOS (~11 and lower) versions, albafetch likely won't build natively.
+
+You can, however, install albafetch on those using the [package](https://ports.macports.org/port/albafetch) on MacPorts
+
+This can be easily done with the following
+```
+# port install albafetch 
 ```
 
 ## Manual installation
