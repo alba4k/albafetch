@@ -53,11 +53,11 @@ int main(int argc, char **argv) {
     struct timeval start, end, start_all;
     double time;
 
-    // just setting every option to 1 (except maybe pkg_pip cause pip is slow af)
+    // just setting every option to 1 (except maybe _pkg_pip cause pip is slow af)
     if(argc > 1)
-        config.options = strcmp(argv[1], "--no-pip") ? 0xffffffffffffffff : 0xffffffffffff7fff;
+        config.boolean_options = strcmp(argv[1], "--no-pip") ? 0xffffffffffffffff : 0xffffffffffff7fff;
     else
-        config.options = 0xffffffffffffffff;
+        config.boolean_options = 0xffffffffffffffff;
     // these are just defaults
     strcpy(config.col_block_str, "   ");
     strcpy(config.date_format, "%02d/%02d/%d %02d:%02d:%02d");

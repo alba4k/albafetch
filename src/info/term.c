@@ -38,7 +38,7 @@ int term(char *dest) {
             terminal = "Kitty";
     }
 
-    if(term_ssh && getenv("SSH_CONNECTION"))
+    if(_term_ssh && getenv("SSH_CONNECTION"))
         snprintf(dest, 256, "%s (SSH)", terminal);
     else
         strncpy(dest, terminal, 256);

@@ -18,7 +18,7 @@ int os(char *dest) {
     uname(&name);
 
     #ifdef __APPLE__
-        if(os_arch)
+        if(_os_arch)
             snprintf(dest, 256, "macOS (%s)", name.machine);
         else
             strncpy(dest, "macOS", 255);
@@ -28,7 +28,7 @@ int os(char *dest) {
         char *args[] = {"getprop", "ro.build.version.release", NULL},
         exec_cmd(version, 16, args);
 
-        if(os_arch)
+        if(_os_arch)
             snprintf(dest, 256, "Android %s%s(%s)", version, version[0] ? " " : "", name.machine);
         else
             snprintf(dest, 256, "Android %s", version);
@@ -64,7 +64,7 @@ int os(char *dest) {
         if(end)
             *end = 0;
 
-        if(os_arch)
+        if(_os_arch)
             snprintf(dest, 256, "%s (%s)", os_name, name.machine);
         else
             strncpy(dest, os_name, 255);

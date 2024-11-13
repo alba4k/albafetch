@@ -59,14 +59,14 @@ int battery(char *dest) {
     #endif // __ANDROID__
 
     if(capacity[0] != 0 && status[0] != 0) {
-        if((bat_status))
+        if((_bat_status))
             snprintf(dest, 256, "%s%% (%s)", capacity, status);
         else
             snprintf(dest, 256, "%s%%", capacity);
     }
     else if(capacity[0] != 0)
         snprintf(dest, 256, "%s%%", capacity);
-    else if(status[0] != 0 && (bat_status))
+    else if(status[0] != 0 && (_bat_status))
         strncpy(dest, status, 256);
     else
         return 1;

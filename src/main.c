@@ -43,46 +43,46 @@
 struct Config config = {
     // Default values for boolean options (least to most significant bit)
     // 0111 0101 1111 1110 1111 1001 0110 ...
-    0x69f7fae,
+    .boolean_options = 0x69f7fae,
 
-    NULL,   // logo
-    "",     // color
-    ": ",   // dash
-    "-",    // separator
-    5,      // spacing
+    .logo = NULL,
+    .color = "",
+    .dash = ": ",
+    .separator = "-",
+    .spacing = 5,
 
-    0,                              // gpu_index
-    "%02d/%02d/%d %02d:%02d:%02d",  // date_format
-    "   ",                          // col_block_str
+    .gpu_index = 0,
+    .date_format = "%02d/%02d/%d %02d:%02d:%02d",
+    .col_block_str = "   ",
 
-    "",         // separator_prefix
-    "",         // spacing_prefix
-    "",         // title_prefix
-    "User",     // user_prefix
-    "Hostname", // hostname_prefix
-    "Uptime",   // uptime_prefix
-    "OS",       // os_prefix
-    "Kernel",   // kernel_prefix
-    "Desktop",  // desktop_prefix
-    "Theme",    // gtk_theme_prefix
-    "Icons",    // icon_theme_prefix
-    "Cursor",   // cursor_theme_prefix
-    "Shell",    // shell_prefix
-    "Login",    // login_shell_prefix
-    "Terminal", // term_prefix
-    "Packages", // pkg_prefix
-    "Host",     // host_prefix
-    "BIOS",     // bios_prefix
-    "CPU",      // cpu_prefix
-    "GPU",      // gpu_prefix
-    "Memory",   // mem_prefix
-    "Public IP",// pub_prefix
-    "Local IP", // loc_prefix
-    "Directory",// pwd_prefix
-    "Date",     // date_prefix
-    "Battery",  // bat_prefix
-    "",         // colors_prefix
-    "",         // light_colors_prefix
+    .separator_prefix = "",
+    .spacing_prefix = "",
+    .title_prefix = "",
+    .user_prefix = "User",
+    .hostname_prefix = "Hostname",
+    .uptime_prefix = "Uptime",
+    .os_prefix = "OS",
+    .kernel_prefix = "Kernel",
+    .desktop_prefix = "Desktop",
+    .gtk_theme_prefix = "Theme",
+    .icon_theme_prefix = "Icons",
+    .cursor_theme_prefix = "Cursor",
+    .shell_prefix = "Shell",
+    .login_shell_prefix = "Login",
+    .term_prefix = "Terminal",
+    .pkg_prefix = "Packages",
+    .host_prefix = "Host",
+    .bios_prefix = "BIOS",
+    .cpu_prefix = "CPU",
+    .gpu_prefix = "GPU",
+    .mem_prefix = "Memory",
+    .pub_prefix = "Public IP",
+    .loc_prefix = "Local IP",
+    .pwd_prefix = "Directory",
+    .date_prefix = "Date",
+    .bat_prefix = "Battery",
+    .colors_prefix = "",
+    .light_colors_prefix = "",
 };
 
 int main(int argc, char **argv) {
@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
 
     // these store either the default values or the ones defined in the config
     // they are needed to know what is used if no arguments are given (for --help)
-    bool default_bold = bold;
+    bool default_bold = _bold;
     char default_color[8] = "";
     char default_logo[16] = "";
 
@@ -307,13 +307,13 @@ int main(int argc, char **argv) {
 
     if(asking_bold) {
         if(asking_bold < argc) {
-            // modifying the 2nd least significant bit of options
+            // modifying the 2nd least significant bit of boolean_options
             if(strcmp(argv[asking_bold], "on") == 0) {
-                config.options |= ((uint64_t)1 << 1);
+                config.boolean_options |= ((uint64_t)1 << 1);
                 goto bold_done;
             }
             else if(strcmp(argv[asking_bold], "off") == 0) {
-                config.options &= ~((uint64_t)1 << 1);
+                config.boolean_options &= ~((uint64_t)1 << 1);
                 goto bold_done;
             }
 
@@ -341,49 +341,49 @@ int main(int argc, char **argv) {
         destroy_array(modules);
 
         printf("%s%salbafetch\033[0m - a system fetch utility\n",
-               config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "");
 
         printf("\n%s%sFLAGS\033[0m:\n",
-               config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n",
-               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s-v\033[0m,%s%s --version\033[0m:\t Print the version and exit\n",
-               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
                "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"
                " \033[34mblue\033[0m, \033[35mpurple\033[0m, \033[36mcyan\033[0m, \033[90mgray\033[0m,"
                " \033[37mwhite\033[0m]\n",
-               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
+               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1], default_color[0] ? "default" : "logo default");
 
         printf("\t%s%s-b\033[0m,%s%s --bold\033[0m:\t Specifies if bold should be used in colored parts (default: %s\033[0m)\n"
                "\t\t\t   [\033[1mon\033[0m, off]\n",
-               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
+               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
         
         printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
                "\t\t\t   [alpine, android, apple, arch, arch_small, debian, endeavouros, fedora, gentoo]\n"
                "\t\t\t   [linux, linuxmint, mageia, manjaro, neon, nixos, none, parrot, pop, ubuntu, windows]\n",
-               config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
+               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
         printf("\t%s%s--ascii\033[0m:\t Specifies a file containing a custom ascii art to use as logo (default: none)\n"
-               "\t\t\t   [path]\n", config.color, bold ? "\033[1m" : "");
+               "\t\t\t   [path]\n", config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Aligns the infos if set (default: %s)\n"
-               "\t\t\t   [on, off]\n", config.color, bold ? "\033[1m" : "", config.color, bold ? "\033[1m" : "", align ? "on" : "off");
+               "\t\t\t   [on, off]\n", config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", _align ? "on" : "off");
 
         printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
-               "\t\t\t   [path]\n", config.color, bold ? "\033[1m" : "");
+               "\t\t\t   [path]\n", config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s--no-logo\033[0m:\t Prints the infos without a logo or ascii art\n",
-               config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s--no-config\033[0m:\t Ignores any provided or existing config file\n",
-               config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "");
 
         printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n",
-               config.color, bold ? "\033[1m" : "");
+               config.color, _bold ? "\033[1m" : "");
 
         return 0;
     }
@@ -391,11 +391,11 @@ int main(int argc, char **argv) {
     if(asking_align) {
         if(asking_align < argc) {
             if(strcmp(argv[asking_align], "on") == 0) {
-                config.options |= (uint64_t)1;
+                config.boolean_options |= (uint64_t)1;
                 goto align_done;
             }
             else if(strcmp(argv[asking_align], "off") == 0) {
-                config.options &= ~((uint64_t)1);
+                config.boolean_options &= ~((uint64_t)1);
                 goto align_done;
             }
 
@@ -433,7 +433,7 @@ int main(int argc, char **argv) {
         int (*func)(char *);    // function to run
     };
     struct Info module_table[] = {
-     // {"identifier", "label", func},
+     // {"identifier", label, func},
         {"separator", config.separator_prefix, NULL},
         {"space", config.spacing_prefix, NULL},
         {"title", config.title_prefix, NULL},
@@ -500,7 +500,7 @@ int main(int argc, char **argv) {
                 current->func = module_table[i].func;
             }
 
-    if(align) {
+    if(_align) {
         size_t current_len;
         asking_align = 0;
 
@@ -579,13 +579,13 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strcat(printed, current->label);
 
-            if(title_color)
+            if(_title_color)
                 snprintf(printed+strlen(printed), 1024-strlen(printed), "%s%s%s%s@%s%s%s",
                     config.color,
-                    bold ? "\033[1m" : "",
+                    _bold ? "\033[1m" : "",
                     name,
                     "\033[0m",
-                    bold ? "\033[1m" : "",
+                    _bold ? "\033[1m" : "",
                     config.color,
                     host
                 );

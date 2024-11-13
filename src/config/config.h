@@ -10,11 +10,11 @@
 
 struct Config {
     /* Starting from the least significant byte, see the #define statements later
-    * 0. align
-    * 1. bold
-    * 2. title_color
-    * 3. os_arch
-    * 4. kernel_short
+    * 0. _align
+    * 1. _bold
+    * 2. _title_color
+    * 3. _os_arch
+    * 4. _kernel_short
     * 5. de_type
     * 6. shell_path
     * 7. term_ssh
@@ -38,7 +38,7 @@ struct Config {
     * 25. bat_status
     * 26. [...]
     */
-    uint64_t options;
+    uint64_t boolean_options;
 
     char **logo;
     char color[8];
@@ -81,33 +81,33 @@ struct Config {
 };
 extern struct Config config;
 
-#define align           config.options & 0x1
-#define bold            config.options & 0x2
-#define title_color     config.options & 0x4
-#define os_arch         config.options & 0x8
-#define kernel_short    config.options & 0x10
-#define de_type         config.options & 0x20
-#define shell_path      config.options & 0x40
-#define term_ssh        config.options & 0x80
-#define pkg_mgr         config.options & 0x100
-#define pkg_pacman      config.options & 0x200
-#define pkg_dpkg        config.options & 0x400
-#define pkg_rpm         config.options & 0x800
-#define pkg_flatpak     config.options & 0x1000
-#define pkg_snap        config.options & 0x2000
-#define pkg_brew        config.options & 0x4000
-#define pkg_pip         config.options & 0x8000
-#define cpu_brand       config.options & 0x10000
-#define cpu_freq        config.options & 0x20000
-#define cpu_count       config.options & 0x40000
-#define gpu_brand       config.options & 0x80000
-#define mem_perc        config.options & 0x100000
-#define loc_localhost   config.options & 0x200000
-#define loc_docker      config.options & 0x400000
-#define pwd_path        config.options & 0x800000
-#define kernel_type     config.options & 0x1000000
-#define col_background  config.options & 0x2000000
-#define bat_status      config.options & 0x4000000
+#define _align           config.boolean_options & 0x1
+#define _bold            config.boolean_options & 0x2
+#define _title_color     config.boolean_options & 0x4
+#define _os_arch         config.boolean_options & 0x8
+#define _kernel_short    config.boolean_options & 0x10
+#define _de_type         config.boolean_options & 0x20
+#define _shell_path      config.boolean_options & 0x40
+#define _term_ssh        config.boolean_options & 0x80
+#define _pkg_mgr         config.boolean_options & 0x100
+#define _pkg_pacman      config.boolean_options & 0x200
+#define _pkg_dpkg        config.boolean_options & 0x400
+#define _pkg_rpm         config.boolean_options & 0x800
+#define _pkg_flatpak     config.boolean_options & 0x1000
+#define _pkg_snap        config.boolean_options & 0x2000
+#define _pkg_brew        config.boolean_options & 0x4000
+#define _pkg_pip         config.boolean_options & 0x8000
+#define _cpu_brand       config.boolean_options & 0x10000
+#define _cpu_freq        config.boolean_options & 0x20000
+#define _cpu_count       config.boolean_options & 0x40000
+#define _gpu_brand       config.boolean_options & 0x80000
+#define _mem_perc        config.boolean_options & 0x100000
+#define _loc_localhost   config.boolean_options & 0x200000
+#define _loc_docker      config.boolean_options & 0x400000
+#define _pwd_path        config.boolean_options & 0x800000
+#define _kernel_type     config.boolean_options & 0x1000000
+#define _col_background  config.boolean_options & 0x2000000
+#define _bat_status      config.boolean_options & 0x4000000
 
 void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
 

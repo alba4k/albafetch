@@ -43,7 +43,7 @@ int cpu(char *dest) {
     fclose(fp);
 
     cpu_info = buf;
-    if(cpu_count) {
+    if(_cpu_count) {
         end = cpu_info;
         while((end = strstr(end, "processor"))) {
             ++count;
@@ -82,7 +82,7 @@ int cpu(char *dest) {
     // Printing the clock frequency the first thread is currently running at
     ++end;
     char *frequency = strstr(end, "cpu MHz");
-    if(frequency && cpu_freq) {
+    if(frequency && _cpu_freq) {
         frequency = strchr(frequency, ':');
         if(frequency) {
             frequency += 2;
@@ -114,7 +114,7 @@ int cpu(char *dest) {
         *end = 0;
     }
 
-    if((cpu_brand) == 0) {
+    if((_cpu_brand) == 0) {
         if((end = strstr(cpu_info, "Intel Core ")))
             memmove(end, end+11, strlen(end+1));
         else if((end = strstr(cpu_info, "Apple ")))
@@ -131,7 +131,7 @@ int cpu(char *dest) {
     if(freq[0])
         strncat(dest, freq, 255-strlen(dest));
 
-    if(count && cpu_count) {
+    if(count && _cpu_count) {
         char core_count[16];
         snprintf(core_count, 16, " (%d) ", count);
         strncat(dest, core_count, 255-strlen(dest));

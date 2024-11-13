@@ -151,7 +151,7 @@ void get_logo_line(char *dest, unsigned *line) {
 
 // print no more than maxlen visible characters of line
 void print_line(char *line, const size_t maxlen) {
-    if(bold)
+    if(_bold)
         fputs("\033[1m", stdout);
     fputs(config.color, stdout);
 

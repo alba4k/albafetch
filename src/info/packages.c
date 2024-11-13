@@ -26,13 +26,13 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/pacman/local", 256-strlen(path));
-        if(pkg_pacman && (dir = opendir(path))) {
+        if(_pkg_pacman && (dir = opendir(path))) {
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
                     ++count;
 
             if(count) {
-                snprintf(dest, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (pacman)" : "");
+                snprintf(dest, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (pacman)" : "");
                 done = true;
             }
             closedir(dir);
@@ -42,7 +42,7 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
-        if(pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
+        if(_pkg_dpkg && (fp = fopen(path, "r"))) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
             fseek(fp, 0, SEEK_END);
             size_t len = (size_t)ftell(fp);
             rewind(fp);
@@ -62,7 +62,7 @@ int packages(char *dest) {
             free(dpkg_list);
 
             if(count) {
-                snprintf(buf, 256, "%u%s", count, pkg_mgr ? " (dpkg)" : "");
+                snprintf(buf, 256, "%u%s", count, _pkg_mgr ? " (dpkg)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -72,12 +72,12 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
-        if(pkg_rpm && access(path, F_OK) == 0) {
+        if(_pkg_rpm && access(path, F_OK) == 0) {
             char *args[] = {"sqlite3", path, "SELECT count(*) FROM Packages", NULL};
             exec_cmd(str, 16, args);
 
             if(str[0] != '0' && str[0]) {
-                snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, pkg_mgr ? " (rpm)" : "");
+                snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, _pkg_mgr ? " (rpm)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -87,14 +87,14 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
-        if(pkg_flatpak && (dir = opendir(path))) {
+        if(_pkg_flatpak && (dir = opendir(path))) {
             count = 0;
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
                     ++count;
 
             if(count) {
-                snprintf(buf, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (flatpak)" : "");
+                snprintf(buf, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (flatpak)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
@@ -105,18 +105,18 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/bin/snap", 256-strlen(path));
-        if(pkg_snap && access(path, F_OK) == 0) {
+        if(_pkg_snap && access(path, F_OK) == 0) {
             char *args[] = {"sh", "-c", "snap list 2>/dev/null | wc -l", NULL};
             exec_cmd(str, 16, args);
 
             if(str[0] != '0' && str[0]) {
-                snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, pkg_mgr ? " (snap)" : "");
+                snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-1, _pkg_mgr ? " (snap)" : "");
                 done = true;
                 strncat(dest, buf, 256 - strlen(dest));
             }
         }
     #endif
-    if(pkg_brew && (access("/usr/local/bin/brew", F_OK) == 0 || access("/opt/homebrew/bin/brew", F_OK) == 0 || access("/bin/brew", F_OK) == 0)) {
+    if(_pkg_brew && (access("/usr/local/bin/brew", F_OK) == 0 || access("/opt/homebrew/bin/brew", F_OK) == 0 || access("/bin/brew", F_OK) == 0)) {
         char *args[] = {"brew", "--cellar", NULL};
         exec_cmd(str, 16, args);
 
@@ -129,7 +129,7 @@ int packages(char *dest) {
                         ++count;
 
                 if(count) {
-                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, pkg_mgr ? " (brew)" : "");
+                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (brew)" : "");
                     done = true;
                     strncat(dest, buf, 256 - strlen(dest));
                 }
@@ -144,12 +144,12 @@ int packages(char *dest) {
     if(getenv("PREFIX"))
         strncpy(path, getenv("PREFIX"), 255);
     strncat(path, "/bin/pip", 256-strlen(path));
-    if(pkg_pip && access(path, F_OK) == 0) {
+    if(_pkg_pip && access(path, F_OK) == 0) {
         char *args[] = {"sh", "-c", "pip list 2>/dev/null | wc -l", NULL};
         exec_cmd(str, 16, args);
         
         if(str[0] != '0' && str[0]) {
-            snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, pkg_mgr ? " (pip)" : "");
+            snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, _pkg_mgr ? " (pip)" : "");
             done = true;
             strncat(dest, buf, 256 - strlen(dest));
         }

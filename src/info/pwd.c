@@ -7,7 +7,7 @@
 
 // get the current working directory
 int pwd(char *dest) {
-    if((pwd_path) == 0) {
+    if((_pwd_path) == 0) {
         char buf[256];
 
         if(getcwd(buf, 256) == NULL)

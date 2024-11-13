@@ -234,12 +234,12 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     for(size_t i = 0; i < sizeof(booleanOptions)/sizeof(booleanOptions[0]); ++i) {
         if(parse_config_bool(conf, booleanOptions[i], &buffer) == 0) {
             if(buffer)
-                config.options |= ((uint64_t)1 << i);
+                config.boolean_options |= ((uint64_t)1 << i);
             else
-                config.options &= ~((uint64_t)1 << i);
+                config.boolean_options &= ~((uint64_t)1 << i);
         }
     }
-    *default_bold = bold;
+    *default_bold = _bold;
 
     // OTHER MODULE-RELATED OPTIONS
 

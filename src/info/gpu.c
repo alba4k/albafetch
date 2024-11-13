@@ -144,7 +144,7 @@ int gpu(char *dest) {
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
     dest[0] = 0;    //  yk it's decent a yk it works
     for(unsigned j = 0; j < sizeof(gpus)/sizeof(gpus[0]) && gpus[j%3]; ++j) {
-        if((gpu_brand) == 0) {
+        if((_gpu_brand) == 0) {
             if(strstr(gpus[j], "Intel ")
                || strstr(gpus[j], "Apple "))
                 gpus[j] += 6;

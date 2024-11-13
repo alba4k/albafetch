@@ -61,7 +61,7 @@ int memory(char *dest) {
         snprintf(dest, 256, "%lu MiB / %lu MiB", usedram/1024, totalram/1024);
     #endif
 
-    if(mem_perc) {
+    if(_mem_perc) {
         const size_t len = 256-strlen(dest);
         char perc[len];
         

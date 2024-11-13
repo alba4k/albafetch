@@ -26,7 +26,7 @@ int desktop(char *dest) {
 
         strcpy(dest, desktop);
 
-        if(de_type) {
+        if(_de_type) {
             if(getenv("WAYLAND_DISPLAY"))
                 strncat(dest, " (Wayland)", 255-strlen(dest));
             else if((desktop = getenv("XDG_SESSION_TYPE"))) {
