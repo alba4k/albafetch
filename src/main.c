@@ -26,7 +26,8 @@
     #define LOGIN_NAME_MAX HOST_NAME_MAX
 #endif
 
-/* TODO:
+// TODO:
+/*
  * print de, shell and terminal versions
  * Windows support? *BSD support?
  * make ascii dynamically use the available space (aka line by line)

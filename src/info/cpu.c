@@ -25,7 +25,7 @@ int cpu(char *dest) {
         if(buf[0] == 0)
             return 1;
 
-        if((cpu_freq) == 0) {
+        if((_cpu_freq) == 0) {
             if((end = strstr(buf, " @")))
                 *end = 0;
             else if((end = strchr(buf, '@')))

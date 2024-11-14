@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <string.h>
 
-/* TODO: rewrite config parsing from scratch
+// TODO: rewrite config parsing from scratch
+
+/*
 
 // checks if the given character is between two " "
 bool is_in_string(const char *str, const char *place) {
