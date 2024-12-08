@@ -4,7 +4,7 @@
   meson,
   ninja,
   pciutils,
-  sqlite3,
+  sqlite,
   pkg-config,
   Foundation,
   IOKit,
@@ -18,7 +18,7 @@ stdenv.mkDerivation {
 
   buildInputs =
     [
-      sqlite3.dev
+      sqlite.dev
     ]
     ++ lib.optional stdenv.isLinux pciutils;
 

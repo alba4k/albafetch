@@ -3,7 +3,8 @@ project(
   'c',
   version : '4.2.1',
   default_options : ['warning_level=3'],
-  license : 'MIT'
+  license : 'MIT',
+  meson_version: '>=1.3.0'
 )
 
 src = [
@@ -44,7 +45,9 @@ project_dependencies = []
 if host_machine.system() == 'linux'
   project_dependencies += dependency('sqlite3', method: 'pkg-config', required: true)
 
-  if host_machine.cpu_family() in ['x86', 'x86_64']
+  # "host_machine.system() != 'android'" is a bit unreliable soooo
+  cc = meson.get_compiler('c')
+  if not cc.has_define('__ANDROID__')
     project_dependencies += dependency('libpci', method: 'pkg-config', required: true)
   endif
 endif
