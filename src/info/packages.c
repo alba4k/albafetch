@@ -4,6 +4,11 @@
 
 #include <string.h>
 
+// just here to stop vscode from complaining about DT_DIR
+#ifndef __USE_MISC
+#define __USE_MISC
+#endif
+
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,17 +52,18 @@ int packages(char *dest) {
             size_t len = (size_t)ftell(fp);
             rewind(fp);
 
-            char *dpkg_list = malloc(len);
-            dpkg_list[fread(dpkg_list, 1, len, fp) - 1] = 0;
+            char *dpkg_list = malloc(len+1);
+            dpkg_list[fread(dpkg_list, 1, len, fp)] = 0;
 
             fclose(fp);
 
             count = 0;
-            // this will be wrong if some package does not have "\nInstalled-Size: "
-            // or if some package (for some reason) has it in the package description
-            while((dpkg_list = strstr(dpkg_list, "\nInstalled-Size: "))) {
+            char *ptr = dpkg_list;
+            // this will be wrong if some package (for whatever reason) does not have "\nInstalled-Size: "
+            // or if some package has it in the package description
+            while((ptr = strstr(ptr, "\nInstalled-Size: "))) {
                 ++count;
-                ++dpkg_list;
+                ptr += 17;
             }
             free(dpkg_list);
 
