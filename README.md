@@ -55,31 +55,42 @@ Feel free to test any other platform :)
 ## Build dependencies
 These will also install the relative runtime dependencies
 
-* libpci:
+* [libpci](https://github.com/pciutils/pciutils):
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
-	- On Debian, [libpci-dev](https://packages.debian.org/buster/libpci-dev)
+	- On Debian, [libpci-dev](https://packages.debian.org/bookworm/libpci-dev)
 	- On Fedora, [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-devel)
 	- On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils-dev)
-* libc (should already be installed):
+* [sqlite3](https://www.sqlite.org):
+  - On Arch Linux, [sqlite](https://archlinux.org/packages/core/x86_64/sqlite/)
+  - On Debian, [libsqlite3-dev](https://packages.debian.org/bookworm/libsqlite3-dev)
+  - On Fedora, [sqlite-devel](https://packages.fedoraproject.org/pkgs/sqlite/sqlite-devel)
+  - On Alpine Linux, [sqlite-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/sqlite-dev)
+* [libc](https://www.gnu.org/software/libc) (likely already installed):
 	- On Alpine Linux, [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
 * A build system:
-	- Make and meson are already set up, more details are found [here](#compilation).
+	- A [Makefile](https://www.gnu.org/software/make) exists (which uses [meson](https://mesonbuild.com/Getting-meson.html), [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages) and [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config)/[pkgconf](http://pkgconf.org)), more details are found [here](#compilation).
 
 ## Runtime dependencies
 I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
 Also, in case albafetch was unable to get the info using libpci libraries, it'll fall back to `lspci` (as system shell commands).
 
-* libpci (for dynamically linked binaries):
+* [libpci](https://github.com/pciutils/pciutils) (for dynamically linked binaries):
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci3](https://packages.debian.org/buster/libpci3)
 	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
+  - On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils)
+* [sqlite3](https://www.sqlite.org)
+  - On Arch Linux, [sqlite](https://archlinux.org/packages/core/x86_64/sqlite/)
+  - On Debian, [sqlite3](https://packages.debian.org/bookworm/sqlite3)
+  - On Fedora, [sqlite](https://packages.fedoraproject.org/pkgs/sqlite/sqlite)
+  - On Alpine Linux, [sqlite](https://pkgs.alpinelinux.org/package/edge/main/x86_64/sqlite)
 * there must be a `sh` binary in your PATH. This should already be satisfied on any UNIX-like system
 
 # Compilation
 
 ## Using the Makefile
 
-This will need you to have a C compiler installed and will still use meson under the hood.
+This will need you to have a C compiler installed and will still use meson/ninja under the hood.
 
 ```shell
 $ git clone https://github.com/alba4k/albafetch
@@ -87,7 +98,18 @@ $ cd albafetch
 $ make
 ```
 
-An executable file should appear as `build/albafetch` if the compilation succeeds.
+## Using meson
+
+If you prefer to build with meson/ninja directly, you can use these commands:
+
+```sh
+$ git clone https://github.com/alba4k/albafetch
+$ cd albafetch
+$ meson setup build
+$ meson compile -C build
+```
+
+In both cases, an executable file should appear as `build/albafetch` if the compilation succeeds.
 
 ### Debug builds
 It is possible to build a debug binary (`build/debug`) that will test every single function and make sure it runs correctly. This can be done by running
@@ -98,7 +120,7 @@ $ make debug
 
 ## Using meson
 
-If you prefer to build with meson/ninja, you can use these commands:
+If you prefer to build with meson/ninja directly, you can use these commands:
 
 ```sh
 $ meson setup build

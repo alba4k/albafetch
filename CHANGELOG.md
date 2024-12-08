@@ -17,13 +17,17 @@
 ## Bug fixes
 
 ### Noticeable fixes
+* Packages should be counted faster for dpkg and especially snap
 
 ### Technical fixes
 * Reduced the size of default logos
 * Moved some functions from `src/utils.c` to `src/config/config.c` and `src/config/config.c`.
   Planning on rewriting config parsing and reducing `src/utils.c` even more.
+* Memory safety improvements in packages
 
 ## Dependencies
+* sqlite3 is now needed to build the project
+* meson, ninja and pkg-config are now used in the Makefile
 
 ---
 

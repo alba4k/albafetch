@@ -1,11 +1,9 @@
 .vscode
 .idea
 build
-albafetch.conf.link
 debian/albafetch*
 
 # nix stuff
 .direnv/
 result*
 repl-result-out*
-
