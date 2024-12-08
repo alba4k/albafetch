@@ -13,7 +13,7 @@ OS := $(shell uname -o 2> /dev/null)
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
-	CONFIGPATH := $(PREFIX)/etc
+	CONFIGPATH := $(PREFIX)/etc/xdg
 endif
 
 ifeq ($(KERNEL),Darwin)

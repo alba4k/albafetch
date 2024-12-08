@@ -3,13 +3,12 @@
 #include "../config/config.h"
 
 #include <stdio.h>
+#include <sys/utsname.h>
 
 #ifdef __ANDROID__
-#include <unistd.h>
-#include <sys/wait.h>
+#include "../utils.h"
 #else
 #include <string.h>
-#include <sys/utsname.h>
 #endif // __ANDROID__
 
 // print the operating system name and architecture (uname -m)
@@ -25,7 +24,7 @@ int os(char *dest) {
     #else
     #ifdef __ANDROID__
         char version[16];
-        char *args[] = {"getprop", "ro.build.version.release", NULL},
+        char *args[] = {"getprop", "ro.build.version.release", NULL};
         exec_cmd(version, 16, args);
 
         if(_os_arch)
@@ -33,7 +32,7 @@ int os(char *dest) {
         else
             snprintf(dest, 256, "Android %s", version);
 
-#else
+    #else
         FILE *fp = fopen("/etc/os-release", "r");
         if(fp == NULL) {
             fp = fopen("/usr/lib/os-release", "r");

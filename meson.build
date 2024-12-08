@@ -1,7 +1,7 @@
 project(
   'albafetch',
   'c',
-  version : '4.1',
+  version : '4.2.1',
   default_options : ['warning_level=3'],
   license : 'MIT'
 )
@@ -42,8 +42,11 @@ src = [
 project_dependencies = []
 
 if host_machine.system() == 'linux'
-  project_dependencies += dependency('libpci', method: 'pkg-config', required: true)
   project_dependencies += dependency('sqlite3', method: 'pkg-config', required: true)
+
+  if host_machine.cpu_family() in ['x86', 'x86_64']
+    project_dependencies += dependency('libpci', method: 'pkg-config', required: true)
+  endif
 endif
 
 if host_machine.system() == 'darwin'
@@ -62,7 +65,8 @@ src += 'src/main.c'
 build_args = [
   '-Wall',
   '-Wextra',
-  '-Ofast',
+  '-O3',
+  '-ffast-math',
   '-std=gnu99',
 ]
 

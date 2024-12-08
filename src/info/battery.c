@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __ANDROID__
+#include <ctype.h>
+#endif // __ANDROID__
+
 // get the battery percentage and status (Linux only!)
 int battery(char *dest) {
     char capacity[5] = "";
@@ -12,7 +16,7 @@ int battery(char *dest) {
     
     #ifdef __ANDROID__  // relies on termux api
         char buf[256];
-        char *args[] = {"termux-battery-status", NULL}
+        char *args[] = {"termux-battery-status", NULL};
         exec_cmd(buf, 256, args);
 
         char *ptr = strstr(buf, "percentage");
