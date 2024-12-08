@@ -42,11 +42,12 @@ src = [
 project_dependencies = []
 
 if host_machine.system() == 'linux'
-  project_dependencies += dependency('libpci', method: 'pkg-config')
+  project_dependencies += dependency('libpci', method: 'pkg-config', required: true)
+  project_dependencies += dependency('sqlite3', method: 'pkg-config', required: true)
 endif
 
 if host_machine.system() == 'darwin'
-  project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'])
+  project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'], required: true)
   add_languages('objc')
   src += [
     'src/macos/macos_infos.c',
@@ -82,4 +83,3 @@ executable(
   install : false,
   c_args : debug_args
 )
-

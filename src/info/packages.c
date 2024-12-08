@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sqlite3.h>
 #include <sys/wait.h>
 
 // get the number of installed packages
@@ -47,25 +48,17 @@ int packages(char *dest) {
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
-        if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {   // alternatively, I could use "dpkg-query -f L -W" and strlen
-            fseek(fp, 0, SEEK_END);
-            size_t len = (size_t)ftell(fp);
-            rewind(fp);
+        if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
+            char line[512];
+            int count = 0;
 
-            char *dpkg_list = malloc(len+1);
-            dpkg_list[fread(dpkg_list, 1, len, fp)] = 0;
-
-            fclose(fp);
-
-            count = 0;
-            char *ptr = dpkg_list;
-            // this will be wrong if some package (for whatever reason) does not have "\nInstalled-Size: "
-            // or if some package has it in the package description
-            while((ptr = strstr(ptr, "\nInstalled-Size: "))) {
-                ++count;
-                ptr += 17;
+            while(fgets(line, sizeof(line), fp)) {
+                // check if the line starts with "Package:"
+                if(strncmp(line, "Package:", 8) == 0) {
+                    ++count;
+                }
             }
-            free(dpkg_list);
+            fclose(fp);
 
             if(count) {
                 snprintf(buf, 256, "%u%s", count, _pkg_mgr ? " (dpkg)" : "");
@@ -74,19 +67,37 @@ int packages(char *dest) {
             }
         }
 
+        // could also use rpm APIs directly
         path[0] = 0;
         if(getenv("PREFIX"))
             strncpy(path, getenv("PREFIX"), 255);
         strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
         if(_pkg_rpm && access(path, F_OK) == 0) {
-            char *args[] = {"sqlite3", path, "SELECT count(*) FROM Packages", NULL};
-            exec_cmd(str, 16, args);
+            sqlite3 *db;
+            sqlite3_stmt *stmt;
+            int count = 0;
 
-            if(str[0] != '0' && str[0]) {
-                snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, _pkg_mgr ? " (rpm)" : "");
-                done = true;
-                strncat(dest, buf, 256 - strlen(dest));
+            if(sqlite3_open(path, &db) != SQLITE_OK)
+                goto skip;
+            if(sqlite3_prepare_v2(db, "SELECT count(*) FROM Packages", -1, &stmt, NULL) != SQLITE_OK) {
+                sqlite3_close(db);
+                goto skip;
             }
+
+            if (sqlite3_step(stmt) == SQLITE_ROW) {
+                count = sqlite3_column_int(stmt, 0);
+
+                if(count > 0) {
+                    snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, _pkg_mgr ? " (rpm)" : "");
+                    done = true;
+                    strncat(dest, buf, 256 - strlen(dest));
+                }
+            }
+
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+
+            skip: ;
         }
 
         path[0] = 0;
