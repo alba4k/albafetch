@@ -78,7 +78,7 @@ Dependencies marked with an asterisk are optional. This means that if not instal
 
 ## Runtime dependencies
 I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
-Dependencies marked with an asterisk are optional. This means that if not installed at compile-time, albafetch will be compiles with custom implementations of the functions used.
+Dependencies marked with an asterisk are optional. This means that if not installed at compile-time, albafetch will be compiles with custom implementations of the functions used. If the binary was compiled with the dependency installed, however, it will be needed at runtime too.
 
 * [libpci](https://github.com/pciutils/pciutils)\*:
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
