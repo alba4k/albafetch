@@ -1,12 +1,12 @@
 #include "info.h"
-#include "../queue.h"
+#include "../utils/queue.h"
 #include "../config/config.h"
 
 #include <stdio.h>
 #include <sys/utsname.h>
 
 #ifdef __ANDROID__
-#include "../utils.h"
+#include "../utils/utils.h"
 #else
 #include <string.h>
 #endif // __ANDROID__

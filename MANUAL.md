@@ -8,8 +8,6 @@
     * [1](#error-1)
     * [-1](#error--1-255)
 
-
-
 # Configuration
 
 A complete configuration file with comments can be found as [`albafetch.conf`](albafetch.conf) in this repository.

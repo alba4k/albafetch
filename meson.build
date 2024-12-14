@@ -8,8 +8,10 @@ project(
 )
 
 src = [
-  'src/queue.c',
-  'src/utils.c',
+  'src/utils/queue.c',
+  'src/utils/utils.c',
+  'src/optdeps/libpci.c',
+  'src/optdeps/glib.c',
   'src/config/config.c',
   'src/config/parsing.c',
   'src/info/battery.c',
@@ -40,15 +42,30 @@ src = [
   'src/info/user.c',
 ]
 
+build_args = [
+  '-Wall',
+  '-Wextra',
+  '-O3',
+  '-ffast-math',
+  '-std=gnu99',
+]
+
 project_dependencies = []
+
+# See src/utils/optdeps.c
+glib = dependency('glib-2.0', method: 'pkg-config', required: false)
+if glib.found()
+  build_args += '-DGLIB_EXISTS'
+  project_dependencies += glib
+endif
 
 if host_machine.system() == 'linux'
   project_dependencies += dependency('sqlite3', method: 'pkg-config', required: true)
 
-  # "host_machine.system() != 'android'" is a bit unreliable soooo
-  cc = meson.get_compiler('c')
-  if not cc.has_define('__ANDROID__')
-    project_dependencies += dependency('libpci', method: 'pkg-config', required: true)
+  libpci = dependency('libpci', method: 'pkg-config', required: false)
+  if libpci.found()
+    build_args += '-DLIBPCI_EXISTS'
+    project_dependencies += libpci
   endif
 endif
 
@@ -64,14 +81,6 @@ endif
 
 src_debug = src + ['src/debug.c']
 src += 'src/main.c'
-
-build_args = [
-  '-Wall',
-  '-Wextra',
-  '-O3',
-  '-ffast-math',
-  '-std=gnu99',
-]
 
 debug_args = build_args + ['-g']
 

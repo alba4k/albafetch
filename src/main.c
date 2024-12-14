@@ -8,9 +8,9 @@
 
 #include "config/config.h"
 #include "info/info.h"
-#include "utils.h"
+#include "utils/utils.h"
 #include "logos.h"
-#include "queue.h"
+#include "utils/queue.h"
 
 // idk hy but this is sometimes not defined
 #ifndef HOST_NAME_MAX

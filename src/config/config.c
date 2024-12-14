@@ -1,7 +1,7 @@
 #include "config.h"
 #include "parsing.h"
 #include "../logos.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #define _GNU_SOURCE
 
@@ -198,7 +198,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     // separator
     parse_config_str(conf, "separator_character", config.separator, sizeof(config.separator));
 
-    // BOOLEAN OPTIONS (check utils.h)
+    // BOOLEAN OPTIONS (check utils/utils.h)
 
     const char *booleanOptions[] = {
         "align_infos",

@@ -1,17 +1,18 @@
-#include "info.h"
-#include "../utils.h"
-
 #include <string.h>
 
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
+#include "info.h"
+#include "../optdeps/optdeps.h"
+#include "../utils/utils.h"
+
 // get the current Cursor Theme
 int cursor_theme(char *dest){ 
     // try using gsettings
     // reading ~/.config/gtk-3.0/settings.ini could also be an option 
-    if(access("/bin/gsettings", F_OK) == 0){
+    if(binary_in_path("gsettings")) {
         char buf[256] = "";
         char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "cursor-theme", NULL};
         exec_cmd(buf, 256, args);
