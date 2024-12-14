@@ -1,13 +1,13 @@
-#include "utils.h"
-#include "config/config.h"
-#include "config/parsing.h"
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <unistd.h>
 #include <sys/wait.h>
+
+#include "utils.h"
+#include "../config/config.h"
+#include "../config/parsing.h"
 
 // copy an ascii art from file to mem
 void *file_to_logo(char *file) {

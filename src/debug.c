@@ -8,7 +8,7 @@
 
 #include "config/config.h"
 #include "info/info.h"
-#include "utils.h"
+#include "utils/utils.h"
 
 // Most of those aren't even needed
 struct Config config;

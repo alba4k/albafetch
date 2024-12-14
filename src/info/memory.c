@@ -1,5 +1,5 @@
 #include "info.h"
-#include "../queue.h"
+#include "../utils/queue.h"
 #include "../config/config.h"
 
 #include <string.h>

@@ -3,7 +3,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include <stdbool.h>
 #include <stdint.h>

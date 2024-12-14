@@ -28,6 +28,8 @@
 ## Dependencies
 * sqlite3 is now needed to build the project
 * meson, ninja and pkg-config are now used in the Makefile
+* glib is now an optional dependency. If not installed at compile time, custom implementations will be used
+* libpci is not an optional dependency at compile time too
 
 ---
 

@@ -10,7 +10,7 @@
 #include <sys/sysctl.h>
 #endif // __APPLE__
 #ifdef __ANDROID__
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include <unistd.h>
 #include <sys/wait.h>

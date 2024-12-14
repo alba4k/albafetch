@@ -1,6 +1,6 @@
 #include "info.h"
 #include "../config/config.h"
-#include "../utils.h"
+#include "../utils/utils.h"
 
 #include <string.h>
 
@@ -13,7 +13,7 @@
 #include "../macos/macos_infos.h"
 #else
 #ifndef __ANDROID__
-#include <pci/pci.h>
+#include "../optdeps/optdeps.h"
 #endif // __ANDROID__
 #endif // __APPLE__
 
@@ -46,50 +46,11 @@ int gpu(char *dest) {
     # ifdef __ANDROID__
         return 1;
     # else
-        // based on https://github.com/pciutils/pciutils/blob/master/example.c
-        char device_class[256], namebuf[768];
-        struct pci_dev *dev;
-        struct pci_access *pacc = pci_alloc();		// get the pci_access structure;
-
-        pci_init(pacc);		// initialize the PCI library
-        pci_scan_bus(pacc);		// we want to get the list of devices
-
-        int i = 0;
-
-        for(dev=pacc->devices; dev; dev=dev->next)	{ // iterates over all devices
-            pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	// fill in header info
-
-            pci_lookup_name(pacc, device_class, 256, PCI_LOOKUP_CLASS, dev->device_class);
-            if(strcmp(device_class, "VGA compatible controller") == 0 || strcmp(device_class, "3D controller") == 0) {
-                // look up the full name of the device
-                if(config.gpu_index == 0) {
-                    gpus[i] = pci_lookup_name(pacc, namebuf+i*256, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
-                    
-                    if(i < 2)
-                        ++i;
-                    else
-                        break;
-                }
-                else {
-                    if(i == config.gpu_index-1) {
-                        gpus[0] = pci_lookup_name(pacc, namebuf, 256, PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
-                        break;
-                    }
-
-                    if(i < 2)
-                        ++i;
-                    else
-                        break;
-                }
-            }
-        }
-
-        pci_cleanup(pacc);  // close everything
-
+        get_gpus(gpus);
+    
         // fallback (will only get 1 gpu)
 
         char gpu[256];
-
         if(gpus[0] == 0) {
             if(config.gpu_index > 1)   // lol why would you choose a non-existing GPU
                 return 1;
@@ -129,7 +90,6 @@ int gpu(char *dest) {
                 return 1;
             }
             *end = 0;
-            
             strncpy(gpu, gpus[0], 255);
             free(lspci);
             gpus[0] = gpu;
@@ -137,7 +97,7 @@ int gpu(char *dest) {
     # endif // __ANDROID__
     #endif // __APPLE__
 
-    if(gpus[0] == 0)
+    if(gpus[0] == NULL)
         return 1;
 
     // this next part is just random cleanup
