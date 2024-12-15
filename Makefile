@@ -9,8 +9,6 @@ CONFIGPATH := /etc/xdg
 INSTALLFLAGS := -Dm755
 CONFIGFLAGS := -Dm644
 
-RELEASE := 0
-
 OS := $(shell uname -o 2> /dev/null)
 
 ifeq ($(OS),Android)

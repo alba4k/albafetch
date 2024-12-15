@@ -50,36 +50,25 @@ build_args = [
   '-std=gnu99',
 ]
 
-# MAKE THE VERSION PRINTED BY albafetch -h DYNAMIC
-commit_cmd = run_command('git', 'rev-parse', '--short', 'HEAD', check: false)
-commit = commit_cmd.stdout().strip()
-
-config = configuration_data()
-config.set('VERSION', '"'+meson.project_version()+'"')
-config.set('COMMIT', '"'+commit+'"')
-configure_file(configuration: config, output: 'version.h')
-
 # DEPENDENCY HANDLING
 
 project_dependencies = []
 
-glib = dependency('glib-2.0', method: 'pkg-config', required: false)
+glib = dependency('glib-2.0', required: false)
 if glib.found()
   build_args += '-DGLIB_EXISTS'
   project_dependencies += glib
 endif
 
 if host_machine.system() == 'linux'
-  project_dependencies += dependency('sqlite3', method: 'pkg-config', required: true)
+  project_dependencies += dependency('sqlite3', required: true)
 
-  libpci = dependency('libpci', method: 'pkg-config', required: false)
+  libpci = dependency('libpci', required: false)
   if libpci.found()
     build_args += '-DLIBPCI_EXISTS'
     project_dependencies += libpci
   endif
-endif
-
-if host_machine.system() == 'darwin'
+elif host_machine.system() == 'darwin'
   project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'], required: true)
   add_languages('objc')
   src += [
@@ -88,6 +77,23 @@ if host_machine.system() == 'darwin'
     'src/macos/macos_gpu_string.m',
   ]
 endif
+
+# MAKE THE VERSION PRINTED BY albafetch -h DYNAMIC
+git = find_program('git', required : false)
+commit = '{unknown}'
+if git.found()
+  commit_cmd = run_command(git, 'rev-parse', '--short', 'HEAD', check: false)
+  if commit_cmd.returncode() == 0
+    commit = commit_cmd.stdout().strip()
+  endif
+endif
+
+config = configuration_data()
+config.set('VERSION', '"'+meson.project_version()+'"')
+config.set('COMMIT', '"'+commit+'"')
+configure_file(configuration: config, output: 'version.h')
+
+# BUILD
 
 src_debug = src + ['src/debug.c']
 src += 'src/main.c'

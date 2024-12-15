@@ -57,23 +57,29 @@ These will usually also install the relative [runtime dependencies](#runtime-dep
 Dependencies marked with an asterisk are optional. This means that if not installed at compile-time, albafetch will be compiles with custom implementations of the functions used.
 
 * [libpci](https://github.com/pciutils/pciutils)\*:
+  Used to get gpu information
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
 	- On Debian, [libpci-dev](https://packages.debian.org/bookworm/libpci-dev)
 	- On Fedora, [pciutils-devel](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-devel)
 	- On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils-dev)
 * [sqlite3](https://www.sqlite.org):
+  Used to gather the amount of installed rpm packages
   - On Arch Linux, [sqlite](https://archlinux.org/packages/core/x86_64/sqlite)
   - On Debian, [libsqlite3-dev](https://packages.debian.org/bookworm/libsqlite3-dev)
   - On Fedora, [sqlite-devel](https://packages.fedoraproject.org/pkgs/sqlite/sqlite-devel)
   - On Alpine Linux, [sqlite-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/sqlite-dev)
 * [libc](https://www.gnu.org/software/libc) (likely already installed):
 	- On Alpine Linux, [musl-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/musl-dev)
-* [glib](https://docs.gtk.org/glib/)\*
+* [glib](https://docs.gtk.org/glib/)\*:
+  Provides some useful abstractions
   - On Arch Linux, [glib2]((https://archlinux.org/packages/core/x86_64/glib2))
   - On Debian, [libglib2.0-dev](https://packages.debian.org/bookworm/libglib2.0)
   - On Fedora, [glib2-devel](https://packages.fedoraproject.org/pkgs/glib2/glib2-devel)
   - On Alpine Linux, [glib-dev](https://pkgs.alpinelinux.org/package/edge/main/x86/glib)
+* [git](https://git-scm.com)\*:
+  When building from this repo, used to add the commit hash in the `--version` output
 * A build system:
+  To build the project
 	- A [Makefile](https://www.gnu.org/software/make) exists (which uses [meson](https://mesonbuild.com/Getting-meson.html), [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages) and [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config)/[pkgconf](http://pkgconf.org)), more details are found [here](#compilation).
 
 ## Runtime dependencies
@@ -85,12 +91,12 @@ Dependencies marked with an asterisk are optional. This means that if not instal
 	- On Debian, [libpci3](https://packages.debian.org/buster/libpci3)
 	- On Fedora, [pciutils-libs](https://packages.fedoraproject.org/pkgs/pciutils/pciutils-libs)
   - On Alpine Linux, [pciutils-dev](https://pkgs.alpinelinux.org/package/edge/main/x86_64/pciutils)
-* [sqlite3](https://www.sqlite.org)
+* [sqlite3](https://www.sqlite.org):
   - On Arch Linux, [sqlite](https://archlinux.org/packages/core/x86_64/sqlite/)
   - On Debian, [sqlite3](https://packages.debian.org/bookworm/sqlite3)
   - On Fedora, [sqlite](https://packages.fedoraproject.org/pkgs/sqlite/sqlite)
   - On Alpine Linux, [sqlite](https://pkgs.alpinelinux.org/package/edge/main/x86_64/sqlite)
-* [glib](https://docs.gtk.org/glib/)\*
+* [glib](https://docs.gtk.org/glib/)\*:
   - On Arch Linux, [glib2]((https://archlinux.org/packages/core/x86_64/glib2))
   - On Debian, [libglib2.0-dev](https://packages.debian.org/bookworm/libglib2.0)
   - On Fedora, [glib2-devel](https://packages.fedoraproject.org/pkgs/glib2/glib2)
