@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef PARSING_H
-#define PARSING_H
-
 #include <stdbool.h>
 
 // bool is_in_string(const char *str, const char *place);
@@ -14,5 +11,3 @@
 void uncomment(char *str, const char start);
 
 void unescape(char *str);
-
-#endif // PARSING_H

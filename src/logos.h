@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef LOGOS_H
-#define LOGOS_H
-
 #include <stddef.h>
 
 // A lot of these logos come from the following projects:
@@ -511,5 +508,3 @@ static char *logos[][32] = {      // please leave logos[0] to Linux and logos[1]
         NULL
     },
 };
-
-#endif // LOGOS_H

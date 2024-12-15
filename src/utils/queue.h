@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef QUEUE_H
-#define QUEUE_H
-
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
@@ -29,5 +26,3 @@ int dequeue(Queue *q, char *out);
 void destroy_queue(Queue *q);
 
 void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size);
-
-#endif	// QUEUE_H

@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef INFO_H
-#define INFO_H
-
 int user(char *dest);
 
 int hostname(char *dest);
@@ -52,5 +49,3 @@ int battery(char *dest);
 int colors(char *dest);
 
 int light_colors(char *dest);
-
-#endif // INFO_H

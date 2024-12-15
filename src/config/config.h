@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef CONFIG_H
-#define CONFIG_H
-
 #include "../utils/utils.h"
 
 #include <stdbool.h>
@@ -110,5 +107,3 @@ extern struct Config config;
 #define _bat_status      config.boolean_options & 0x4000000
 
 void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
-
-#endif // CONFIG_H

@@ -8,7 +8,7 @@
 * Custom ascii arts will now print in the specified color by default
 
 ### Command line arguments
-* Added `--version` (`-v` for short)
+* Added `--version` (`-v` for short), prints version and build commit
 
 ### Other changes
 * added a logo for [Rocky Linux](https://rockylinux.org)

@@ -9,14 +9,9 @@
 
 #pragma once
 
-#ifndef OPTDEPS_H
-#define OPTDEPS_H
-
 #include <stdbool.h>
 
 // can use libc or alternatives
 bool binary_in_path(const char *str);
 
 void get_gpus(char **gpus);
-
-#endif // OPTDEPS_H

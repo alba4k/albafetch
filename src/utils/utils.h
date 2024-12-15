@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef UTILS_H
-#define UTILS_H
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -30,5 +27,3 @@ void unescape(char *str);
 int exec_cmd(char *buf, size_t len, char *const *argv);
 
 size_t strlen_real(const char *str);
-
-#endif // UTILS_H

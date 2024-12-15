@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef MACOS_INFOS_H
-#define MACOS_INFOS_H
-
 #include <sys/sysctl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,5 +21,3 @@ char *get_gpu_string(void);
 bytes_t used_mem_size(void);
 
 bytes_t system_mem_size(void);
-
-#endif //MACOS_INFOS_H 

@@ -9,6 +9,8 @@ CONFIGPATH := /etc/xdg
 INSTALLFLAGS := -Dm755
 CONFIGFLAGS := -Dm644
 
+RELEASE := 0
+
 OS := $(shell uname -o 2> /dev/null)
 
 ifeq ($(OS),Android)
@@ -32,12 +34,13 @@ clean:
 	meson setup build --wipe
 
 compile: build
-	meson compile -C build
+	meson compile -C build albafetch
 
 run: compile
 	build/albafetch
 
-debug: compile
+debug: build
+	meson compile -C build debug
 	build/debug --no-pip
 
 deb: compile

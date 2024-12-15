@@ -50,9 +50,19 @@ build_args = [
   '-std=gnu99',
 ]
 
+# MAKE THE VERSION PRINTED BY albafetch -h DYNAMIC
+commit_cmd = run_command('git', 'rev-parse', '--short', 'HEAD', check: false)
+commit = commit_cmd.stdout().strip()
+
+config = configuration_data()
+config.set('VERSION', '"'+meson.project_version()+'"')
+config.set('COMMIT', '"'+commit+'"')
+configure_file(configuration: config, output: 'version.h')
+
+# DEPENDENCY HANDLING
+
 project_dependencies = []
 
-# See src/utils/optdeps.c
 glib = dependency('glib-2.0', method: 'pkg-config', required: false)
 if glib.found()
   build_args += '-DGLIB_EXISTS'
@@ -89,7 +99,8 @@ executable(
   src,
   dependencies : project_dependencies,
   install : true,
-  c_args : build_args
+  c_args : build_args,
+  include_directories: include_directories('.')
 )
 
 executable(
@@ -97,5 +108,6 @@ executable(
   src_debug,
   dependencies : project_dependencies,
   install : false,
-  c_args : debug_args
+  c_args : debug_args,
+  include_directories: include_directories('.')
 )
