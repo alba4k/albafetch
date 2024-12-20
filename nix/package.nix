@@ -47,6 +47,10 @@ stdenv.mkDerivation {
 
   OBJC = lib.optionalString stdenv.hostPlatform.isDarwin "clang";
 
+  postFixup = lib.optionalString stdenv.hostPlatform.isStatic ''
+    rm -r $out/nix-support
+  '';
+
   meta = {
     description = "Faster neofetch alternative, written in C.";
     homepage = "https://github.com/alba4k/albafetch";
