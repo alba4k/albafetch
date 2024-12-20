@@ -5,8 +5,9 @@
   ninja,
   pciutils,
   pkg-config,
-  self,
   sqlite,
+
+  self ? { },
 }:
 
 let
