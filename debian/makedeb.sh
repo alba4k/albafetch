@@ -1,5 +1,4 @@
-# shellcheck disable=SC1113
-#/bin/bash
+#!/usr/bin/env bash
 
 version=$(../build/albafetch --version)
 arch=$(uname -m)
