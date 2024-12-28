@@ -209,14 +209,15 @@ int main(int argc, char **argv) {
             if(found == false)
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"! Use --help for more info\n", argv[asking_logo]);
         }
-        else
-            fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
-
-        if(found)
-            strcpy(config.color, config.logo[1]);
-        else
+        if (found) {
+            // Ensure that 'config.logo[1]' is a null-terminated string
+            strncpy(config.color, config.logo[1], sizeof(config.color) - 1);
+            // Ensure 'config.color' is null-terminated
+            config.color[sizeof(config.color) - 1] = '\0';
+        } else {
             user_is_an_idiot = true;
-    }
+        }
+
     if(config.logo == NULL) {  // get a logo based on the OS (--logo was not used and no logo was set by the config)
         #ifdef __APPLE__
             config.logo = logos[1];
@@ -272,10 +273,13 @@ int main(int argc, char **argv) {
             }
         # endif // __ANDROID__
         #endif // __APPLE__
-        
-        strcpy(default_logo, config.logo[0]);
-        strcpy(config.color, config.logo[1]);
-    }
+        // Ensure that 'config.logo[0]' and 'config.logo[1]' are null-terminated strings
+        strncpy(default_logo, config.logo[0], sizeof(default_logo) - 1);
+        default_logo[sizeof(default_logo) - 1] = '\0';  // Ensure null-termination
+
+        strncpy(config.color, config.logo[1], sizeof(config.color) - 1);
+        config.color[sizeof(config.color) - 1] = '\0';  // Ensure null-termination
+
 
     if(asking_color) {
         if(asking_color < argc) {
@@ -291,11 +295,13 @@ int main(int argc, char **argv) {
                 {"white", "\033[37m"},
             };
 
-            for(int j = 0; j < 9; ++j)
-                if(strcmp(argv[asking_color], *colors[j]) == 0) {
-                    strcpy(config.color, colors[j][1]);
-                    goto color_done;
-                }
+for (int j = 0; j < 9; ++j)
+    if (strcmp(argv[asking_color], *colors[j]) == 0) {
+        // Use strncpy to safely copy the color string, ensuring no overflow
+        strncpy(config.color, colors[j][1], sizeof(config.color) - 1);
+        config.color[sizeof(config.color) - 1] = '\0';  // Ensure null-termination
+        goto color_done;
+    }
 
             fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"! Use --help for more info\n", argv[asking_color]);
         }
@@ -625,10 +631,15 @@ int main(int argc, char **argv) {
                     strcat(printed, " ");
             }
                 
-            strcat(printed, config.color);
-            strcpy(label, current->label);
-            if(current->label[0] && current->func != colors && current->func != light_colors)
-                strcat(label, config.dash);
+            // Ensure printed has enough space before using strncat
+            strncat(printed, config.color, sizeof(printed) - strlen(printed) - 1);  // Safer strcat using strncat
+            // Use strncpy to copy the label, ensuring no overflow
+            strncpy(label, current->label, sizeof(label) - 1);
+            label[sizeof(label) - 1] = '\0';  // Ensure null-termination
+
+            // Check if the label is not empty and the function is not colors or light_colors
+            if (current->label[0] && current->func != colors && current->func != light_colors)
+                strncat(label, config.dash, sizeof(label) - strlen(label) - 1);  // Safer strcat using strncat
 
             snprintf(printed+strlen(printed), 1024-strlen(printed), format, label, data);
         }

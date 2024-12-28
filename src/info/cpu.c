@@ -98,21 +98,32 @@ int cpu(char *dest) {
     #endif
 
     // cleaning the string from various garbage
-    if((end = strstr(cpu_info, "(R)")))
-        memmove(end, end+3, strlen(end+3)+1);
-    if((end = strstr(cpu_info, "(TM)")))
-        memmove(end, end+4, strlen(end+4)+1);
-    if((end = strstr(cpu_info, " CPU")))
-        memmove(end, end+4, strlen(end+4)+1);
-    if((end = strstr(cpu_info, "th Gen ")))
-        memmove(end-2, end+7, strlen(end+7)+1);
-    if((end = strstr(cpu_info, " with Radeon Graphics")))
-        *end = 0;
-    if((end = strstr(cpu_info, "-Core Processor"))) {
-        end -= 4;
-        end = strchr(end, ' ');
+    if ((end = strstr(cpu_info, "(R)"))) {
+        memmove(end, end + 3, strlen(end + 3) + 1);
+    }
+    if ((end = strstr(cpu_info, "(TM)"))) {
+        memmove(end, end + 4, strlen(end + 4) + 1);
+    }
+    if ((end = strstr(cpu_info, " CPU"))) {
+        memmove(end, end + 4, strlen(end + 4) + 1);
+    }
+    if ((end = strstr(cpu_info, "th Gen "))) {
+        memmove(end - 2, end + 7, strlen(end + 7) + 1);
+    }
+    if ((end = strstr(cpu_info, " with Radeon Graphics"))) {
         *end = 0;
     }
+    if ((end = strstr(cpu_info, "-Core Processor"))) {
+        // Ensure that the pointer manipulation is safe
+        if (end >= cpu_info + 4) {
+            end -= 4;
+            end = strchr(end, ' ');
+            if (end != NULL) {
+                *end = 0;
+            }
+        }
+    }
+
 
     if((_cpu_brand) == 0) {
         if((end = strstr(cpu_info, "Intel Core ")))

@@ -44,7 +44,7 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
         dest[maxlen-1] = 0;
     }
     else
-        memcpy(dest, ptr, len+1);
+dest[maxlen-1] = '\0';  // Ensure null termination
 
 
     *end = '"';
@@ -159,13 +159,16 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     parse_config_str(conf, "logo", logo, sizeof(logo));
     if(logo[0]) {
         for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
-            if(strcmp(logos[i][0], logo) == 0) {
+            if (strcmp(logos[i][0], logo) == 0) {
                 config.logo = logos[i];
-                strcpy(default_logo, logos[i][0]);
-                strcpy(config.color, logos[i][1]);
-            }
-    }
 
+                // Ensure that 'default_logo' and 'config.color' have enough space for copying
+                strncpy(default_logo, logos[i][0], sizeof(default_logo) - 1);
+                default_logo[sizeof(default_logo) - 1] = '\0';  // Ensure null-termination
+
+                strncpy(config.color, logos[i][1], sizeof(config.color) - 1);
+                config.color[sizeof(config.color) - 1] = '\0';  // Ensure null-termination
+            }
     // color
     char color[16] = "";
     parse_config_str(conf, "default_color", color, sizeof(color));
@@ -182,12 +185,16 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
             {"white", "\033[37m"},
         };
 
-        for(int i = 0; i < 9; ++i)
-            if(strcmp(color, *colors[i]) == 0) {
-                strcpy(config.color, colors[i][1]);
-                strcpy(default_color, colors[i][1]);
+        for (int i = 0; i < 9; ++i)
+            if (strcmp(color, *colors[i]) == 0) {
+                // Use strncpy to safely copy the color string, ensuring no overflow
+                strncpy(config.color, colors[i][1], sizeof(config.color) - 1);
+                config.color[sizeof(config.color) - 1] = '\0';  // Ensure null-termination
+
+                strncpy(default_color, colors[i][1], sizeof(default_color) - 1);
+                default_color[sizeof(default_color) - 1] = '\0';  // Ensure null-termination
             }
-    }
+
 
     // dash
     parse_config_str(conf, "dash", config.dash, sizeof(config.dash));

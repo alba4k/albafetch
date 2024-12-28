@@ -59,7 +59,9 @@ void *file_to_logo(char *file) {
 
     for(int j = 0; j < 9; ++j)
         if(strcmp(buffer, *colors[j]) == 0)
-            strcpy(config.color, colors[j][1]);
+            strncpy(config.color, colors[j][1], sizeof(config.color) - 1);
+    config.color[sizeof(config.color) - 1] = '\0';  // Ensure null-termination
+
 
     mem = malloc(10240);
     memset(mem, 0, 1024);
@@ -139,15 +141,19 @@ void get_logo_line(char *dest, unsigned *line) {
     if(config.logo == NULL || dest == NULL || *line < 1)
         return;
         
-    if(config.logo[(*line)+1]) {
+    // Ensure dest has enough space before performing strncat
+    if (config.logo[(*line) + 1]) {
         ++(*line);
-        strcat(dest, config.logo[*line]);
+        // Use strncat instead of strcat to prevent buffer overflow
+        strncat(dest, config.logo[*line], sizeof(dest) - strlen(dest) - 1);
+    } else {
+        // Ensure dest has enough space to append spaces safely
+        size_t spaces_to_add = strlen(config.logo[2]);
+        for (size_t i = 0; i < spaces_to_add && strlen(dest) + 1 < sizeof(dest); ++i) {
+            strncat(dest, " ", sizeof(dest) - strlen(dest) - 1);
+        }
     }
-    else {
-        for(size_t i = 0; i < strlen_real(config.logo[2]); ++i)
-            strcat(dest, " ");
-    }
-}
+
 
 // print no more than maxlen visible characters of line
 void print_line(char *line, const size_t maxlen) {

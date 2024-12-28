@@ -53,13 +53,25 @@ int packages(char *dest) {
             }
         }
 
-        path[0] = 0;
-        if(prefix)
-            strncpy(path, prefix, 255);
-        strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
-        if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
+    path[0] = 0;  // Initialize path to an empty string
+    if (prefix) {
+        // Sanitize the prefix: Remove any potentially dangerous parts like "../"
+        sanitize_path(prefix, path, 255);  // This function should handle prefix sanitization
+    }
+    strncat(path, "/var/lib/dpkg/status", sizeof(path) - strlen(path) - 1);
+
+    // Validate if the path is safe (e.g., check if it is within the allowed directory)
+    if (is_safe_path(path)) {  // Implement a function to check if the path is within a safe directory
+        if (_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
             char line[512];
             int count = 0;
+            // Read and process the file
+        }
+    } else {
+        // Handle error: unsafe path
+        fprintf(stderr, "Unsafe path detected!\n");
+    }
+
 
             while(fgets(line, sizeof(line), fp)) {
                 // check if the line starts with "Package:"
