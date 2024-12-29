@@ -109,9 +109,12 @@ int cpu(char *dest) {
     if((end = strstr(cpu_info, " with Radeon Graphics")))
         *end = 0;
     if((end = strstr(cpu_info, "-Core Processor"))) {
-        end -= 4;
-        end = strchr(end, ' ');
-        *end = 0;
+        if(end >= cpu_info+5) {
+            end -= 5;
+            end = strchr(end, ' ');
+            if(end != NULL)
+                *end = 0;
+        }
     }
 
     if((_cpu_brand) == 0) {
