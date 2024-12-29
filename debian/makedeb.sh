@@ -1,6 +1,6 @@
-#/bin/bash
+#!/usr/bin/env bash
 
-version=$(../build/albafetch --version)
+version=$(../build/albafetch --version | cut -d " " -f 1)
 arch=$(uname -m)
 
 if [ "$arch" = "x86_64" ]; then
@@ -11,8 +11,8 @@ else
     arch="any"
 fi
 
-echo -e "\n\e[1m[\e[33mINFO\e[0m\e[1m]\e[0m Detected version $version."
-echo -e "\e[1m[\e[33mINFO\e[0m\e[1m]\e[0m Detected architecture $arch.\n"
+echo -e "\n\e[1m[\e[33mINFO\e[0m\e[1m]\e[0m Detected version $version"
+echo -e "\e[1m[\e[33mINFO\e[0m\e[1m]\e[0m Detected architecture $arch\n"
 
 dirname="albafetch_"$version"_"$arch
 
@@ -32,9 +32,9 @@ Essential: no
 Priority: optional
 Depends: libpci3
 Maintainer: Aaron Blasko
-Description: Faster neofetch alternative, written in C." > $dirname/DEBIAN/control
+Description: Faster neofetch alternative, written in C." > "$dirname"/DEBIAN/control
 
-dpkg-deb --build $dirname
+dpkg-deb --build "$dirname"
 
 echo -e -n "\n\e[1m\e[32mInstall Now\e[0m\e[1m [Y/n] ?\e[0m > "
 read -r -n 1 install
@@ -42,5 +42,5 @@ read -r -n 1 install
 if [ "$install" = "N" ] || [ "$install" = "n" ]; then
     echo -e "\n\e[1m[\e[32mDONE\e[0m\e[1m]\e[0m File created as $PWD/$dirname.deb"
 else
-    sudo dpkg -i $dirname.deb
+    sudo dpkg -i "$dirname.deb"
 fi

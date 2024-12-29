@@ -46,7 +46,6 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
     else
         memcpy(dest, ptr, len+1);
 
-
     *end = '"';
 
     return 0;
