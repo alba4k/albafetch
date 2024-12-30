@@ -1,6 +1,7 @@
 {
   lib,
   stdenv,
+  apple-sdk_12,
   meson,
   ninja,
   pciutils,
@@ -35,9 +36,12 @@ stdenv.mkDerivation {
 
   src = self;
 
-  buildInputs = [
-    sqlite
-  ] ++ lib.optional stdenv.hostPlatform.isLinux pciutils;
+  buildInputs =
+    [
+      sqlite
+    ]
+    ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_12
+    ++ lib.optional stdenv.hostPlatform.isLinux pciutils;
 
   nativeBuildInputs = [
     meson

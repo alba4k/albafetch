@@ -1,4 +1,4 @@
-.PHONY: compile
+.PHONY: all compile clean run debug deb install uninstall
 
 OS := $(shell uname -o 2> /dev/null)
 KERNEL := $(shell uname -s 2> /dev/null)
@@ -8,8 +8,6 @@ CONFIGPATH := /etc/xdg
 
 INSTALLFLAGS := -Dm755
 CONFIGFLAGS := -Dm644
-
-OS := $(shell uname -o 2> /dev/null)
 
 ifeq ($(OS),Android)
 	INSTALLPATH := $(PREFIX)/bin
@@ -29,7 +27,7 @@ build:
 	meson setup build
 
 clean:
-	meson setup build --wipe
+	rm -rf build
 
 compile: build
 	meson compile -C build albafetch
@@ -45,14 +43,12 @@ deb: compile
 	cd debian; \
 	./makedeb.sh
 
-install: build/albafetch
+install: compile
 	mkdir -p $(INSTALLPATH) $(CONFIGPATH)
 
 	install $(INSTALLFLAGS) build/albafetch $(INSTALLPATH)/albafetch
-
 	install $(CONFIGFLAGS) albafetch.conf $(CONFIGPATH)/albafetch.conf
 
 uninstall:
 	rm $(INSTALLPATH)/albafetch
-
 	rm $(CONFIGPATH)/albafetch.conf

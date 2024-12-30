@@ -46,6 +46,6 @@ void get_gpus(char **gpus) {
 
     pci_cleanup(pacc);  // close everything
 #else
-
-#endif // GLIB_EXISTS
+(void)gpus;
+#endif // LIBPCI_EXISTS
 }
