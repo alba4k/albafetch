@@ -13,7 +13,7 @@ int term(char *dest) {
 
     const char *terminals[][2] = {
      // {"ENVIRONMENT_VARIABLE", "terminal"},
-        {"ALACRITTY_SOCKET", "Alacritty"},
+        {"ALACRITTY_WINDOW_ID", "Alacritty"},
         {"KITTY_PID", "Kitty"},
         {"VSCODE_INJECTION", "VS Code"},
         {"TERMUX_VERSION", "Termux"},
@@ -36,6 +36,8 @@ int term(char *dest) {
         
         if(strcmp(terminal, "xterm-kitty") == 0)
             terminal = "Kitty";
+        else if(strcmp(terminal, "alacritty") == 0)
+            terminal = "Alacritty";
     }
 
     if(_term_ssh && getenv("SSH_CONNECTION"))
