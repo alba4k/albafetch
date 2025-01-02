@@ -27,7 +27,7 @@
 // get the number of installed packages
 int packages(char *dest) {
     dest[0] = 0;
-    char buf[256] = "", str[128] = "", path[256] = "";
+    char buf[256] = "", str[128] = "";
     DIR *dir;
     struct dirent *entry;
     unsigned count = 0;
@@ -36,6 +36,7 @@ int packages(char *dest) {
     #ifdef __linux__   // package managers that won't run on macOS
         FILE *fp;
         char *prefix = getenv("PREFIX");
+        char path[256];
 
         path[0] = 0;
         if(prefix)

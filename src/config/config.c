@@ -226,7 +226,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         "pwd_path",
         "kernel_type",
         "col_background",
-        "bat_status"
+        "bat_status",
         "swap_perc"
     };
 
