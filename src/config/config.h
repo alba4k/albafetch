@@ -12,28 +12,29 @@ struct Config {
     * 2. _title_color
     * 3. _os_arch
     * 4. _kernel_short
-    * 5. de_type
-    * 6. shell_path
-    * 7. term_ssh
-    * 8. pkg_mgr
-    * 9. pkg_pacman
-    * 10. pkg_dpkg
-    * 11. pkg_rpm
-    * 12. pkg_flatpak
-    * 13. pkg_snap
-    * 14. pkg_brew
-    * 15. pkg_pip
-    * 16. cpu_brand
-    * 17. cpu_freq
-    * 18. cpu_count
-    * 19. gpu_brand
-    * 20. mem_perc
-    * 21. loc_localhost
-    * 22. loc_docker
-    * 23. pwd_path
-    * 24. col_background
-    * 25. bat_status
-    * 26. [...]
+    * 5. _de_type
+    * 6. _shell_path
+    * 7. _term_ssh
+    * 8. _pkg_mgr
+    * 9. _pkg_pacman
+    * 10. _pkg_dpkg
+    * 11. _pkg_rpm
+    * 12. _pkg_flatpak
+    * 13. _pkg_snap
+    * 14. _pkg_brew
+    * 15. _pkg_pip
+    * 16. _cpu_brand
+    * 17. _cpu_freq
+    * 18. _cpu_count
+    * 19. _gpu_brand
+    * 20. _mem_perc
+    * 21. _loc_localhost
+    * 22. _loc_docker
+    * 23. _pwd_path
+    * 24. _col_background
+    * 25. _bat_status
+    * 26. _swap_perc
+    * [...]
     */
     uint64_t boolean_options;
 
@@ -68,6 +69,7 @@ struct Config {
     char cpu_prefix[64];
     char gpu_prefix[64];
     char mem_prefix[64];
+    char swap_prefix[64];
     char pub_prefix[64];
     char loc_prefix[64];
     char pwd_prefix[64];
@@ -105,5 +107,6 @@ extern struct Config config;
 #define _kernel_type     config.boolean_options & 0x1000000
 #define _col_background  config.boolean_options & 0x2000000
 #define _bat_status      config.boolean_options & 0x4000000
+#define _swap_perc       config.boolean_options & 0x8000000
 
 void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);

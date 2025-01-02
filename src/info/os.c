@@ -1,15 +1,11 @@
-#include "info.h"
-#include "../utils/queue.h"
-#include "../config/config.h"
-
 #include <stdio.h>
+#include <string.h>
 #include <sys/utsname.h>
 
-#ifdef __ANDROID__
-#include "../utils/utils.h"
-#else
-#include <string.h>
-#endif // __ANDROID__
+#include "info.h"
+#include "../config/config.h"
+#include "../utils/queue.h"
+#include "../utils/wrappers.h"
 
 // print the operating system name and architecture (uname -m)
 int os(char *dest) {
@@ -20,7 +16,7 @@ int os(char *dest) {
         if(_os_arch)
             snprintf(dest, 256, "macOS (%s)", name.machine);
         else
-            strncpy(dest, "macOS", 255);
+            safe_strncpy(dest, "macOS", 256);
     #else
     #ifdef __ANDROID__
         char version[16];
@@ -66,7 +62,7 @@ int os(char *dest) {
         if(_os_arch)
             snprintf(dest, 256, "%s (%s)", os_name, name.machine);
         else
-            strncpy(dest, os_name, 255);
+            safe_strncpy(dest, os_name, 256);
     #endif // __ANDROID__
     #endif // __APPLE__
 

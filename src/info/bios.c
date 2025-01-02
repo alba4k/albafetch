@@ -1,9 +1,10 @@
-#include "info.h"
-
 #include <string.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "info.h"
+#include "../utils/wrappers.h"
 
 // get the current BIOS vendor and version (Linux only!)
 int bios(char *dest) {
@@ -36,9 +37,9 @@ int bios(char *dest) {
     if(vendor != NULL && version != NULL)
         snprintf(dest, 256, "%s %s", vendor, version);
     else if(vendor != NULL)
-        strncpy(dest, vendor, 256);
+        safe_strncpy(dest, vendor, 256);
     else if(version != NULL)
-        strncpy(dest, version, 256);
+        safe_strncpy(dest, version, 256);
     else
         return 1;
 

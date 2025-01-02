@@ -8,24 +8,20 @@ project(
 )
 
 src = [
-  'src/utils/queue.c',
-  'src/utils/utils.c',
-  'src/optdeps/libpci.c',
-  'src/optdeps/glib.c',
   'src/config/config.c',
   'src/config/parsing.c',
   'src/info/battery.c',
   'src/info/bios.c',
   'src/info/colors.c',
   'src/info/cpu.c',
+  'src/info/cursor_theme.c',
   'src/info/date.c',
   'src/info/desktop.c',
   'src/info/gpu.c',
   'src/info/gtk_theme.c',
-  'src/info/icon_theme.c',
-  'src/info/cursor_theme.c',
   'src/info/host.c',
   'src/info/hostname.c',
+  'src/info/icon_theme.c',
   'src/info/info.h',
   'src/info/kernel.c',
   'src/info/light_colors.c',
@@ -37,9 +33,15 @@ src = [
   'src/info/public_ip.c',
   'src/info/pwd.c',
   'src/info/shell.c',
+  'src/info/swap.c',
   'src/info/term.c',
   'src/info/uptime.c',
   'src/info/user.c',
+  'src/optdeps/glib.c',
+  'src/optdeps/libpci.c',
+  'src/utils/queue.c',
+  'src/utils/utils.c',
+  'src/utils/wrappers.c',
 ]
 
 build_args = [

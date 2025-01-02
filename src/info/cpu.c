@@ -1,6 +1,3 @@
-#include "info.h"
-#include "../config/config.h"
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +5,10 @@
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #endif // __APPLE__
+
+#include "info.h"
+#include "../config/config.h"
+#include "../utils/wrappers.h"
 
 // get the cpu name and frequency
 int cpu(char *dest) {
@@ -126,7 +127,7 @@ int cpu(char *dest) {
             memmove(end, end+4, strlen(end+1));
     }
 
-    strncpy(dest, cpu_info, 256);
+    safe_strncpy(dest, cpu_info, 256);
     #ifdef __linux__
         free(buf);
     #endif

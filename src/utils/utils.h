@@ -23,7 +23,3 @@ void get_logo_line(char *dest, unsigned *line);
 void print_line(char *line, const size_t maxlen);
 
 void unescape(char *str);
-
-int exec_cmd(char *buf, size_t len, char *const *argv);
-
-size_t strlen_real(const char *str);

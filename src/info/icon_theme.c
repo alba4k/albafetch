@@ -1,12 +1,11 @@
 #include <string.h>
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
 #include "info.h"
 #include "../optdeps/optdeps.h"
-#include "../utils/utils.h"
+#include "../utils/wrappers.h"
 
 // get the current Icon Theme
 int icon_theme(char *dest){ 
@@ -27,7 +26,7 @@ int icon_theme(char *dest){
                     *ptr = 0;
             }
 
-            strncpy(dest, buf, 256);
+            safe_strncpy(dest, buf, 256);
             return 0;
         }
     }

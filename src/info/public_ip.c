@@ -1,5 +1,3 @@
-#include "info.h"
-
 #include <string.h>
 #include <stdlib.h>
 
@@ -7,7 +5,12 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-// Valgdrind complains about this. Absolutely no clue why it does.
+#include "info.h"
+#include "../utils/wrappers.h"
+
+// Also, this doesn't seem to be working with the Wifi of a Hotel I'm currently staying in
+// I wonder why. There seems to be no IP adress in buf, but using curl works just fine.
+// I should probably reimplement curl as optdep for fallback, idk
 
 // get the current public ip
 int public_ip(char *dest) {
@@ -52,7 +55,7 @@ int public_ip(char *dest) {
 
     close(socket_fd);
     freeaddrinfo(addrs);
-
+    
     /* buf should now look like this:
      * """
      * HTTP/1.1 200 OK
@@ -73,7 +76,7 @@ int public_ip(char *dest) {
 
     start += 3;
     
-    strncpy(dest, start, 256);
+    safe_strncpy(dest, start, 256);
 
     return 0;
 }

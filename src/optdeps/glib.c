@@ -15,9 +15,15 @@
 // use g_find_program_in_path() if glib can be used
 bool binary_in_path(const char *binary) {
 #ifdef GLIB_EXISTS
-return (g_find_program_in_path(binary) != NULL);
+    char *program = g_find_program_in_path(binary);
+    
+    if(program == NULL)
+        return false;
+
+    free(program);
+    return true;
 #else
-char *path_env = getenv("PATH");
+    char *path_env = getenv("PATH");
     if (path_env == NULL) {
         return false;
     }

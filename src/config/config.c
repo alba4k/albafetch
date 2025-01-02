@@ -227,6 +227,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         "kernel_type",
         "col_background",
         "bat_status"
+        "swap_perc"
     };
 
     bool buffer;
@@ -278,6 +279,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         {config.cpu_prefix, "cpu_prefix"},
         {config.gpu_prefix, "gpu_prefix"},
         {config.mem_prefix, "mem_prefix"},
+        {config.swap_prefix, "swap_prefix"},
         {config.pub_prefix, "pub_prefix"},
         {config.loc_prefix, "loc_prefix"},
         {config.pwd_prefix, "pwd_prefix"},

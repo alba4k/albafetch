@@ -1,6 +1,3 @@
-#include "info.h"
-#include "../config/config.h"
-
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,6 +5,10 @@
 #ifdef __ANDROID__
 #include <ctype.h>
 #endif // __ANDROID__
+
+#include "info.h"
+#include "../config/config.h"
+#include "../utils/wrappers.h"
 
 // get the battery percentage and status (Linux only!)
 int battery(char *dest) {
@@ -28,7 +29,7 @@ int battery(char *dest) {
             end = strchr(ptr, ',');
             if(end != NULL) {
                 *end = 0;
-                strncpy(capacity, ptr, 5);
+                safe_strncpy(capacity, ptr, 5);
             }
         }
 
@@ -44,7 +45,7 @@ int battery(char *dest) {
 
             if(end != NULL) {
                 *end = 0;
-                strncpy(status, ptr2, 20);
+                safe_strncpy(status, ptr2, 20);
             }
         }
     #else
@@ -71,7 +72,7 @@ int battery(char *dest) {
     else if(capacity[0] != 0)
         snprintf(dest, 256, "%s%%", capacity);
     else if(status[0] != 0 && (_bat_status))
-        strncpy(dest, status, 256);
+        safe_strncpy(dest, status, 256);
     else
         return 1;
 

@@ -1,5 +1,3 @@
-#include "info.h"
-
 #include <string.h>
 
 #include <stdio.h>
@@ -8,13 +6,18 @@
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
-#endif // __APPLE__
+#else
 #ifdef __ANDROID__
-#include "../utils/utils.h"
-
 #include <unistd.h>
 #include <sys/wait.h>
+
+#include "../utils/wrappers.h"
+#else
+#include "../utils/wrappers.h"
 #endif // __ANDROID__
+#endif // __APPLE__
+
+#include "info.h"
 
 // get the machine name and eventually model version
 int host(char *dest) {
@@ -79,9 +82,9 @@ int host(char *dest) {
         if(name && version && name_defined && version_defined)
             snprintf(dest, 256, "%s %s", name, version);
         else if(name && name_defined)
-            strncpy(dest, name, 256);
+            safe_strncpy(dest, name, 256);
         else if(version && version_defined)
-            strncpy(dest, version, 256);
+            safe_strncpy(dest, version, 256);
         else {
             free(name);
             free(version);

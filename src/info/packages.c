@@ -15,7 +15,7 @@
 #include "info.h"
 #include "../config/config.h"
 #include "../optdeps/optdeps.h"
-#include "../utils/utils.h"
+#include "../utils/wrappers.h"
 
 /*
  * I know that I could probably use specific libraries (like ALPM
@@ -39,7 +39,7 @@ int packages(char *dest) {
 
         path[0] = 0;
         if(prefix)
-            strncpy(path, prefix, 255);
+            safe_strncpy(path, prefix, 256);
         strncat(path, "/var/lib/pacman/local", 256-strlen(path));
         if(_pkg_pacman && (dir = opendir(path)) != NULL) {
             while((entry = readdir(dir)) != NULL)
@@ -55,7 +55,7 @@ int packages(char *dest) {
 
         path[0] = 0;
         if(prefix)
-            strncpy(path, prefix, 255);
+            safe_strncpy(path, prefix, 256);
         strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
         if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
             char line[512];
@@ -78,7 +78,7 @@ int packages(char *dest) {
 
         path[0] = 0;
         if(prefix)
-            strncpy(path, prefix, 255);
+            safe_strncpy(path, prefix, 256);
         strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
         if(_pkg_rpm && access(path, F_OK) == 0) {
             sqlite3 *db;
@@ -110,7 +110,7 @@ int packages(char *dest) {
 
         path[0] = 0;
         if(prefix)
-            strncpy(path, prefix, 255);
+            safe_strncpy(path, prefix, 256);
         strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
         if(_pkg_flatpak && (dir = opendir(path)) != NULL) {
             count = 0;
@@ -128,7 +128,7 @@ int packages(char *dest) {
 
         path[0] = 0;
         if(prefix)
-            strncpy(path, prefix, 255);
+            safe_strncpy(path, prefix, 256);
         strncat(path, "/var/snap", 256-strlen(path));
         if(_pkg_snap && (dir = opendir(path)) != NULL) {
             count = 0;

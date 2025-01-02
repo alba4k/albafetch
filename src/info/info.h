@@ -36,6 +36,8 @@ int gpu(char *dest);
 
 int memory(char *dest);
 
+int swap(char *dest);
+
 int public_ip(char *dest);
 
 int local_ip(char *dest);

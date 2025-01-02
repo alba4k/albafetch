@@ -1,10 +1,10 @@
-#include "info.h"
-#include "../config/config.h"
-
-#include <string.h>
-
 #include <sys/utsname.h>
 #include <stdio.h>
+#include <string.h>
+
+#include "info.h"
+#include "../config/config.h"
+#include "../utils/wrappers.h"
 
 // print the running kernel version (uname -r)
 int kernel(char *dest) {
@@ -25,7 +25,7 @@ int kernel(char *dest) {
     if(_kernel_type && type)
         snprintf(dest, 256, "%s (%s)", name.release, type);
     else
-        strncpy(dest, name.release, 256);
+        safe_strncpy(dest, name.release, 256);
 
     return 0;
 }

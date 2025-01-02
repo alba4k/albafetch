@@ -1,8 +1,3 @@
-#include "info.h"
-#include "../config/config.h"
-
-#include <string.h>
-
 #include <libgen.h>
 #include <stdlib.h>
 
@@ -10,6 +5,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #endif // __linux__
+
+#include "info.h"
+#include "../config/config.h"
+#include "../utils/wrappers.h"
 
 // get the parent process name (usually the shell)
 int shell(char *dest) {
@@ -25,11 +24,11 @@ int shell(char *dest) {
             fclose(fp);
 
             if(shell[0] == '-') { // cmdline is "-bash" when login shell
-                strncpy(dest, _shell_path ? shell+1 : basename(shell+1), 256);
+                safe_strncpy(dest, _shell_path ? shell+1 : basename(shell+1), 256);
                 return 0;
             }
 
-            strncpy(dest, _shell_path ? shell : basename(shell), 256);
+            safe_strncpy(dest, _shell_path ? shell : basename(shell), 256);
             return 0;
         }
     #endif
@@ -40,7 +39,7 @@ int shell(char *dest) {
     if(shell[0] == 0)
         return 1;
     
-    strncpy(dest, _shell_path ? shell : basename(shell), 256);
+    safe_strncpy(dest, _shell_path ? shell : basename(shell), 256);
 
     return 0;
 }

@@ -1,14 +1,14 @@
-#include "info.h"
-
-#include <string.h>
-
 #include <stdio.h>
+#include <string.h>
 
 #ifdef __APPLE__
 #include "../macos/bsdwrap.h"
 #else
 #include <sys/sysinfo.h>
 #endif // __APPLE__
+
+#include "info.h"
+#include "../utils/wrappers.h"
 
 // print the current uptime
 int uptime(char *dest) {
@@ -57,7 +57,7 @@ int uptime(char *dest) {
         strcat(result, str);
     }
 
-    strncpy(dest, result, 256);
+    safe_strncpy(dest, result, 256);
 
     return 0;
 }

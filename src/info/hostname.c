@@ -1,9 +1,9 @@
-#include "info.h"
-
-#include <string.h>
-
-#include <unistd.h>
 #include <limits.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "info.h"
+#include "../utils/wrappers.h"
 
 // idk why but this is sometimes not defined
 #ifndef HOST_NAME_MAX
@@ -23,7 +23,7 @@ int hostname(char *dest) {
     if(ptr)
         *ptr = 0;
 
-    strncpy(dest, hostname, 256);
+    safe_strncpy(dest, hostname, 256);
 
     return 0;
 }

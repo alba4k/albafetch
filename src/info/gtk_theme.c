@@ -1,12 +1,11 @@
 #include <string.h>
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
 #include "info.h"
 #include "../optdeps/optdeps.h"
-#include "../utils/utils.h"
+#include "../utils/wrappers.h"
 
 // get the current GTK Theme
 int gtk_theme(char *dest){ 
@@ -14,7 +13,7 @@ int gtk_theme(char *dest){
 
     // try using GTK_THEME (faster)
     if(theme) {
-        strncpy(dest, theme, 256);
+        safe_strncpy(dest, theme, 256);
 
         return 0;
     }
@@ -36,7 +35,7 @@ int gtk_theme(char *dest){
                     *ptr = 0;
             }
 
-            strncpy(dest, buf, 256);
+            safe_strncpy(dest, buf, 256);
             return 0;
         }
     }

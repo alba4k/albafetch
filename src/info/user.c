@@ -1,9 +1,8 @@
-#include "info.h"
-
-#include <string.h>
-
 #include <unistd.h>
 #include <pwd.h>
+
+#include "info.h"
+#include "../utils/wrappers.h"
 
 // print the current user
 int user(char *dest) {
@@ -17,7 +16,7 @@ int user(char *dest) {
 
     pw = getpwuid(uid);
 
-    strncpy(dest, pw->pw_name, 255);
+    safe_strncpy(dest, pw->pw_name, 256);
 
     return 0;
 }

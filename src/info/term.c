@@ -1,10 +1,10 @@
-#include "info.h"
-#include "../config/config.h"
-
-#include <string.h>
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "info.h"
+#include "../config/config.h"
+#include "../utils/wrappers.h"
 
 // get the current terminal
 int term(char *dest) {
@@ -43,7 +43,7 @@ int term(char *dest) {
     if(_term_ssh && getenv("SSH_CONNECTION"))
         snprintf(dest, 256, "%s (SSH)", terminal);
     else
-        strncpy(dest, terminal, 256);
+        safe_strncpy(dest, terminal, 256);
 
     return 0;
 }

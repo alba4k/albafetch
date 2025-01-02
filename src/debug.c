@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
         {cpu, "cpu"},
         {gpu, "gpu"},
         {memory, "memory"},
+        {swap, "swap"},
         {public_ip, "public_ip"},
         {local_ip, "local_ip"},
         {pwd, "pwd"},

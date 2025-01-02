@@ -3,9 +3,12 @@
 ## New Features
 
 ### Modules
+* Added a `swap` module that prints the used and total swap on linux
 
 ### Config syntax
 * Custom ascii arts will now print in the specified color by default
+* Added `swap_label`, the label for the new swa module
+* Added `swap_perc`, whether the used swap percentage should be printed
 
 ### Command line arguments
 * Added `--version` (`-v` for short), prints version and build commit
@@ -19,12 +22,13 @@
 ### Noticeable fixes
 * Packages should be counted faster for dpkg and especially snap
 * Alacritty will now be properly recognized even with `general.ipc_socket = false`
+* `gpu` should now print all gpus even when libpci doesn't work
 
 ### Technical fixes
 * Reduced the size of default logos
-* Moved some functions from `src/utils.c` to `src/config/config.c` and `src/config/config.c`.
-  Planning on rewriting config parsing and reducing `src/utils.c` even more.
-* Memory safety improvements in packages
+* Moved some functions from `src/utils/utils.c` to `src/config/config.c` and `src/config/config.c`.
+  Planning on rewriting config parsing and reducing `src/utils/utils.c` even more.
+* Minor memory safety improvements
 
 ## Dependencies
 * sqlite3 is now needed to build the project
