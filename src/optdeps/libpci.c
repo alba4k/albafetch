@@ -1,11 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "optdeps.h"
 #include "../config/config.h"
 
 #ifdef LIBPCI_EXISTS
 #include <pci/pci.h>
-#include <string.h>
 #else
 #include "../utils/utils.h"
 #include "../utils/wrappers.h"
