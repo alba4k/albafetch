@@ -71,5 +71,5 @@ __attribute__((pure)) size_t real_strlen(const char *str) {
 // Copy no more than N characters of SRC to DEST, but always guarantee null-termination
 void safe_strncpy(char *dest, const char *src, size_t n) {
     strncpy(dest, src, n-1);
-    dest[n] = 0;
+    dest[n-1] = 0;
 }
