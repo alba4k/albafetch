@@ -18,9 +18,10 @@ int cpu(char *dest) {
     char freq[24] = "";
 
     #ifdef __APPLE__
-        char buf[DEST_SIZE];
+        size_t BUF_SIZE = DEST_SIZE;
+        char buf[BUF_SIZE];
         buf[0] = 0;
-        sysctlbyname("machdep.cpu.brand_string", buf, &DEST_SIZE, NULL, 0);
+        sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
         if(buf[0] == 0)
             return 1;
