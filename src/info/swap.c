@@ -27,10 +27,10 @@ int swap(char *dest) {
 
         unsigned long usedswap = totalswap - freeswap;
 
-        snprintf(dest, 256, "%lu MiB / %lu MiB", usedswap/1024, totalswap/1024);
+        snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedswap/1024, totalswap/1024);
 
     if(_swap_perc) {
-        const size_t len = 256-strlen(dest);
+        const size_t len = DEST_SIZE-strlen(dest);
         char perc[len];
         
         snprintf(perc, len, " (%lu%%)", (unsigned long)((usedswap * 100) / totalswap));

@@ -37,7 +37,7 @@ int uptime(char *dest) {
     char hours = uptime/3600 - days*24;
     char mins = uptime/60 - days*1440 - hours*60;
 
-    char result[256] = "";
+    char result[DEST_SIZE] = "";
     char str[24] = "";
 
     if(days) {
@@ -57,7 +57,7 @@ int uptime(char *dest) {
         strcat(result, str);
     }
 
-    safe_strncpy(dest, result, 256);
+    safe_strncpy(dest, result, DEST_SIZE);
 
     return 0;
 }

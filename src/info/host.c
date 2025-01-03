@@ -22,7 +22,7 @@
 // get the machine name and eventually model version
 int host(char *dest) {
     #ifdef __APPLE__
-        size_t BUF_SIZE = 256;
+        size_t BUF_SIZE = DEST_SIZE;
         sysctlbyname("hw.model", dest, &BUF_SIZE, NULL, 0);
     #else
     #ifdef __ANDROID__
@@ -37,7 +37,7 @@ int host(char *dest) {
         if((brand[0] || model[0]) == 0)
             return 1;
 
-        snprintf(dest, 256, "%s%s%s", brand, brand[0] ? " " : "", model);
+        snprintf(dest, DEST_SIZE, "%s%s%s", brand, brand[0] ? " " : "", model);
     #else
         char *name = NULL, *version = NULL;
         FILE *fp = NULL;
@@ -80,11 +80,11 @@ int host(char *dest) {
         }
 
         if(name && version && name_defined && version_defined)
-            snprintf(dest, 256, "%s %s", name, version);
+            snprintf(dest, DEST_SIZE, "%s %s", name, version);
         else if(name && name_defined)
-            safe_strncpy(dest, name, 256);
+            safe_strncpy(dest, name, DEST_SIZE);
         else if(version && version_defined)
-            safe_strncpy(dest, version, 256);
+            safe_strncpy(dest, version, DEST_SIZE);
         else {
             free(name);
             free(version);

@@ -16,9 +16,9 @@ int battery(char *dest) {
     char status[20] = "";
     
     #ifdef __ANDROID__  // relies on termux api
-        char buf[256];
+        char buf[DEST_SIZE];
         char *args[] = {"termux-battery-status", NULL};
-        exec_cmd(buf, 256, args);
+        exec_cmd(buf, DEST_SIZE, args);
 
         char *ptr = strstr(buf, "percentage");
         char *ptr2 = strstr(buf, "status");
@@ -65,14 +65,14 @@ int battery(char *dest) {
 
     if(capacity[0] != 0 && status[0] != 0) {
         if((_bat_status))
-            snprintf(dest, 256, "%s%% (%s)", capacity, status);
+            snprintf(dest, DEST_SIZE, "%s%% (%s)", capacity, status);
         else
-            snprintf(dest, 256, "%s%%", capacity);
+            snprintf(dest, DEST_SIZE, "%s%%", capacity);
     }
     else if(capacity[0] != 0)
-        snprintf(dest, 256, "%s%%", capacity);
+        snprintf(dest, DEST_SIZE, "%s%%", capacity);
     else if(status[0] != 0 && (_bat_status))
-        safe_strncpy(dest, status, 256);
+        safe_strncpy(dest, status, DEST_SIZE);
     else
         return 1;
 

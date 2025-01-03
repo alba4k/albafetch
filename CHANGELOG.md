@@ -23,6 +23,7 @@
 * Packages should be counted faster for dpkg and especially snap
 * Alacritty will now be properly recognized even with `general.ipc_socket = false`
 * `gpu` should now print all gpus even when libpci doesn't work
+* fixed `pwd_path` not working
 
 ### Technical fixes
 * Reduced the size of default logos

@@ -23,9 +23,9 @@ int kernel(char *dest) {
     }
 
     if(_kernel_type && type)
-        snprintf(dest, 256, "%s (%s)", name.release, type);
+        snprintf(dest, DEST_SIZE, "%s (%s)", name.release, type);
     else
-        safe_strncpy(dest, name.release, 256);
+        safe_strncpy(dest, name.release, DEST_SIZE);
 
     return 0;
 }

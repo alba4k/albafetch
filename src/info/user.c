@@ -16,7 +16,7 @@ int user(char *dest) {
 
     pw = getpwuid(uid);
 
-    safe_strncpy(dest, pw->pw_name, 256);
+    safe_strncpy(dest, pw->pw_name, DEST_SIZE);
 
     return 0;
 }

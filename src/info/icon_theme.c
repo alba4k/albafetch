@@ -12,9 +12,9 @@ int icon_theme(char *dest){
     // try using gsettings
     // reading ~/.config/gtk-3.0/settings.ini could also be an option 
     if(binary_in_path("gsettings")) {
-        char buf[256] = "";
+        char buf[DEST_SIZE] = "";
         char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "icon-theme", NULL};
-        exec_cmd(buf, 256, args);
+        exec_cmd(buf, DEST_SIZE, args);
 
         // cleanup
         if(buf[0] != 0) {
@@ -26,7 +26,7 @@ int icon_theme(char *dest){
                     *ptr = 0;
             }
 
-            safe_strncpy(dest, buf, 256);
+            safe_strncpy(dest, buf, DEST_SIZE);
             return 0;
         }
     }

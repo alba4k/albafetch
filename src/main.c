@@ -163,8 +163,8 @@ int main(int argc, char **argv) {
             use_config = false;
     }
 
-    char data[256] = "";     // output of each module
-    char printed[1024] = ""; // line-by-line output of albafetch
+    char data[DEST_SIZE] = "";     // output of each module
+    char printed[DEST_SIZE*4] = ""; // line-by-line output of albafetch
     
     struct Module *modules = malloc(sizeof(struct Module));
     modules->id = NULL;
@@ -566,8 +566,8 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
         }
         else if(strcmp(current->id, "title") == 0) {    // titles are handled differently
-            char name[256];
-            char host[256];
+            char name[DEST_SIZE];
+            char host[DEST_SIZE];
 
             if(user(name) || hostname(host))
                 continue;

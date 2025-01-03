@@ -14,9 +14,9 @@ int os(char *dest) {
 
     #ifdef __APPLE__
         if(_os_arch)
-            snprintf(dest, 256, "macOS (%s)", name.machine);
+            snprintf(dest, DEST_SIZE, "macOS (%s)", name.machine);
         else
-            safe_strncpy(dest, "macOS", 256);
+            safe_strncpy(dest, "macOS", DEST_SIZE);
     #else
     #ifdef __ANDROID__
         char version[16];
@@ -24,9 +24,9 @@ int os(char *dest) {
         exec_cmd(version, 16, args);
 
         if(_os_arch)
-            snprintf(dest, 256, "Android %s%s(%s)", version, version[0] ? " " : "", name.machine);
+            snprintf(dest, DEST_SIZE, "Android %s%s(%s)", version, version[0] ? " " : "", name.machine);
         else
-            snprintf(dest, 256, "Android %s", version);
+            snprintf(dest, DEST_SIZE, "Android %s", version);
 
     #else
         FILE *fp = fopen("/etc/os-release", "r");
@@ -60,9 +60,9 @@ int os(char *dest) {
             *end = 0;
 
         if(_os_arch)
-            snprintf(dest, 256, "%s (%s)", os_name, name.machine);
+            snprintf(dest, DEST_SIZE, "%s (%s)", os_name, name.machine);
         else
-            safe_strncpy(dest, os_name, 256);
+            safe_strncpy(dest, os_name, DEST_SIZE);
     #endif // __ANDROID__
     #endif // __APPLE__
 

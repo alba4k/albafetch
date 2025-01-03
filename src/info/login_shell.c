@@ -9,8 +9,8 @@
 int login_shell(char *dest) {
     char *buf = getenv("SHELL");
 
-    if(buf && buf[0]) {
-        safe_strncpy(dest, _shell_path ? buf : basename(buf), 256);
+    if(buf != NULL) {
+        safe_strncpy(dest, _shell_path ? buf : basename(buf), DEST_SIZE);
         return 0;
     }
 

@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
     unsigned errors = 0;
     int return_value;
-    char mem[256];
+    char mem[DEST_SIZE];
 
     struct timeval start, end, start_all;
     double time;

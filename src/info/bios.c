@@ -35,11 +35,11 @@ int bios(char *dest) {
     }
 
     if(vendor != NULL && version != NULL)
-        snprintf(dest, 256, "%s %s", vendor, version);
+        snprintf(dest, DEST_SIZE, "%s %s", vendor, version);
     else if(vendor != NULL)
-        safe_strncpy(dest, vendor, 256);
+        safe_strncpy(dest, vendor, DEST_SIZE);
     else if(version != NULL)
-        safe_strncpy(dest, version, 256);
+        safe_strncpy(dest, version, DEST_SIZE);
     else
         return 1;
 

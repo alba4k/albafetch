@@ -17,14 +17,14 @@ void *file_to_logo(char *file) {
      * mem is assumed to be a 10 KiB buffer, aka 10240 B.
      * this will be filled in with up to 64 lines,
      * each of which can be up to 160 bytes long.
-     * (LINE_LEN * LINE_NUM) should equal this size.
+     * (LINE_LEN * LINE_COUNT) should equal this size.
      * Check out main.c, line 132
     */
     #define LINE_LEN 256
-    #define LINE_NUM 40
+    #define LINE_COUNT 40
 
     // where the final logo is saved
-    static char *logo[LINE_NUM + 1];
+    static char *logo[LINE_COUNT + 1];
     char *mem = NULL;
 
     char *buffer = NULL;
@@ -72,7 +72,7 @@ void *file_to_logo(char *file) {
     }
 
     // for every remaining line of the logo...
-    while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < LINE_NUM) {
+    while((line_len = getline(&buffer, &len, fp)) != (size_t)-1 && i < LINE_COUNT) {
         if(buffer[line_len-1] == '\n')
             buffer[line_len-1] = 0;
 

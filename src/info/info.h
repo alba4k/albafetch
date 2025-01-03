@@ -1,5 +1,7 @@
 #pragma once
 
+#define DEST_SIZE 256
+
 int user(char *dest);
 
 int hostname(char *dest);

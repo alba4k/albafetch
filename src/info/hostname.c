@@ -23,7 +23,7 @@ int hostname(char *dest) {
     if(ptr)
         *ptr = 0;
 
-    safe_strncpy(dest, hostname, 256);
+    safe_strncpy(dest, hostname, DEST_SIZE);
 
     return 0;
 }

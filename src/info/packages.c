@@ -27,7 +27,7 @@
 // get the number of installed packages
 int packages(char *dest) {
     dest[0] = 0;
-    char buf[256] = "", str[128] = "";
+    char buf[DEST_SIZE] = "", str[128] = "";
     DIR *dir;
     struct dirent *entry;
     unsigned count = 0;
@@ -49,7 +49,7 @@ int packages(char *dest) {
             closedir(dir);
 
             if(count) {
-                snprintf(dest, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (pacman)" : "");
+                snprintf(dest, DEST_SIZE, "%u%s", count, _pkg_mgr ? " (pacman)" : "");
                 done = true;
             }
         }
@@ -71,9 +71,9 @@ int packages(char *dest) {
             fclose(fp);
 
             if(count) {
-                snprintf(buf, 256, "%u%s", count, _pkg_mgr ? " (dpkg)" : "");
+                snprintf(buf, DEST_SIZE, "%u%s", count, _pkg_mgr ? " (dpkg)" : "");
                 done = true;
-                strncat(dest, buf, 256 - strlen(dest));
+                strncat(dest, buf, DEST_SIZE - strlen(dest));
             }
         }
 
@@ -97,9 +97,9 @@ int packages(char *dest) {
                 count = sqlite3_column_int(stmt, 0);
 
                 if(count > 0) {
-                    snprintf(buf, 255 - strlen(buf), "%s%s%s", done ? ", " : "", str, _pkg_mgr ? " (rpm)" : "");
+                    snprintf(buf, DEST_SIZE - strlen(buf), "%s%s%s", done ? ", " : "", str, _pkg_mgr ? " (rpm)" : "");
                     done = true;
-                    strncat(dest, buf, 256 - strlen(dest));
+                    strncat(dest, buf, DEST_SIZE - strlen(dest));
                 }
             }
 
@@ -121,9 +121,9 @@ int packages(char *dest) {
             closedir(dir);
 
             if(count) {
-                snprintf(buf, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (flatpak)" : "");
+                snprintf(buf, DEST_SIZE - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (flatpak)" : "");
                 done = true;
-                strncat(dest, buf, 256 - strlen(dest));
+                strncat(dest, buf, DEST_SIZE - strlen(dest));
             }
         }
 
@@ -139,9 +139,9 @@ int packages(char *dest) {
             closedir(dir);
 
             if(count) {
-                snprintf(buf, 255 - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (snap)" : "");
+                snprintf(buf, DEST_SIZE - strlen(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (snap)" : "");
                 done = true;
-                strncat(dest, buf, 256 - strlen(dest));
+                strncat(dest, buf, DEST_SIZE - strlen(dest));
             }
         }
     #endif
@@ -160,9 +160,9 @@ int packages(char *dest) {
                 closedir(dir);
 
                 if(count) {
-                    snprintf(buf, 256, "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (brew)" : "");
+                    snprintf(buf, DEST_SIZE, "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (brew)" : "");
                     done = true;
-                    strncat(dest, buf, 256 - strlen(dest));
+                    strncat(dest, buf, DEST_SIZE - strlen(dest));
                 }
             }
         }
@@ -173,9 +173,9 @@ int packages(char *dest) {
         exec_cmd(str, 16, args);
         
         if(str[0] != '0' && str[0]) {
-            snprintf(buf, 255 - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, _pkg_mgr ? " (pip)" : "");
+            snprintf(buf, DEST_SIZE - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str)-2, _pkg_mgr ? " (pip)" : "");
             done = true;
-            strncat(dest, buf, 256 - strlen(dest));
+            strncat(dest, buf, DEST_SIZE - strlen(dest));
         }
     }
 

@@ -18,10 +18,9 @@ int cpu(char *dest) {
     char freq[24] = "";
 
     #ifdef __APPLE__
-        size_t BUF_SIZE = 256;
-        char buf[BUF_SIZE];
+        char buf[DEST_SIZE];
         buf[0] = 0;
-        sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
+        sysctlbyname("machdep.cpu.brand_string", buf, &DEST_SIZE, NULL, 0);
 
         if(buf[0] == 0)
             return 1;
@@ -127,18 +126,18 @@ int cpu(char *dest) {
             memmove(end, end+4, strlen(end+1));
     }
 
-    safe_strncpy(dest, cpu_info, 256);
+    safe_strncpy(dest, cpu_info, DEST_SIZE);
     #ifdef __linux__
         free(buf);
     #endif
 
     if(freq[0])
-        strncat(dest, freq, 255-strlen(dest));
+        strncat(dest, freq, DEST_SIZE-1-strlen(dest));
 
     if(count && _cpu_count) {
         char core_count[16];
         snprintf(core_count, 16, " (%d) ", count);
-        strncat(dest, core_count, 255-strlen(dest));
+        strncat(dest, core_count, DEST_SIZE-1-strlen(dest));
     }
     // final cleanup ("Intel Core i5         650" lol)
     while((end = strstr(dest, "  ")))

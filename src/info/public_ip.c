@@ -76,7 +76,7 @@ int public_ip(char *dest) {
 
     start += 3;
     
-    safe_strncpy(dest, start, 256);
+    safe_strncpy(dest, start, DEST_SIZE);
 
     return 0;
 }

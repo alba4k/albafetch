@@ -23,7 +23,7 @@ int memory(char *dest) {
             return 1;
         }
 
-        snprintf(dest, 256, "%llu MiB / %llu MiB", usedram/1048576, totalram/1048576);
+        snprintf(dest, DEST_SIZE, "%llu MiB / %llu MiB", usedram/1048576, totalram/1048576);
     #else
         struct sysinfo info;
         if(sysinfo(&info))
@@ -38,10 +38,10 @@ int memory(char *dest) {
         if(fp == NULL)
             return 1;
 
-        char buf[256];
+        char buf[DEST_SIZE];
         char *cachedram = buf;
 
-        read_after_sequence(fp, "Cached:", buf, 256);
+        read_after_sequence(fp, "Cached:", buf, DEST_SIZE);
         fclose(fp);
 
         if(buf[0] == 0)
@@ -58,11 +58,11 @@ int memory(char *dest) {
         unsigned long usedram = totalram - freeram - atol(cachedram);
         // usedram -= sharedram;
 
-        snprintf(dest, 256, "%lu MiB / %lu MiB", usedram/1024, totalram/1024);
+        snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedram/1024, totalram/1024);
     #endif
 
     if(_mem_perc) {
-        const size_t len = 256-strlen(dest);
+        const size_t len = DEST_SIZE-strlen(dest);
         char perc[len];
         
         snprintf(perc, len, " (%lu%%)", (unsigned long)((usedram * 100) / totalram));

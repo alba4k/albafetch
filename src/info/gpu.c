@@ -81,8 +81,8 @@ int gpu(char *dest) {
 
         // (finally) writing the GPU(s) into dest
         if(i > 0)
-            strncat(dest, ", ", 256-strlen(dest));
-        strncat(dest, gpus[i], 256-strlen(dest));
+            strncat(dest, ", ", DEST_SIZE-strlen(dest));
+        strncat(dest, gpus[i], DEST_SIZE-1-strlen(dest));
     }
 
     return 0;

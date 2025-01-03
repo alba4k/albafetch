@@ -11,7 +11,7 @@
 int local_ip(char *dest) {
     struct ifaddrs *addrs=NULL;
     bool done = false;
-    int buf_size = 256;
+    int buf_size = DEST_SIZE;
     
     getifaddrs(&addrs);
 

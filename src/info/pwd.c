@@ -1,3 +1,5 @@
+#include <libgen.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "info.h"
@@ -6,17 +8,17 @@
 
 // get the current working directory
 int pwd(char *dest) {
-    if((_pwd_path) == 0) {
-        char buf[256];
+    #ifdef __APPLE__
+    char *pwd = getcwd(NULL, DEST_SIZE);
+    #else
+    char *pwd = getcwd(NULL, 0);
+    #endif // __APPLE__
 
-        if(getcwd(buf, 256) == NULL)
-            return 1;
-
-        safe_strncpy(dest, buf, 256);
-    }
-
-    if(getcwd(dest, 256) == NULL)
+    if(pwd == NULL)
         return 1;
+    
+    safe_strncpy(dest, _pwd_path ? pwd : basename(pwd), DEST_SIZE);
+    free(pwd);
 
     return 0;
 }

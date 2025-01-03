@@ -28,7 +28,7 @@ int desktop(char *dest) {
 
         if(_de_type) {
             if(getenv("WAYLAND_DISPLAY"))
-                strncat(dest, " (Wayland)", 255-strlen(dest));
+                strncat(dest, " (Wayland)", DEST_SIZE-strlen(dest));
             else if((desktop = getenv("XDG_SESSION_TYPE"))) {
                 if(desktop[0] == 0)
                     return 0;
@@ -36,7 +36,7 @@ int desktop(char *dest) {
                 
                 char buf[32];
                 snprintf(buf, 32, " (%s) ", desktop);
-                strncat(dest, buf, 255-strlen(dest));
+                strncat(dest, buf, DEST_SIZE-1-strlen(dest));
             }
         }
     #endif
