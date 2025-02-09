@@ -41,7 +41,7 @@ int packages(char *dest) {
         path[0] = 0;
         if(prefix)
             safe_strncpy(path, prefix, 256);
-        strncat(path, "/var/lib/pacman/local", 256-strlen(path));
+        strncat(path, "/var/lib/pacman/local", 255-strlen(path));
         if(_pkg_pacman && (dir = opendir(path)) != NULL) {
             while((entry = readdir(dir)) != NULL)
                 if(entry->d_type == DT_DIR && entry->d_name[0] != '.')
@@ -57,7 +57,7 @@ int packages(char *dest) {
         path[0] = 0;
         if(prefix)
             safe_strncpy(path, prefix, 256);
-        strncat(path, "/var/lib/dpkg/status", 256-strlen(path));
+        strncat(path, "/var/lib/dpkg/status", 255-strlen(path));
         if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
             char line[512];
             int count = 0;
@@ -80,7 +80,7 @@ int packages(char *dest) {
         path[0] = 0;
         if(prefix)
             safe_strncpy(path, prefix, 256);
-        strncat(path, "/var/lib/rpm/rpmdb.sqlite", 256-strlen(path));
+        strncat(path, "/var/lib/rpm/rpmdb.sqlite", 255-strlen(path));
         if(_pkg_rpm && access(path, F_OK) == 0) {
             sqlite3 *db;
             sqlite3_stmt *stmt;
@@ -112,7 +112,7 @@ int packages(char *dest) {
         path[0] = 0;
         if(prefix)
             safe_strncpy(path, prefix, 256);
-        strncat(path, "/var/lib/flatpak/runtime", 256-strlen(path));
+        strncat(path, "/var/lib/flatpak/runtime", 255-strlen(path));
         if(_pkg_flatpak && (dir = opendir(path)) != NULL) {
             count = 0;
             while((entry = readdir(dir)) != NULL)
@@ -130,7 +130,7 @@ int packages(char *dest) {
         path[0] = 0;
         if(prefix)
             safe_strncpy(path, prefix, 256);
-        strncat(path, "/var/snap", 256-strlen(path));
+        strncat(path, "/var/snap", 255-strlen(path));
         if(_pkg_snap && (dir = opendir(path)) != NULL) {
             count = 0;
             while((entry = readdir(dir)) != NULL)

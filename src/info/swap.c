@@ -27,6 +27,9 @@ int swap(char *dest) {
 
         unsigned long usedswap = totalswap - freeswap;
 
+        if(totalswap*freeswap == 0) // one or the other
+            return 1;
+
         snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedswap/1024, totalswap/1024);
 
     if(_swap_perc) {
