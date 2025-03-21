@@ -37,5 +37,8 @@ int local_ip(char *dest) {
 
     freeifaddrs(first);
     
-    return !done;
+    if(done)
+        return RET_OK;
+    else
+        return ERR_NO_INFO;
 }

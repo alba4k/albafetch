@@ -99,7 +99,7 @@ albafetch accepts a few command line arguments, which can be used to override ce
 A short explanation of what every argument does, including every accepted and default value, can be obtained by running `albafetch --help`
 
 Here they are:
-* `--help` (or `-h`): Prints a small guide on the program usage and return 0.
+* `--help` (or `-h`): Prints a small guide on the program usage and return RET_OK.
 * `--color` (or `-c`): Followed by the color you want to set, this option will override the config `default_color` entry and set a custom color for the whole output.
 * `--bold` (or `-b`): Followed by a boolean "on" or "off", this option overrides the config `bold` entry and enables or disables the usage of bold in the output.
 * `--logo` (or `-l`): This option, followed by the logo you want to print, overrides the config `logo` entry and makes albafetch print a custom logo instead of the default one.

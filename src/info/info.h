@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../utils/return.h"
+
 #define DEST_SIZE 256
 
 int user(char *dest);

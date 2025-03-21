@@ -35,7 +35,7 @@ int host(char *dest) {
         exec_cmd(model, 64, model_args);
 
         if((brand[0] || model[0]) == 0)
-            return 1;
+            return ERR_NO_INFO;
 
         snprintf(dest, DEST_SIZE, "%s%s%s", brand, brand[0] ? " " : "", model);
     #else
@@ -49,6 +49,8 @@ int host(char *dest) {
             rewind(fp);
 
             name = malloc(len);
+            if(name == NULL)
+                return ERR_OOM;
             name[fread(name, 1, len, fp) - 1] = 0;
             
             fclose(fp);
@@ -60,6 +62,8 @@ int host(char *dest) {
             rewind(fp);
 
             version = malloc(len);
+            if(version == NULL)
+                return ERR_OOM;
             version[fread(version, 1, len, fp) - 1] = 0;
 
             fclose(fp);
@@ -89,7 +93,7 @@ int host(char *dest) {
             free(name);
             free(version);
 
-            return 1;
+            return ERR_NO_INFO;
         }
 
         free(name);
@@ -97,5 +101,5 @@ int host(char *dest) {
     #endif // __ANDROID__
     #endif // __APPLE__
 
-    return 0;
+    return RET_OK;
 }

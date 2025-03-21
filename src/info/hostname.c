@@ -25,5 +25,5 @@ int hostname(char *dest) {
 
     safe_strncpy(dest, hostname, DEST_SIZE);
 
-    return 0;
+    return RET_OK;
 }

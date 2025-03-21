@@ -16,19 +16,19 @@ int swap(char *dest) {
     #ifdef __APPLE__ 
         // don't really know how to do it and am too lazy to research it, so...
         (void)dest;
-        return 1;
+        return ERR_UNSUPPORTED;
     #else
         struct sysinfo info;
         if(sysinfo(&info))
-            return 1;
+            return ERR_NO_INFO;
 
         unsigned long totalswap = info.totalswap / 1024;
         unsigned long freeswap = info.freeswap / 1024;
 
-        unsigned long usedswap = totalswap - freeswap;
-
         if(totalswap*freeswap == 0) // one or the other
-            return 1;
+            return ERR_NO_INFO;
+            
+        unsigned long usedswap = totalswap - freeswap;
 
         snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedswap/1024, totalswap/1024);
 
@@ -41,5 +41,5 @@ int swap(char *dest) {
     }
     #endif
 
-    return 0;
+    return RET_OK;
 }

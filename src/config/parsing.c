@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "../utils/return.h"
+
 // TODO: rewrite config parsing from scratch
 
 /*

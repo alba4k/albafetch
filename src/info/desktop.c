@@ -22,7 +22,7 @@ int desktop(char *dest) {
                             // strcmp("linux", getenv("TERM") == 0 ? "none" :      // running in tty
                             NULL;
         if(desktop == NULL)
-            return 1;
+            return ERR_NO_INFO;
 
         strcpy(dest, desktop);
 
@@ -31,7 +31,7 @@ int desktop(char *dest) {
                 strncat(dest, " (Wayland)", DEST_SIZE-strlen(dest));
             else if((desktop = getenv("XDG_SESSION_TYPE"))) {
                 if(desktop[0] == 0)
-                    return 0;
+                    return RET_OK;
                 desktop[0] = toupper(desktop[0]);
                 
                 char buf[32];
@@ -41,5 +41,5 @@ int desktop(char *dest) {
         }
     #endif
 
-    return 0;
+    return RET_OK;
 }

@@ -15,7 +15,7 @@ int gtk_theme(char *dest){
     if(theme) {
         safe_strncpy(dest, theme, DEST_SIZE);
 
-        return 0;
+        return RET_OK;
     }
 
     // try using gsettings (fallback)
@@ -36,9 +36,9 @@ int gtk_theme(char *dest){
             }
 
             safe_strncpy(dest, buf, DEST_SIZE);
-            return 0;
+            return RET_OK;
         }
     }
 
-    return 1;
+    return ERR_UNSUPPORTED;
 }

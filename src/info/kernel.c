@@ -27,5 +27,5 @@ int kernel(char *dest) {
     else
         safe_strncpy(dest, name.release, DEST_SIZE);
 
-    return 0;
+    return RET_OK;
 }

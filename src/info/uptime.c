@@ -19,7 +19,7 @@ int uptime(char *dest) {
         error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
         if(error < 0)
-            return 1;
+            return ERR_NO_INFO;
 
         time_t boot_seconds = boottime.tv_sec;
         time_t current_seconds = time(NULL);
@@ -28,7 +28,7 @@ int uptime(char *dest) {
     #else
         struct sysinfo info;
         if(sysinfo(&info))
-            return 1;
+            return ERR_NO_INFO;
 
         const long uptime = info.uptime;
     #endif // __APPLE__
@@ -59,5 +59,5 @@ int uptime(char *dest) {
 
     safe_strncpy(dest, result, DEST_SIZE);
 
-    return 0;
+    return RET_OK;
 }
