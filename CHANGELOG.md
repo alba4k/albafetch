@@ -16,6 +16,7 @@
 ### Other changes
 * added a logo for [Rocky Linux](https://rockylinux.org)
 * updated the [Garuda Linux](https://garudalinux.org) logo
+* changed return values to be more clear than 0 or 1
 
 ## Bug fixes
 
@@ -24,6 +25,7 @@
 * Alacritty will now be properly recognized even with `general.ipc_socket = false`
 * `gpu` should now print all gpus even when libpci doesn't work
 * fixed `pwd_path` not working
+* should now exit on OOM, not segfault
 
 ### Technical fixes
 * Reduced the size of default logos

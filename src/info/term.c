@@ -32,7 +32,7 @@ int term(char *dest) {
         if(terminal == NULL)
             terminal = getenv("TERM");
         if(terminal == NULL)
-            return 1;
+            return ERR_NO_INFO;
         
         if(strcmp(terminal, "xterm-kitty") == 0)
             terminal = "Kitty";
@@ -45,5 +45,5 @@ int term(char *dest) {
     else
         safe_strncpy(dest, terminal, DEST_SIZE);
 
-    return 0;
+    return RET_OK;
 }

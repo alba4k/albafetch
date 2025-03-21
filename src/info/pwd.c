@@ -15,10 +15,10 @@ int pwd(char *dest) {
     #endif // __APPLE__
 
     if(pwd == NULL)
-        return 1;
+        return ERR_NO_INFO;
     
     safe_strncpy(dest, _pwd_path ? pwd : basename(pwd), DEST_SIZE);
     free(pwd);
 
-    return 0;
+    return RET_OK;
 }

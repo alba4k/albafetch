@@ -33,7 +33,7 @@ int os(char *dest) {
         if(fp == NULL) {
             fp = fopen("/usr/lib/os-release", "r");
             if(fp == NULL)
-                return 1;
+                return ERR_NO_FILE;
         }
 
         char buf[64];
@@ -44,10 +44,10 @@ int os(char *dest) {
         fclose(fp);
 
         if(buf[0] == 0)
-            return 1;
+            return ERR_PARSING;
 
         if((end = strchr(os_name, '\n')) == 0)
-            return 1;
+            return ERR_PARSING + 0x10;
         *end = 0;
 
         // sometimes we have something like `ID="distro"`. yeah its stupid
@@ -66,5 +66,5 @@ int os(char *dest) {
     #endif // __ANDROID__
     #endif // __APPLE__
 
-    return 0;
+    return RET_OK;
 }

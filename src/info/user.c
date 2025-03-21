@@ -11,12 +11,12 @@ int user(char *dest) {
     unsigned uid = geteuid();
     if((int)uid == -1) {
         // couldn't get UID
-        return 1;
+        return ERR_NO_INFO;
     }
 
     pw = getpwuid(uid);
 
     safe_strncpy(dest, pw->pw_name, DEST_SIZE);
 
-    return 0;
+    return RET_OK;
 }

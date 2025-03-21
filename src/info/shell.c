@@ -25,21 +25,21 @@ int shell(char *dest) {
 
             if(shell[0] == '-') { // cmdline is "-bash" when login shell
                 safe_strncpy(dest, _shell_path ? shell+1 : basename(shell+1), DEST_SIZE);
-                return 0;
+                return RET_OK;
             }
 
             safe_strncpy(dest, _shell_path ? shell : basename(shell), DEST_SIZE);
-            return 0;
+            return RET_OK;
         }
     #endif
 
     char *shell = getenv("SHELL");
     if(shell == NULL)
-        return 1;
+        return ERR_NO_INFO;
     if(shell[0] == 0)
-        return 1;
+        return ERR_NO_INFO + 0x10;
     
     safe_strncpy(dest, _shell_path ? shell : basename(shell), DEST_SIZE);
 
-    return 0;
+    return RET_OK;
 }

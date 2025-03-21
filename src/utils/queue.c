@@ -3,12 +3,17 @@
 #include <string.h>
 
 #include "queue.h"
+#include "../utils/return.h"
 
 Queue *queue_with_size(size_t size) {
     Queue *q = malloc(sizeof(Queue));
+    if(q == NULL)
+        return NULL;
 
     size_t byte_size = sizeof(char) * size;
     q->data = malloc(byte_size);
+    if(q->data == NULL)
+        return NULL;
     memset(q->data, 0, byte_size);
 
     q->alloc_size = size;
@@ -22,7 +27,7 @@ int requeue(Queue *q) {
     // If there is no available space,
     // requeueing won't do anything.
     if(q->size == q->alloc_size)
-        return -1;
+        return ERR_GENERIC;
     
     size_t used_byte_size = sizeof(char) * q->size;
     char buf[q->size];
@@ -33,7 +38,7 @@ int requeue(Queue *q) {
     memcpy(q->data, buf, used_byte_size);
     q->offset = 0;
 
-    return 0;
+    return RET_OK;
 }
 
 int enqueue(Queue *q, char val) {
@@ -82,6 +87,8 @@ void destroy_queue(Queue *q) {
 void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size) {
     size_t seq_size = strlen(seq);
     Queue *q = queue_with_size(3 * seq_size);
+    if(q == NULL)
+        return;
     int ch;
     int error;
     bool found = false;

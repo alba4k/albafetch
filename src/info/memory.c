@@ -20,14 +20,14 @@ int memory(char *dest) {
         bytes_t totalram = system_mem_size();
 
         if(usedram == 0 || totalram == 0) { 
-            return 1;
+            return ERR_NO_INFO;
         }
 
         snprintf(dest, DEST_SIZE, "%llu MiB / %llu MiB", usedram/1048576, totalram/1048576);
     #else
         struct sysinfo info;
         if(sysinfo(&info))
-            return 1;
+            return ERR_NO_INFO;
 
         unsigned long totalram = info.totalram / 1024;
         unsigned long freeram = info.freeram / 1024;
@@ -36,7 +36,7 @@ int memory(char *dest) {
         FILE *fp = fopen("/proc/meminfo", "r");
 
         if(fp == NULL)
-            return 1;
+            return ERR_NO_FILE;
 
         char buf[DEST_SIZE];
         char *cachedram = buf;
@@ -45,13 +45,13 @@ int memory(char *dest) {
         fclose(fp);
 
         if(buf[0] == 0)
-            return 1;
+            return ERR_PARSING;
         cachedram += 2;
 
         char *end = strstr(cachedram, " kB");
         
         if(end == NULL)
-            return 1;
+            return ERR_PARSING + 0x10;
         
         *end = 0;
 
@@ -69,5 +69,5 @@ int memory(char *dest) {
         strcat(dest, perc);
     }
 
-    return 0;
+    return RET_OK;
 }

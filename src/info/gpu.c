@@ -34,27 +34,27 @@ int gpu(char *dest) {
 
             gpus[0] = strstr(buf, "Chipset Model: ");
             if(gpus[0] == 0)
-                return 1;
+                return ERR_NO_INFO;
             gpus[0] += 15;
             char *end = strchr(gpus[0], '\n');
             if(end == NULL)
-                return 1;
+                return ERR_PARSING;
             *end = 0;
         }
     #else
     #ifdef __ANDROID__
-        return 1;
+        return ERR_UNSUPPORTED;
     #else
         get_gpus(gpus);
     #endif // __ANDROID__
     #endif // __APPLE__
 
     if(gpus[0] == NULL)
-        return 1;
+        return ERR_NO_INFO;
 
     // this next part is just random cleanup
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
-    //  yk it's decent and yk it works
+    //  yk it's decent and it works
     dest[0] = 0;
     for(unsigned i = 0; i < sizeof(gpus)/sizeof(gpus[0]) && gpus[i] != NULL; ++i) {
         if((_gpu_brand) == 0) {
@@ -85,5 +85,5 @@ int gpu(char *dest) {
         strncat(dest, gpus[i], DEST_SIZE-1-strlen(dest));
     }
 
-    return 0;
+    return RET_OK;
 }

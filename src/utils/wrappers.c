@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 
 #include "wrappers.h"
+#include "return.h"
 
 // Run a command using execvp and copy the output into buf
 int exec_cmd(char *buf, size_t len, char *const *argv) {
@@ -11,7 +12,7 @@ int exec_cmd(char *buf, size_t len, char *const *argv) {
     int stdout_pipes[2];
 
     if(pipe(stdout_pipes) != 0 || pipe(stderr_pipes) != 0)
-        return 1;
+        return ERR_GENERIC;
 
     if(fork() == 0) {
         close(stdout_pipes[0]);
@@ -31,13 +32,13 @@ int exec_cmd(char *buf, size_t len, char *const *argv) {
     buf[read(stdout_pipes[0], buf, len) - 1] = 0;
     close(stdout_pipes[0]);
 
-    return 0;
+    return RET_OK;
 }
 
 // get the printed length of a string (not how big it is in memory)
 __attribute__((pure)) size_t real_strlen(const char *str) {
     if(str == NULL)
-        return 0;
+        return RET_OK;
 
     size_t len = 0;
 

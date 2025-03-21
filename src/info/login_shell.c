@@ -11,8 +11,8 @@ int login_shell(char *dest) {
 
     if(buf != NULL) {
         safe_strncpy(dest, _shell_path ? buf : basename(buf), DEST_SIZE);
-        return 0;
+        return RET_OK;
     }
 
-    return 1;
+    return ERR_NO_INFO;
 }

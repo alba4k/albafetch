@@ -58,6 +58,8 @@ void get_gpus(char **gpus) {
     char *temp_gpus[] = {NULL, NULL, NULL};
 
     char *lspci = malloc(0x2000);
+    if(lspci == NULL)
+        return ERR_OOM;
     char *args[] = {"lspci", "-mm", NULL};
     exec_cmd(lspci, 0x2000, args);
     char *current = lspci;

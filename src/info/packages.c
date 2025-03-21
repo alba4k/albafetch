@@ -179,5 +179,8 @@ int packages(char *dest) {
         }
     }
 
-    return !done;
+    if(done)
+        return RET_OK;
+    else
+        return ERR_NO_INFO;
 }

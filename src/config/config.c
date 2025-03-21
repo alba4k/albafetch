@@ -1,6 +1,7 @@
 #include "config.h"
 #include "parsing.h"
-#include "../logos.h"
+#include "../utils/logos.h"
+#include "../utils/return.h"
 #include "../utils/utils.h"
 
 #define _GNU_SOURCE
@@ -18,22 +19,22 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
     // looks for the keyword
     ptr = strstr(source, field);
     if(ptr == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // looks for the opening "
     ptr = strchr(ptr, '"');
     if(ptr == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // checks whether the string continues after
     ++ptr;
     if(*ptr == 0)
-        return 1;
+        return ERR_PARSING;
 
     // looks for the closing "
     end = strchr(ptr, '"');
     if(end == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // copies the option
     *end = 0;
@@ -48,7 +49,7 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 
     *end = '"';
 
-    return 0;
+    return RET_OK;
 }
 
 // a return code of 0 means that the option was parsed successfully
@@ -58,22 +59,22 @@ int parse_config_int(const char *source, const char *field, int *dest, const uns
     // looks for the keyword
     ptr = strstr(source, field);
     if(ptr == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // looks for the opening "
     ptr = strchr(ptr, '"');
     if(ptr == NULL)
-        return 1;
+        return ERR_PARSING;
         
     // checks whether the string continues after
     ++ptr;
     if(*ptr == 0)
-        return 1;
+        return ERR_PARSING;
 
     // looks for the closing "
     end = strchr(ptr, '"');
     if(end == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // copies the option
     *end = 0;
@@ -81,11 +82,11 @@ int parse_config_int(const char *source, const char *field, int *dest, const uns
     *end = '"';
 
     if((unsigned)num > max)
-        return 1;
+        return ERR_PARSING;
 
     *dest =  num;
 
-    return 0;
+    return RET_OK;
 }
 
 // a return code of 0 means that the option was parsed successfully
@@ -95,29 +96,29 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
     // looks for the keyword
     ptr = strstr(source, field);
     if(ptr == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // looks for the opening "
     ptr = strchr(ptr, '"');
     if(ptr == NULL)
-        return 1;
+        return ERR_PARSING;
         
     // checks whether the string continues after
     ++ptr;
     if(*ptr == 0)
-        return 1;
+        return ERR_PARSING;
 
     // looks for the closing "
     end = strchr(ptr, '"');
     if(end == NULL)
-        return 1;
+        return ERR_PARSING;
 
     // copies the option
     *end = 0;
     *dest = strcmp(ptr, "false");
     *end = '"';
 
-    return 0;
+    return RET_OK;
 }
 
 // parse the provided config file
@@ -131,7 +132,9 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     size_t len = (size_t)ftell(fp);
     rewind(fp);
     
-    char *conf = malloc(len+1);
+    char *conf = malloc(len);
+    if(conf == NULL)
+        return;
     conf[fread(conf, 1, len, fp)] = 0;
     fclose(fp);
 

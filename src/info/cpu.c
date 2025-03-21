@@ -24,7 +24,7 @@ int cpu(char *dest) {
         sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
         if(buf[0] == 0)
-            return 1;
+            return ERR_NO_INFO;
 
         if((_cpu_freq) == 0) {
             if((end = strstr(buf, " @")))
@@ -37,9 +37,11 @@ int cpu(char *dest) {
     #else
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(fp == NULL)
-        return 1;
+        return ERR_NO_FILE;
 
-    char *buf = malloc(0x10001);
+    char *buf = malloc(0x10000);
+    if(buf == NULL)
+        return ERR_OOM;
     buf[fread(buf, 1, 0x10000, fp)] = 0;
     fclose(fp);
 
@@ -55,7 +57,7 @@ int cpu(char *dest) {
     cpu_info = strstr(cpu_info, "model name");
     if(cpu_info == NULL) {
         free(buf);
-        return 1;
+        return ERR_PARSING;
     }
 
     cpu_info += 13;
@@ -67,7 +69,7 @@ int cpu(char *dest) {
         end = strchr(cpu_info, '\n');
         if(end == NULL) {
             free(buf);
-            return 1;
+            return ERR_PARSING + 0x10;
         }
             
         *end = 0;
@@ -144,5 +146,5 @@ int cpu(char *dest) {
     while((end = strstr(dest, "  ")))
         memmove(end, end+1, strlen(end));
 
-    return 0;
+    return RET_OK;
 }

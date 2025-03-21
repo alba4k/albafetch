@@ -14,5 +14,5 @@ int colors(char *dest) {
 
     strcat(dest, "\033[0m");
 
-    return 0;
+    return RET_OK;
 }

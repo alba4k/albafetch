@@ -1,4 +1,5 @@
 #include "macos_infos.h"
+#include "../utils/return.h"
 
 /* STATIC HELPERS */
 
@@ -30,7 +31,7 @@ static int get_stats(struct vm_statistics *stat, mach_port_t host) {
     if(error != KERN_SUCCESS)
         return error;
 
-    return 0;
+    return RET_OK;
 }
 #else
 static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
@@ -45,7 +46,7 @@ static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
     if(error != KERN_SUCCESS)
         return error;
 
-    return 0;
+    return RET_OK;
 }
 #endif
 
@@ -60,7 +61,7 @@ bytes_t system_mem_size(void) {
     // Since no computer should have 0 bytes of memory,
     // 0 indicates failure.
     if(error < 0)
-        return 0;
+        return RET_OK;
 
     return size;
 }
@@ -72,7 +73,7 @@ bytes_t used_mem_size(void) {
 
     struct vm_statistics vm_stat;
     if(get_stats(&vm_stat, host) < 0)
-        return 0;
+        return RET_OK;
 
     active   = vm_stat.active_count;
     wired    = vm_stat.wire_count;
@@ -85,7 +86,7 @@ bytes_t used_mem_size(void) {
 
     struct vm_statistics64 vm_stat;
     if(get_stats(&vm_stat, host) < 0)
-        return 0;
+        return RET_OK;
 
     internal   = vm_stat.internal_page_count - vm_stat.purgeable_count;
     wired      = vm_stat.wire_count;

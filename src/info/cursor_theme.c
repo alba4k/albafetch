@@ -27,9 +27,9 @@ int cursor_theme(char *dest){
             }
 
             safe_strncpy(dest, buf, DEST_SIZE);
-            return 0;
+            return RET_OK;
         }
     }
 
-    return 1;
+    return ERR_UNSUPPORTED;
 }

@@ -18,6 +18,8 @@ int bios(char *dest) {
         rewind(fp);
 
         vendor = malloc(len);
+        if(vendor == NULL)
+            return ERR_OOM;
         vendor[fread(vendor, 1, len, fp) - 1] = 0;
 
         fclose(fp);
@@ -29,6 +31,8 @@ int bios(char *dest) {
         rewind(fp);
 
         version = malloc(len);
+        if(version == NULL)
+            return ERR_OOM;
         version[fread(version, 1, len, fp) - 1] = 0;
 
         fclose(fp);
@@ -41,10 +45,10 @@ int bios(char *dest) {
     else if(version != NULL)
         safe_strncpy(dest, version, DEST_SIZE);
     else
-        return 1;
+        return ERR_NO_INFO;
 
     free(vendor);
     free(version);
     
-    return 0;
+    return RET_OK;
 }

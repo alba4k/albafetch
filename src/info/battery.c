@@ -74,7 +74,7 @@ int battery(char *dest) {
     else if(status[0] != 0 && (_bat_status))
         safe_strncpy(dest, status, DEST_SIZE);
     else
-        return 1;
+        return ERR_NO_INFO;
 
-    return 0;
+    return RET_OK;
 }   

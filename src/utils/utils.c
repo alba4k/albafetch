@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "utils.h"
+#include "return.h"
 #include "wrappers.h"
 #include "../config/config.h"
 #include "../config/parsing.h"
@@ -59,7 +60,9 @@ void *file_to_logo(char *file) {
         if(strcmp(buffer, *colors[j]) == 0)
             strcpy(config.color, colors[j][1]);
 
-    mem = malloc(10240);
+    mem = malloc(1024);
+    if(mem == NULL)
+        return NULL;
     memset(mem, 0, 1024);
 
     if(config.color[0] == 0) {
@@ -103,6 +106,8 @@ void *file_to_logo(char *file) {
 // add a module containing id to array
 void add_module(struct Module *array, char *id) {
     struct Module *new = malloc(sizeof(struct Module));
+    if(new == NULL)
+        return;
     struct Module *last = array;
 
     for(struct Module *current = array; current->next; current = current->next)
@@ -111,6 +116,8 @@ void add_module(struct Module *array, char *id) {
     last->next = new;
 
     new->id = malloc(strlen(id)+1);
+    if(new->id == NULL)
+        return;
     strcpy(new->id, id);
 
     new->label = NULL;
