@@ -12,48 +12,47 @@
 
 // print the current uptime
 int uptime(char *dest) {
-    #ifdef __APPLE__
-        struct timeval boottime;
-        int error;
-        long uptime;
-        error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
+#ifdef __APPLE__
+    struct timeval boottime;
+    int error;
+    long uptime;
+    error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
-        if(error < 0)
-            return ERR_NO_INFO;
+    if(error < 0)
+        return ERR_NO_INFO;
 
-        time_t boot_seconds = boottime.tv_sec;
-        time_t current_seconds = time(NULL);
+    time_t boot_seconds = boottime.tv_sec;
+    time_t current_seconds = time(NULL);
 
-        uptime = (long)difftime(current_seconds, boot_seconds);
-    #else
-        struct sysinfo info;
-        if(sysinfo(&info))
-            return ERR_NO_INFO;
+    uptime = (long)difftime(current_seconds, boot_seconds);
+#else
+    struct sysinfo info;
+    if(sysinfo(&info))
+        return ERR_NO_INFO;
 
-        const long uptime = info.uptime;
-    #endif // __APPLE__
+    const long uptime = info.uptime;
+#endif // __APPLE__
 
-    long days = uptime/86400;
-    char hours = uptime/3600 - days*24;
-    char mins = uptime/60 - days*1440 - hours*60;
+    long days = uptime / 86400;
+    char hours = uptime / 3600 - days * 24;
+    char mins = uptime / 60 - days * 1440 - hours * 60;
 
     char result[DEST_SIZE] = "";
     char str[24] = "";
 
     if(days) {
-        snprintf(str, 24, "%ldd%c", days, hours || mins ? ' ' : 0);     // print the number of days passed if more than 0
+        snprintf(str, 24, "%ldd%c", days, hours || mins ? ' ' : 0); // print the number of days passed if more than 0
         strcat(result, str);
     }
     if(hours) {
-        snprintf(str, 24, "%dh%c", hours, mins ? ' ' : 0);      // print the number of days passed if more than 0
+        snprintf(str, 24, "%dh%c", hours, mins ? ' ' : 0); // print the number of days passed if more than 0
         strcat(result, str);
     }
     if(mins) {
-        snprintf(str, 24, "%dm", mins);       // print the number of minutes passed if more than 0
+        snprintf(str, 24, "%dm", mins); // print the number of minutes passed if more than 0
         strcat(result, str);
-    }
-    else if(uptime < 60) {
-        snprintf(str, 24, "%lds", uptime);       // print the number of seconds passed if less than 60
+    } else if(uptime < 60) {
+        snprintf(str, 24, "%lds", uptime); // print the number of seconds passed if less than 60
         strcat(result, str);
     }
 

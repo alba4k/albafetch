@@ -56,13 +56,12 @@ __attribute__((pure)) size_t real_strlen(const char *str) {
         }
 
         if(*str != '\033') {
-            len += (size_t)1-escaping;
+            len += (size_t)1 - escaping;
 
             escaping = (*str != 'm') && escaping;
-        }
-        else
+        } else
             escaping = true;
-        
+
         ++str;
     }
 
@@ -71,6 +70,6 @@ __attribute__((pure)) size_t real_strlen(const char *str) {
 
 // Copy no more than N characters of SRC to DEST, but always guarantee null-termination
 void safe_strncpy(char *dest, const char *src, size_t n) {
-    strncpy(dest, src, n-1);
-    dest[n-1] = 0;
+    strncpy(dest, src, n - 1);
+    dest[n - 1] = 0;
 }

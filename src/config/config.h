@@ -80,33 +80,33 @@ struct Config {
 };
 extern struct Config config;
 
-#define _align           config.boolean_options & 0x1
-#define _bold            config.boolean_options & 0x2
-#define _title_color     config.boolean_options & 0x4
-#define _os_arch         config.boolean_options & 0x8
-#define _kernel_short    config.boolean_options & 0x10
-#define _de_type         config.boolean_options & 0x20
-#define _shell_path      config.boolean_options & 0x40
-#define _term_ssh        config.boolean_options & 0x80
-#define _pkg_mgr         config.boolean_options & 0x100
-#define _pkg_pacman      config.boolean_options & 0x200
-#define _pkg_dpkg        config.boolean_options & 0x400
-#define _pkg_rpm         config.boolean_options & 0x800
-#define _pkg_flatpak     config.boolean_options & 0x1000
-#define _pkg_snap        config.boolean_options & 0x2000
-#define _pkg_brew        config.boolean_options & 0x4000
-#define _pkg_pip         config.boolean_options & 0x8000
-#define _cpu_brand       config.boolean_options & 0x10000
-#define _cpu_freq        config.boolean_options & 0x20000
-#define _cpu_count       config.boolean_options & 0x40000
-#define _gpu_brand       config.boolean_options & 0x80000
-#define _mem_perc        config.boolean_options & 0x100000
-#define _loc_localhost   config.boolean_options & 0x200000
-#define _loc_docker      config.boolean_options & 0x400000
-#define _pwd_path        config.boolean_options & 0x800000
-#define _kernel_type     config.boolean_options & 0x1000000
-#define _col_background  config.boolean_options & 0x2000000
-#define _bat_status      config.boolean_options & 0x4000000
-#define _swap_perc       config.boolean_options & 0x8000000
+#define _align          config.boolean_options & 0x1
+#define _bold           config.boolean_options & 0x2
+#define _title_color    config.boolean_options & 0x4
+#define _os_arch        config.boolean_options & 0x8
+#define _kernel_short   config.boolean_options & 0x10
+#define _de_type        config.boolean_options & 0x20
+#define _shell_path     config.boolean_options & 0x40
+#define _term_ssh       config.boolean_options & 0x80
+#define _pkg_mgr        config.boolean_options & 0x100
+#define _pkg_pacman     config.boolean_options & 0x200
+#define _pkg_dpkg       config.boolean_options & 0x400
+#define _pkg_rpm        config.boolean_options & 0x800
+#define _pkg_flatpak    config.boolean_options & 0x1000
+#define _pkg_snap       config.boolean_options & 0x2000
+#define _pkg_brew       config.boolean_options & 0x4000
+#define _pkg_pip        config.boolean_options & 0x8000
+#define _cpu_brand      config.boolean_options & 0x10000
+#define _cpu_freq       config.boolean_options & 0x20000
+#define _cpu_count      config.boolean_options & 0x40000
+#define _gpu_brand      config.boolean_options & 0x80000
+#define _mem_perc       config.boolean_options & 0x100000
+#define _loc_localhost  config.boolean_options & 0x200000
+#define _loc_docker     config.boolean_options & 0x400000
+#define _pwd_path       config.boolean_options & 0x800000
+#define _kernel_type    config.boolean_options & 0x1000000
+#define _col_background config.boolean_options & 0x2000000
+#define _bat_status     config.boolean_options & 0x4000000
+#define _swap_perc      config.boolean_options & 0x8000000
 
 void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);

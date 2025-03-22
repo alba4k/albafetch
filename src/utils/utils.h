@@ -6,10 +6,10 @@
 
 // element of a module linked list
 struct Module {
-    char *id;               // module identifier
-    char *label;            // module label
-    int (*func)(char *);    // function to run
-    struct Module *next;    // next module
+    char *id;            // module identifier
+    char *label;         // module label
+    int (*func)(char *); // function to run
+    struct Module *next; // next module
 };
 
 void *file_to_logo(char *file);

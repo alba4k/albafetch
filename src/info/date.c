@@ -6,7 +6,6 @@
 #include <time.h>
 #include <stdio.h>
 
-
 // get the current date and time
 int date(char *dest) {
     time_t t = time(NULL);

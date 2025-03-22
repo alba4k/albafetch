@@ -17,24 +17,24 @@ int cpu(char *dest) {
     int count = 0;
     char freq[24] = "";
 
-    #ifdef __APPLE__
-        size_t BUF_SIZE = DEST_SIZE;
-        char buf[BUF_SIZE];
-        buf[0] = 0;
-        sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
+#ifdef __APPLE__
+    size_t BUF_SIZE = DEST_SIZE;
+    char buf[BUF_SIZE];
+    buf[0] = 0;
+    sysctlbyname("machdep.cpu.brand_string", buf, &BUF_SIZE, NULL, 0);
 
-        if(buf[0] == 0)
-            return ERR_NO_INFO;
+    if(buf[0] == 0)
+        return ERR_NO_INFO;
 
-        if((_cpu_freq) == 0) {
-            if((end = strstr(buf, " @")))
-                *end = 0;
-            else if((end = strchr(buf, '@')))
-                *end = 0;
-        }
+    if((_cpu_freq) == 0) {
+        if((end = strstr(buf, " @")))
+            *end = 0;
+        else if((end = strchr(buf, '@')))
+            *end = 0;
+    }
 
-        cpu_info = buf;
-    #else
+    cpu_info = buf;
+#else
     FILE *fp = fopen("/proc/cpuinfo", "r");
     if(fp == NULL)
         return ERR_NO_FILE;
@@ -71,7 +71,7 @@ int cpu(char *dest) {
             free(buf);
             return ERR_PARSING + 0x10;
         }
-            
+
         *end = 0;
     }
 
@@ -94,25 +94,25 @@ int cpu(char *dest) {
             if(end) {
                 *end = 0;
 
-                snprintf(freq, 24, " @ %g GHz", (float)(atoi(frequency)/100) / 10);
+                snprintf(freq, 24, " @ %g GHz", (float)(atoi(frequency) / 100) / 10);
             }
         }
     }
-    #endif
+#endif
 
     // cleaning the string from various garbage
     if((end = strstr(cpu_info, "(R)")))
-        memmove(end, end+3, strlen(end+3)+1);
+        memmove(end, end + 3, strlen(end + 3) + 1);
     if((end = strstr(cpu_info, "(TM)")))
-        memmove(end, end+4, strlen(end+4)+1);
+        memmove(end, end + 4, strlen(end + 4) + 1);
     if((end = strstr(cpu_info, " CPU")))
-        memmove(end, end+4, strlen(end+4)+1);
+        memmove(end, end + 4, strlen(end + 4) + 1);
     if((end = strstr(cpu_info, "th Gen ")))
-        memmove(end-2, end+7, strlen(end+7)+1);
+        memmove(end - 2, end + 7, strlen(end + 7) + 1);
     if((end = strstr(cpu_info, " with Radeon Graphics")))
         *end = 0;
     if((end = strstr(cpu_info, "-Core Processor"))) {
-        if(end >= cpu_info+5) {
+        if(end >= cpu_info + 5) {
             end -= 5;
             end = strchr(end, ' ');
             if(end != NULL)
@@ -122,29 +122,29 @@ int cpu(char *dest) {
 
     if((_cpu_brand) == 0) {
         if((end = strstr(cpu_info, "Intel Core ")))
-            memmove(end, end+11, strlen(end+1));
+            memmove(end, end + 11, strlen(end + 1));
         else if((end = strstr(cpu_info, "Apple ")))
-            memmove(end, end+6, strlen(end+6)+1);
+            memmove(end, end + 6, strlen(end + 6) + 1);
         else if((end = strstr(cpu_info, "AMD ")))
-            memmove(end, end+4, strlen(end+1));
+            memmove(end, end + 4, strlen(end + 1));
     }
 
     safe_strncpy(dest, cpu_info, DEST_SIZE);
-    #ifdef __linux__
-        free(buf);
-    #endif
+#ifdef __linux__
+    free(buf);
+#endif
 
     if(freq[0])
-        strncat(dest, freq, DEST_SIZE-1-strlen(dest));
+        strncat(dest, freq, DEST_SIZE - 1 - strlen(dest));
 
     if(count && _cpu_count) {
         char core_count[16];
         snprintf(core_count, 16, " (%d) ", count);
-        strncat(dest, core_count, DEST_SIZE-1-strlen(dest));
+        strncat(dest, core_count, DEST_SIZE - 1 - strlen(dest));
     }
     // final cleanup ("Intel Core i5         650" lol)
     while((end = strstr(dest, "  ")))
-        memmove(end, end+1, strlen(end));
+        memmove(end, end + 1, strlen(end));
 
     return RET_OK;
 }

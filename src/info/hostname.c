@@ -7,11 +7,11 @@
 
 // idk why but this is sometimes not defined
 #ifndef HOST_NAME_MAX
-    #ifdef _POSIX_HOST_NAME_MAX
-        #define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
-    #else
-        #define HOST_NAME_MAX 255
-    #endif
+#ifdef _POSIX_HOST_NAME_MAX
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#else
+#define HOST_NAME_MAX 255
+#endif
 #endif
 
 // print the machine hostname

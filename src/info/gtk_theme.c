@@ -8,7 +8,7 @@
 #include "../utils/wrappers.h"
 
 // get the current GTK Theme
-int gtk_theme(char *dest){ 
+int gtk_theme(char *dest) {
     char *theme = getenv("GTK_THEME");
 
     // try using GTK_THEME (faster)
@@ -19,7 +19,7 @@ int gtk_theme(char *dest){
     }
 
     // try using gsettings (fallback)
-    // reading ~/.config/gtk-3.0/settings.ini could also be an option 
+    // reading ~/.config/gtk-3.0/settings.ini could also be an option
     if(binary_in_path("gsettings")) {
         char buf[DEST_SIZE] = "";
         char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "gtk-theme", NULL};
@@ -28,7 +28,7 @@ int gtk_theme(char *dest){
         // cleanup
         if(buf[0] != 0) {
             if(buf[0] == '\'') {
-                memmove(buf, buf+1, strlen(buf));
+                memmove(buf, buf + 1, strlen(buf));
 
                 char *ptr = strchr(buf, '\'');
                 if(ptr)

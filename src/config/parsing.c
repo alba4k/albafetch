@@ -69,19 +69,19 @@ void uncomment(char *str, const char start) {
             ++ptr2;
             ++counter;
         }
-        if(counter&1) {
+        if(counter & 1) {
             ++ptr;
             continue;
         }
 
         ptr2 = strchr(ptr, '\n');
-        
+
         if(ptr2 == NULL) {
             *ptr = 0;
             break;
         }
 
-        memmove(ptr, ptr2+1, strlen(ptr2));
+        memmove(ptr, ptr2 + 1, strlen(ptr2));
     }
 }
 
@@ -90,21 +90,21 @@ void unescape(char *str) {
     while((str = strchr(str, '\\'))) {
         switch(str[1]) {
             case 'e':
-                memmove(str, str+1, strlen(str));
+                memmove(str, str + 1, strlen(str));
                 *str = '\033';
                 break;
             case '0':
                 if(str[2] == '3' && str[3] == '3') {
-                    memmove(str, str+3, strlen(str+2));
+                    memmove(str, str + 3, strlen(str + 2));
                     *str = '\033';
                 }
                 break;
             case 'n':
-                memmove(str, str+1, strlen(str));
+                memmove(str, str + 1, strlen(str));
                 *str = '\n';
                 break;
-            default:    // takes care of "\\" and any other sort of "\X"
-                memmove(str, str+1, strlen(str));
+            default: // takes care of "\\" and any other sort of "\X"
+                memmove(str, str + 1, strlen(str));
                 ++str;
                 break;
         }

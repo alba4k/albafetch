@@ -11,7 +11,7 @@ int kernel(char *dest) {
     struct utsname name;
     uname(&name);
     char *ptr = name.release, *type = NULL;
-    
+
     if(_kernel_type) {
         while((ptr = strchr(ptr, '-')))
             type = ++ptr;

@@ -1,0 +1,67 @@
+---
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# Based on Hyprland's
+Language: Cpp
+BasedOnStyle: LLVM
+
+AccessModifierOffset: -2
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+AlignConsecutiveMacros: true
+AlignEscapedNewlines: Right
+AlignOperands: false
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: true
+AllowAllConstructorInitializersOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializers: AfterColon
+ColumnLimit: 180
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ExperimentalAutoDetectBinPacking: false
+FixNamespaceComments: false
+IncludeBlocks: Preserve
+IndentCaseLabels: true
+IndentWidth: 4
+InsertNewlineAtEOF: true
+PointerAlignment: Right
+ReflowComments: false
+SortIncludes: false
+SortUsingDeclarations: false
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: false
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+Standard: Auto
+TabWidth: 4
+UseTab: Never
+
+AllowShortEnumsOnASingleLine: false
+
+BraceWrapping:
+  AfterEnum: false
+
+NamespaceIndentation: All

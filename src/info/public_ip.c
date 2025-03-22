@@ -20,7 +20,7 @@ int public_ip(char *dest) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = 0;
-    
+
     // using this as it is faster than ident.me
     if(getaddrinfo("whatismyip.akamai.com", "80", &hints, &addrs)) {
         return ERR_NO_INFO;
@@ -31,7 +31,7 @@ int public_ip(char *dest) {
         freeaddrinfo(addrs);
         return ERR_NO_INFO + 0x10;
     }
-        
+
     if(connect(socket_fd, addrs->ai_addr, addrs->ai_addrlen) == -1) {
         close(socket_fd);
         freeaddrinfo(addrs);
@@ -54,7 +54,7 @@ int public_ip(char *dest) {
 
     close(socket_fd);
     freeaddrinfo(addrs);
-    
+
     /* buf should now look like this:
      * """
      * HTTP/1.1 200 OK
@@ -74,7 +74,7 @@ int public_ip(char *dest) {
         return ERR_PARSING;
 
     start += 3;
-    
+
     safe_strncpy(dest, start, DEST_SIZE);
 
     return RET_OK;

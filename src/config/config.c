@@ -13,7 +13,7 @@
 #include <string.h>
 
 // a return code of 0 means that the option was parsed successfully
-int parse_config_str(const char* source, const char *field, char *dest, const size_t maxlen) {
+int parse_config_str(const char *source, const char *field, char *dest, const size_t maxlen) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -38,14 +38,13 @@ int parse_config_str(const char* source, const char *field, char *dest, const si
 
     // copies the option
     *end = 0;
-    
+
     size_t len = strlen(ptr);
-    if(len+1 > maxlen) {
+    if(len + 1 > maxlen) {
         memcpy(dest, ptr, maxlen);
-        dest[maxlen-1] = 0;
-    }
-    else
-        memcpy(dest, ptr, len+1);
+        dest[maxlen - 1] = 0;
+    } else
+        memcpy(dest, ptr, len + 1);
 
     *end = '"';
 
@@ -65,7 +64,7 @@ int parse_config_int(const char *source, const char *field, int *dest, const uns
     ptr = strchr(ptr, '"');
     if(ptr == NULL)
         return ERR_PARSING;
-        
+
     // checks whether the string continues after
     ++ptr;
     if(*ptr == 0)
@@ -84,7 +83,7 @@ int parse_config_int(const char *source, const char *field, int *dest, const uns
     if((unsigned)num > max)
         return ERR_PARSING;
 
-    *dest =  num;
+    *dest = num;
 
     return RET_OK;
 }
@@ -102,7 +101,7 @@ int parse_config_bool(const char *source, const char *field, bool *dest) {
     ptr = strchr(ptr, '"');
     if(ptr == NULL)
         return ERR_PARSING;
-        
+
     // checks whether the string continues after
     ++ptr;
     if(*ptr == 0)
@@ -131,7 +130,7 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     fseek(fp, 0, SEEK_END);
     size_t len = (size_t)ftell(fp);
     rewind(fp);
-    
+
     char *conf = malloc(len);
     if(conf == NULL)
         return;
@@ -155,12 +154,12 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     parse_config_str(conf, "ascii_art", path, sizeof(path));
     if(path[0])
         *ascii_ptr = file_to_logo(path);
-    
+
     // logo
     char logo[32] = "";
     parse_config_str(conf, "logo", logo, sizeof(logo));
     if(logo[0]) {
-        for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); ++i)
+        for(size_t i = 0; i < sizeof(logos) / sizeof(logos[0]); ++i)
             if(strcmp(logos[i][0], logo) == 0) {
                 config.logo = logos[i];
                 strcpy(default_logo, logos[i][0]);
@@ -173,15 +172,8 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
     parse_config_str(conf, "default_color", color, sizeof(color));
     if(color[0]) {
         const char *colors[][2] = {
-            {"black", "\033[30m"},
-            {"red", "\033[31m"},
-            {"green", "\033[32m"},
-            {"yellow", "\033[33m"},
-            {"blue", "\033[34m"},
-            {"purple", "\033[35m"},
-            {"cyan", "\033[36m"},
-            {"gray", "\033[90m"},
-            {"white", "\033[37m"},
+            {"black", "\033[30m"},  {"red", "\033[31m"},  {"green", "\033[32m"}, {"yellow", "\033[33m"}, {"blue", "\033[34m"},
+            {"purple", "\033[35m"}, {"cyan", "\033[36m"}, {"gray", "\033[90m"},  {"white", "\033[37m"},
         };
 
         for(int i = 0; i < 9; ++i)
@@ -202,39 +194,13 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
 
     // BOOLEAN OPTIONS (check utils/utils.h)
 
-    const char *booleanOptions[] = {
-        "align_infos",
-        "bold",
-        "colored_title",
-        "os_arch",
-        "kernel_short",
-        "desktop_type",
-        "shell_path",
-        "term_ssh",
-        "pkg_mgr",
-        "pkg_pacman",
-        "pkg_dpkg",
-        "pkg_rpm",
-        "pkg_flatpak",
-        "pkg_snap",
-        "pkg_brew",
-        "pkg_pip",
-        "cpu_brand",
-        "cpu_freq",
-        "cpu_count",
-        "gpu_brand",
-        "mem_perc",
-        "loc_localhost",
-        "loc_docker",
-        "pwd_path",
-        "kernel_type",
-        "col_background",
-        "bat_status",
-        "swap_perc"
-    };
+    const char *booleanOptions[] = {"align_infos",   "bold",       "colored_title", "os_arch",     "kernel_short",   "desktop_type", "shell_path",
+                                    "term_ssh",      "pkg_mgr",    "pkg_pacman",    "pkg_dpkg",    "pkg_rpm",        "pkg_flatpak",  "pkg_snap",
+                                    "pkg_brew",      "pkg_pip",    "cpu_brand",     "cpu_freq",    "cpu_count",      "gpu_brand",    "mem_perc",
+                                    "loc_localhost", "loc_docker", "pwd_path",      "kernel_type", "col_background", "bat_status",   "swap_perc"};
 
     bool buffer;
-    for(size_t i = 0; i < sizeof(booleanOptions)/sizeof(booleanOptions[0]); ++i) {
+    for(size_t i = 0; i < sizeof(booleanOptions) / sizeof(booleanOptions[0]); ++i) {
         if(parse_config_bool(conf, booleanOptions[i], &buffer) == 0) {
             if(buffer)
                 config.boolean_options |= ((uint64_t)1 << i);
@@ -258,9 +224,9 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         char *option;
         const char *config_name;
     };
-    
+
     struct Prefix prefixes[] = {
-    //  {config.module_prefix, "module_prefix"}
+        //  {config.module_prefix, "module_prefix"}
         {config.separator_prefix, "separator_prefix"},
         {config.spacing_prefix, "spacing_prefix"},
         {config.title_prefix, "title_prefix"},
@@ -292,11 +258,11 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
         {config.light_colors_prefix, "colors_light_prefix"},
     };
 
-    for(size_t i = 0; i < sizeof(prefixes)/sizeof(prefixes[0]); ++i)
+    for(size_t i = 0; i < sizeof(prefixes) / sizeof(prefixes[0]); ++i)
         parse_config_str(conf, prefixes[i].config_name, prefixes[i].option, 64);
 
     // MODULES
-    
+
     ptr = strstr(conf, "modules");
     if(ptr == NULL) {
         free(conf);
@@ -328,11 +294,11 @@ void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bo
 
         add_module(modules, ptr);
 
-     // *ptr2 = '"';
+        // *ptr2 = '"';
         ++ptr2;
     }
 
- // *end = '}';
+    // *end = '}';
 
     free(conf);
 }

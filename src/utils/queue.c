@@ -28,7 +28,7 @@ int requeue(Queue *q) {
     // requeueing won't do anything.
     if(q->size == q->alloc_size)
         return ERR_GENERIC;
-    
+
     size_t used_byte_size = sizeof(char) * q->size;
     char buf[q->size];
 
@@ -49,7 +49,7 @@ int enqueue(Queue *q, char val) {
 
     if(write_index >= q->alloc_size) {
         // We know that a requeue is possible because we check that the queue is not full.
-        requeue(q); 
+        requeue(q);
         write_index = q->size;
     }
 
@@ -75,7 +75,7 @@ int dequeue(Queue *q, char *out) {
     q->size--;   // Decrease the size since we removed a character.
 
     *out = front;
-    
+
     return QUEUE_OK;
 }
 
@@ -100,24 +100,24 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
             continue;
         }
 
-        assert(q->size == seq_size);   // Window is of correct width
+        assert(q->size == seq_size); // Window is of correct width
 
         if(strncmp((char *)q->data + q->offset, seq, seq_size) == 0) {
             found = true;
             break;
         }
-        
+
         error = dequeue(q, &elem);
-        assert(error != QUEUE_EMPTY);  // Queue should always have at least `seq_size` items
+        assert(error != QUEUE_EMPTY); // Queue should always have at least `seq_size` items
 
         error = enqueue(q, ch);
-        assert(error != QUEUE_FULL);    // Queue should maintain same size, as 1 item is added and another is removed
+        assert(error != QUEUE_FULL); // Queue should maintain same size, as 1 item is added and another is removed
     }
 
     destroy_queue(q);
 
     if(found == false) {
-        buffer[0] = 0;  // make buffer an empty string if the sequence is not found
+        buffer[0] = 0; // make buffer an empty string if the sequence is not found
     }
 
     // Actually read for the rest of the file, or the buffer.

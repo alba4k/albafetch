@@ -17,7 +17,7 @@ bool binary_in_path(const char *binary) {
 #ifdef GLIB_EXISTS
     // valgrind complains about this, don't really know why
     char *program = g_find_program_in_path(binary);
-    
+
     if(program == NULL)
         return false;
 
@@ -25,12 +25,12 @@ bool binary_in_path(const char *binary) {
     return true;
 #else
     char *path_env = getenv("PATH");
-    if (path_env == NULL) {
+    if(path_env == NULL) {
         return false;
     }
 
     char *path = strdup(path_env);
-    if (path == NULL) {
+    if(path == NULL) {
         return false;
     }
 

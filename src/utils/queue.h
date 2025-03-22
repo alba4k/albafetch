@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#define QUEUE_OK     0
+#define QUEUE_OK    0
 #define QUEUE_EMPTY (-1)
 #define QUEUE_FULL  (-2)
 
