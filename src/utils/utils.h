@@ -6,9 +6,9 @@
 
 // element of a module linked list
 struct SModule {
-    char *id;            // module identifier
-    char *label;         // module label
-    int (*func)(char *); // function to run
+    char *id;             // module identifier
+    char *label;          // module label
+    int (*func)(char *);  // function to run
     struct SModule *next; // next module
 };
 

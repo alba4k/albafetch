@@ -26,7 +26,7 @@ int gpu(char *dest) {
     uname(&name);
 
     if(strcmp(name.machine, "x86_64") == 0)
-        gpus[0] = getGpuString();                      // only works on x64
+        gpus[0] = getGpuString();                        // only works on x64
     if(gpus[0] == 0 || strcmp(name.machine, "x86_64")) { // fallback
         char buf[1024];
         char *args[] = {"/usr/sbin/system_profiler", "SPDisplaysDataType", NULL};

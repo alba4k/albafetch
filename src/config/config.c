@@ -130,7 +130,7 @@ void parseSConfig(const char *file, struct SModule *modules, void **ascii_ptr, b
     fseek(fp, 0, SEEK_END);
     size_t len = (size_t)ftell(fp);
     fseek(fp, 0, SEEK_SET);
-    
+
     char *conf = malloc(len);
     if(conf == NULL)
         return;
