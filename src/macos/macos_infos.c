@@ -22,11 +22,8 @@ static vm_size_t page_size(mach_port_t host) {
 static int get_stats(struct vm_statistics *stat, mach_port_t host) {
     int error;
 
-    unsigned count = HOST_VM_INFO_COUNT; 
-    error = host_statistics(host, 
-                            HOST_VM_INFO,
-                            (host_info_t) stat,
-                            &count);
+    unsigned count = HOST_VM_INFO_COUNT;
+    error = host_statistics(host, HOST_VM_INFO, (host_info_t)stat, &count);
 
     if(error != KERN_SUCCESS)
         return error;
@@ -37,11 +34,8 @@ static int get_stats(struct vm_statistics *stat, mach_port_t host) {
 static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
     int error;
 
-    unsigned count = HOST_VM_INFO64_COUNT; 
-    error = host_statistics64(host, 
-                            HOST_VM_INFO64,
-                            (host_info64_t) stat,
-                            &count);
+    unsigned count = HOST_VM_INFO64_COUNT;
+    error = host_statistics64(host, HOST_VM_INFO64, (host_info64_t)stat, &count);
 
     if(error != KERN_SUCCESS)
         return error;
@@ -50,7 +44,7 @@ static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
 }
 #endif
 
-/* EXPORTS */ 
+/* EXPORTS */
 
 bytes_t system_mem_size(void) {
     uint64_t size;
@@ -75,8 +69,8 @@ bytes_t used_mem_size(void) {
     if(get_stats(&vm_stat, host) < 0)
         return RET_OK;
 
-    active   = vm_stat.active_count;
-    wired    = vm_stat.wire_count;
+    active = vm_stat.active_count;
+    wired = vm_stat.wire_count;
     inactive = vm_stat.inactive_count;
 
     return (active + wired + inactive) * page_size(host);
@@ -88,8 +82,8 @@ bytes_t used_mem_size(void) {
     if(get_stats(&vm_stat, host) < 0)
         return RET_OK;
 
-    internal   = vm_stat.internal_page_count - vm_stat.purgeable_count;
-    wired      = vm_stat.wire_count;
+    internal = vm_stat.internal_page_count - vm_stat.purgeable_count;
+    wired = vm_stat.wire_count;
     compressed = vm_stat.compressor_page_count;
 
     return (internal + wired + compressed) * page_size(host);

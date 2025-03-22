@@ -49,6 +49,6 @@ int bios(char *dest) {
 
     free(vendor);
     free(version);
-    
+
     return RET_OK;
 }

@@ -15,56 +15,56 @@
 
 // get used and total memory
 int memory(char *dest) {
-    #ifdef __APPLE__ 
-        bytes_t usedram = used_mem_size();
-        bytes_t totalram = system_mem_size();
+#ifdef __APPLE__
+    bytes_t usedram = used_mem_size();
+    bytes_t totalram = system_mem_size();
 
-        if(usedram == 0 || totalram == 0) { 
-            return ERR_NO_INFO;
-        }
+    if(usedram == 0 || totalram == 0) {
+        return ERR_NO_INFO;
+    }
 
-        snprintf(dest, DEST_SIZE, "%llu MiB / %llu MiB", usedram/1048576, totalram/1048576);
-    #else
-        struct sysinfo info;
-        if(sysinfo(&info))
-            return ERR_NO_INFO;
+    snprintf(dest, DEST_SIZE, "%llu MiB / %llu MiB", usedram / 1048576, totalram / 1048576);
+#else
+    struct sysinfo info;
+    if(sysinfo(&info))
+        return ERR_NO_INFO;
 
-        unsigned long totalram = info.totalram / 1024;
-        unsigned long freeram = info.freeram / 1024;
-        // unsigned long sharedram = info.sharedram / 1024;
+    unsigned long totalram = info.totalram / 1024;
+    unsigned long freeram = info.freeram / 1024;
+    // unsigned long sharedram = info.sharedram / 1024;
 
-        FILE *fp = fopen("/proc/meminfo", "r");
+    FILE *fp = fopen("/proc/meminfo", "r");
 
-        if(fp == NULL)
-            return ERR_NO_FILE;
+    if(fp == NULL)
+        return ERR_NO_FILE;
 
-        char buf[DEST_SIZE];
-        char *cachedram = buf;
+    char buf[DEST_SIZE];
+    char *cachedram = buf;
 
-        read_after_sequence(fp, "Cached:", buf, DEST_SIZE);
-        fclose(fp);
+    read_after_sequence(fp, "Cached:", buf, DEST_SIZE);
+    fclose(fp);
 
-        if(buf[0] == 0)
-            return ERR_PARSING;
-        cachedram += 2;
+    if(buf[0] == 0)
+        return ERR_PARSING;
+    cachedram += 2;
 
-        char *end = strstr(cachedram, " kB");
-        
-        if(end == NULL)
-            return ERR_PARSING + 0x10;
-        
-        *end = 0;
+    char *end = strstr(cachedram, " kB");
 
-        unsigned long usedram = totalram - freeram - atol(cachedram);
-        // usedram -= sharedram;
+    if(end == NULL)
+        return ERR_PARSING + 0x10;
 
-        snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedram/1024, totalram/1024);
-    #endif
+    *end = 0;
+
+    unsigned long usedram = totalram - freeram - atol(cachedram);
+    // usedram -= sharedram;
+
+    snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedram / 1024, totalram / 1024);
+#endif
 
     if(_mem_perc) {
-        const size_t len = DEST_SIZE-strlen(dest);
+        const size_t len = DEST_SIZE - strlen(dest);
         char perc[len];
-        
+
         snprintf(perc, len, " (%lu%%)", (unsigned long)((usedram * 100) / totalram));
         strcat(dest, perc);
     }

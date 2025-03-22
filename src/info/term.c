@@ -11,19 +11,12 @@ int term(char *dest) {
     // TODO: print terminal version (using env variables, parsing --version outputs, ...)
     const char *terminal = NULL;
 
-    const char *terminals[][2] = {
-     // {"ENVIRONMENT_VARIABLE", "terminal"},
-        {"ALACRITTY_WINDOW_ID", "Alacritty"},
-        {"KITTY_PID", "Kitty"},
-        {"VSCODE_INJECTION", "VS Code"},
-        {"TERMUX_VERSION", "Termux"},
-        {"KONSOLE_VERSION", "Konsole"},
-        {"GNOME_TERMINAL_SCREEN", "GNOME Terminal"},
-        {"WT_SESSION", "Windows Terminal"},
-        {"TERMINATOR_UUID", "Terminator"}
-    };
+    const char *terminals[][2] = {// {"ENVIRONMENT_VARIABLE", "terminal"},
+                                  {"ALACRITTY_WINDOW_ID", "Alacritty"}, {"KITTY_PID", "Kitty"},           {"VSCODE_INJECTION", "VS Code"},
+                                  {"TERMUX_VERSION", "Termux"},         {"KONSOLE_VERSION", "Konsole"},   {"GNOME_TERMINAL_SCREEN", "GNOME Terminal"},
+                                  {"WT_SESSION", "Windows Terminal"},   {"TERMINATOR_UUID", "Terminator"}};
 
-    for(size_t i = 0; i < sizeof(terminals)/sizeof(terminals[0]); ++i)
+    for(size_t i = 0; i < sizeof(terminals) / sizeof(terminals[0]); ++i)
         if(getenv(terminals[i][0]))
             terminal = terminals[i][1];
 
@@ -33,7 +26,7 @@ int term(char *dest) {
             terminal = getenv("TERM");
         if(terminal == NULL)
             return ERR_NO_INFO;
-        
+
         if(strcmp(terminal, "xterm-kitty") == 0)
             terminal = "Kitty";
         else if(strcmp(terminal, "alacritty") == 0)
