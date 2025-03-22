@@ -40,7 +40,7 @@ int packages(char *dest) {
 
     path[0] = 0;
     if(prefix)
-        safe_strncpy(path, prefix, 256);
+        safeStrncpy(path, prefix, 256);
     strncat(path, "/var/lib/pacman/local", 255 - strlen(path));
     if(_pkg_pacman && (dir = opendir(path)) != NULL) {
         while((entry = readdir(dir)) != NULL)
@@ -56,7 +56,7 @@ int packages(char *dest) {
 
     path[0] = 0;
     if(prefix)
-        safe_strncpy(path, prefix, 256);
+        safeStrncpy(path, prefix, 256);
     strncat(path, "/var/lib/dpkg/status", 255 - strlen(path));
     if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
         char line[512];
@@ -79,7 +79,7 @@ int packages(char *dest) {
 
     path[0] = 0;
     if(prefix)
-        safe_strncpy(path, prefix, 256);
+        safeStrncpy(path, prefix, 256);
     strncat(path, "/var/lib/rpm/rpmdb.sqlite", 255 - strlen(path));
     if(_pkg_rpm && access(path, F_OK) == 0) {
         sqlite3 *db;
@@ -111,7 +111,7 @@ int packages(char *dest) {
 
     path[0] = 0;
     if(prefix)
-        safe_strncpy(path, prefix, 256);
+        safeStrncpy(path, prefix, 256);
     strncat(path, "/var/lib/flatpak/runtime", 255 - strlen(path));
     if(_pkg_flatpak && (dir = opendir(path)) != NULL) {
         count = 0;
@@ -129,7 +129,7 @@ int packages(char *dest) {
 
     path[0] = 0;
     if(prefix)
-        safe_strncpy(path, prefix, 256);
+        safeStrncpy(path, prefix, 256);
     strncat(path, "/var/snap", 255 - strlen(path));
     if(_pkg_snap && (dir = opendir(path)) != NULL) {
         count = 0;
@@ -146,16 +146,16 @@ int packages(char *dest) {
     }
 #endif
 
-    if(_pkg_brew && (binary_in_path("brew"))) {
+    if(_pkg_brew && (binaryInPath("brew"))) {
         char *args[] = {"brew", "--cellar", NULL};
-        exec_cmd(str, 16, args);
+        execCmd(str, 16, args);
 
         if(str[0]) {
             if((dir = opendir(str)) != NULL) {
                 count = 0;
 
                 while((entry = readdir(dir)) != NULL)
-                    if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") && strcmp(entry->d_name, ".."))
+                    if(entry->d_type == DT_DIR && strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
                         ++count;
                 closedir(dir);
 
@@ -168,9 +168,9 @@ int packages(char *dest) {
         }
     }
 
-    if(_pkg_pip && binary_in_path("pip")) {
+    if(_pkg_pip && binaryInPath("pip")) {
         char *args[] = {"sh", "-c", "pip list 2>/dev/null | wc -l", NULL};
-        exec_cmd(str, 16, args);
+        execCmd(str, 16, args);
 
         if(str[0] != '0' && str[0]) {
             snprintf(buf, DEST_SIZE - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str) - 2, _pkg_mgr ? " (pip)" : "");

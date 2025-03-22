@@ -16,8 +16,8 @@
 // get used and total memory
 int memory(char *dest) {
 #ifdef __APPLE__
-    bytes_t usedram = used_mem_size();
-    bytes_t totalram = system_mem_size();
+    bytes_t usedram = usedMemSize();
+    bytes_t totalram = systemMemSize();
 
     if(usedram == 0 || totalram == 0) {
         return ERR_NO_INFO;
@@ -41,7 +41,7 @@ int memory(char *dest) {
     char buf[DEST_SIZE];
     char *cachedram = buf;
 
-    read_after_sequence(fp, "Cached:", buf, DEST_SIZE);
+    readAfterSequence(fp, "Cached:", buf, DEST_SIZE);
     fclose(fp);
 
     if(buf[0] == 0)
@@ -65,7 +65,7 @@ int memory(char *dest) {
         const size_t len = DEST_SIZE - strlen(dest);
         char perc[len];
 
-        snprintf(perc, len, " (%lu%%)", (unsigned long)((usedram * 100) / totalram));
+        snprintf(perc, len, " (%lu%%)", (usedram * 100) / totalram);
         strcat(dest, perc);
     }
 

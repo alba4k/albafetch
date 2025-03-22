@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef __APPLE__
+
 #include <stdlib.h>
 #include <sys/sysctl.h>
 
@@ -27,10 +29,12 @@
  * ```c
  * uint64_t size;
  * size_t len = sizeof(uin64_t);
- * sysctl_wrap(&size, &len, 
+ * sysctlWrap(&size, &len, 
  *             CTL_HW,      // Query the hardware domain.
  *             HW_MEMSIZE); // Get memory size from the hardware domain.
  * ```
  */
 
-int sysctl_wrap(void *out, size_t outsize, int domain, int field);
+int sysctlWrap(void *out, size_t outsize, int domain, int field);
+
+#endif // __APPLE__

@@ -6,11 +6,11 @@
 #include "../utils/wrappers.h"
 
 // get the current login shell
-int login_shell(char *dest) {
+int loginShell(char *dest) {
     char *buf = getenv("SHELL");
 
     if(buf != NULL) {
-        safe_strncpy(dest, _shell_path ? buf : basename(buf), DEST_SIZE);
+        safeStrncpy(dest, _shell_path ? buf : basename(buf), DEST_SIZE);
         return RET_OK;
     }
 

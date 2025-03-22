@@ -3,6 +3,8 @@
 
 /* STATIC HELPERS */
 
+#ifdef __APPLE__
+
 const static vm_size_t FALLBACK_PAGE_SIZE = 4096;
 
 static vm_size_t page_size(mach_port_t host) {
@@ -46,11 +48,11 @@ static int get_stats(struct vm_statistics64 *stat, mach_port_t host) {
 
 /* EXPORTS */
 
-bytes_t system_mem_size(void) {
+bytes_t systemMemSize(void) {
     uint64_t size;
     int error;
 
-    error = sysctl_wrap(&size, sizeof(uint64_t), CTL_HW, HW_MEMSIZE);
+    error = sysctlWrap(&size, sizeof(uint64_t), CTL_HW, HW_MEMSIZE);
 
     // Since no computer should have 0 bytes of memory,
     // 0 indicates failure.
@@ -60,7 +62,7 @@ bytes_t system_mem_size(void) {
     return size;
 }
 
-bytes_t used_mem_size(void) {
+bytes_t usedMemSize(void) {
 #if MAC_OS_X_VERSION_MIN_REQUIRED < 1090
     pages_t active, wired, inactive;
     mach_port_t host = mach_host_self();
@@ -89,3 +91,5 @@ bytes_t used_mem_size(void) {
     return (internal + wired + compressed) * page_size(host);
 #endif
 }
+
+#endif // __APPLE__

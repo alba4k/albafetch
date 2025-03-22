@@ -15,7 +15,7 @@ int bios(char *dest) {
     if((fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r"))) {
         fseek(fp, 0, SEEK_END);
         len = ftell(fp);
-        rewind(fp);
+        fseek(fp, 0, SEEK_END);
 
         vendor = malloc(len);
         if(vendor == NULL)
@@ -28,7 +28,7 @@ int bios(char *dest) {
     if((fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r"))) {
         fseek(fp, 0, SEEK_END);
         len = ftell(fp);
-        rewind(fp);
+        fseek(fp, 0, SEEK_SET);
 
         version = malloc(len);
         if(version == NULL)
@@ -41,9 +41,9 @@ int bios(char *dest) {
     if(vendor != NULL && version != NULL)
         snprintf(dest, DEST_SIZE, "%s %s", vendor, version);
     else if(vendor != NULL)
-        safe_strncpy(dest, vendor, DEST_SIZE);
+        safeStrncpy(dest, vendor, DEST_SIZE);
     else if(version != NULL)
-        safe_strncpy(dest, version, DEST_SIZE);
+        safeStrncpy(dest, version, DEST_SIZE);
     else
         return ERR_NO_INFO;
 

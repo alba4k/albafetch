@@ -17,7 +17,7 @@ int pwd(char *dest) {
     if(pwd == NULL)
         return ERR_NO_INFO;
 
-    safe_strncpy(dest, _pwd_path ? pwd : basename(pwd), DEST_SIZE);
+    safeStrncpy(dest, _pwd_path ? pwd : basename(pwd), DEST_SIZE);
     free(pwd);
 
     return RET_OK;

@@ -94,6 +94,7 @@ config = configuration_data()
 config.set('VERSION', '"'+meson.project_version()+'"')
 config.set('COMMIT', '"'+commit+'"')
 configure_file(configuration: config, output: 'version.h')
+build_args += '-DHAVE_VERSION_H'
 
 # BUILD
 

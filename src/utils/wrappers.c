@@ -7,7 +7,7 @@
 #include "return.h"
 
 // Run a command using execvp and copy the output into buf
-int exec_cmd(char *buf, size_t len, char *const *argv) {
+int execCmd(char *buf, size_t len, char *const *argv) {
     int stderr_pipes[2];
     int stdout_pipes[2];
 
@@ -36,7 +36,7 @@ int exec_cmd(char *buf, size_t len, char *const *argv) {
 }
 
 // get the printed length of a string (not how big it is in memory)
-__attribute__((pure)) size_t real_strlen(const char *str) {
+__attribute__((pure)) size_t realStrlen(const char *str) {
     if(str == NULL)
         return RET_OK;
 
@@ -44,7 +44,7 @@ __attribute__((pure)) size_t real_strlen(const char *str) {
 
     bool escaping = false;
 
-    // determine how long the printed string is (same logic as in print_line, utils.c)
+    // determine how long the printed string is (same logic as in printLine, utils.c)
     while(*str) {
         if(*str == '\n')
             break;
@@ -69,7 +69,7 @@ __attribute__((pure)) size_t real_strlen(const char *str) {
 }
 
 // Copy no more than N characters of SRC to DEST, but always guarantee null-termination
-void safe_strncpy(char *dest, const char *src, size_t n) {
+void safeStrncpy(char *dest, const char *src, size_t n) {
     strncpy(dest, src, n - 1);
     dest[n - 1] = 0;
 }

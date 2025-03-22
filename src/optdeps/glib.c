@@ -7,13 +7,12 @@
 #include <glib-2.0/glib.h>
 #else
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #endif // GLIB_EXISTS
 
 // use g_find_program_in_path() if glib can be used
-bool binary_in_path(const char *binary) {
+bool binaryInPath(const char *binary) {
 #ifdef GLIB_EXISTS
     // valgrind complains about this, don't really know why
     char *program = g_find_program_in_path(binary);

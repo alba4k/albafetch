@@ -9,7 +9,7 @@
 #include "../config/parsing.h"
 
 // copy an ascii art from file to mem
-void *file_to_logo(char *file) {
+void *fileToLogo(char *file) {
     FILE *fp = fopen(file, "r");
     if(fp == NULL)
         return NULL;
@@ -31,7 +31,7 @@ void *file_to_logo(char *file) {
     char *buffer = NULL;
     size_t len = 0;
     size_t line_len;
-    int i = 0;
+    ptrdiff_t i = 0;
 
     // setting the correct color (or eventually the first line)
 
@@ -61,8 +61,8 @@ void *file_to_logo(char *file) {
     if(config.color[0] == 0) {
         unescape(buffer);
 
-        logo[i + 2] = mem + i * LINE_LEN;
-        safe_strncpy((char *)logo[i + 2], buffer, LINE_LEN);
+        logo[i + 2] = mem + (i * LINE_LEN);
+        safeStrncpy(logo[i + 2], buffer, LINE_LEN);
 
         ++i;
     }
@@ -74,8 +74,8 @@ void *file_to_logo(char *file) {
 
         unescape(buffer);
 
-        logo[i + 2] = mem + i * LINE_LEN;
-        safe_strncpy(logo[i + 2], buffer, LINE_LEN);
+        logo[i + 2] = mem + (i * LINE_LEN);
+        safeStrncpy(logo[i + 2], buffer, LINE_LEN);
 
         ++i;
     }
@@ -97,13 +97,13 @@ void *file_to_logo(char *file) {
 }
 
 // add a module containing id to array
-void add_module(struct Module *array, char *id) {
-    struct Module *new = malloc(sizeof(struct Module));
+void addModule(struct SModule *array, char *id) {
+    struct SModule *new = malloc(sizeof(struct SModule));
     if(new == NULL)
         return;
-    struct Module *last = array;
+    struct SModule *last = array;
 
-    for(struct Module *current = array; current->next; current = current->next)
+    for(struct SModule *current = array; current->next; current = current->next)
         last = current->next;
 
     last->next = new;
@@ -120,9 +120,9 @@ void add_module(struct Module *array, char *id) {
 }
 
 // free every module in array
-void destroy_array(struct Module *array) {
-    struct Module *current = array;
-    struct Module *next;
+void destroyArray(struct SModule *array) {
+    struct SModule *current = array;
+    struct SModule *next;
 
     while(current) {
         next = current->next;
@@ -133,7 +133,7 @@ void destroy_array(struct Module *array) {
 }
 
 // print a certain line of the logo
-void get_logo_line(char *dest, unsigned *line) {
+void getLogoLine(char *dest, unsigned *line) {
     if(config.logo == NULL || dest == NULL || *line < 1)
         return;
 
@@ -141,13 +141,13 @@ void get_logo_line(char *dest, unsigned *line) {
         ++(*line);
         strcat(dest, config.logo[*line]);
     } else {
-        for(size_t i = 0; i < real_strlen(config.logo[2]); ++i)
+        for(size_t i = 0; i < realStrlen(config.logo[2]); ++i)
             strcat(dest, " ");
     }
 }
 
 // print no more than maxlen visible characters of line
-void print_line(char *line, const size_t maxlen) {
+void printLine(char *line, const size_t maxlen) {
     if(_bold)
         fputs("\033[1m", stdout);
     fputs(config.color, stdout);

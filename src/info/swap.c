@@ -36,7 +36,7 @@ int swap(char *dest) {
         const size_t len = DEST_SIZE - strlen(dest);
         char perc[len];
 
-        snprintf(perc, len, " (%lu%%)", (unsigned long)((usedswap * 100) / totalswap));
+        snprintf(perc, len, " (%lu%%)", (usedswap * 100) / totalswap);
         strcat(dest, perc);
     }
 #endif

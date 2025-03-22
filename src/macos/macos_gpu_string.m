@@ -4,7 +4,7 @@
 #import <Foundation/Foundation.h>
 #import <IOKit/IOKitLib.h>
 
-char *get_gpu_string(void) {
+char *getGpuString(void) {
     CFMutableDictionaryRef dict = IOServiceMatching("IOPCIDevice");
     io_iterator_t iter;
     int success;

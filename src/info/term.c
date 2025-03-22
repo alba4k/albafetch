@@ -36,7 +36,7 @@ int term(char *dest) {
     if(_term_ssh && getenv("SSH_CONNECTION"))
         snprintf(dest, DEST_SIZE, "%s (SSH)", terminal);
     else
-        safe_strncpy(dest, terminal, DEST_SIZE);
+        safeStrncpy(dest, terminal, DEST_SIZE);
 
     return RET_OK;
 }

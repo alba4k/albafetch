@@ -5,7 +5,7 @@
 #include "queue.h"
 #include "../utils/return.h"
 
-Queue *queue_with_size(size_t size) {
+Queue *queueWithSIze(size_t size) {
     Queue *q = malloc(sizeof(Queue));
     if(q == NULL)
         return NULL;
@@ -79,14 +79,14 @@ int dequeue(Queue *q, char *out) {
     return QUEUE_OK;
 }
 
-void destroy_queue(Queue *q) {
+void destroyQueue(Queue *q) {
     free(q->data);
     free(q);
 }
 
-void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size) {
+void readAfterSequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size) {
     size_t seq_size = strlen(seq);
-    Queue *q = queue_with_size(3 * seq_size);
+    Queue *q = queueWithSIze(3 * seq_size);
     if(q == NULL)
         return;
     int ch;
@@ -102,7 +102,7 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
 
         assert(q->size == seq_size); // Window is of correct width
 
-        if(strncmp((char *)q->data + q->offset, seq, seq_size) == 0) {
+        if(strncmp(q->data + q->offset, seq, seq_size) == 0) {
             found = true;
             break;
         }
@@ -114,7 +114,7 @@ void read_after_sequence(FILE *fp, const char *seq, char *buffer, size_t buffer_
         assert(error != QUEUE_FULL); // Queue should maintain same size, as 1 item is added and another is removed
     }
 
-    destroy_queue(q);
+    destroyQueue(q);
 
     if(found == false) {
         buffer[0] = 0; // make buffer an empty string if the sequence is not found

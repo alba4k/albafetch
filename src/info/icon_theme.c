@@ -8,13 +8,13 @@
 #include "../utils/wrappers.h"
 
 // get the current Icon Theme
-int icon_theme(char *dest) {
+int iconTheme(char *dest) {
     // try using gsettings
     // reading ~/.config/gtk-3.0/settings.ini could also be an option
-    if(binary_in_path("gsettings")) {
+    if(binaryInPath("gsettings")) {
         char buf[DEST_SIZE] = "";
         char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "icon-theme", NULL};
-        exec_cmd(buf, DEST_SIZE, args);
+        execCmd(buf, DEST_SIZE, args);
 
         // cleanup
         if(buf[0] != 0) {
@@ -26,7 +26,7 @@ int icon_theme(char *dest) {
                     *ptr = 0;
             }
 
-            safe_strncpy(dest, buf, DEST_SIZE);
+            safeStrncpy(dest, buf, DEST_SIZE);
             return RET_OK;
         }
     }

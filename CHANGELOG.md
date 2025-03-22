@@ -4,10 +4,11 @@
 
 ### Modules
 * Added a `swap` module that prints the used and total swap on linux
+* the `cpu` modules now prints 2 decimal digits is the frequency is below 1 GHz
 
 ### Config syntax
 * Custom ascii arts will now print in the specified color by default
-* Added `swap_label`, the label for the new swa module
+* Added `swap_label`, the label for the new swap module
 * Added `swap_perc`, whether the used swap percentage should be printed
 
 ### Command line arguments

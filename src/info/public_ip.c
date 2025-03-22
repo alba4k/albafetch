@@ -13,7 +13,7 @@
 // I should probably reimplement curl as optdep for fallback, idk
 int puts(const char *);
 // get the current public ip
-int public_ip(char *dest) {
+int publicIp(char *dest) {
     // https://stackoverflow.com/a/65362666 - thanks dbush
 
     struct addrinfo hints = {0}, *addrs;
@@ -66,7 +66,7 @@ int public_ip(char *dest) {
      */
     char *start = buf, *end;
     end = strchr(start, '\n');
-    if(strncmp(start, "HTTP/1.1 200 OK", end - start - 1))
+    if(strncmp(start, "HTTP/1.1 200 OK", end - start - 1) != 0)
         return ERR_NO_INFO + 0x50;
 
     start = strstr(start, "\n\r\n");
@@ -75,7 +75,7 @@ int public_ip(char *dest) {
 
     start += 3;
 
-    safe_strncpy(dest, start, DEST_SIZE);
+    safeStrncpy(dest, start, DEST_SIZE);
 
     return RET_OK;
 }

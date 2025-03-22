@@ -12,6 +12,6 @@
 #include <stdbool.h>
 
 // can use libc or alternatives
-bool binary_in_path(const char *str);
+bool binaryInPath(const char *str);
 
-void get_gpus(char **gpus);
+void getGpus(char **gpus);

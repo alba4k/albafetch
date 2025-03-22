@@ -94,7 +94,7 @@ int cpu(char *dest) {
             if(end) {
                 *end = 0;
 
-                snprintf(freq, 24, " @ %g GHz", (float)(atoi(frequency) / 100) / 10);
+                snprintf(freq, 24, " @ %.2g GHz", atof(frequency) / 1e3);
             }
         }
     }
@@ -129,7 +129,7 @@ int cpu(char *dest) {
             memmove(end, end + 4, strlen(end + 1));
     }
 
-    safe_strncpy(dest, cpu_info, DEST_SIZE);
+    safeStrncpy(dest, cpu_info, DEST_SIZE);
 #ifdef __linux__
     free(buf);
 #endif

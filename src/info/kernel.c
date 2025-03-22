@@ -25,7 +25,7 @@ int kernel(char *dest) {
     if(_kernel_type && type)
         snprintf(dest, DEST_SIZE, "%s (%s)", name.release, type);
     else
-        safe_strncpy(dest, name.release, DEST_SIZE);
+        safeStrncpy(dest, name.release, DEST_SIZE);
 
     return RET_OK;
 }

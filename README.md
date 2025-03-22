@@ -288,7 +288,7 @@ If you want to, you can directly modify the source code contained in this reposi
 
 New logos can be added in [`src/logos.h`](src/logos.h) (be careful to follow the format), new infos in `src/info` and [`src/info/info.h`](src/info/info.h). Config options are mainly parsed in [`src/utils.c`](src/utils.c). You will also need to edit [`src/main.c`](src/main.c) afterwards to fully enable the new features.
 
-Don't mind opening a pull request if you think some of the changes you made should be in the public version, just try to follow the coding style that I used in the rest of the project.
+Don't mind opening a pull request if you think some of the changes you made should be in the public version. Please run `clang-tidy --fix src/**/*{.c,.h}` to check for any issues and `clang-format -i src/**/*{c,h}` to make sure the code style is consistent with the rest of the project before committing.
 
 Any contribution, even just a fix of a typo, is highly appreciated.
 

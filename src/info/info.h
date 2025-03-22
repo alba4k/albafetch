@@ -16,15 +16,15 @@ int kernel(char *dest);
 
 int desktop(char *dest);
 
-int gtk_theme(char *dest);
+int gtkTheme(char *dest);
 
-int icon_theme(char *dest);
+int iconTheme(char *dest);
 
-int cursor_theme(char *dest);
+int cursorTheme(char *dest);
 
 int shell(char *dest);
 
-int login_shell(char *dest);
+int loginShell(char *dest);
 
 int term(char *dest);
 
@@ -42,9 +42,9 @@ int memory(char *dest);
 
 int swap(char *dest);
 
-int public_ip(char *dest);
+int publicIp(char *dest);
 
-int local_ip(char *dest);
+int localIp(char *dest);
 
 int pwd(char *dest);
 
@@ -54,4 +54,4 @@ int battery(char *dest);
 
 int colors(char *dest);
 
-int light_colors(char *dest);
+int lightColors(char *dest);

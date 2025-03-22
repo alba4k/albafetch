@@ -16,7 +16,7 @@ int uptime(char *dest) {
     struct timeval boottime;
     int error;
     long uptime;
-    error = sysctl_wrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
+    error = sysctlWrap(&boottime, sizeof(boottime), CTL_KERN, KERN_BOOTTIME);
 
     if(error < 0)
         return ERR_NO_INFO;
@@ -34,8 +34,8 @@ int uptime(char *dest) {
 #endif // __APPLE__
 
     long days = uptime / 86400;
-    char hours = uptime / 3600 - days * 24;
-    char mins = uptime / 60 - days * 1440 - hours * 60;
+    long hours = (uptime / 3600) - (days * 24);
+    long mins = (uptime / 60) - (days * 1440) - (hours * 60);
 
     char result[DEST_SIZE] = "";
     char str[24] = "";
@@ -45,18 +45,18 @@ int uptime(char *dest) {
         strcat(result, str);
     }
     if(hours) {
-        snprintf(str, 24, "%dh%c", hours, mins ? ' ' : 0); // print the number of days passed if more than 0
+        snprintf(str, 24, "%ldh%c", hours, mins ? ' ' : 0); // print the number of days passed if more than 0
         strcat(result, str);
     }
     if(mins) {
-        snprintf(str, 24, "%dm", mins); // print the number of minutes passed if more than 0
+        snprintf(str, 24, "%ldm", mins); // print the number of minutes passed if more than 0
         strcat(result, str);
     } else if(uptime < 60) {
         snprintf(str, 24, "%lds", uptime); // print the number of seconds passed if less than 60
         strcat(result, str);
     }
 
-    safe_strncpy(dest, result, DEST_SIZE);
+    safeStrncpy(dest, result, DEST_SIZE);
 
     return RET_OK;
 }

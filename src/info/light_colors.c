@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 // show the terminal color configuration
-int light_colors(char *dest) {
+int lightColors(char *dest) {
     memset(dest, 0, DEST_SIZE);
 
     for(int i = 0; i < 8; ++i)

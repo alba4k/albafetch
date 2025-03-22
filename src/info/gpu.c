@@ -26,11 +26,11 @@ int gpu(char *dest) {
     uname(&name);
 
     if(strcmp(name.machine, "x86_64") == 0)
-        gpus[0] = get_gpu_string();                      // only works on x64
+        gpus[0] = getGpuString();                      // only works on x64
     if(gpus[0] == 0 || strcmp(name.machine, "x86_64")) { // fallback
         char buf[1024];
         char *args[] = {"/usr/sbin/system_profiler", "SPDisplaysDataType", NULL};
-        exec_cmd(buf, 1024, args);
+        execCmd(buf, 1024, args);
 
         gpus[0] = strstr(buf, "Chipset Model: ");
         if(gpus[0] == 0)
@@ -45,7 +45,7 @@ int gpu(char *dest) {
 #ifdef __ANDROID__
     return ERR_UNSUPPORTED;
 #else
-    get_gpus(gpus);
+    getGpus(gpus);
 #endif // __ANDROID__
 #endif // __APPLE__
 

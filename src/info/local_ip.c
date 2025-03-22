@@ -8,7 +8,7 @@
 #include <arpa/inet.h>
 
 // get all local ips
-int local_ip(char *dest) {
+int localIp(char *dest) {
     struct ifaddrs *addrs = NULL;
     bool done = false;
     int buf_size = DEST_SIZE;
@@ -21,7 +21,7 @@ int local_ip(char *dest) {
         // checking if the ip is valid
         if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
             // filtering out docker or localhost ips
-            if((strcmp(addrs->ifa_name, "lo") || _loc_localhost) && (strcmp(addrs->ifa_name, "docker0") || _loc_docker)) {
+            if((strcmp(addrs->ifa_name, "lo") != 0 || _loc_localhost) && (strcmp(addrs->ifa_name, "docker0") != 0 || _loc_docker)) {
                 struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
 
                 // saving it to the list of interfaces

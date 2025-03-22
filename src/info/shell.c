@@ -24,11 +24,11 @@ int shell(char *dest) {
         fclose(fp);
 
         if(shell[0] == '-') { // cmdline is "-bash" when login shell
-            safe_strncpy(dest, _shell_path ? shell + 1 : basename(shell + 1), DEST_SIZE);
+            safeStrncpy(dest, _shell_path ? shell + 1 : basename(shell + 1), DEST_SIZE);
             return RET_OK;
         }
 
-        safe_strncpy(dest, _shell_path ? shell : basename(shell), DEST_SIZE);
+        safeStrncpy(dest, _shell_path ? shell : basename(shell), DEST_SIZE);
         return RET_OK;
     }
 #endif
@@ -39,7 +39,7 @@ int shell(char *dest) {
     if(shell[0] == 0)
         return ERR_NO_INFO + 0x10;
 
-    safe_strncpy(dest, _shell_path ? shell : basename(shell), DEST_SIZE);
+    safeStrncpy(dest, _shell_path ? shell : basename(shell), DEST_SIZE);
 
     return RET_OK;
 }

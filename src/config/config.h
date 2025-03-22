@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct Config {
+struct SConfig {
     /* Starting from the least significant byte, see the #define statements later
     * 0. _align
     * 1. _bold
@@ -78,7 +78,7 @@ struct Config {
     char colors_prefix[64];
     char light_colors_prefix[64];
 };
-extern struct Config config;
+extern struct SConfig config;
 
 #define _align          config.boolean_options & 0x1
 #define _bold           config.boolean_options & 0x2
@@ -109,4 +109,4 @@ extern struct Config config;
 #define _bat_status     config.boolean_options & 0x4000000
 #define _swap_perc      config.boolean_options & 0x8000000
 
-void parse_config(const char *file, struct Module *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
+void parseSConfig(const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);

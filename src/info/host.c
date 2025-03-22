@@ -30,8 +30,8 @@ int host(char *dest) {
     char *brand_args[] = {"getprop", "ro.product.brand", NULL};
     char *model_args[] = {"getprop", "ro.product.model", NULL};
 
-    exec_cmd(brand, 64, brand_args);
-    exec_cmd(model, 64, model_args);
+    execCmd(brand, 64, brand_args);
+    execCmd(model, 64, model_args);
 
     if((brand[0] || model[0]) == 0)
         return ERR_NO_INFO;
@@ -45,7 +45,7 @@ int host(char *dest) {
     if((fp = fopen("/sys/devices/virtual/dmi/id/product_name", "r"))) {
         fseek(fp, 0, SEEK_END);
         len = ftell(fp);
-        rewind(fp);
+        fseek(fp, 0, SEEK_SET);
 
         name = malloc(len);
         if(name == NULL)
@@ -58,7 +58,7 @@ int host(char *dest) {
     if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
         fseek(fp, 0, SEEK_END);
         len = ftell(fp);
-        rewind(fp);
+        fseek(fp, 0, SEEK_SET);
 
         version = malloc(len);
         if(version == NULL)
@@ -85,9 +85,9 @@ int host(char *dest) {
     if(name && version && name_defined && version_defined)
         snprintf(dest, DEST_SIZE, "%s %s", name, version);
     else if(name && name_defined)
-        safe_strncpy(dest, name, DEST_SIZE);
+        safeStrncpy(dest, name, DEST_SIZE);
     else if(version && version_defined)
-        safe_strncpy(dest, version, DEST_SIZE);
+        safeStrncpy(dest, version, DEST_SIZE);
     else {
         free(name);
         free(version);
