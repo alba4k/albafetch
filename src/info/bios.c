@@ -15,7 +15,7 @@ int bios(char *dest) {
     if((fp = fopen("/sys/devices/virtual/dmi/id/bios_vendor", "r"))) {
         fseek(fp, 0, SEEK_END);
         len = ftell(fp);
-        fseek(fp, 0, SEEK_END);
+        fseek(fp, 0, SEEK_SET);
 
         vendor = malloc(len);
         if(vendor == NULL)
@@ -31,8 +31,10 @@ int bios(char *dest) {
         fseek(fp, 0, SEEK_SET);
 
         version = malloc(len);
-        if(version == NULL)
+        if(version == NULL) {
+            free(vendor);
             return ERR_OOM;
+        }
         version[fread(version, 1, len, fp) - 1] = 0;
 
         fclose(fp);

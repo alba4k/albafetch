@@ -46,7 +46,7 @@
  * cpu temp (off by default)
  * rewrite config parsing and make it decent (check rewrite-config-parsing branch)
  * write manpage
- * implement ERR_OOM where needed in info
+ * fix writing in the previous block when fread returns 0
  */
 
 // This contains the default config values
@@ -567,8 +567,12 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strncat(printed, current->id, 1023 - strlen(printed));
         } else {
-            if((current->func)(data))
+            int ret = current->func(data);
+            if(ret != RET_OK) {
+                if(ret == ERR_OOM)
+                    return ERR_OOM;
                 continue;
+            }
 
             char label[80];
             printed[0] = 0;

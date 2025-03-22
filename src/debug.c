@@ -92,10 +92,8 @@ int main(int argc, char **argv) {
             ++errors;
         }
     }
-    printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
 
     gettimeofday(&end, NULL);
-
     time = ((end.tv_sec - start_all.tv_sec) * 1e6 + end.tv_usec - start_all.tv_usec) / 1e3;
 
     printf("\n\033[1mDebug run finished with a total of %u errors.\033[0m [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
