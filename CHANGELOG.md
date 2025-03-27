@@ -4,7 +4,7 @@
 
 ### Modules
 * Added a `swap` module that prints the used and total swap on linux
-* the `cpu` modules now prints 2 decimal digits is the frequency is below 1 GHz
+* The `cpu` modules now prints 2 decimal digits is the frequency is below 1 GHz
 
 ### Config syntax
 * Custom ascii arts will now print in the specified color by default
@@ -14,10 +14,13 @@
 ### Command line arguments
 * Added `--version` (`-v` for short), prints version and build commit
 
-### Other changes
-* added a logo for [Rocky Linux](https://rockylinux.org)
-* updated the [Garuda Linux](https://garudalinux.org) logo
-* changed return values to be more clear than 0 or 1
+### Other
+* Added a logo for [Rocky Linux](https://rockylinux.org)
+
+## Changes
+* Updated the [Garuda Linux](https://garudalinux.org) logo
+* Changed return values to be more clear than 0 or 1
+* User errors are now handled gracefully
 
 ## Bug fixes
 
@@ -25,8 +28,8 @@
 * Packages should be counted faster for dpkg and especially snap
 * Alacritty will now be properly recognized even with `general.ipc_socket = false`
 * `gpu` should now print all gpus even when libpci doesn't work
-* fixed `pwd_path` not working
-* should now exit on OOM, not segfault
+* Fixed `pwd_path` not working
+* Should now exit on OOM, not segfault
 
 ### Technical fixes
 * Reduced the size of default logos

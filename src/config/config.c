@@ -121,11 +121,14 @@ int parseSConfigBool(const char *source, const char *field, bool *dest) {
 }
 
 // parse the provided config file
-void parseSConfig(const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
+void parseSConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
-    if(fp == NULL)
+    if(fp == NULL) {
+        if(error)
+            perror(file);
         return;
+    }
 
     fseek(fp, 0, SEEK_END);
     size_t len = (size_t)ftell(fp);

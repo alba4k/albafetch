@@ -1,6 +1,7 @@
-#include <string.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "utils.h"
 #include "return.h"
@@ -11,8 +12,10 @@
 // copy an ascii art from file to mem
 void *fileToLogo(char *file) {
     FILE *fp = fopen(file, "r");
-    if(fp == NULL)
+    if(fp == NULL) {
+        perror(file);
         return NULL;
+    }
 
 /* 
      * mem is assumed to be a 10 KiB buffer, aka 10240 B.
