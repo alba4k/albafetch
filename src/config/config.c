@@ -13,7 +13,7 @@
 #include <string.h>
 
 // a return code of 0 means that the option was parsed successfully
-int parseSConfigStr(const char *source, const char *field, char *dest, const size_t maxlen) {
+int parseConfigStr(const char *source, const char *field, char *dest, const size_t maxlen) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -52,7 +52,7 @@ int parseSConfigStr(const char *source, const char *field, char *dest, const siz
 }
 
 // a return code of 0 means that the option was parsed successfully
-int parseSConfigInt(const char *source, const char *field, int *dest, const unsigned max) {
+int parseConfigInt(const char *source, const char *field, int *dest, const unsigned max) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -89,7 +89,7 @@ int parseSConfigInt(const char *source, const char *field, int *dest, const unsi
 }
 
 // a return code of 0 means that the option was parsed successfully
-int parseSConfigBool(const char *source, const char *field, bool *dest) {
+int parseConfigBool(const char *source, const char *field, bool *dest) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -121,7 +121,7 @@ int parseSConfigBool(const char *source, const char *field, bool *dest) {
 }
 
 // parse the provided config file
-void parseSConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
+void parseConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
     if(fp == NULL) {
@@ -135,9 +135,11 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
     fseek(fp, 0, SEEK_SET);
 
     char *conf = malloc(len);
-    if(conf == NULL)
+    if(conf == NULL) {
+        perror("malloc");
         return;
-    conf[fread(conf, 1, len, fp)] = 0;
+    }
+    conf[fread(conf, 1, len, fp) - 1] = 0;
     fclose(fp);
 
     // used later
@@ -154,13 +156,13 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
 
     // ascii art
     char path[96] = "";
-    parseSConfigStr(conf, "ascii_art", path, sizeof(path));
+    parseConfigStr(conf, "ascii_art", path, sizeof(path));
     if(path[0])
         *ascii_ptr = fileToLogo(path);
 
     // logo
     char logo[32] = "";
-    parseSConfigStr(conf, "logo", logo, sizeof(logo));
+    parseConfigStr(conf, "logo", logo, sizeof(logo));
     if(logo[0]) {
         for(size_t i = 0; i < sizeof(logos) / sizeof(logos[0]); ++i)
             if(strcmp(logos[i][0], logo) == 0) {
@@ -172,7 +174,7 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
 
     // color
     char color[16] = "";
-    parseSConfigStr(conf, "default_color", color, sizeof(color));
+    parseConfigStr(conf, "default_color", color, sizeof(color));
     if(color[0]) {
         const char *colors[][2] = {
             {"black", "\033[30m"},  {"red", "\033[31m"},  {"green", "\033[32m"}, {"yellow", "\033[33m"}, {"blue", "\033[34m"},
@@ -187,13 +189,13 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
     }
 
     // dash
-    parseSConfigStr(conf, "dash", config.dash, sizeof(config.dash));
+    parseConfigStr(conf, "dash", config.dash, sizeof(config.dash));
 
     // spacing
-    parseSConfigInt(conf, "spacing", &config.spacing, 64);
+    parseConfigInt(conf, "spacing", &config.spacing, 64);
 
     // separator
-    parseSConfigStr(conf, "separator_character", config.separator, sizeof(config.separator));
+    parseConfigStr(conf, "separator_character", config.separator, sizeof(config.separator));
 
     // BOOLEAN OPTIONS (check utils/utils.h)
 
@@ -204,7 +206,7 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
 
     bool buffer;
     for(size_t i = 0; i < sizeof(booleanOptions) / sizeof(booleanOptions[0]); ++i) {
-        if(parseSConfigBool(conf, booleanOptions[i], &buffer) == 0) {
+        if(parseConfigBool(conf, booleanOptions[i], &buffer) == 0) {
             if(buffer)
                 config.boolean_options |= ((uint64_t)1 << i);
             else
@@ -215,11 +217,11 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
 
     // OTHER MODULE-RELATED OPTIONS
 
-    parseSConfigInt(conf, "gpu_index", &config.gpu_index, 3);
+    parseConfigInt(conf, "gpu_index", &config.gpu_index, 3);
 
-    parseSConfigStr(conf, "date_format", config.date_format, sizeof(config.date_format));
+    parseConfigStr(conf, "date_format", config.date_format, sizeof(config.date_format));
 
-    parseSConfigStr(conf, "col_block_str", config.col_block_str, sizeof(config.col_block_str));
+    parseConfigStr(conf, "col_block_str", config.col_block_str, sizeof(config.col_block_str));
 
     // LABELS
 
@@ -262,7 +264,7 @@ void parseSConfig(bool error, const char *file, struct SModule *modules, void **
     };
 
     for(size_t i = 0; i < sizeof(prefixes) / sizeof(prefixes[0]); ++i)
-        parseSConfigStr(conf, prefixes[i].config_name, prefixes[i].option, 64);
+        parseConfigStr(conf, prefixes[i].config_name, prefixes[i].option, 64);
 
     // MODULES
 

@@ -188,11 +188,13 @@ int main(int argc, char **argv) {
             }
         }
 
-        parseSConfig(error, config_file, modules, &ascii_ptr, &default_bold, default_color, default_logo);
+        parseConfig(error, config_file, modules, &ascii_ptr, &default_bold, default_color, default_logo);
     }
 
-    if(ascii_file)
+    if(ascii_file) {
+        free(ascii_ptr);
         ascii_ptr = fileToLogo(ascii_file);
+    }
 
     if(asking_logo) { // --logo was used
         if(asking_logo < argc) {

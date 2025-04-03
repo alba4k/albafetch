@@ -17,7 +17,7 @@ void *fileToLogo(char *file) {
         return NULL;
     }
 
-/* 
+    /* 
      * mem is assumed to be a 10 KiB buffer, aka 10240 B.
      * this will be filled in with up to 64 lines,
      * each of which can be up to 160 bytes long.
@@ -39,8 +39,10 @@ void *fileToLogo(char *file) {
     // setting the correct color (or eventually the first line)
 
     line_len = getline(&buffer, &len, fp); // save the first line to buffer
-    if(line_len == (size_t)-1)             // getline returns -1 in case of error
+    if(line_len == (size_t)-1) {           // getline returns -1 in case of error
+        free(buffer);
         return NULL;
+    }
 
     if(buffer[line_len - 1] == '\n')
         buffer[line_len - 1] = 0;
@@ -56,16 +58,16 @@ void *fileToLogo(char *file) {
         if(strcmp(buffer, *colors[j]) == 0)
             strcpy(config.color, colors[j][1]);
 
-    mem = malloc(1024);
-    if(mem == NULL)
-        return NULL;
-    memset(mem, 0, 1024);
-
     if(config.color[0] == 0) {
         unescape(buffer);
 
-        logo[i + 2] = mem + (i * LINE_LEN);
-        safeStrncpy(logo[i + 2], buffer, LINE_LEN);
+        mem = malloc(LINE_LEN);
+        if(mem == NULL) {
+            perror("malloc");
+            return NULL;
+        }
+
+        safeStrncpy(mem, buffer, LINE_LEN);
 
         ++i;
     }
@@ -77,18 +79,27 @@ void *fileToLogo(char *file) {
 
         unescape(buffer);
 
-        logo[i + 2] = mem + (i * LINE_LEN);
-        safeStrncpy(logo[i + 2], buffer, LINE_LEN);
+        void *newmem = realloc(mem, (i + 1) * LINE_LEN);
+        if(newmem == NULL) {
+            free(mem);
+            perror("realloc");
+            return NULL;
+        }
+        mem = newmem;
+
+        safeStrncpy(mem + (i * LINE_LEN), buffer, LINE_LEN);
 
         ++i;
     }
-
     // cleaning up
-    fclose(fp);
     free(buffer);
+    fclose(fp);
 
     // set up the logo metadata;
     logo[0] = "custom"; // logo ID
+
+    for(ptrdiff_t j = 0; j < i; ++j)
+        logo[j + 2] = mem + (j * LINE_LEN);
 
     // the array of lines is NULL-terminated;
     logo[i + 2] = NULL;

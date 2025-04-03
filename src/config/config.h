@@ -109,4 +109,4 @@ extern struct SConfig config;
 #define _bat_status     config.boolean_options & 0x4000000
 #define _swap_perc      config.boolean_options & 0x8000000
 
-void parseSConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
+void parseConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);

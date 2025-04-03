@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
         if(return_value == 0) {
             printf("\033[1m\033[32m%-12s\033[0m %-40s [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", arr[i].name, mem, time);
         } else {
-            printf("\033[1m\033[31m%-12s\033[0m 0x%x                                "
+            printf("\033[1m\033[31m%-13s\033[0m 0x%-38x"
                    "[\033[1m\033[36m\033[1m%.3f ms\033[0m]\n",
                    arr[i].name, return_value, time);
             ++errors;
