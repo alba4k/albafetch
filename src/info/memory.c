@@ -23,7 +23,7 @@ int memory(char *dest) {
         return ERR_NO_INFO;
     }
 
-    snprintf(dest, DEST_SIZE, "%llu MiB / %llu MiB", usedram / 1048576, totalram / 1048576);
+    snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedram / 1048576, totalram / 1048576);
     
 #else
     struct sysinfo info;
