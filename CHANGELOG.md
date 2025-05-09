@@ -21,6 +21,7 @@
 * Updated the [Garuda Linux](https://garudalinux.org) logo
 * Changed return values to be more clear than 0 or 1
 * User errors are now handled gracefully
+* term will not print `Apple Terminal` instead of `Apple_Terminal`
 
 ## Bug fixes
 

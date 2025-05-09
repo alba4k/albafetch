@@ -31,6 +31,8 @@ int term(char *dest) {
             terminal = "Kitty";
         else if(strcmp(terminal, "alacritty") == 0)
             terminal = "Alacritty";
+        else if(strcmp(terminal, "Apple_Terminal") == 0)
+            terminal = "Apple Terminal";
     }
 
     if(_term_ssh && getenv("SSH_CONNECTION"))
