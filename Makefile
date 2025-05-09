@@ -17,7 +17,7 @@ endif
 ifeq ($(KERNEL),Darwin)
 	INSTALLFLAGS := -m755
 	CONFIGFLAGS := -m644
-	INSTALLPATH := $(PREFIX)/bin
+	INSTALLPATH := /usr/local/bin
 	CONFIGPATH := ~/.config/
 endif
 
