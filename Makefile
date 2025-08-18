@@ -35,9 +35,8 @@ compile: build
 run: compile
 	build/albafetch
 
-debug: build
-	meson compile -C build debug
-	build/debug --no-pip
+debug: compile
+	build/albafetch --debug --no-pip
 
 deb: compile
 	cd debian; \

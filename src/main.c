@@ -8,6 +8,7 @@
 
 #include "config/config.h"
 #include "info/info.h"
+#include "utils/debug.h"
 #include "utils/logos.h"
 #include "utils/queue.h"
 #include "utils/return.h"
@@ -136,7 +137,6 @@ int main(int argc, char **argv) {
                 continue;
             }
             ascii_file = argv[i + 1];
-            continue;
         } else if(strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--logo") == 0)
             asking_logo = i + 1;
         else if(strcmp(argv[i], "--align") == 0 || strcmp(argv[i], "-a") == 0)
@@ -147,8 +147,25 @@ int main(int argc, char **argv) {
                 continue;
             }
             safeStrncpy(config_file, argv[i + 1], sizeof(config_file));
-            continue;
-        } else if(strcmp(argv[i], "--no-logo") == 0)
+        } else if(strcmp(argv[i], "--debug") == 0) {
+            puts("version: \033[1m\033[34m" VERSION "\033[0m, commit: \033[1m\033[34m" COMMIT "\033[0m\n");
+
+            // just setting every option to 1 (except maybe _pkg_pip cause pip is slow af)
+            config.boolean_options = 0xffffffffffffffff;
+            if(argc > i+1) {
+                if(strcmp(argv[i+1], "--no-pip") == 0)
+                    config.boolean_options = 0xffffffffffff7fff;
+            }
+
+            double time;
+            unsigned errors;
+            run_debug(&errors, &time);
+
+            printf("\n\033[1mDebug run finished with a total of %u error(s).\033[0m [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
+
+            return RET_OK;
+        }
+        else if(strcmp(argv[i], "--no-logo") == 0)
             print_logo = false;
         else if(strcmp(argv[i], "--no-config") == 0)
             use_config = false;
@@ -323,6 +340,10 @@ int main(int argc, char **argv) {
         printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n", config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s-v\033[0m,%s%s --version\033[0m:\t Print the version and exit\n", config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "");
+
+        printf("\t%s%s--debug\033[0m:\t Test all modules and exit\n", config.color, _bold ? "\033[1m" : "");
+
+        printf("\t%s%s--no-pip\033[0m:\t Disables pip in testing because of speed concerns\n", config.color, _bold ? "\033[1m" : "");
 
         printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
                "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"

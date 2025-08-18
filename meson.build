@@ -39,6 +39,7 @@ src = [
   'src/info/user.c',
   'src/optdeps/glib.c',
   'src/optdeps/libpci.c',
+  'src/utils/debug.c',
   'src/utils/queue.c',
   'src/utils/utils.c',
   'src/utils/wrappers.c',
@@ -98,10 +99,8 @@ build_args += '-DHAVE_VERSION_H'
 
 # BUILD
 
-src_debug = src + ['src/debug.c']
 src += 'src/main.c'
-
-debug_args = build_args + ['-g']
+# debug_args = build_args + ['-g']
 
 executable(
   meson.project_name(),
@@ -109,14 +108,5 @@ executable(
   dependencies : project_dependencies,
   install : true,
   c_args : build_args,
-  include_directories: include_directories('.')
-)
-
-executable(
-  'debug',
-  src_debug,
-  dependencies : project_dependencies,
-  install : false,
-  c_args : debug_args,
   include_directories: include_directories('.')
 )
