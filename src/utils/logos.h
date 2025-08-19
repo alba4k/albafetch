@@ -440,13 +440,6 @@ static char *logos[][32] = {
      "           giliiiiiiiiiiiiT`       ",
      "          -^~$ililili@~~'          ",
      NULL},
-    {// Windows
-     "windows", "\033[34m", "\033[31m        ,.=:!!t3Z3z.,                ", "\033[31m       :tt:::tt333EE3                ",
-     "\033[31m       Et:::ztt33EEEL \033[32m@Ee.,      .., ", "\033[31m      ;tt:::tt333EE7 \033[32m;EEEEEEttttt33# ", "\033[31m     :Et:::zt333EEQ. \033[32m$EEEEEttttt33QL ",
-     "\033[31m     it::::tt333EEF \033[32m@EEEEEEttttt33F  ", "\033[31m    ;3=*^```\"*4EEV \033[32m:EEEEEEttttt33@.  ", "    ,.=::::!t=., \033[31m` \033[32m@EEEEEEtttz33QF   ",
-     "   ;::::::::zt33)   \033[32m\"4EEEtttji3P*    ", "  :t::::::::tt33.\033[33m:Z3z..  \033[32m`` \033[33m,..g.    ", "  i::::::::zt33F \033[33mAEEEtttt::::ztF     ",
-     " ;:::::::::t33V \033[33m;EEEttttt::::t3      ", " E::::::::zt33L \033[33m@EEEtttt::::z3F      ", "{3=*^```\"*4E3) \033[33m;EEEtttt:::::tZ`      ",
-     "             `\033[33m \033[33m:EEEEtttt::::z7       ", "\033[33m                 \"VEzjt:;;z>*`       ", NULL},
     {// Ubuntu
      "ubuntu",
      "\033[31m",
@@ -493,6 +486,13 @@ static char *logos[][32] = {
      "            \033[32m~|Invnvnvvnvvvnnv}+`  ",
      "                \033[32m-~|{*l}*|~        ",
      NULL},
+    {// Windows
+     "windows", "\033[34m", "\033[31m        ,.=:!!t3Z3z.,                ", "\033[31m       :tt:::tt333EE3                ",
+     "\033[31m       Et:::ztt33EEEL \033[32m@Ee.,      .., ", "\033[31m      ;tt:::tt333EE7 \033[32m;EEEEEEttttt33# ", "\033[31m     :Et:::zt333EEQ. \033[32m$EEEEEttttt33QL ",
+     "\033[31m     it::::tt333EEF \033[32m@EEEEEEttttt33F  ", "\033[31m    ;3=*^```\"*4EEV \033[32m:EEEEEEttttt33@.  ", "    ,.=::::!t=., \033[31m` \033[32m@EEEEEEtttz33QF   ",
+     "   ;::::::::zt33)   \033[32m\"4EEEtttji3P*    ", "  :t::::::::tt33.\033[33m:Z3z..  \033[32m`` \033[33m,..g.    ", "  i::::::::zt33F \033[33mAEEEtttt::::ztF     ",
+     " ;:::::::::t33V \033[33m;EEEttttt::::t3      ", " E::::::::zt33L \033[33m@EEEtttt::::z3F      ", "{3=*^```\"*4E3) \033[33m;EEEtttt:::::tZ`      ",
+     "             `\033[33m \033[33m:EEEEtttt::::z7       ", "\033[33m                 \"VEzjt:;;z>*`       ", NULL},
     {// Empty Logo
      "none", "", "", NULL},
 };
