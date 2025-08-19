@@ -489,9 +489,9 @@ static char *logos[][32] = {
      "      \033[32m+vnvnnv,                  `-|===       ",
      "       \033[32m+vnvnvns.           .       =-        ",
      "        \033[32m-Invnvvnsi..___..=sv=.     `         ",
-     "          \033[32m+Invnvnvnnnnnnnnvvnn;.\033[0m",
-     "            \033[32m~|Invnvnvvnvvvnnv}+`\033[0m  ",
-     "                \033[32m-~|{*l}*|~\033[0m        ",
+     "          \033[32m+Invnvnvnnnnnnnnvvnn;.",
+     "            \033[32m~|Invnvnvvnvvvnnv}+`  ",
+     "                \033[32m-~|{*l}*|~        ",
      NULL},
     {// Empty Logo
      "none", "", "", NULL},
