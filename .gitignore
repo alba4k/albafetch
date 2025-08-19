@@ -1,6 +1,6 @@
 .vscode
 .idea
-build
+build/
 debian/albafetch*
 
 # nix stuff
