@@ -477,7 +477,7 @@ static char *logos[][32] = {
      "\033[37m+QmQQm\033[32mpvvnv;\033[37m _yYsyQQWUUQQQm #QmQ#\033[32m:\033[37mQQQWUV$QQm.",
      " \033[37m-QQWQW\033[32mpvvo\033[37mwZ?.wQQQE\033[32m==<\033[37mQWWQ/QWQW.QQWW\033[32m(:\033[37m jQWQE",
      "  \033[37m-$QQQQmmU'  jQQQ\033[32m@+=<\033[37mQWQQ)mQQQ.mQQQC\033[32m+;\033[37mjWQQ@'",
-     "   \033[37m-$WQ8Y\033[32mnI:\033[37m   QWQQwgQQWV\033[32m`\033[37mmWQQ.jQWQQgyyWW@!",
+     "   \033[37m-$WQ8Y\033[32mnI:\033[37m   QWQQwgQQWV\033[32m`\033[37mmWQQ.jQWQQgyyWW@!  ",
      "     \033[32m-1vvnvv.     `~+++`        ++|+++       ",
      "      \033[32m+vnvnnv,                  `-|===       ",
      "       \033[32m+vnvnvns.           .       =-        ",
