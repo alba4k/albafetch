@@ -157,7 +157,7 @@ static char *logos[][32] = {
      NULL},
      {//Devuan Linux
      "devuan",
-     "\033[38;5;18m",
+     "\033[34m",
      "   ..,,;;;::;,..                      ",
      "           `':ddd;:,.                 ",
      "                 `'dPPd:,.            ",
