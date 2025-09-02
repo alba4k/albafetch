@@ -53,8 +53,8 @@ Feel free to test any other platform :)
 # Dependencies
 
 ## Build dependencies
-These will usually also install the relative [runtime dependencies](#runtime-dependencies)
-Dependencies marked with an asterisk are optional. This means that if not installed at compile-time, albafetch will be compiles with custom implementations of the functions used.
+These will usually also install the relative [runtime dependencies](#runtime-dependencies).
+Dependencies marked with an asterisk are optional. This means that if they're not installed at compile-time, albafetch will be compiled with custom implementations of some functions.
 
 * [libpci](https://github.com/pciutils/pciutils)\*:
   Used to get gpu information
@@ -83,8 +83,8 @@ Dependencies marked with an asterisk are optional. This means that if not instal
 	- A [Makefile](https://www.gnu.org/software/make) exists (which uses [meson](https://mesonbuild.com/Getting-meson.html), [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages) and [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config)/[pkgconf](http://pkgconf.org)), more details are found [here](#compilation).
 
 ## Runtime dependencies
-I would like to eventually remove those, by checking at runtime if they are installed and not use them if not so.
-Dependencies marked with an asterisk are optional. This means that if not installed at compile-time, albafetch will be compiles with custom implementations of the functions used. If the binary was compiled with the dependency installed, however, it will be needed at runtime too.
+I would like to eventually remove those, by checking at runtime if they are installed and avoid using them them if they're not.
+Dependencies marked with an asterisk are optional. This means that if not installed at compile-time, albafetch will be compiled with custom implementations of the functions used. If the binary was compiled with the dependency installed, however, it will be needed at runtime too.
 
 * [libpci](https://github.com/pciutils/pciutils)\*:
 	- On Arch Linux, [pciutils](https://archlinux.org/packages/core/x86_64/pciutils)
