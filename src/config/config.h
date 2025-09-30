@@ -108,5 +108,8 @@ extern struct SConfig config;
 #define _col_background config.boolean_options & 0x2000000
 #define _bat_status     config.boolean_options & 0x4000000
 #define _swap_perc      config.boolean_options & 0x8000000
+#define _de_version     config.boolean_options & 0x10000000
+#define _term_version   config.boolean_options & 0x20000000
+#define _shell_version  config.boolean_options & 0x40000000
 
 void parseConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);

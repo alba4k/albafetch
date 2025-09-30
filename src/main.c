@@ -38,7 +38,6 @@
 
 // TODO:
 /*
- * print de, shell and terminal versions
  * Windows support? *BSD support?
  * make ascii dynamically use the available space (aka line by line)
  * start using gtk for theme and icons
@@ -54,8 +53,8 @@
 // This contains the default config values
 struct SConfig config = {
     // Default values for boolean options (least to most significant bit)
-    // 0111 0101 1111 1110 1111 1001 0110 ...
-    .boolean_options = 0x69f7fae,
+    // 0111 0101 1111 1110 1111 1001 0110 000...
+    .boolean_options = 0x0e9f7fae,
 
     .logo = NULL,
     .color = "",
@@ -107,7 +106,6 @@ int main(int argc, char **argv) {
     int asking_bold = 0;
     int asking_logo = 0;
     int asking_align = 0;
-
     // these store either the default values or the ones defined in the config
     // they are needed to know what is used if no arguments are given (for --help)
     bool default_bold = _bold;
@@ -154,7 +152,7 @@ int main(int argc, char **argv) {
             config.boolean_options = 0xffffffffffffffff;
             if(argc > i+1) {
                 if(strcmp(argv[i+1], "--no-pip") == 0)
-                    config.boolean_options = 0xffffffffffff7fff;
+                    config.boolean_options = config.boolean_options & ~(_pkg_pip);
             }
 
             double time;

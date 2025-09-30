@@ -8,7 +8,6 @@
 
 // get the current terminal
 int term(char *dest) {
-    // TODO: print terminal version (using env variables, parsing --version outputs, ...)
     const char *terminal = NULL;
 
     const char *terminals[][2] = {// {"ENVIRONMENT_VARIABLE", "terminal"},
@@ -39,6 +38,35 @@ int term(char *dest) {
         snprintf(dest, DEST_SIZE, "%s (SSH)", terminal);
     else
         safeStrncpy(dest, terminal, DEST_SIZE);
+
+    if(_term_version) {
+        char version[32] = "";
+        if(strcmp(terminal, "Kitty") == 0) {
+            char *argv[] = {"kitty", "--version", NULL};
+            execCmd(version, sizeof(version), argv);
+            char *end = strchr(version + 6, ' ');
+            if(end != NULL) {
+                *end = 0;
+                strncat(dest, " ", DEST_SIZE - strlen(dest));
+                strncat(dest, version + 6, DEST_SIZE - strlen(dest));
+            }
+        }
+        else if(strcmp(terminal, "Alacritty") == 0) {
+            char *argv[] = {"alacritty", "--version", NULL};
+            execCmd(version, sizeof(version), argv);
+            char *end = strchr(version + 10, ' ');
+            if(end != NULL) {
+                *end = 0;
+                strncat(dest, " ", DEST_SIZE - strlen(dest));
+                strncat(dest, version + 10, DEST_SIZE - strlen(dest));
+            }
+        }
+        else if(strcmp(terminal, "Konsole") == 0) {
+            char *argv[] = {"konsole", "--version", NULL};
+            execCmd(version, sizeof(version), argv);
+            strncat(dest, version + 7, DEST_SIZE - strlen(dest));
+        }
+    }
 
     return RET_OK;
 }
