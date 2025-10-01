@@ -203,7 +203,7 @@ void parseConfig(bool error, const char *file, struct SModule *modules, void **a
                                     "term_ssh",      "pkg_mgr",    "pkg_pacman",    "pkg_dpkg",    "pkg_rpm",        "pkg_flatpak",  "pkg_snap",
                                     "pkg_brew",      "pkg_pip",    "cpu_brand",     "cpu_freq",    "cpu_count",      "gpu_brand",    "mem_perc",
                                     "loc_localhost", "loc_docker", "pwd_path",      "kernel_type", "col_background", "bat_status",   "swap_perc",
-                                    "desktop_version", "term_version", "shell_version"};
+                                    "desktop_version", "term_version", "shell_version", "cpu_temp"};
 
     bool buffer;
     for(size_t i = 0; i < sizeof(booleanOptions) / sizeof(booleanOptions[0]); ++i) {

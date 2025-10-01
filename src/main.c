@@ -40,7 +40,7 @@
 /*
  * Windows support? *BSD support?
  * make ascii dynamically use the available space (aka line by line)
- * start using gtk for theme and icons
+ * start using gtk for theme and icons (not gsettings)
  * display resolution
  * storage
  * steam installed "packages" (off by default)
@@ -53,7 +53,7 @@
 // This contains the default config values
 struct SConfig config = {
     // Default values for boolean options (least to most significant bit)
-    // 0111 0101 1111 1110 1111 1001 0110 000...
+    // 0111 0101 1111 1110 1111 1001 0110 0000...
     .boolean_options = 0x0e9f7fae,
 
     .logo = NULL,

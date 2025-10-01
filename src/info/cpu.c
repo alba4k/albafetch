@@ -130,21 +130,37 @@ int cpu(char *dest) {
     }
 
     safeStrncpy(dest, cpu_info, DEST_SIZE);
-#ifdef __linux__
+#ifndef __APPLE__
     free(buf);
 #endif
 
     if(freq[0])
         strncat(dest, freq, DEST_SIZE - 1 - strlen(dest));
 
+    // final cleanup ("Intel Core i5         650" lol)
+    while((end = strstr(dest, "  ")))
+        memmove(end, end + 1, strlen(end));
+
     if(count && _cpu_count) {
         char core_count[16];
         snprintf(core_count, 16, " (%d) ", count);
         strncat(dest, core_count, DEST_SIZE - 1 - strlen(dest));
     }
-    // final cleanup ("Intel Core i5         650" lol)
-    while((end = strstr(dest, "  ")))
-        memmove(end, end + 1, strlen(end));
+    if(_cpu_temp) {
+        FILE *fp = fopen("/sys/class/thermal/thermal_zone2/temp", "r");
+        if(fp == NULL)
+            return ERR_NO_FILE;
+
+        char buf[10] = "";
+        buf[fread(buf, 1, 10, fp)] = 0;
+        fclose(fp);
+        
+        if(buf[0] != 0) {
+            int temp = atoi(buf)/1000;
+            snprintf(buf, DEST_SIZE, " [%d°C]", temp);
+            strncat(dest, buf, DEST_SIZE - strlen(dest));
+        }
+    }
 
     return RET_OK;
 }

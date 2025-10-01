@@ -111,5 +111,6 @@ extern struct SConfig config;
 #define _de_version     config.boolean_options & 0x10000000
 #define _term_version   config.boolean_options & 0x20000000
 #define _shell_version  config.boolean_options & 0x40000000
+#define _cpu_temp      config.boolean_options & 0x80000000
 
 void parseConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
