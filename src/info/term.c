@@ -61,6 +61,16 @@ int term(char *dest) {
                 strncat(dest, version + 10, DEST_SIZE - strlen(dest));
             }
         }
+        else if(strcmp(terminal, "VS Code") == 0) {
+            char *argv[] = {"code", "--version", NULL};
+            execCmd(version, sizeof(version), argv);
+            char *end = strchr(version, '\n');
+            if(end != NULL) {
+                *end = 0;
+                strncat(dest, " ", DEST_SIZE - strlen(dest));
+                strncat(dest, version, DEST_SIZE - strlen(dest));
+            }
+        }
         else if(strcmp(terminal, "Konsole") == 0) {
             char *argv[] = {"konsole", "--version", NULL};
             execCmd(version, sizeof(version), argv);
