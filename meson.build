@@ -1,7 +1,7 @@
 project(
   'albafetch',
   'c',
-  version : '4.2.1',
+  version : '4.3',
   default_options : ['warning_level=3'],
   license : 'MIT',
   meson_version: '>=1.3.0'
@@ -51,6 +51,7 @@ build_args = [
   '-O3',
   '-ffast-math',
   '-std=gnu99',
+  # '-g'
 ]
 
 # DEPENDENCY HANDLING
@@ -100,7 +101,6 @@ build_args += '-DHAVE_VERSION_H'
 # BUILD
 
 src += 'src/main.c'
-# debug_args = build_args + ['-g']
 
 executable(
   meson.project_name(),

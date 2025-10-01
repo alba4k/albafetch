@@ -4,18 +4,24 @@
 
 ### Modules
 * Added a `swap` module that prints the used and total swap on linux
-* The `cpu` modules now prints 2 decimal digits is the frequency is below 1 GHz
+* `cpu` now prints 2 decimal digits if the frequency is below 1 GHz
 
 ### Config syntax
 * Custom ascii arts will now print in the specified color by default
 * Added `swap_label`, the label for the new swap module
 * Added `swap_perc`, whether the used swap percentage should be printed
+* Added `desktop_version`, `term_version`, `shell_version`, whether the version numbers should be printed
+* Added `cpu_temp`, whether the cpu temperature should be printed
 
 ### Command line arguments
 * Added `--version` (`-v` for short), prints version and build commit
+* Added `--debug`, tests every module (replaces the old debug build)
 
 ### Other
 * Added a logo for [Rocky Linux](https://rockylinux.org)
+* Added a logo for [Artix Linux](https://artixlinux.org)
+* Added a logo for [Devuan](https://www.devuan.org)
+* Added a logo for [Void Linux](https://voidlinux.org)
 
 ## Changes
 * Updated the [Garuda Linux](https://garudalinux.org) logo
@@ -41,8 +47,8 @@
 ## Dependencies
 * sqlite3 is now needed to build the project
 * meson, ninja and pkg-config are now used in the Makefile
-* glib is now an optional dependency. If not installed at compile time, custom implementations will be used
-* libpci is not an optional dependency at compile time too
+* glib is now an optional dependency. If not installed at compile time, custom implementation will be used
+* libpci is now an optional dependency at compile time too
 
 ---
 
