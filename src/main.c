@@ -44,7 +44,6 @@
  * display resolution
  * storage
  * steam installed "packages" (off by default)
- * cpu temp (off by default)
  * rewrite config parsing and make it decent (check rewrite-config-parsing branch)
  * write manpage
  * fix writing in the previous block when fread returns 0
