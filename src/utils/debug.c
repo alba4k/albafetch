@@ -58,8 +58,13 @@ void run_debug(unsigned *errors, double *time) {
         *time = ((end.tv_sec - start.tv_sec) * 1e6 + end.tv_usec - start.tv_usec) / 1e3;
 
         if(return_value == 0) {
-            printf("\033[1m\033[32m%-12s\033[0m %-40s [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", arr[i].name, mem, *time);
-        } else {
+            printf("\033[1m\033[32m%-12s\033[0m %-42s%s[\033[1m\033[36m\033[1m%.3f ms\033[0m]\n",
+                   arr[i].name, mem,
+                   (!strcmp(arr[i].name, "colors") || !strcmp(arr[i].name, "light_colors")) ? "                  " : "",
+                   *time
+                  );
+        }
+        else {
             printf("\033[1m\033[31m%-13s\033[0m 0x%-38x"
                    "[\033[1m\033[36m\033[1m%.3f ms\033[0m]\n",
                    arr[i].name, return_value, *time);

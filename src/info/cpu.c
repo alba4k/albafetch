@@ -143,7 +143,7 @@ int cpu(char *dest) {
 
     if(count && _cpu_count) {
         char core_count[16];
-        snprintf(core_count, 16, " (%d) ", count);
+        snprintf(core_count, sizeof(core_count), " (%d)", count);
         strncat(dest, core_count, DEST_SIZE - 1 - strlen(dest));
     }
     if(_cpu_temp) {
@@ -151,13 +151,13 @@ int cpu(char *dest) {
         if(fp == NULL)
             return ERR_NO_FILE;
 
-        char buf[10] = "";
-        buf[fread(buf, 1, 10, fp)] = 0;
+        char buf[16] = "";
+        buf[fread(buf, 1, sizeof(buf), fp)] = 0;
         fclose(fp);
         
         if(buf[0] != 0) {
             int temp = atoi(buf)/1000;
-            snprintf(buf, DEST_SIZE, " [%d°C]", temp);
+            snprintf(buf, sizeof(buf), " [%dC]", temp);
             strncat(dest, buf, DEST_SIZE - strlen(dest));
         }
     }

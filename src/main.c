@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
             unsigned errors;
             run_debug(&errors, &time);
 
-            printf("\n\033[1mDebug run finished with a total of %u error(s).\033[0m [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
+            printf("\n\033[1mDebug run finished with a total of %u error(s).\033[0m         [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
 
             return RET_OK;
         }
