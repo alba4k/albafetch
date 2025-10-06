@@ -30,7 +30,7 @@ Version: $version
 Architecture: $arch
 Essential: no
 Priority: optional
-Depends: libpci3
+Depends: libglib2.0-dev, libpci3, sqlite3
 Maintainer: Aaron Blasko
 Description: Faster neofetch alternative, written in C." > "$dirname"/DEBIAN/control
 
