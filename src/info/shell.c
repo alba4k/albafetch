@@ -22,8 +22,12 @@ int shell(char *dest) {
     FILE *fp = fopen(path, "r");
     if(fp) {
         char shell[DEST_SIZE];
-        shell[fread(shell, 1, DEST_SIZE - 1, fp)] = 0;
+        size_t read = fread(shell, sizeof(*shell), DEST_SIZE - 1, fp);
         fclose(fp);
+        if(read > 0)
+            shell[read - 1] = 0;
+        else
+            return ERR_NO_INFO;
 
         if(shell[0] == '-') { // cmdline is "-bash" when login shell
             safeStrncpy(shell_name, basename(shell+1), sizeof(shell_name));
@@ -36,7 +40,7 @@ int shell(char *dest) {
     }
     else
         return ERR_NO_INFO;
-#else
+#else // could probably be used on linux as fallback?
     char *shell = getenv("SHELL");
     if(shell == NULL)
         return ERR_NO_INFO;

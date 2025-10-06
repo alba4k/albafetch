@@ -14,7 +14,7 @@
 // use g_find_program_in_path() if glib can be used
 bool binaryInPath(const char *binary) {
 #ifdef GLIB_EXISTS
-    // valgrind complains about this, don't really know why
+    // valgrind complains about this (still reachable, it's fine)
     gchar *program = g_find_program_in_path(binary);
 
     if(program == NULL)

@@ -20,9 +20,15 @@ int bios(char *dest) {
         vendor = malloc(len);
         if(vendor == NULL)
             return ERR_OOM;
-        vendor[fread(vendor, 1, len, fp) - 1] = 0;
-
+        
+        size_t read = fread(vendor, sizeof(*vendor), len, fp);
         fclose(fp);
+        if(read > 0)
+            vendor[read - 1] = 0;
+        else {
+            free(vendor);
+            vendor = NULL;
+        }
     }
 
     if((fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r"))) {
@@ -35,9 +41,16 @@ int bios(char *dest) {
             free(vendor);
             return ERR_OOM;
         }
-        version[fread(version, 1, len, fp) - 1] = 0;
-
+        
+        size_t read = fread(version, sizeof(*version), len, fp);
         fclose(fp);
+        if(read > 0)
+            version[read - 1] = 0;
+        else {
+            free(version);
+            free(vendor);
+            version = NULL;
+        }
     }
 
     if(vendor != NULL && version != NULL)

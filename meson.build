@@ -82,7 +82,7 @@ elif host_machine.system() == 'darwin'
   ]
 endif
 
-# MAKE THE VERSION PRINTED BY albafetch -h DYNAMIC
+# MAKE THE VERSION PRINTED BY albafetch --debug DYNAMIC
 git = find_program('git', required : false)
 commit = '{unknown}'
 if git.found()

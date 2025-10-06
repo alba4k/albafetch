@@ -139,8 +139,14 @@ void parseConfig(bool error, const char *file, struct SModule *modules, void **a
         perror("malloc");
         return;
     }
-    conf[fread(conf, 1, len, fp) - 1] = 0;
+    size_t read = fread(conf, sizeof(*conf), len, fp);
     fclose(fp);
+    if(read > 0)
+        conf[read - 1] = 0;
+    else {
+        fprintf(stderr, "fread() failed: %zu\n", read);
+        return;
+    }
 
     // used later
     char *ptr, *ptr2;

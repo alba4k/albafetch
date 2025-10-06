@@ -1,54 +1,25 @@
-# Changes since v4.2.1
+# Changes since v4.3
 
 ## New Features
 
 ### Modules
-* Added a `swap` module that prints the used and total swap on linux
-* `cpu` now prints 2 decimal digits if the frequency is below 1 GHz
 
 ### Config syntax
-* Custom ascii arts will now print in the specified color by default
-* Added `swap_label`, the label for the new swap module
-* Added `swap_perc`, whether the used swap percentage should be printed
-* Added `desktop_version`, `term_version`, `shell_version`, whether the version numbers should be printed
-* Added `cpu_temp`, whether the cpu temperature should be printed
 
 ### Command line arguments
-* Added `--version` (`-v` for short), prints version and build commit
-* Added `--debug`, tests every module (replaces the old debug build)
 
 ### Other
-* Added a logo for [Rocky Linux](https://rockylinux.org)
-* Added a logo for [Artix Linux](https://artixlinux.org)
-* Added a logo for [Devuan](https://www.devuan.org)
-* Added a logo for [Void Linux](https://voidlinux.org)
 
 ## Changes
-* Updated the [Garuda Linux](https://garudalinux.org) logo
-* Changed return values to be more clear than 0 or 1
-* User errors are now handled gracefully
-* term will not print `Apple Terminal` instead of `Apple_Terminal`
 
 ## Bug fixes
 
 ### Noticeable fixes
-* Packages should be counted faster for dpkg and especially snap
-* Alacritty will now be properly recognized even with `general.ipc_socket = false`
-* `gpu` should now print all gpus even when libpci doesn't work
-* Fixed `pwd_path` not working
-* Should now exit on OOM, not segfault
 
 ### Technical fixes
-* Reduced the size of default logos
-* Moved some functions from `src/utils/utils.c` to `src/config/config.c` and `src/config/config.c`.
-  Planning on rewriting config parsing and reducing `src/utils/utils.c` even more.
-* Minor memory safety improvements
+* Improved fread() usage
 
 ## Dependencies
-* sqlite3 is now needed to build the project
-* meson, ninja and pkg-config are now used in the Makefile
-* glib is now an optional dependency. If not installed at compile time, custom implementation will be used
-* libpci is now an optional dependency at compile time too
 
 ---
 

@@ -16,6 +16,7 @@ int cpu(char *dest) {
     char *end;
     int count = 0;
     char freq[24] = "";
+    size_t read = 0;
 
 #ifdef __APPLE__
     size_t BUF_SIZE = DEST_SIZE;
@@ -42,8 +43,15 @@ int cpu(char *dest) {
     char *buf = malloc(0x10000);
     if(buf == NULL)
         return ERR_OOM;
-    buf[fread(buf, 1, 0x10000, fp)] = 0;
+
+    read = fread(buf, sizeof(*buf), 0x10000, fp);
     fclose(fp);
+    if(read > 0)
+        buf[read - 1] = 0;
+    else {
+        free(buf);
+        return ERR_NO_INFO;
+    }
 
     cpu_info = buf;
     if(_cpu_count) {
@@ -152,9 +160,14 @@ int cpu(char *dest) {
             return ERR_NO_FILE;
 
         char buf[16] = "";
-        buf[fread(buf, 1, sizeof(buf), fp)] = 0;
+        read = fread(buf, sizeof(*buf), sizeof(buf), fp);
         fclose(fp);
+
+        if(read <= 0)
+            return RET_OK;
         
+        buf[read - 1] = 0;
+
         if(buf[0] != 0) {
             int temp = atoi(buf)/1000;
             snprintf(buf, sizeof(buf), " [%dC]", temp);

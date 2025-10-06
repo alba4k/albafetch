@@ -52,14 +52,22 @@ int battery(char *dest) {
     FILE *fp = NULL;
 
     if((fp = fopen("/sys/class/power_supply/BAT0/capacity", "r"))) {
-        capacity[fread(capacity, 1, 5, fp) - 1] = 0;
-
+        size_t read = fread(capacity, sizeof(*capacity), 5, fp);
         fclose(fp);
+
+        if(read > 0)
+            capacity[read - 1] = 0;
+        else
+            status[0] = 0;
     }
     if((fp = fopen("/sys/class/power_supply/BAT0/status", "r"))) {
-        status[fread(status, 1, 20, fp) - 1] = 0;
-
+        size_t read = fread(status, sizeof(*status), 5, fp);
         fclose(fp);
+        
+        if(read > 0)
+            status[read - 1] = 0;
+        else
+            status[0] = 0;
     }
 #endif // __ANDROID__
 

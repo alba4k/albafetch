@@ -50,9 +50,15 @@ int host(char *dest) {
         name = malloc(len);
         if(name == NULL)
             return ERR_OOM;
-        name[fread(name, 1, len, fp) - 1] = 0;
 
+        size_t read = fread(name, sizeof(*name), len, fp);
         fclose(fp);
+        if(read > 0)
+            name[read - 1] = 0;
+        else {
+            free(name);
+            name = NULL;
+        }
     }
 
     if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
@@ -63,9 +69,16 @@ int host(char *dest) {
         version = malloc(len);
         if(version == NULL)
             return ERR_OOM;
-        version[fread(version, 1, len, fp) - 1] = 0;
-
+        
+        size_t read = fread(version, sizeof(*version), len, fp);
         fclose(fp);
+        if(read > 0)
+            version[read - 1] = 0;
+        else {
+            free(version);
+            free(name);
+            version = NULL;
+        }
     }
 
     // filtering out some shitty defaults because the file can't just be empty"
