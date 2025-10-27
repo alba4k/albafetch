@@ -38,13 +38,13 @@ jobs:
       - name: test
         run: ./result/bin/albafetch
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: runner.os == 'Linux'
         with:
           name: albafetch-linux-x64-static
           path: ${{ github.workspace }}/result/bin/albafetch
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: runner.os == 'macOS'
         with:
           name: albafetch-darwin-x64
@@ -54,7 +54,7 @@ jobs:
         if: runner.os == 'Linux'
         run: nix build -L --accept-flake-config .#albafetch-arm
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: runner.os == 'Linux'
         with:
           name: albafetch-linux-aarch64-static
