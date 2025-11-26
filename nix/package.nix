@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  apple-sdk_12,
+  apple-sdk_14,
   meson,
   ninja,
   pciutils,
@@ -12,7 +12,7 @@
 }:
 
 let
-  latestTag = "4.2.1";
+  latestTag = "4.3";
 
   fullDate = lib.substring 0 8 self.lastModifiedDate;
 
@@ -40,7 +40,7 @@ stdenv.mkDerivation {
     [
       sqlite
     ]
-    ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_12
+    ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_14
     ++ lib.optional stdenv.hostPlatform.isLinux pciutils;
 
   nativeBuildInputs = [
