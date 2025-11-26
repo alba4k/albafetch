@@ -24,7 +24,7 @@ And this is what [my configuration](https://github.com/alba4k/.dotfiles/blob/mas
 
 </details>
 
-You will find a lot of useful usage and configuration related info inside of the [user manual](MANUAL.md) and a small list of the things I changed since the last release in the [changelog](CHANGELOG.md).
+You will find a lot of useful usage and configuration related info inside of the [wiki](https://github.com/alba4k/albafetch/wiki) and a small list of the things I changed since the last release in the [changelog](CHANGELOG.md).
 
 It currently supports a lot of GNU/Linux distributions, macOS (both x64 and arm64 macs) and even Android (only tested in Termux).
 Feel free to test any other platform :)
