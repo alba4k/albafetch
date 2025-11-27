@@ -61,7 +61,7 @@ int battery(char *dest) {
             status[0] = 0;
     }
     if((fp = fopen("/sys/class/power_supply/BAT0/status", "r"))) {
-        size_t read = fread(status, sizeof(*status), 5, fp);
+        size_t read = fread(status, sizeof(*status), 12, fp);
         fclose(fp);
         
         if(read > 0)
