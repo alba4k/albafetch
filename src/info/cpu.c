@@ -157,7 +157,7 @@ int cpu(char *dest) {
     if(_cpu_temp) {
         FILE *fp = fopen("/sys/class/thermal/thermal_zone2/temp", "r");
         if(fp == NULL)
-            return ERR_NO_FILE;
+            return RET_OK;
 
         char buf[16] = "";
         read = fread(buf, sizeof(*buf), sizeof(buf), fp);
