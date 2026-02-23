@@ -229,7 +229,12 @@ int main(int argc, char **argv) {
     }
     if(config.logo == NULL) { // get a logo based on the OS (--logo was not used and no logo was set by the config)
 #ifdef __APPLE__
-        config.logo = logos[1];
+        for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
+            if(strcmp(logos[i][0], "apple") == 0) {
+                config.logo = logos[i];
+                break;
+            }
+            
 #else
 #ifdef __ANDROID__
         config.logo = logos[2];
