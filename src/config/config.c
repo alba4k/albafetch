@@ -152,8 +152,8 @@ void parseConfig(bool error, const char *file, struct SModule *modules, void **a
     char *ptr, *ptr2;
 
     // remove comments
-    uncomment(conf, '#');
     uncomment(conf, ';');
+    uncomment(conf, '#');
 
     // handle escape sequences
     unescape(conf);

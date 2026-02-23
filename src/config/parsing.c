@@ -60,28 +60,23 @@ char *skip_full(char *ptr) {
 
 // remove comments, aka from start to the end of the line
 void uncomment(char *str, const char start) {
-    char *ptr = str, *ptr2;
-    while((ptr = strchr(ptr, start))) {
-        // when it is between two " (aka the number of " before it is odd)
-        int counter = 0;
-        ptr2 = str;
-        while((ptr2 = strchr(ptr2, '"')) && ptr2 < ptr) {
-            ++ptr2;
+    char *ptr = str;
+    int counter = 0;
+
+    while(ptr[0] != 0) {
+        if(ptr[0] == '\"' && (ptr == str || ptr[-1] != '\\')) {
             ++counter;
-        }
-        if(counter & 1) {
             ++ptr;
             continue;
         }
-
-        ptr2 = strchr(ptr, '\n');
-
-        if(ptr2 == NULL) {
-            *ptr = 0;
-            break;
+        
+        if(ptr[0] == start && counter % 2 == 0) {
+            while(ptr[0] != '\n' && ptr[0] != '\0') {
+                ptr[0] = ' '; // blank out from the comment start to the end of line
+                ++ptr;
+            }
         }
-
-        memmove(ptr, ptr2 + 1, strlen(ptr2));
+        else ++ptr;
     }
 }
 
