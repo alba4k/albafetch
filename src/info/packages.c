@@ -148,9 +148,9 @@ int packages(char *dest) {
 
     if(_pkg_brew && (binaryInPath("brew"))) {
         char *args[] = {"brew", "--cellar", NULL};
-        execCmd(str, 16, args);
+        execCmd(str, 64, args);
 
-        if(str[0]) {
+        if(str[0] != '\0') {
             if((dir = opendir(str)) != NULL) {
                 count = 0;
 
@@ -172,7 +172,7 @@ int packages(char *dest) {
         char *args[] = {"sh", "-c", "pip list 2>/dev/null | wc -l", NULL};
         execCmd(str, 16, args);
 
-        if(str[0] != '0' && str[0]) {
+        if(str[0] != '0') {
             snprintf(buf, DEST_SIZE - strlen(buf), "%s%d%s", done ? ", " : "", atoi(str) - 2, _pkg_mgr ? " (pip)" : "");
             done = true;
             strncat(dest, buf, DEST_SIZE - strlen(dest));
