@@ -3,6 +3,7 @@
 #include "../utils/logos.h"
 #include "../utils/return.h"
 #include "../utils/utils.h"
+#include "../utils/wrappers.h"
 
 #define GNU_SOURCE
 
