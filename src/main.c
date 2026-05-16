@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
             if(found == false)
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"!\n", argv[asking_logo]);
             else
-                strcpy(config.color, config.logo[1]);
+                safeStrncpy(config.color, config.logo[1], sizeof(config.color));
         } else
             fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
     }
@@ -288,8 +288,8 @@ int main(int argc, char **argv) {
 #endif // __ANDROID__
 #endif // __APPLE__
 
-        strcpy(default_logo, config.logo[0]);
-        strcpy(config.color, config.logo[1]);
+        safeStrncpy(default_logo, config.logo[0], sizeof(default_logo));
+        safeStrncpy(config.color, config.logo[1], sizeof(config.color));
     }
 
     if(asking_color) {
@@ -301,7 +301,7 @@ int main(int argc, char **argv) {
 
             for(int j = 0; j < 9; ++j)
                 if(strcmp(argv[asking_color], *colors[j]) == 0) {
-                    strcpy(config.color, colors[j][1]);
+                    safeStrncpy(config.color, colors[j][1], sizeof(config.color));
                     goto color_done;
                 }
 

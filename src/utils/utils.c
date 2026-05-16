@@ -56,7 +56,7 @@ void *fileToLogo(char *file) {
 
     for(int j = 0; j < 9; ++j)
         if(strcmp(buffer, *colors[j]) == 0)
-            strcpy(config.color, colors[j][1]);
+            safeStrncpy(config.color, colors[j][1], sizeof(config.color));
 
     if(config.color[0] == 0) {
         unescape(buffer);

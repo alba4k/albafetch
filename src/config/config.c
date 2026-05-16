@@ -173,8 +173,8 @@ void parseConfig(bool error, const char *file, struct SModule *modules, void **a
         for(size_t i = 0; i < sizeof(logos) / sizeof(logos[0]); ++i)
             if(strcmp(logos[i][0], logo) == 0) {
                 config.logo = logos[i];
-                strcpy(default_logo, logos[i][0]);
-                strcpy(config.color, logos[i][1]);
+                safeStrncpy(default_logo, logos[i][0], 16);
+                safeStrncpy(config.color, logos[i][1], sizeof(config.color));
             }
     }
 
