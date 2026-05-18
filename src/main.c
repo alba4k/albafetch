@@ -289,7 +289,10 @@ int main(int argc, char **argv) {
 #endif // __APPLE__
 
         safeStrncpy(default_logo, config.logo[0], sizeof(default_logo));
-        safeStrncpy(config.color, config.logo[1], sizeof(config.color));
+        if(strcmp(default_color, "") == 0)
+            safeStrncpy(default_color, config.logo[1], sizeof(default_color));
+        if(strcmp(config.color, "") == 0)
+            safeStrncpy(config.color, config.logo[1], sizeof(config.color));
     }
 
     if(asking_color) {
@@ -311,7 +314,6 @@ int main(int argc, char **argv) {
 
     color_done:;
     }
-
     if(asking_bold) {
         if(asking_bold < argc) {
             // modifying the 2nd least significant bit of boolean_options
