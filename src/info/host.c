@@ -82,7 +82,7 @@ int host(char *dest) {
     }
 
     // filtering out some shitty defaults because the file can't just be empty"
-    const char *errors[] = {"System Product Name", "System Version", "To Be Filled By O.E.M.", "None", ""};
+    const char *errors[] = {"System Product Name", "System Version", "To Be Filled By O.E.M.", "Default string-WCP", "None", ""};
     bool name_defined = true;
     bool version_defined = true;
 

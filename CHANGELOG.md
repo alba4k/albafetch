@@ -15,6 +15,7 @@
 ## Bug fixes
 
 ### Noticeable fixes
+* Skip `Default string-WCP` vendor version
 
 ### Technical fixes
 * Improved fread() usage
