@@ -507,7 +507,7 @@ int main(int argc, char **argv) {
             printed[0] = 0;
 
             if(print_logo) {
-                getLogoLine(printed, &line);
+                getLogoLine(printed, sizeof(printed), &line);
 
                 for(int i = 0; i < config.spacing; ++i)
                     strcat(printed, " ");
@@ -523,7 +523,7 @@ int main(int argc, char **argv) {
             printed[0] = 0;
 
             if(print_logo) {
-                getLogoLine(printed, &line);
+                getLogoLine(printed, sizeof(printed), &line);
 
                 for(int i = 0; i < config.spacing; ++i)
                     strcat(printed, " ");

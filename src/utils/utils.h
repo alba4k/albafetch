@@ -18,7 +18,7 @@ void addModule(struct SModule *array, char *id);
 
 void destroyArray(struct SModule *array);
 
-void getLogoLine(char *dest, unsigned *line);
+void getLogoLine(char *dest, size_t dest_size, unsigned *line);
 
 void printLine(char *line, const size_t maxlen);
 

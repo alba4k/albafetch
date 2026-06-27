@@ -125,7 +125,7 @@ void addModule(struct SModule *array, char *id) {
     new->id = malloc(strlen(id) + 1);
     if(new->id == NULL)
         return;
-    strcpy(new->id, id);
+    safeStrncpy(new->id, id, strlen(id) + 1);
 
     new->label = NULL;
     new->func = NULL;
@@ -147,16 +147,16 @@ void destroyArray(struct SModule *array) {
 }
 
 // print a certain line of the logo
-void getLogoLine(char *dest, unsigned *line) {
-    if(config.logo == NULL || dest == NULL || *line < 1)
+void getLogoLine(char *dest, size_t dest_size, unsigned *line) {
+    if(config.logo == NULL || dest == NULL || *line < 1 || dest_size == 0)
         return;
 
     if(config.logo[(*line) + 1]) {
         ++(*line);
-        strcat(dest, config.logo[*line]);
+        snprintf(dest + strlen(dest), dest_size - strlen(dest), "%s", config.logo[*line]);
     } else {
         for(size_t i = 0; i < realStrlen(config.logo[2]); ++i)
-            strcat(dest, " ");
+            snprintf(dest + strlen(dest), dest_size - strlen(dest), " ");
     }
 }
 
