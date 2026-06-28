@@ -125,7 +125,7 @@ void addModule(struct SModule *array, char *id) {
     new->id = malloc(strlen(id) + 1);
     if(new->id == NULL)
         return;
-    safeStrncpy(new->id, id, strlen(id) + 1);
+    strcpy(new->id, id);
 
     new->label = NULL;
     new->func = NULL;
