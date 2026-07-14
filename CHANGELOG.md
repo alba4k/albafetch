@@ -16,6 +16,7 @@
 
 ### Noticeable fixes
 * Skip `Default string-WCP` vendor version
+* Fixed `rpm` package counts
 
 ### Technical fixes
 * Improved fread() usage

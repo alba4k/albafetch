@@ -81,12 +81,21 @@ int packages(char *dest) {
     if(prefix)
         safeStrncpy(path, prefix, 256);
     strncat(path, "/var/lib/rpm/rpmdb.sqlite", 255 - strlen(path));
+    if(access(path, F_OK) != 0) {
+        path[0] = 0;
+        if(prefix)
+            safeStrncpy(path, prefix, 256);
+        strncat(path, "/usr/lib/sysimage/rpm/rpmdb.sqlite", 255 - strlen(path));
+    }
     if(_pkg_rpm && access(path, F_OK) == 0) {
         sqlite3 *db;
         sqlite3_stmt *stmt;
         int count = 0;
 
-        if(sqlite3_open(path, &db) != SQLITE_OK)
+        char uri[320];
+        snprintf(uri, sizeof(uri), "file:%s?immutable=1", path);
+
+        if(sqlite3_open_v2(uri, &db, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, NULL) != SQLITE_OK)
             goto skip;
         if(sqlite3_prepare_v2(db, "SELECT count(*) FROM Packages", -1, &stmt, NULL) != SQLITE_OK) {
             sqlite3_close(db);
