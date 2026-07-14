@@ -90,7 +90,6 @@ int packages(char *dest) {
     if(_pkg_rpm && access(path, F_OK) == 0) {
         sqlite3 *db;
         sqlite3_stmt *stmt;
-        int count = 0;
 
         char uri[320];
         snprintf(uri, sizeof(uri), "file:%s?immutable=1", path);
@@ -103,10 +102,10 @@ int packages(char *dest) {
         }
 
         if(sqlite3_step(stmt) == SQLITE_ROW) {
-            count = sqlite3_column_int(stmt, 0);
+            int count = sqlite3_column_int(stmt, 0);
 
             if(count > 0) {
-                snprintf(buf, DEST_SIZE - strlen(buf), "%s%s%s", done ? ", " : "", str, _pkg_mgr ? " (rpm)" : "");
+                snprintf(buf, DEST_SIZE - strlen(buf), "%s%d%s", done ? ", " : "", count, _pkg_mgr ? " (rpm)" : "");
                 done = true;
                 strncat(dest, buf, DEST_SIZE - strlen(dest));
             }
