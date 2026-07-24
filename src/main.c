@@ -260,11 +260,8 @@ int main(int argc, char **argv) {
                 *end = 0;
 
             // because Arch Linux ARM has to be special for some reason
-            // edit: fedora asahi too, yay
             if(strcmp(os_id, "archarm") == 0)
                 os_id[5] = 0;
-            else if(strcmp(os_id, "fedora-asahi-remix") == 0)
-                os_id[6] = 0;
 
             // clean up because of some distros randomly using " or ' when they shouldnt be
             if(os_id[0] == '\'' || os_id[0] == '"') {
@@ -360,8 +357,8 @@ int main(int argc, char **argv) {
                config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
 
         printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
-               "\t\t\t   [alpine, android, apple, arch, arch_small, artix, debian, devuan, endeavouros, fedora, gentoo]\n"
-               "\t\t\t   [linux, linuxmint, mageia, manjaro, neon, nixos, none, parrot, pop, ubuntu, void, windows]\n",
+               "\t\t\t   [alpine, android, apple, arch, arch_small, artix, debian, devuan, endeavouros, fedora, fedora-asahi-remix]\n"
+               "\t\t\t   [garuda, gentoo, linux, linuxmint, mageia, manjaro, neon, nixos, none, parrot, pop, rocky, ubuntu, void, windows]\n",
                config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
         printf("\t%s%s--ascii\033[0m:\t Specifies a file containing a custom ascii art to use as logo (default: none)\n"

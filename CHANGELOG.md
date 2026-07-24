@@ -9,6 +9,7 @@
 ### Command line arguments
 
 ### Other
+* Added logo for Fedora Asahi Remix
 
 ## Changes
 
