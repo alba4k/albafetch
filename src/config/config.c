@@ -81,7 +81,7 @@ int parseConfigInt(const char *source, const char *field, int *dest, const unsig
     int num = atoi(ptr);
     *end = '"';
 
-    if((unsigned)num > max)
+    if(num > (int)max)
         return ERR_PARSING;
 
     *dest = num;

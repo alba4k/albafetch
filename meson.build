@@ -38,7 +38,6 @@ src = [
   'src/info/uptime.c',
   'src/info/user.c',
   'src/optdeps/glib.c',
-  'src/optdeps/libpci.c',
   'src/utils/debug.c',
   'src/utils/queue.c',
   'src/utils/utils.c',
@@ -66,12 +65,9 @@ endif
 
 if host_machine.system() == 'linux'
   project_dependencies += dependency('sqlite3', required: true)
-
-  libpci = dependency('libpci', required: false)
-  if libpci.found()
-    build_args += '-DLIBPCI_EXISTS'
-    project_dependencies += libpci
-  endif
+endif
+if host_machine.system() != 'darwin'
+  project_dependencies += dependency('vulkan', required: true)
 elif host_machine.system() == 'darwin'
   project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'], required: true)
   add_languages('objc')

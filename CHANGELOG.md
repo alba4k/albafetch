@@ -12,6 +12,8 @@
 * Added logo for Fedora Asahi Remix
 
 ## Changes
+* `gpu` now uses vulkan to find the exact gpu model (not libpci) except on macOS
+* `cpu` now prints `Core` (e.g. in `Intel Core i7-1260P`) even when using `cpu_brand = "false"`
 
 ## Bug fixes
 
@@ -23,6 +25,8 @@
 * Improved fread() usage
 
 ## Dependencies
+* dropped `libpci`
+* added `vulkan`
 
 ---
 

@@ -129,8 +129,8 @@ int cpu(char *dest) {
     }
 
     if((_cpu_brand) == 0) {
-        if((end = strstr(cpu_info, "Intel Core ")))
-            memmove(end, end + 11, strlen(end + 1));
+        if((end = strstr(cpu_info, "Intel ")))
+            memmove(end, end + 6, strlen(end + 6) + 1);
         else if((end = strstr(cpu_info, "Apple ")))
             memmove(end, end + 6, strlen(end + 6) + 1);
         else if((end = strstr(cpu_info, "AMD ")))

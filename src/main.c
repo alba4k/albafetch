@@ -605,6 +605,6 @@ int main(int argc, char **argv) {
     // memory clean up
     free(ascii_ptr);
     destroyArray(modules);
-
+    
     return RET_OK;
 }
