@@ -23,7 +23,7 @@ int memory(char *dest) {
         return ERR_NO_INFO;
     }
 
-    snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedram / 1048576, totalram / 1048576);
+    snprintf(dest, DEST_SIZE, "%lu / %lu MiB", usedram / 1048576, totalram / 1048576);
     
 #else
     struct sysinfo info;
@@ -59,7 +59,7 @@ int memory(char *dest) {
     unsigned long usedram = totalram - freeram - atol(cachedram);
     // usedram -= sharedram;
 
-    snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedram / 1024, totalram / 1024);
+    snprintf(dest, DEST_SIZE, "%lu / %lu MiB", usedram / 1024, totalram / 1024);
 #endif
 
     if(_mem_perc) {
