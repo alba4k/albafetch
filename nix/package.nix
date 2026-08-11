@@ -1,3 +1,4 @@
+# nix/package.nix
 {
   lib,
   stdenv,
@@ -5,6 +6,7 @@
   meson,
   ninja,
   vulkan-headers,
+  vulkan-loader,
   pkg-config,
   sqlite,
 
@@ -19,11 +21,8 @@ let
   formattedDate =
     if (self ? "lastModifiedDate") then
       lib.concatStringsSep "-" [
-        # YYYY
         (lib.substring 0 4 fullDate)
-        ## MM
         (lib.substring 4 2 fullDate)
-        # DD
         (lib.substring 6 2 fullDate)
       ]
     else
@@ -39,9 +38,10 @@ stdenv.mkDerivation {
   buildInputs =
     [
       sqlite
+      vulkan-headers
+      vulkan-loader
     ]
-    ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_14
-    ++ lib.optional stdenv.hostPlatform.isLinux vulkan-headers;
+    ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_14;
 
   nativeBuildInputs = [
     meson
