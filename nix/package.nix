@@ -4,7 +4,7 @@
   apple-sdk_14,
   meson,
   ninja,
-  vulkan,
+  vulkan-headers,
   pkg-config,
   sqlite,
 
@@ -41,7 +41,7 @@ stdenv.mkDerivation {
       sqlite
     ]
     ++ lib.optional stdenv.hostPlatform.isDarwin apple-sdk_14
-    ++ lib.optional stdenv.hostPlatform.isLinux vulkan;
+    ++ lib.optional stdenv.hostPlatform.isLinux vulkan-headers;
 
   nativeBuildInputs = [
     meson
