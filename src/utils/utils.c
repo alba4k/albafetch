@@ -123,8 +123,10 @@ void addModule(struct SModule *array, char *id) {
     last->next = new;
 
     new->id = malloc(strlen(id) + 1);
-    if(new->id == NULL)
+    if(new->id == NULL) {
+        free(new);
         return;
+    }
     strcpy(new->id, id);
 
     new->label = NULL;

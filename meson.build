@@ -63,12 +63,18 @@ if glib.found()
   project_dependencies += glib
 endif
 
-if host_machine.system() == 'linux'
-  project_dependencies += dependency('sqlite3', required: true)
-endif
 if host_machine.system() != 'darwin'
-  project_dependencies += dependency('vulkan', required: true)
-elif host_machine.system() == 'darwin'
+  if host_machine.system() == 'linux'
+    project_dependencies += dependency('sqlite3', required: true)
+  endif
+
+  vulkan = dependency('vulkan', required: true)
+  cc = meson.get_compiler('c')
+  if not cc.has_header('vulkan/vulkan.h', dependencies: vulkan)
+    error('vulkan-headers not found — install vulkan-headers')
+  endif
+  project_dependencies += vulkan
+else
   project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'], required: true)
   add_languages('objc')
   src += [

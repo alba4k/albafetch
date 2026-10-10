@@ -299,34 +299,28 @@ int main(int argc, char **argv) {
                 {"purple", "\033[35m"}, {"cyan", "\033[36m"}, {"gray", "\033[90m"},  {"white", "\033[37m"},
             };
 
+            bool done = false;
             for(int j = 0; j < 9; ++j)
-                if(strcmp(argv[asking_color], *colors[j]) == 0) {
+                if(strcmp(argv[asking_color], *colors[j]) == 0)
                     safeStrncpy(config.color, colors[j][1], sizeof(config.color));
-                    goto color_done;
-                }
 
-            fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"!\n", argv[asking_color]);
+            if(!done)
+                fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"!\n", argv[asking_color]);
         } else
             fputs("\033[31m\033[1mERROR\033[0m: --color requires an extra argument!\n", stderr);
-
-    color_done:;
     }
     if(asking_bold) {
         if(asking_bold < argc) {
             // modifying the 2nd least significant bit of boolean_options
-            if(strcmp(argv[asking_bold], "on") == 0) {
+            if(strcmp(argv[asking_bold], "on") == 0)
                 config.boolean_options |= ((uint64_t)1 << 1);
-                goto bold_done;
-            } else if(strcmp(argv[asking_bold], "off") == 0) {
+            else if(strcmp(argv[asking_bold], "off") == 0)
                 config.boolean_options &= ~((uint64_t)1 << 1);
-                goto bold_done;
-            }
-
-            fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
-        } else
+            else
+                fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
+        }
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --bold requires an extra argument!\n", stderr);
-
-    bold_done:;
     }
 
     if(asking_help) {
@@ -384,19 +378,15 @@ int main(int argc, char **argv) {
 
     if(asking_align) {
         if(asking_align < argc) {
-            if(strcmp(argv[asking_align], "on") == 0) {
+            if(strcmp(argv[asking_align], "on") == 0)
                 config.boolean_options |= (uint64_t)1;
-                goto align_done;
-            } else if(strcmp(argv[asking_align], "off") == 0) {
+            else if(strcmp(argv[asking_align], "off") == 0)
                 config.boolean_options &= ~((uint64_t)1);
-                goto align_done;
-            }
-
-            fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
-        } else
+            else
+                fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
+        }
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --align requires an extra argument!\n", stderr);
-
-    align_done:;
     }
 
     // I am deeply sorry for the code you're about to see - I hope you like spaghetti

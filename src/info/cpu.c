@@ -27,7 +27,7 @@ int cpu(char *dest) {
     if(buf[0] == 0)
         return ERR_NO_INFO;
 
-    if((_cpu_freq) == 0) {
+    if(!_cpu_freq) {
         if((end = strstr(buf, " @")))
             *end = 0;
         else if((end = strchr(buf, '@')))
@@ -128,7 +128,7 @@ int cpu(char *dest) {
         }
     }
 
-    if((_cpu_brand) == 0) {
+    if(!_cpu_brand) {
         if((end = strstr(cpu_info, "Intel ")))
             memmove(end, end + 6, strlen(end + 6) + 1);
         else if((end = strstr(cpu_info, "Apple ")))

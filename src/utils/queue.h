@@ -15,7 +15,7 @@ typedef struct {
     char *data;
 } Queue;
 
-Queue *queueWithSIze(size_t size);
+Queue *queueWithSize(size_t size);
 
 int requeue(Queue *q);
 

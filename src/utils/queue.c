@@ -5,7 +5,7 @@
 #include "queue.h"
 #include "../utils/return.h"
 
-Queue *queueWithSIze(size_t size) {
+Queue *queueWithSize(size_t size) {
     Queue *q = malloc(sizeof(Queue));
     if(q == NULL)
         return NULL;
@@ -86,7 +86,7 @@ void destroyQueue(Queue *q) {
 
 void readAfterSequence(FILE *fp, const char *seq, char *buffer, size_t buffer_size) {
     size_t seq_size = strlen(seq);
-    Queue *q = queueWithSIze(3 * seq_size);
+    Queue *q = queueWithSize(3 * seq_size);
     if(q == NULL)
         return;
     int ch;

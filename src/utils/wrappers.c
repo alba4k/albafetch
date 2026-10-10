@@ -29,9 +29,15 @@ int execCmd(char *buf, size_t len, char *const *argv) {
     close(stderr_pipes[1]);
 
     close(stdout_pipes[1]);
-    buf[read(stdout_pipes[0], buf, len) - 1] = 0;
-    close(stdout_pipes[0]);
 
+    ssize_t rlen = read(stdout_pipes[0], buf, len);
+    if(rlen < 0) {
+        close(stdout_pipes[0]);
+        return ERR_GENERIC;
+    }
+
+    buf[rlen == 0 ? 0 : rlen-1] = 0;
+    close(stdout_pipes[0]);
     return RET_OK;
 }
 

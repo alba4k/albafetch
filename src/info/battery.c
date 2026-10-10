@@ -104,7 +104,7 @@ int battery(char *dest) {
 #endif // __ANDROID__
 
     if(capacity[0] != 0 && status[0] != 0) {
-        if((_bat_status))
+        if(_bat_status)
             snprintf(dest, DEST_SIZE, "%s%% (%s)", capacity, status);
         else
             snprintf(dest, DEST_SIZE, "%s%%", capacity);
