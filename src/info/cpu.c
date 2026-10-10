@@ -165,11 +165,11 @@ int cpu(char *dest) {
 
         if(read <= 0)
             return RET_OK;
-        
+
         buf[read - 1] = 0;
 
         if(buf[0] != 0) {
-            int temp = atoi(buf)/1000;
+            int temp = atoi(buf) / 1000;
             snprintf(buf, sizeof(buf), " [%dC]", temp);
             strncat(dest, buf, DEST_SIZE - strlen(dest));
         }

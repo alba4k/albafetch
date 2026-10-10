@@ -65,9 +65,8 @@ int packages(char *dest) {
 
         while(fgets(line, sizeof(line), fp)) {
             // check if the line starts with "Package:"
-            if(strncmp(line, "Package:", 8) == 0) {
+            if(strncmp(line, "Package:", 8) == 0)
                 ++count;
-            }
         }
         fclose(fp);
 

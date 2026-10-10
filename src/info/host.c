@@ -69,7 +69,7 @@ int host(char *dest) {
         version = malloc(len);
         if(version == NULL)
             return ERR_OOM;
-        
+
         size_t read = fread(version, sizeof(*version), len, fp);
         fclose(fp);
         if(read > 0)

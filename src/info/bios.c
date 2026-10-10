@@ -20,7 +20,7 @@ int bios(char *dest) {
         vendor = malloc(len);
         if(vendor == NULL)
             return ERR_OOM;
-        
+
         size_t read = fread(vendor, sizeof(*vendor), len, fp);
         fclose(fp);
         if(read > 0)
@@ -41,7 +41,7 @@ int bios(char *dest) {
             free(vendor);
             return ERR_OOM;
         }
-        
+
         size_t read = fread(version, sizeof(*version), len, fp);
         fclose(fp);
         if(read > 0)

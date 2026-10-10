@@ -156,7 +156,8 @@ void getLogoLine(char *dest, unsigned *line) {
     if(config.logo[(*line) + 1]) {
         ++(*line);
         strcat(dest, config.logo[*line]);
-    } else {
+    }
+    else {
         for(size_t i = 0; i < realStrlen(config.logo[2]); ++i)
             strcat(dest, " ");
     }
@@ -180,16 +181,18 @@ void printLine(char *line, const size_t maxlen) {
             escaping = true;
         else if(line[i] & 0x80) {      // is the 1st bit 1?
             if(line[i] & 0x40) {       // is the 2nd bit 1?
-                if(line[i] & 0x20) {   // is the 3rd bit 1?
+                if(line[i] & 0x20)     // is the 3rd bit 1?
                     if(line[i] & 0x10) // is the 4th bit 1?
                         unicode = 3;   // first of 4 unicode bytes (0b11110xxx)
                     else
                         unicode = 2; // first of 3 unicode bytes (0b1110xxxx)
-                } else
-                    unicode = 1;      // first of 2 unicode bytes (0b110xxxxx)
-            } else if(unicode-- == 1) // unicode continuation byte (0b10xxxxxx)
+                else
+                    unicode = 1; // first of 2 unicode bytes (0b110xxxxx)
+            }
+            else if(unicode-- == 1) // unicode continuation byte (0b10xxxxxx)
                 ++len;
-        } else {
+        }
+        else {
             // look mom, I just wanted to try to write some branchless code
 
             // this line is a bit weird

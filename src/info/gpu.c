@@ -43,11 +43,9 @@ int gpu(char *dest) {
     }
 #elif defined(VULKAN_EXISTS)
     VkInstance instance;
-    VkInstanceCreateInfo create_info = {
-        .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO
-    };
+    VkInstanceCreateInfo create_info = {.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
 
-    if (vkCreateInstance(&create_info, NULL, &instance) != VK_SUCCESS)
+    if(vkCreateInstance(&create_info, NULL, &instance) != VK_SUCCESS)
         return ERR_UNSUPPORTED;
 
     uint32_t count = 0;
@@ -69,9 +67,10 @@ int gpu(char *dest) {
         vkGetPhysicalDeviceProperties(devices[i], &props);
 
         if((config.gpu_index == -1 && props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) ||
-            (config.gpu_index == -2 && props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) ||
-            (config.gpu_index == 0 && (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU || props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)) ||
-            (config.gpu_index > 0 && (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU || props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) && (config.gpu_index == (int)i + 1))) {
+           (config.gpu_index == -2 && props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) ||
+           (config.gpu_index == 0 && (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU || props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)) ||
+           (config.gpu_index > 0 && (props.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU || props.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) &&
+            (config.gpu_index == (int)i + 1))) {
             char *current = malloc(strlen(props.deviceName) + 1);
             strcpy(current, props.deviceName);
             gpus[added++] = current;
@@ -93,7 +92,7 @@ int gpu(char *dest) {
         char *end;
         while((end = strstr(gpus[i], "(R)")))
             memmove(end, end + 3, strlen(end + 3) + 1);
-        
+
         if(!_gpu_brand) {
             if(strstr(gpus[i], "Intel ") || strstr(gpus[i], "Apple "))
                 memmove(gpus[i], gpus[i] + 6, strlen(gpus[i] + 6) + 1);
@@ -107,8 +106,8 @@ int gpu(char *dest) {
 
         if((end = strstr(gpus[i], " Integrated Graphics Controller")))
             *end = 0;
-        if((end = strstr(gpus[i], "-Core Processor")) && end > gpus[i]+1)
-            *(end-2) = 0;
+        if((end = strstr(gpus[i], "-Core Processor")) && end > gpus[i] + 1)
+            *(end - 2) = 0;
         if((end = strstr(gpus[i], " Rev. ")))
             *end = 0;
 
@@ -118,10 +117,10 @@ int gpu(char *dest) {
         strncat(dest, gpus[i], DEST_SIZE - 1 - strlen(dest));
     }
 
-    #ifdef VULKAN_EXISTS
-        for(int i = 0; i < 3; i++)
-            free(gpus[i]);
-    #endif
+#ifdef VULKAN_EXISTS
+    for(int i = 0; i < 3; i++)
+        free(gpus[i]);
+#endif
 
     return RET_OK;
 }

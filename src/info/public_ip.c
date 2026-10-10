@@ -22,9 +22,8 @@ int publicIp(char *dest) {
     hints.ai_protocol = 0;
 
     // using this as it is faster than ident.me
-    if(getaddrinfo("whatismyip.akamai.com", "80", &hints, &addrs)) {
+    if(getaddrinfo("whatismyip.akamai.com", "80", &hints, &addrs))
         return ERR_NO_INFO;
-    }
 
     int socket_fd = socket(addrs->ai_family, addrs->ai_socktype, addrs->ai_protocol);
     if(socket_fd == -1) {

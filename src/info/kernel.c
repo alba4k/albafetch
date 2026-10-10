@@ -12,10 +12,9 @@ int kernel(char *dest) {
     uname(&name);
     char *ptr = name.release, *type = NULL;
 
-    if(_kernel_type) {
+    if(_kernel_type)
         while((ptr = strchr(ptr, '-')))
             type = ++ptr;
-    }
 
     if(_kernel_short) {
         if((ptr = strchr(name.release, '-')))

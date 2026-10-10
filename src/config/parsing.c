@@ -69,14 +69,15 @@ void uncomment(char *str, const char start) {
             ++ptr;
             continue;
         }
-        
+
         if(ptr[0] == start && counter % 2 == 0) {
             while(ptr[0] != '\n' && ptr[0] != '\0') {
                 ptr[0] = ' '; // blank out from the comment start to the end of line
                 ++ptr;
             }
         }
-        else ++ptr;
+        else
+            ++ptr;
     }
 }
 

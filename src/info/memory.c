@@ -19,12 +19,11 @@ int memory(char *dest) {
     unsigned long usedram = (unsigned long)usedMemSize();
     unsigned long totalram = (unsigned long)systemMemSize();
 
-    if(usedram == 0 || totalram == 0) {
+    if(usedram == 0 || totalram == 0)
         return ERR_NO_INFO;
-    }
 
     snprintf(dest, DEST_SIZE, "%lu / %lu MiB", usedram / 1048576, totalram / 1048576);
-    
+
 #else
     struct sysinfo info;
     if(sysinfo(&info))

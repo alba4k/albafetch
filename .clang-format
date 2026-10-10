@@ -1,7 +1,7 @@
 ---
 # https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 # Based on Hyprland's
-Language: Cpp
+Language: C
 BasedOnStyle: LLVM
 
 AccessModifierOffset: -2
@@ -25,7 +25,7 @@ AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: Yes
-BreakBeforeBraces: Attach
+BreakBeforeBraces: Custom
 BreakBeforeTernaryOperators: false
 BreakConstructorInitializers: AfterColon
 ColumnLimit: 180
@@ -39,6 +39,7 @@ IndentWidth: 4
 InsertNewlineAtEOF: true
 PointerAlignment: Right
 ReflowComments: false
+RemoveBracesLLVM: true
 SortIncludes: false
 SortUsingDeclarations: false
 SpaceAfterCStyleCast: false
@@ -63,5 +64,6 @@ AllowShortEnumsOnASingleLine: false
 
 BraceWrapping:
   AfterEnum: false
+  BeforeElse: true
 
 NamespaceIndentation: All

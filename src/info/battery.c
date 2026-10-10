@@ -68,7 +68,7 @@ int battery(char *dest) {
     CFNumberRef currentRef = CFDictionaryGetValue(powerSource, CFSTR(kIOPSCurrentCapacityKey));
     CFNumberRef maxRef = CFDictionaryGetValue(powerSource, CFSTR(kIOPSMaxCapacityKey));
 
-    if (currentRef && maxRef) {
+    if(currentRef && maxRef) {
         CFNumberGetValue(currentRef, kCFNumberLongType, &current_capacity);
         CFNumberGetValue(maxRef, kCFNumberLongType, &max_capacity);
 
@@ -94,7 +94,7 @@ int battery(char *dest) {
     if((fp = fopen("/sys/class/power_supply/BAT0/status", "r"))) {
         size_t read = fread(status, sizeof(*status), 12, fp);
         fclose(fp);
-        
+
         if(read > 0)
             status[read - 1] = 0;
         else
@@ -103,12 +103,12 @@ int battery(char *dest) {
 #endif // __APPLE__
 #endif // __ANDROID__
 
-    if(capacity[0] != 0 && status[0] != 0) {
+    if(capacity[0] != 0 && status[0] != 0)
         if(_bat_status)
             snprintf(dest, DEST_SIZE, "%s%% (%s)", capacity, status);
         else
             snprintf(dest, DEST_SIZE, "%s%%", capacity);
-    } else if(capacity[0] != 0)
+    else if(capacity[0] != 0)
         snprintf(dest, DEST_SIZE, "%s%%", capacity);
     else if(status[0] != 0 && (_bat_status))
         safeStrncpy(dest, status, DEST_SIZE);

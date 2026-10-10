@@ -123,7 +123,8 @@ int main(int argc, char **argv) {
         if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
             puts(VERSION " (built from commit " COMMIT ")");
             return RET_OK;
-        } else if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--color") == 0)
+        }
+        else if(strcmp(argv[i], "-c") == 0 || strcmp(argv[i], "--color") == 0)
             asking_color = i + 1;
         else if(strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--bold") == 0)
             asking_bold = i + 1;
@@ -133,7 +134,8 @@ int main(int argc, char **argv) {
                 continue;
             }
             ascii_file = argv[i + 1];
-        } else if(strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--logo") == 0)
+        }
+        else if(strcmp(argv[i], "-l") == 0 || strcmp(argv[i], "--logo") == 0)
             asking_logo = i + 1;
         else if(strcmp(argv[i], "--align") == 0 || strcmp(argv[i], "-a") == 0)
             asking_align = i + 1;
@@ -143,13 +145,14 @@ int main(int argc, char **argv) {
                 continue;
             }
             safeStrncpy(config_file, argv[i + 1], sizeof(config_file));
-        } else if(strcmp(argv[i], "--debug") == 0) {
+        }
+        else if(strcmp(argv[i], "--debug") == 0) {
             puts("version: \033[1m\033[34m" VERSION "\033[0m, commit: \033[1m\033[34m" COMMIT "\033[0m\n");
 
             // just setting every option to 1 (except maybe _pkg_pip cause pip is slow af)
             config.boolean_options = 0xffffffffffffffff;
-            if(argc > i+1) {
-                if(strcmp(argv[i+1], "--no-pip") == 0)
+            if(argc > i + 1) {
+                if(strcmp(argv[i + 1], "--no-pip") == 0)
                     config.boolean_options = config.boolean_options & ~(_pkg_pip);
             }
 
@@ -196,9 +199,8 @@ int main(int argc, char **argv) {
                 if(access(config_file, F_OK))
                     snprintf(config_file, sizeof(config_file), "%s/.config/albafetch/albafetch.conf", home);
             }
-            if(access(config_file, F_OK)) {
+            if(access(config_file, F_OK))
                 strcpy(config_file, "/etc/xdg/albafetch.conf");
-            }
         }
 
         parseConfig(error, config_file, modules, &ascii_ptr, &default_bold, default_color, default_logo);
@@ -224,17 +226,18 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid logo \"%s\"!\n", argv[asking_logo]);
             else
                 safeStrncpy(config.color, config.logo[1], sizeof(config.color));
-        } else
+        }
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --logo requires an extra argument!\n", stderr);
     }
     if(config.logo == NULL) { // get a logo based on the OS (--logo was not used and no logo was set by the config)
 #ifdef __APPLE__
-        for(size_t i = 0; i < sizeof(logos)/sizeof(logos[0]); i++)
+        for(size_t i = 0; i < sizeof(logos) / sizeof(logos[0]); i++)
             if(strcmp(logos[i][0], "apple") == 0) {
                 config.logo = logos[i];
                 break;
             }
-            
+
 #else
 #ifdef __ANDROID__
         config.logo = logos[2];
@@ -306,7 +309,8 @@ int main(int argc, char **argv) {
 
             if(!done)
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"!\n", argv[asking_color]);
-        } else
+        }
+        else
             fputs("\033[31m\033[1mERROR\033[0m: --color requires an extra argument!\n", stderr);
     }
     if(asking_bold) {
@@ -506,7 +510,8 @@ int main(int argc, char **argv) {
             const size_t separator_len = strlen(config.separator);
             for(size_t i = 0; i < len && strlen(printed) < 1023 - separator_len * i; ++i)
                 strcat(printed, config.separator);
-        } else if(strcmp(current->id, "space") == 0) { // spacings are handled differently (they don't do shit)
+        }
+        else if(strcmp(current->id, "space") == 0) { // spacings are handled differently (they don't do shit)
             printed[0] = 0;
 
             if(print_logo) {
@@ -518,7 +523,8 @@ int main(int argc, char **argv) {
 
             strcat(printed, config.color);
             strcat(printed, current->label);
-        } else if(strcmp(current->id, "title") == 0) { // titles are handled differently
+        }
+        else if(strcmp(current->id, "title") == 0) { // titles are handled differently
             char name[DEST_SIZE];
             char host[DEST_SIZE];
 
@@ -542,7 +548,8 @@ int main(int argc, char **argv) {
                          config.color, host);
             else
                 snprintf(printed + strlen(printed), 1024 - strlen(printed), "%s%s@%s", "\033[0m", name, host);
-        } else if(current->func == NULL) { // printing a custom text
+        }
+        else if(current->func == NULL) { // printing a custom text
             printed[0] = 0;
 
             if(print_logo) {
@@ -554,7 +561,8 @@ int main(int argc, char **argv) {
 
             strcat(printed, config.color);
             strncat(printed, current->id, 1023 - strlen(printed));
-        } else {
+        }
+        else {
             int ret = current->func(data);
             if(ret != RET_OK) {
                 if(ret == ERR_OOM)
@@ -595,6 +603,6 @@ int main(int argc, char **argv) {
     // memory clean up
     free(ascii_ptr);
     destroyArray(modules);
-    
+
     return RET_OK;
 }

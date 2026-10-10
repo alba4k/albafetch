@@ -26,7 +26,7 @@ int desktop(char *dest) {
         return ERR_NO_INFO;
 
     strcpy(dest, de_name);
-    
+
     if(_de_version) {
         char version[32] = "";
         if(strcmp(de_name, "Hyprland") == 0) {
@@ -50,7 +50,7 @@ int desktop(char *dest) {
             strncat(dest, version + 11, DEST_SIZE - strlen(dest));
         }
     }
-    
+
     if(_de_type) {
         if(getenv("WAYLAND_DISPLAY"))
             strncat(dest, " (Wayland)", DEST_SIZE - strlen(dest));

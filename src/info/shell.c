@@ -30,7 +30,7 @@ int shell(char *dest) {
             return ERR_NO_INFO;
 
         if(shell[0] == '-') { // cmdline is "-bash" when login shell
-            safeStrncpy(shell_name, basename(shell+1), sizeof(shell_name));
+            safeStrncpy(shell_name, basename(shell + 1), sizeof(shell_name));
             safeStrncpy(dest, _shell_path ? shell + 1 : shell_name, DEST_SIZE);
             return RET_OK;
         }
@@ -46,7 +46,7 @@ int shell(char *dest) {
         return ERR_NO_INFO;
     if(shell[0] == 0)
         return ERR_NO_INFO + 0x10;
-    
+
     safeStrncpy(shell_name, basename(shell), sizeof(shell_name));
     safeStrncpy(dest, _shell_path ? shell : shell_name, DEST_SIZE);
 #endif
@@ -56,7 +56,7 @@ int shell(char *dest) {
             char *argv[] = {"fish", "--version", NULL}; // using `fish -c "echo $FISH_VERSION"` would be slower
             execCmd(version, sizeof(version), argv);
             strncat(dest, " ", DEST_SIZE - strlen(dest));
-            strncat(dest, version+14, DEST_SIZE - strlen(dest));
+            strncat(dest, version + 14, DEST_SIZE - strlen(dest));
         }
         else if(strcmp(shell_name, "make") == 0) {
             char *argv[] = {"make", "--version", NULL};

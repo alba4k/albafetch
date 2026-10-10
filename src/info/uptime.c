@@ -51,7 +51,8 @@ int uptime(char *dest) {
     if(mins) {
         snprintf(str, 24, "%ldm", mins); // print the number of minutes passed if more than 0
         strcat(result, str);
-    } else if(uptime < 60) {
+    }
+    else if(uptime < 60) {
         snprintf(str, 24, "%lds", uptime); // print the number of seconds passed if less than 60
         strcat(result, str);
     }

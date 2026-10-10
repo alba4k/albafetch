@@ -43,7 +43,7 @@ int execCmd(char *buf, size_t len, char *const *argv) {
         return ERR_GENERIC;
     }
 
-    buf[rlen == 0 ? 0 : rlen-1] = 0;
+    buf[rlen == 0 ? 0 : rlen - 1] = 0;
     close(stdout_pipes[0]);
     return RET_OK;
 }
@@ -72,7 +72,8 @@ __attribute__((pure)) size_t realStrlen(const char *str) {
             len += (size_t)1 - escaping;
 
             escaping = (*str != 'm') && escaping;
-        } else
+        }
+        else
             escaping = true;
 
         ++str;
