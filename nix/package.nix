@@ -38,6 +38,8 @@ stdenv.mkDerivation {
   buildInputs =
     [
       sqlite
+    ]
+    ++ lib.optionals (!stdenv.hostPlatform.isStatic && !stdenv.hostPlatform.isDarwin) [
       vulkan-headers
       vulkan-loader
     ]

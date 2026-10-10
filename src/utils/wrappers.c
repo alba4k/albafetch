@@ -10,7 +10,7 @@
 #include "return.h"
 
 #ifndef PATH_MAX
-#define PATH_MAX 256
+#define PATH_MAX 4096
 #endif
 
 // Run a command using execvp and copy the output into buf
