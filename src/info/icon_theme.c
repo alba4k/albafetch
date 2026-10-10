@@ -4,7 +4,6 @@
 #include <sys/wait.h>
 
 #include "info.h"
-#include "../optdeps/optdeps.h"
 #include "../utils/wrappers.h"
 
 // get the current Icon Theme

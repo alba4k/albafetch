@@ -13,9 +13,9 @@
 #include <sys/utsname.h>
 #include "../macos/macos_infos.h"
 #include "../utils/wrappers.h"
-#else
+#elif defined(VULKAN_EXISTS)
 #include <vulkan/vulkan.h>
-#endif // __APPLE__
+#endif
 
 // get the gpu name(s)
 int gpu(char *dest) {
@@ -41,7 +41,7 @@ int gpu(char *dest) {
             return ERR_PARSING;
         *end = 0;
     }
-#else
+#elif defined(VULKAN_EXISTS)
     VkInstance instance;
     VkInstanceCreateInfo create_info = {
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO
@@ -78,7 +78,9 @@ int gpu(char *dest) {
         }
     }
     vkDestroyInstance(instance, NULL);
-#endif // __APPLE__
+#else
+    return ERR_UNSUPPORTED;
+#endif
 
     if(gpus[0] == NULL)
         return ERR_NO_INFO;
@@ -116,7 +118,7 @@ int gpu(char *dest) {
         strncat(dest, gpus[i], DEST_SIZE - 1 - strlen(dest));
     }
 
-    #ifndef __APPLE__
+    #ifdef VULKAN_EXISTS
         for(int i = 0; i < 3; i++)
             free(gpus[i]);
     #endif

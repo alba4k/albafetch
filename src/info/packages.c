@@ -9,12 +9,13 @@
 #endif
 
 #include <dirent.h>
+#ifdef SQLITE3_EXISTS
 #include <sqlite3.h>
+#endif
 #include <sys/wait.h>
 
 #include "info.h"
 #include "../config/config.h"
-#include "../optdeps/optdeps.h"
 #include "../utils/wrappers.h"
 
 /*
@@ -77,6 +78,7 @@ int packages(char *dest) {
         }
     }
 
+#ifdef SQLITE3_EXISTS
     path[0] = 0;
     if(prefix)
         safeStrncpy(path, prefix, 256);
@@ -116,6 +118,7 @@ int packages(char *dest) {
 
     skip:;
     }
+#endif
 
     path[0] = 0;
     if(prefix)

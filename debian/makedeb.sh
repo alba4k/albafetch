@@ -30,7 +30,7 @@ Version: $version
 Architecture: $arch
 Essential: no
 Priority: optional
-Depends: libglib2.0-dev, sqlite3, libvulkan1
+Depends: sqlite3, libvulkan1
 Maintainer: Aaron Blasko
 Description: Faster neofetch alternative, written in C." > "$dirname"/DEBIAN/control
 

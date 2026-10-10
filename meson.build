@@ -37,7 +37,6 @@ src = [
   'src/info/term.c',
   'src/info/uptime.c',
   'src/info/user.c',
-  'src/optdeps/glib.c',
   'src/utils/debug.c',
   'src/utils/queue.c',
   'src/utils/utils.c',
@@ -57,23 +56,19 @@ build_args = [
 
 project_dependencies = []
 
-glib = dependency('glib-2.0', required: false)
-if glib.found()
-  build_args += '-DGLIB_EXISTS'
-  project_dependencies += glib
-endif
-
 if host_machine.system() != 'darwin'
-  if host_machine.system() == 'linux'
-    project_dependencies += dependency('sqlite3', required: true)
+  sqlite = dependency('sqlite3', required: false)
+  if sqlite.found()
+    build_args += '-DSQLITE3_EXISTS'
+    project_dependencies += sqlite
   endif
 
-  vulkan = dependency('vulkan', required: true)
+  vulkan = dependency('vulkan', required: false)
   cc = meson.get_compiler('c')
-  if not cc.has_header('vulkan/vulkan.h', dependencies: vulkan)
-    error('vulkan-headers not found — install vulkan-headers')
+  if vulkan.found() and cc.has_header('vulkan/vulkan.h', dependencies: vulkan)
+    build_args += '-DVULKAN_EXISTS'
+    project_dependencies += vulkan
   endif
-  project_dependencies += vulkan
 else
   project_dependencies += dependency('appleframeworks', modules : ['Foundation', 'IOKit'], required: true)
   add_languages('objc')

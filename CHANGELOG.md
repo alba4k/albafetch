@@ -27,7 +27,9 @@
 
 ## Dependencies
 * dropped `libpci`
+* dropped `glibc`
 * added `vulkan`
+* building without `sqlite3` and `vulkan` now disables the features they're needed for
 
 ---
 
