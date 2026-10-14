@@ -1,4 +1,5 @@
 #include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -15,15 +16,26 @@
 #endif
 
 // print the machine hostname
-int hostname(char *dest) {
-    char hostname[HOST_NAME_MAX + 1];
-    gethostname(hostname, HOST_NAME_MAX + 1);
+SInfo *hostname(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
+    char hostname[HOST_NAME_MAX + 1] = "";
+    if(gethostname(hostname, sizeof(hostname)) != 0 || hostname[0] == '\0') {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     char *ptr = strstr(hostname, ".local");
     if(ptr)
         *ptr = 0;
 
-    safeStrncpy(dest, hostname, DEST_SIZE);
+    res->string = strdup(hostname);
+    if(res->string == NULL)
+        res->retval = ERR_OOM;
 
-    return RET_OK;
+    return res;
 }

@@ -1,5 +1,6 @@
 #include <libgen.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "info.h"
@@ -7,18 +8,23 @@
 #include "../utils/wrappers.h"
 
 // get the current working directory
-int pwd(char *dest) {
-#ifdef __APPLE__
-    char *pwd = getcwd(NULL, DEST_SIZE);
-#else
-    char *pwd = getcwd(NULL, 0);
-#endif // __APPLE__
+SInfo *pwd(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->retval = RET_OK;
 
-    if(pwd == NULL)
-        return ERR_NO_INFO;
+    res->string = getcwd(NULL, 0);
 
-    safeStrncpy(dest, _pwd_path ? pwd : basename(pwd), DEST_SIZE);
-    free(pwd);
+    if(res->string == NULL) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
-    return RET_OK;
+    if(!_pwd_path) {
+        char *dir = basename(res->string);
+        memmove(res->string, dir, strlen(dir)+1);
+    }
+
+    return res;
 }

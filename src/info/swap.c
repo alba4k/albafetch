@@ -12,34 +12,48 @@
 #endif // __APPLE__
 
 // get used and total swap
-int swap(char *dest) {
+SInfo *swap(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
 #ifdef __APPLE__
     // don't really know how to do it and am too lazy to research it, so...
-    (void)dest;
-    return ERR_UNSUPPORTED;
+    res->retval = ERR_UNSUPPORTED;
 #else
     struct sysinfo info;
-    if(sysinfo(&info))
-        return ERR_NO_INFO;
+    if(sysinfo(&info)) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     unsigned long totalswap = info.totalswap / 1024;
     unsigned long freeswap = info.freeswap / 1024;
 
-    if(totalswap * freeswap == 0) // one or the other
-        return ERR_NO_INFO;
+    if(totalswap * freeswap == 0) { // one or the other
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     unsigned long usedswap = totalswap - freeswap;
 
-    snprintf(dest, DEST_SIZE, "%lu MiB / %lu MiB", usedswap / 1024, totalswap / 1024);
+    res->string = malloc(64);
+    if(res->string == NULL) {
+        res->retval = ERR_OOM;
+        return res;
+    }
+    snprintf(res->string, 64, "%lu MiB / %lu MiB", usedswap / 1024, totalswap / 1024);
 
     if(_swap_perc) {
-        const size_t len = DEST_SIZE - strlen(dest);
+        const size_t len = 64 - strlen(res->string);
         char perc[len];
 
         snprintf(perc, len, " (%lu%%)", (usedswap * 100) / totalswap);
-        strcat(dest, perc);
+        strcat(res->string, perc);
     }
 #endif
 
-    return RET_OK;
+    return res;
 }

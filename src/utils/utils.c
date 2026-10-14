@@ -28,7 +28,7 @@ void *fileToLogo(char *file) {
 #define LINE_COUNT 40
 
     // where the final logo is saved
-    static char *logo[LINE_COUNT + 1];
+    static char *logo[LINE_COUNT + 3];
     char *mem = NULL;
 
     char *buffer = NULL;
@@ -68,8 +68,6 @@ void *fileToLogo(char *file) {
         }
 
         safeStrncpy(mem, buffer, LINE_LEN);
-
-        ++i;
     }
 
     // for every remaining line of the logo...
@@ -97,6 +95,7 @@ void *fileToLogo(char *file) {
 
     // set up the logo metadata;
     logo[0] = "custom"; // logo ID
+    logo[1] = config.color;
 
     for(ptrdiff_t j = 0; j < i; ++j)
         logo[j + 2] = mem + (j * LINE_LEN);
@@ -209,4 +208,5 @@ void printLine(char *line, const size_t maxlen) {
     }
 
     fputs("\033[0m\n", stdout);
+    fflush(stdout);
 }

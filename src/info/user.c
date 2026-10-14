@@ -1,22 +1,35 @@
-#include <unistd.h>
 #include <pwd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "info.h"
 #include "../utils/wrappers.h"
 
 // print the current user
-int user(char *dest) {
-    struct passwd *pw;
+SInfo *user(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
 
     unsigned uid = geteuid();
     if((int)uid == -1) {
         // couldn't get UID
-        return ERR_NO_INFO;
+        res->retval = ERR_NO_INFO;
+        return res;
     }
 
-    pw = getpwuid(uid);
+    struct passwd *pw = getpwuid(uid);
+    if(pw == NULL) {
+        res->retval = ERR_NO_INFO + 0x10;
+        return res;
+    }
 
-    safeStrncpy(dest, pw->pw_name, DEST_SIZE);
+    res->string = strdup(pw->pw_name);
+    if(res->string == NULL)
+        res->retval = ERR_OOM;
 
-    return RET_OK;
+    return res;
 }

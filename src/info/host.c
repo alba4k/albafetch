@@ -20,23 +20,48 @@
 #include "info.h"
 
 // get the machine name and eventually model version
-int host(char *dest) {
+SInfo *host(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
 #ifdef __APPLE__
-    size_t BUF_SIZE = DEST_SIZE;
-    sysctlbyname("hw.model", dest, &BUF_SIZE, NULL, 0);
+    size_t BUF_SIZE = 256;
+    char buf[256] = "";
+    if(sysctlbyname("hw.model", buf, &BUF_SIZE, NULL, 0) != 0 || buf[0] == '\0') {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
+
+    res->string = strdup(buf);
+    if(res->string == NULL) {
+        res->retval = ERR_OOM;
+        return res;
+    }
 #else
 #ifdef __ANDROID__
-    char brand[64], model[64];
+    char brand[64] = "", model[64] = "";
     char *brand_args[] = {"getprop", "ro.product.brand", NULL};
     char *model_args[] = {"getprop", "ro.product.model", NULL};
 
     execCmd(brand, 64, brand_args);
     execCmd(model, 64, model_args);
 
-    if((brand[0] || model[0]) == 0)
-        return ERR_NO_INFO;
+    if(brand[0] == 0 || model[0] == 0) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
-    snprintf(dest, DEST_SIZE, "%s%s%s", brand, brand[0] ? " " : "", model);
+    const size_t len = strlen(brand) + strlen(model) + (brand[0] ? 2 : 1);
+    res->string = malloc(len);
+    if(res->string == NULL) {
+        res->retval = ERR_OOM;
+        return res;
+    }
+
+    snprintf(res->string, len, "%s%s%s", brand, brand[0] ? " " : "", model);
 #else
     char *name = NULL, *version = NULL;
     FILE *fp = NULL;
@@ -48,18 +73,22 @@ int host(char *dest) {
         fseek(fp, 0, SEEK_SET);
 
         name = malloc(len);
-        if(name == NULL)
-            return ERR_OOM;
+        if(name == NULL) {
+            fclose(fp);
+            goto skip_name;
+        }
 
         size_t read = fread(name, sizeof(*name), len, fp);
         fclose(fp);
-        if(read > 0)
-            name[read - 1] = 0;
-        else {
+        if(read <= 0) {
             free(name);
             name = NULL;
+            goto skip_name;
         }
+
+        name[read - 1] = 0;
     }
+skip_name:;
 
     if((fp = fopen("/sys/devices/virtual/dmi/id/product_version", "r"))) {
         fseek(fp, 0, SEEK_END);
@@ -67,24 +96,27 @@ int host(char *dest) {
         fseek(fp, 0, SEEK_SET);
 
         version = malloc(len);
-        if(version == NULL)
-            return ERR_OOM;
+        if(version == NULL) {
+            fclose(fp);
+            goto skip_version;
+        }
 
         size_t read = fread(version, sizeof(*version), len, fp);
         fclose(fp);
-        if(read > 0)
-            version[read - 1] = 0;
-        else {
+        if(read <= 0) {
             free(version);
-            free(name);
             version = NULL;
+            goto skip_version;
         }
+
+        version[read - 1] = 0;
     }
+skip_version:;
 
     // filtering out some shitty defaults because the file can't just be empty"
     const char *errors[] = {"System Product Name", "System Version", "To Be Filled By O.E.M.", "Default string-WCP", "None", ""};
-    bool name_defined = true;
-    bool version_defined = true;
+    bool name_defined = (name != NULL);
+    bool version_defined = (version != NULL);
 
     for(unsigned long i = 0; i < sizeof(errors) / sizeof(errors[0]); ++i) {
         if(name)
@@ -95,23 +127,34 @@ int host(char *dest) {
                 version_defined = false;
     }
 
-    if(name && version && name_defined && version_defined)
-        snprintf(dest, DEST_SIZE, "%s %s", name, version);
-    else if(name && name_defined)
-        safeStrncpy(dest, name, DEST_SIZE);
-    else if(version && version_defined)
-        safeStrncpy(dest, version, DEST_SIZE);
+    if(name_defined && version_defined) {
+        const size_t len = strlen(name) + strlen(version) + 2;
+        res->string = malloc(len);
+        if(res->string == NULL) {
+            res->retval = ERR_OOM;
+            goto free;
+        }
+        snprintf(res->string, len, "%s %s", name, version);
+
+    free:
+        free(name);
+        free(version);
+    }
+    else if(name_defined) {
+        free(version);
+        res->string = name;
+    }
+    else if(version_defined) {
+        free(name);
+        res->string = version;
+    }
     else {
         free(name);
         free(version);
-
-        return ERR_NO_INFO;
+        res->retval = ERR_NO_INFO;
     }
-
-    free(name);
-    free(version);
 #endif // __ANDROID__
 #endif // __APPLE__
 
-    return RET_OK;
+    return res;
 }

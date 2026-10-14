@@ -5,6 +5,7 @@
 #else
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #ifdef __ANDROID__
 #include <ctype.h>
@@ -15,14 +16,20 @@
 #include "../config/config.h"
 #include "../utils/wrappers.h"
 
-int battery(char *dest) {
+SInfo *battery(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
     char capacity[5] = "";
     char status[20] = "";
 
 #ifdef __ANDROID__ // relies on termux api
-    char buf[DEST_SIZE];
+    char buf[64];
     char *args[] = {"termux-battery-status", NULL};
-    execCmd(buf, DEST_SIZE, args);
+    execCmd(buf, sizeof(buf), args);
 
     char *ptr = strstr(buf, "percentage");
     char *ptr2 = strstr(buf, "status");
@@ -55,10 +62,24 @@ int battery(char *dest) {
 #else
 #ifdef __APPLE__
     CFTypeRef powerSourceInfo = IOPSCopyPowerSourcesInfo();
-    CFArrayRef powerSourcesList = IOPSCopyPowerSourcesList(powerSourceInfo);
+    if(powerSourceInfo == NULL) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
-    if(CFArrayGetCount(powerSourcesList) == 0)
-        return ERR_NO_INFO;
+    CFArrayRef powerSourcesList = IOPSCopyPowerSourcesList(powerSourceInfo);
+    if(powerSourcesList == NULL) {
+        CFRelease(powerSourceInfo);
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
+
+    if(CFArrayGetCount(powerSourcesList) == 0) {
+        CFRelease(powerSourcesList);
+        CFRelease(powerSourceInfo);
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     CFDictionaryRef powerSource = CFArrayGetValueAtIndex(powerSourcesList, 0);
 
@@ -72,10 +93,21 @@ int battery(char *dest) {
         CFNumberGetValue(currentRef, kCFNumberLongType, &current_capacity);
         CFNumberGetValue(maxRef, kCFNumberLongType, &max_capacity);
 
-        snprintf(capacity, 5, "%ld", (current_capacity * 100) / max_capacity);
+        if(max_capacity > 0)
+            snprintf(capacity, 5, "%ld", (current_capacity * 100) / max_capacity);
+        else {
+            CFRelease(powerSourcesList);
+            CFRelease(powerSourceInfo);
+            res->retval = ERR_NO_INFO;
+            return res;
+        }
     }
-    else
-        return ERR_GENERIC;
+    else {
+        CFRelease(powerSourcesList);
+        CFRelease(powerSourceInfo);
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     CFRelease(powerSourcesList);
     CFRelease(powerSourceInfo);
@@ -103,17 +135,33 @@ int battery(char *dest) {
 #endif // __APPLE__
 #endif // __ANDROID__
 
-    if(capacity[0] != 0 && status[0] != 0)
-        if(_bat_status)
-            snprintf(dest, DEST_SIZE, "%s%% (%s)", capacity, status);
-        else
-            snprintf(dest, DEST_SIZE, "%s%%", capacity);
-    else if(capacity[0] != 0)
-        snprintf(dest, DEST_SIZE, "%s%%", capacity);
-    else if(status[0] != 0 && (_bat_status))
-        safeStrncpy(dest, status, DEST_SIZE);
+    if(capacity[0] != 0 && status[0] != 0 && _bat_status) {
+        const size_t len = strlen(capacity) + strlen(status) + 5;
+        res->string = malloc(len);
+        if(res->string == NULL) {
+            res->retval = ERR_OOM;
+            return res;
+        }
+        snprintf(res->string, len, "%s%% (%s)", capacity, status);
+    }
+    else if(capacity[0] != 0) {
+        const size_t len = strlen(capacity) + 2;
+        res->string = malloc(len);
+        if(res->string == NULL) {
+            res->retval = ERR_OOM;
+            return res;
+        }
+        snprintf(res->string, len, "%s%%", capacity);
+    }
+    else if(status[0] != 0 && (_bat_status)) {
+        res->string = strdup(status);
+        if(res->string == NULL) {
+            res->retval = ERR_OOM;
+            return res;
+        }
+    }
     else
-        return ERR_NO_INFO;
+        res->retval = ERR_NO_INFO;
 
-    return RET_OK;
+    return res;
 }

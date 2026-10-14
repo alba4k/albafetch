@@ -28,6 +28,8 @@ int execCmd(char *buf, size_t len, char *const *argv) {
         dup2(stderr_pipes[1], STDERR_FILENO);
 
         execvp(argv[0], argv);
+
+        exit(1); // in case execvp fails
     }
 
     wait(0);

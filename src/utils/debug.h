@@ -1,3 +1,3 @@
 #pragma once
 
-void run_debug(unsigned *errors, double *time);
+int run_debug(double *time);

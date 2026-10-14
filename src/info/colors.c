@@ -1,18 +1,27 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "info.h"
 #include "../config/config.h"
 
-#include <string.h>
-
-#include <stdio.h>
-
 // show the terminal color configuration
-int colors(char *dest) {
-    memset(dest, 0, DEST_SIZE);
+SInfo *colors(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->retval = RET_OK;
+
+    res->string = calloc(8 * (strlen(config.col_block_str) + 5) + 5, sizeof(char));
+    if(res->string == NULL) {
+        res->retval = ERR_OOM;
+        return res;
+    }
 
     for(int i = 0; i < 8; ++i)
-        sprintf(dest + strlen(dest), "\033[%s%dm%s", _col_background ? "4" : "3", i, config.col_block_str);
+        sprintf(res->string + strlen(res->string), "\033[%s%dm%s", _col_background ? "4" : "3", i, config.col_block_str);
 
-    strcat(dest, "\033[0m");
+    strcat(res->string, "\033[0m");
 
-    return RET_OK;
+    return res;
 }

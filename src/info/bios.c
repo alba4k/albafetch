@@ -7,7 +7,16 @@
 #include "../utils/wrappers.h"
 
 // get the current BIOS vendor and version (Linux only!)
-int bios(char *dest) {
+SInfo *bios(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
+#ifndef __linux__
+    res->retval = ERR_UNSUPPORTED;
+#else
     char *vendor = NULL, *version = NULL;
     FILE *fp = NULL;
     size_t len;
@@ -19,7 +28,7 @@ int bios(char *dest) {
 
         vendor = malloc(len);
         if(vendor == NULL)
-            return ERR_OOM;
+            goto skip_vendor;
 
         size_t read = fread(vendor, sizeof(*vendor), len, fp);
         fclose(fp);
@@ -30,6 +39,7 @@ int bios(char *dest) {
             vendor = NULL;
         }
     }
+skip_vendor:;
 
     if((fp = fopen("/sys/devices/virtual/dmi/id/bios_version", "r"))) {
         fseek(fp, 0, SEEK_END);
@@ -37,10 +47,8 @@ int bios(char *dest) {
         fseek(fp, 0, SEEK_SET);
 
         version = malloc(len);
-        if(version == NULL) {
-            free(vendor);
-            return ERR_OOM;
-        }
+        if(version == NULL)
+            goto skip_version;
 
         size_t read = fread(version, sizeof(*version), len, fp);
         fclose(fp);
@@ -48,22 +56,31 @@ int bios(char *dest) {
             version[read - 1] = 0;
         else {
             free(version);
-            free(vendor);
             version = NULL;
         }
     }
+skip_version:;
 
-    if(vendor != NULL && version != NULL)
-        snprintf(dest, DEST_SIZE, "%s %s", vendor, version);
+    if(vendor != NULL && version != NULL) {
+        const size_t len = strlen(vendor) + strlen(version) + 2;
+        res->string = malloc(len);
+        if(res->string == NULL) {
+            res->retval = ERR_OOM;
+            goto free;
+        }
+        snprintf(res->string, len, "%s %s", vendor, version);
+        
+        free:;
+        free(vendor);
+        free(version);
+    }
     else if(vendor != NULL)
-        safeStrncpy(dest, vendor, DEST_SIZE);
+        res->string = vendor;
     else if(version != NULL)
-        safeStrncpy(dest, version, DEST_SIZE);
+        res->string = version;
     else
-        return ERR_NO_INFO;
+        res->retval = ERR_NO_INFO;
+#endif // __linux__
 
-    free(vendor);
-    free(version);
-
-    return RET_OK;
+    return res;
 }

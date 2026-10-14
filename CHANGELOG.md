@@ -24,6 +24,10 @@
 
 ### Technical fixes
 * Improved fread() usage
+* Rewrote info gathering structure:
+    - should slightly reduce memory consumption
+    - easier future parallelization? no more resource sharing
+* Memory safety improvements
 
 ## Dependencies
 * dropped `libpci`

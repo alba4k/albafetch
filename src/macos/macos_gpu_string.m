@@ -8,7 +8,7 @@ char *getGpuString(void) {
     CFMutableDictionaryRef dict = IOServiceMatching("IOPCIDevice");
     io_iterator_t iter;
     int success;
-    const char *result = NULL;
+    char *result = NULL;
 
     #if __OSX_AVAILABLE_STARTING(__MAC_12_0,__IPHONE_NA)
 
@@ -44,7 +44,7 @@ char *getGpuString(void) {
                 NSString *modelName = [[NSString alloc] initWithData:
                                         (NSData *)gpu_model encoding:NSASCIIStringEncoding];
                 
-                result = [modelName cStringUsingEncoding:NSUTF8StringEncoding];
+                result = strdup([modelName cStringUsingEncoding:NSUTF8StringEncoding]);
             }
         }
 
@@ -54,5 +54,5 @@ char *getGpuString(void) {
 
     IOObjectRelease(iter);
 
-    return (char*)result;
+    return result;
 }

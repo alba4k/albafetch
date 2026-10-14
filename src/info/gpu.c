@@ -18,7 +18,13 @@
 #endif
 
 // get the gpu name(s)
-int gpu(char *dest) {
+SInfo *gpu(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
     char *gpus[] = {NULL, NULL, NULL};
 
 #ifdef __APPLE__
@@ -26,34 +32,43 @@ int gpu(char *dest) {
     uname(&name);
 
     if(strcmp(name.machine, "x86_64") == 0)
-        gpus[0] = getGpuString();                        // only works on x64
-    if(gpus[0] == 0 || strcmp(name.machine, "x86_64")) { // fallback
+        gpus[0] = getGpuString(); // only works on x64
+
+    if(gpus[0] == NULL || strcmp(name.machine, "x86_64") != 0) { // fallback
         char buf[1024];
         char *args[] = {"/usr/sbin/system_profiler", "SPDisplaysDataType", NULL};
-        execCmd(buf, 1024, args);
+        execCmd(buf, sizeof(buf), args);
 
-        gpus[0] = strstr(buf, "Chipset Model: ");
-        if(gpus[0] == 0)
-            return ERR_NO_INFO;
-        gpus[0] += 15;
-        char *end = strchr(gpus[0], '\n');
-        if(end == NULL)
-            return ERR_PARSING;
+        char *model = strstr(buf, "Chipset Model: ");
+        if(model == NULL) {
+            res->retval = ERR_NO_INFO;
+            return res;
+        }
+        model += 15;
+        char *end = strchr(model, '\n');
+        if(end == NULL) {
+            res->retval = ERR_PARSING;
+            return res;
+        }
         *end = 0;
+        gpus[0] = strdup(model);
     }
 #elif defined(VULKAN_EXISTS)
     VkInstance instance;
     VkInstanceCreateInfo create_info = {.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
 
-    if(vkCreateInstance(&create_info, NULL, &instance) != VK_SUCCESS)
-        return ERR_UNSUPPORTED;
+    if(vkCreateInstance(&create_info, NULL, &instance) != VK_SUCCESS) {
+        res->retval = ERR_UNSUPPORTED;
+        return res;
+    }
 
     uint32_t count = 0;
     vkEnumeratePhysicalDevices(instance, &count, NULL);
 
     if(count == 0) {
         vkDestroyInstance(instance, NULL);
-        return ERR_NO_INFO;
+        res->retval = ERR_PARSING;
+        return res;
     }
 
     VkPhysicalDevice devices[3];
@@ -78,16 +93,18 @@ int gpu(char *dest) {
     }
     vkDestroyInstance(instance, NULL);
 #else
-    return ERR_UNSUPPORTED;
+    res->retval = ERR_UNSUPPORTED;
+    return res;
 #endif
 
-    if(gpus[0] == NULL)
-        return ERR_NO_INFO;
+    if(gpus[0] == NULL) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     // this next part is just random cleanup
     // also, I'm using end as a random char* - BaD pRaCtIcE aNd CoNfUsInG - lol stfu
     //  yk it's decent and it works
-    dest[0] = 0;
     for(unsigned i = 0; i < sizeof(gpus) / sizeof(gpus[0]) && gpus[i] != NULL; ++i) {
         char *end;
         while((end = strstr(gpus[i], "(R)")))
@@ -112,15 +129,23 @@ int gpu(char *dest) {
             *end = 0;
 
         // (finally) writing the GPU(s) into dest
-        if(i > 0)
-            strncat(dest, ", ", DEST_SIZE - strlen(dest));
-        strncat(dest, gpus[i], DEST_SIZE - 1 - strlen(dest));
+        char buf[64] = "";
+        if(i) // not the first
+            strcpy(buf, ", ");
+        strncat(buf, gpus[i], sizeof(buf) - (i ? 3 : 1));
+
+        char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
+        if(tmpptr) {
+            if(res->string == NULL) // first time allocating
+                tmpptr[0] = 0;
+
+            res->string = tmpptr;
+            strcat(res->string, buf);
+        }
     }
 
-#ifdef VULKAN_EXISTS
     for(int i = 0; i < 3; i++)
         free(gpus[i]);
-#endif
 
-    return RET_OK;
+    return res;
 }

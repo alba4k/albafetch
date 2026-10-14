@@ -14,60 +14,58 @@
 #endif // __APPLE__
 
 // get used and total memory
-int memory(char *dest) {
+SInfo *memory(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
+
 #ifdef __APPLE__
     unsigned long usedram = (unsigned long)usedMemSize();
     unsigned long totalram = (unsigned long)systemMemSize();
 
-    if(usedram == 0 || totalram == 0)
-        return ERR_NO_INFO;
+    if(usedram == 0 || totalram == 0) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
-    snprintf(dest, DEST_SIZE, "%lu / %lu MiB", usedram / 1048576, totalram / 1048576);
+    res->string = malloc(64);
+    if(res->string == NULL) {
+        res->retval = ERR_OOM;
+        return res;
+    }
+    snprintf(res->string, 64, "%lu / %lu MiB", usedram / 1048576, totalram / 1048576);
 
 #else
     struct sysinfo info;
-    if(sysinfo(&info))
-        return ERR_NO_INFO;
+    if(sysinfo(&info)) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
 
     unsigned long totalram = info.totalram / 1024;
     unsigned long freeram = info.freeram / 1024;
     // unsigned long sharedram = info.sharedram / 1024;
 
-    FILE *fp = fopen("/proc/meminfo", "r");
-
-    if(fp == NULL)
-        return ERR_NO_FILE;
-
-    char buf[DEST_SIZE];
-    char *cachedram = buf;
-
-    readAfterSequence(fp, "Cached:", buf, DEST_SIZE);
-    fclose(fp);
-
-    if(buf[0] == 0)
-        return ERR_PARSING;
-    cachedram += 2;
-
-    char *end = strstr(cachedram, " kB");
-
-    if(end == NULL)
-        return ERR_PARSING + 0x10;
-
-    *end = 0;
-
-    unsigned long usedram = totalram - freeram - atol(cachedram);
+    unsigned long usedram = totalram - freeram;
     // usedram -= sharedram;
 
-    snprintf(dest, DEST_SIZE, "%lu / %lu MiB", usedram / 1024, totalram / 1024);
+    res->string = malloc(64);
+    if(res->string == NULL) {
+        res->retval = ERR_OOM;
+        return res;
+    }
+    snprintf(res->string, 64, "%lu / %lu MiB", usedram / 1024, totalram / 1024);
 #endif
 
     if(_mem_perc) {
-        const size_t len = DEST_SIZE - strlen(dest);
+        const size_t len = 64 - strlen(res->string);
         char perc[len];
 
         snprintf(perc, len, " (%lu%%)", (usedram * 100) / totalram);
-        strcat(dest, perc);
+        strcat(res->string, perc);
     }
 
-    return RET_OK;
+    return res;
 }

@@ -1,18 +1,31 @@
-#include <stdlib.h>
 #include <libgen.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "info.h"
 #include "../config/config.h"
 #include "../utils/wrappers.h"
 
 // get the current login shell
-int loginShell(char *dest) {
-    char *buf = getenv("SHELL");
+SInfo *loginShell(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
 
-    if(buf != NULL) {
-        safeStrncpy(dest, _shell_path ? buf : basename(buf), DEST_SIZE);
-        return RET_OK;
+    char *buf = getenv("SHELL");
+    if(buf == NULL) {
+        res->retval = ERR_NO_INFO;
+        return res;
     }
 
-    return ERR_NO_INFO;
+    if(_shell_path)
+        buf = basename(buf);
+
+    res->string = strdup(buf);
+    if(res->string == NULL)
+        res->retval = ERR_OOM;
+
+    return res;
 }

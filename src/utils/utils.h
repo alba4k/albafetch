@@ -4,11 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "../info/info.h"
+
 // element of a module linked list
 struct SModule {
     char *id;             // module identifier
     char *label;          // module label
-    int (*func)(char *);  // function to run
+    SInfo *(*func)(void); // function to run
     struct SModule *next; // next module
 };
 

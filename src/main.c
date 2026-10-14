@@ -157,8 +157,7 @@ int main(int argc, char **argv) {
             }
 
             double time;
-            unsigned errors;
-            run_debug(&errors, &time);
+            int errors = run_debug(&time);
 
             printf("\n\033[1mDebug run finished with a total of %u error(s).\033[0m         [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
 
@@ -170,8 +169,7 @@ int main(int argc, char **argv) {
             use_config = false;
     }
 
-    char data[DEST_SIZE] = "";        // output of each module
-    char printed[DEST_SIZE * 4] = ""; // line-by-line output of albafetch
+    char printed[1024] = ""; // line-by-line output of albafetch
 
     struct SModule *modules = malloc(sizeof(struct SModule));
     if(modules == NULL)
@@ -289,9 +287,9 @@ int main(int argc, char **argv) {
 #endif // __APPLE__
 
         safeStrncpy(default_logo, config.logo[0], sizeof(default_logo));
-        if(strcmp(default_color, "") == 0)
+        if(default_color[0] == 0)
             safeStrncpy(default_color, config.logo[1], sizeof(default_color));
-        if(strcmp(config.color, "") == 0)
+        if(config.color[0] == 0)
             safeStrncpy(config.color, config.logo[1], sizeof(config.color));
     }
 
@@ -411,12 +409,12 @@ int main(int argc, char **argv) {
     if(win.ws_col == 0)
         win.ws_col = -1;
 
-    struct SInfo {
-        char *id;            // module identifier
-        char *label;         // module label
-        int (*func)(char *); // function to run
+    struct SinfoModule {
+        char *id;             // module identifier
+        char *label;          // module label
+        SInfo *(*func)(void); // function to run
     };
-    struct SInfo module_table[] = {
+    struct SinfoModule module_table[] = {
         // {"identifier", label, func},
         {"separator", config.separator_prefix, NULL},
         {"space", config.spacing_prefix, NULL},
@@ -483,7 +481,7 @@ int main(int argc, char **argv) {
 
         asking_align += (int)realStrlen(config.dash);
 
-        snprintf(format, 32, "%%-%ds\033[0m%%s", asking_align);
+        snprintf(format, sizeof(format), "%%-%ds\033[0m%%s", asking_align);
     }
 
     // printing every module
@@ -508,7 +506,7 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             const size_t separator_len = strlen(config.separator);
-            for(size_t i = 0; i < len && strlen(printed) < 1023 - separator_len * i; ++i)
+            for(size_t i = 0; i < len && strlen(printed) < sizeof(printed) - separator_len * i - 1; ++i)
                 strcat(printed, config.separator);
         }
         else if(strcmp(current->id, "space") == 0) { // spacings are handled differently (they don't do shit)
@@ -525,11 +523,20 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
         }
         else if(strcmp(current->id, "title") == 0) { // titles are handled differently
-            char name[DEST_SIZE];
-            char host[DEST_SIZE];
+            SInfo *name = user();
+            SInfo *host = hostname();
 
-            if(user(name) || hostname(host))
+            if(name == NULL || host == NULL || name->retval != RET_OK || host->retval != RET_OK) {
+                if(name) {
+                    free(name->string);
+                    free(name);
+                }
+                if(host) {
+                    free(host->string);
+                    free(host);
+                }
                 continue;
+            }
 
             printed[0] = 0;
 
@@ -544,10 +551,15 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             if(_title_color)
-                snprintf(printed + strlen(printed), 1024 - strlen(printed), "%s%s%s%s@%s%s%s", config.color, _bold ? "\033[1m" : "", name, "\033[0m", _bold ? "\033[1m" : "",
-                         config.color, host);
+                snprintf(printed + strlen(printed), sizeof(printed) - strlen(printed), "%s%s%s%s@%s%s%s", config.color, _bold ? "\033[1m" : "", name->string, "\033[0m",
+                         _bold ? "\033[1m" : "", config.color, host->string);
             else
-                snprintf(printed + strlen(printed), 1024 - strlen(printed), "%s%s@%s", "\033[0m", name, host);
+                snprintf(printed + strlen(printed), sizeof(printed) - strlen(printed), "%s%s@%s", "\033[0m", name->string, host->string);
+
+            free(name->string);
+            free(host->string);
+            free(name);
+            free(host);
         }
         else if(current->func == NULL) { // printing a custom text
             printed[0] = 0;
@@ -560,13 +572,15 @@ int main(int argc, char **argv) {
             }
 
             strcat(printed, config.color);
-            strncat(printed, current->id, 1023 - strlen(printed));
+            strncat(printed, current->id, sizeof(printed) - strlen(printed) - 1);
         }
         else {
-            int ret = current->func(data);
-            if(ret != RET_OK) {
-                if(ret == ERR_OOM)
-                    return ERR_OOM;
+            SInfo *info = current->func();
+            if(info == NULL)
+                continue;
+            if(info->retval != RET_OK) {
+                free(info->string);
+                free(info);
                 continue;
             }
 
@@ -585,7 +599,10 @@ int main(int argc, char **argv) {
             if(current->label[0] && current->func != colors && current->func != lightColors)
                 strcat(label, config.dash);
 
-            snprintf(printed + strlen(printed), 1024 - strlen(printed), format, label, data);
+            snprintf(printed + strlen(printed), sizeof(printed) - strlen(printed), format, label, info->string);
+
+            free(info->string);
+            free(info);
         }
 
         printLine(printed, win.ws_col);

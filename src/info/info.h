@@ -2,56 +2,35 @@
 
 #include "../utils/return.h"
 
-#define DEST_SIZE 256
+typedef struct {
+    int retval;
+    char *string;
+} SInfo;
 
-int user(char *dest);
-
-int hostname(char *dest);
-
-int uptime(char *dest);
-
-int os(char *dest);
-
-int kernel(char *dest);
-
-int desktop(char *dest);
-
-int gtkTheme(char *dest);
-
-int iconTheme(char *dest);
-
-int cursorTheme(char *dest);
-
-int shell(char *dest);
-
-int loginShell(char *dest);
-
-int term(char *dest);
-
-int packages(char *dest);
-
-int host(char *dest);
-
-int bios(char *dest);
-
-int cpu(char *dest);
-
-int gpu(char *dest);
-
-int memory(char *dest);
-
-int swap(char *dest);
-
-int publicIp(char *dest);
-
-int localIp(char *dest);
-
-int pwd(char *dest);
-
-int date(char *dest);
-
-int battery(char *dest);
-
-int colors(char *dest);
-
-int lightColors(char *dest);
+SInfo *user(void);
+SInfo *ostname(void);
+SInfo *uptime(void);
+SInfo *os(void);
+SInfo *kernel(void);
+SInfo *desktop(void);
+SInfo *gtkTheme(void);
+SInfo *iconTheme(void);
+SInfo *cursorTheme(void);
+SInfo *shell(void);
+SInfo *loginShell(void);
+SInfo *term(void);
+SInfo *packages(void);
+SInfo *host(void);
+SInfo *hostname(void);
+SInfo *bios(void);
+SInfo *cpu(void);
+SInfo *gpu(void);
+SInfo *memory(void);
+SInfo *swap(void);
+SInfo *publicIp(void);
+SInfo *localIp(void);
+SInfo *pwd(void);
+SInfo *date(void);
+SInfo *battery(void);
+SInfo *colors(void);
+SInfo *lightColors(void);

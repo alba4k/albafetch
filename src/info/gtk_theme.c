@@ -7,37 +7,49 @@
 #include "../utils/wrappers.h"
 
 // get the current GTK Theme
-int gtkTheme(char *dest) {
-    char *theme = getenv("GTK_THEME");
+SInfo *gtkTheme(void) {
+    SInfo *res = malloc(sizeof(SInfo));
+    if(res == NULL)
+        return NULL;
+    res->string = NULL;
+    res->retval = RET_OK;
 
     // try using GTK_THEME (faster)
+    char *theme = getenv("GTK_THEME");
     if(theme) {
-        safeStrncpy(dest, theme, DEST_SIZE);
-
-        return RET_OK;
+        res->string = strdup(theme);
+        if(res->string != NULL)
+            return res;
     }
 
     // try using gsettings (fallback)
     // reading ~/.config/gtk-3.0/settings.ini could also be an option
-    if(binaryInPath("gsettings")) {
-        char buf[DEST_SIZE] = "";
-        char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "gtk-theme", NULL};
-        execCmd(buf, DEST_SIZE, args);
-
-        // cleanup
-        if(buf[0] != 0) {
-            if(buf[0] == '\'') {
-                memmove(buf, buf + 1, strlen(buf));
-
-                char *ptr = strchr(buf, '\'');
-                if(ptr)
-                    *ptr = 0;
-            }
-
-            safeStrncpy(dest, buf, DEST_SIZE);
-            return RET_OK;
-        }
+    if(!binaryInPath("gsettings")) {
+        res->retval = ERR_UNSUPPORTED;
+        return res;
     }
 
-    return ERR_UNSUPPORTED;
+    char buf[64] = "";
+    char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "gtk-theme", NULL};
+    execCmd(buf, 64, args);
+
+    // cleanup
+    if(buf[0] == 0) {
+        res->retval = ERR_NO_INFO;
+        return res;
+    }
+
+    if(buf[0] == '\'') {
+        memmove(buf, buf + 1, strlen(buf));
+
+        char *ptr = strchr(buf, '\'');
+        if(ptr)
+            *ptr = 0;
+    }
+
+    res->string = strdup(buf);
+    if(res->string == NULL)
+        res->retval = ERR_OOM;
+
+    return res;
 }
