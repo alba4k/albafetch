@@ -212,7 +212,7 @@ skip_flatpak:;
 skip_snap:;
 #endif
 
-    if(_pkg_brew && (binaryInPath("brew"))) {
+    if(_pkg_brew && binaryInPath("brew")) {
         char *args[] = {"brew", "--cellar", NULL};
         execCmd(buf2, 64, args);
 

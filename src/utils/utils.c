@@ -1,10 +1,8 @@
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "utils.h"
-#include "return.h"
 #include "wrappers.h"
 #include "../config/config.h"
 #include "../config/parsing.h"
@@ -17,7 +15,7 @@ void *fileToLogo(char *file) {
         return NULL;
     }
 
-    /* 
+    /*
      * mem is assumed to be a 10 KiB buffer, aka 10240 B.
      * this will be filled in with up to 64 lines,
      * each of which can be up to 160 bytes long.
@@ -178,11 +176,11 @@ void printLine(char *line, const size_t maxlen) {
             break;
         else if(line[i] == '\033')
             escaping = true;
-        else if(line[i] & 0x80) {      // is the 1st bit 1?
-            if(line[i] & 0x40) {       // is the 2nd bit 1?
-                if(line[i] & 0x20)     // is the 3rd bit 1?
-                    if(line[i] & 0x10) // is the 4th bit 1?
-                        unicode = 3;   // first of 4 unicode bytes (0b11110xxx)
+        else if(line[i] & 0x80U) {      // is the 1st bit 1?
+            if(line[i] & 0x40U) {       // is the 2nd bit 1?
+                if(line[i] & 0x20U)     // is the 3rd bit 1?
+                    if(line[i] & 0x10U) // is the 4th bit 1?
+                        unicode = 3;    // first of 4 unicode bytes (0b11110xxx)
                     else
                         unicode = 2; // first of 3 unicode bytes (0b1110xxxx)
                 else

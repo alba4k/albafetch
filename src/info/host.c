@@ -119,12 +119,10 @@ skip_version:;
     bool version_defined = (version != NULL);
 
     for(unsigned long i = 0; i < sizeof(errors) / sizeof(errors[0]); ++i) {
-        if(name)
-            if(strcmp(name, errors[i]) == 0)
-                name_defined = false;
-        if(version)
-            if(strcmp(version, errors[i]) == 0)
-                version_defined = false;
+        if(name && (strcmp(name, errors[i]) == 0))
+            name_defined = false;
+        if(version && (strcmp(version, errors[i]) == 0))
+            version_defined = false;
     }
 
     if(name_defined && version_defined) {

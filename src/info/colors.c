@@ -12,7 +12,7 @@ SInfo *colors(void) {
         return NULL;
     res->retval = RET_OK;
 
-    res->string = calloc(8 * (strlen(config.col_block_str) + 5) + 5, sizeof(char));
+    res->string = calloc((8 * (strlen(config.col_block_str) + 5)) + 5, sizeof(char));
     if(res->string == NULL) {
         res->retval = ERR_OOM;
         return res;

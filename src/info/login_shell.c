@@ -4,7 +4,6 @@
 
 #include "info.h"
 #include "../config/config.h"
-#include "../utils/wrappers.h"
 
 // get the current login shell
 SInfo *loginShell(void) {

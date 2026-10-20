@@ -65,7 +65,7 @@ __attribute__((pure)) size_t realStrlen(const char *str) {
             break;
 
         // unicode continuation byte 0x10xxxxxx
-        if(*str & 0x80 && (*str & 0x40) == 0) {
+        if(*str & 0x80U && (*str & 0x40U) == 0) {
             ++str;
             continue;
         }

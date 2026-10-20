@@ -1,4 +1,5 @@
 #include "config.h"
+#include "parsing.h"
 
 #include <stdbool.h>
 #include <stddef.h>

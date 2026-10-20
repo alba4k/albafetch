@@ -5,7 +5,10 @@
 #include "info.h"
 #include "../config/config.h"
 #include "../utils/queue.h"
+
+#ifdef __ANDROID__
 #include "../utils/wrappers.h"
+#endif // __ANDROID__
 
 // print the operating system name and architecture (uname -m)
 SInfo *os(void) {

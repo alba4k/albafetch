@@ -1,3 +1,3 @@
 #pragma once
 
-int run_debug(double *time);
+int runDebug(double *time);

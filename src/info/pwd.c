@@ -5,7 +5,6 @@
 
 #include "info.h"
 #include "../config/config.h"
-#include "../utils/wrappers.h"
 
 // get the current working directory
 SInfo *pwd(void) {
@@ -23,7 +22,7 @@ SInfo *pwd(void) {
 
     if(!_pwd_path) {
         char *dir = basename(res->string);
-        memmove(res->string, dir, strlen(dir)+1);
+        memmove(res->string, dir, strlen(dir) + 1);
     }
 
     return res;

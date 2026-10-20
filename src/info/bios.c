@@ -69,8 +69,8 @@ skip_version:;
             goto free;
         }
         snprintf(res->string, len, "%s %s", vendor, version);
-        
-        free:;
+
+    free:
         free(vendor);
         free(version);
     }

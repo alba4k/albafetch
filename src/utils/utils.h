@@ -23,5 +23,3 @@ void destroyArray(struct SModule *array);
 void getLogoLine(char *dest, unsigned *line);
 
 void printLine(char *line, const size_t maxlen);
-
-void unescape(char *str);

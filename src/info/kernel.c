@@ -5,7 +5,6 @@
 
 #include "info.h"
 #include "../config/config.h"
-#include "../utils/wrappers.h"
 
 // print the running kernel version (uname -r)
 SInfo *kernel(void) {

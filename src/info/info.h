@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/return.h"
+#include "../utils/return.h"  // IWYU pragma: export
 
 typedef struct {
     int retval;

@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -151,13 +150,11 @@ int main(int argc, char **argv) {
 
             // just setting every option to 1 (except maybe _pkg_pip cause pip is slow af)
             config.boolean_options = 0xffffffffffffffff;
-            if(argc > i + 1) {
-                if(strcmp(argv[i + 1], "--no-pip") == 0)
-                    config.boolean_options = config.boolean_options & ~(_pkg_pip);
-            }
+            if((argc > i + 1) && (strcmp(argv[i + 1], "--no-pip") == 0))
+                config.boolean_options = config.boolean_options & ~(_pkg_pip);
 
             double time;
-            int errors = run_debug(&time);
+            int errors = runDebug(&time);
 
             printf("\n\033[1mDebug run finished with a total of %u error(s).\033[0m         [\033[1m\033[36m\033[1m%.3f ms\033[0m]\n", errors, time);
 
@@ -403,18 +400,17 @@ int main(int argc, char **argv) {
      */
     struct winsize win;
     win.ws_col = 0;
-    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &win))
-        if(ioctl(STDERR_FILENO, TIOCGWINSZ, &win))
-            ioctl(STDIN_FILENO, TIOCGWINSZ, &win);
+    if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &win) && ioctl(STDERR_FILENO, TIOCGWINSZ, &win))
+        ioctl(STDIN_FILENO, TIOCGWINSZ, &win);
     if(win.ws_col == 0)
         win.ws_col = -1;
 
-    struct SinfoModule {
+    struct SInfoModule {
         char *id;             // module identifier
         char *label;          // module label
         SInfo *(*func)(void); // function to run
     };
-    struct SinfoModule module_table[] = {
+    struct SInfoModule module_table[] = {
         // {"identifier", label, func},
         {"separator", config.separator_prefix, NULL},
         {"space", config.spacing_prefix, NULL},
@@ -506,7 +502,7 @@ int main(int argc, char **argv) {
             strcat(printed, current->label);
 
             const size_t separator_len = strlen(config.separator);
-            for(size_t i = 0; i < len && strlen(printed) < sizeof(printed) - separator_len * i - 1; ++i)
+            for(size_t i = 0; i < len && strlen(printed) < sizeof(printed) - (separator_len * i) - 1; ++i)
                 strcat(printed, config.separator);
         }
         else if(strcmp(current->id, "space") == 0) { // spacings are handled differently (they don't do shit)

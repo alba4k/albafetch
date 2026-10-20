@@ -9,12 +9,12 @@
 #include <string.h>
 #ifdef __ANDROID__
 #include <ctype.h>
+#include "../utils/wrappers.h"
 #endif // __ANDROID__
 #endif // __APPLE__
 
 #include "info.h"
 #include "../config/config.h"
-#include "../utils/wrappers.h"
 
 SInfo *battery(void) {
     SInfo *res = malloc(sizeof(SInfo));

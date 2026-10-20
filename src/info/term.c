@@ -16,10 +16,13 @@ SInfo *term(void) {
 
     const char *terminal = NULL;
 
-    const char *terminals[][2] = {// {"ENVIRONMENT_VARIABLE", "terminal"},
-                                  {"ALACRITTY_WINDOW_ID", "Alacritty"}, {"KITTY_PID", "Kitty"},           {"VSCODE_INJECTION", "VS Code"},
-                                  {"TERMUX_VERSION", "Termux"},         {"KONSOLE_VERSION", "Konsole"},   {"GNOME_TERMINAL_SCREEN", "GNOME Terminal"},
-                                  {"WT_SESSION", "Windows Terminal"},   {"TERMINATOR_UUID", "Terminator"}};
+    const char *terminals[][2] = {
+        // {"ENVIRONMENT_VARIABLE", "terminal"},
+        {"ALACRITTY_WINDOW_ID", "Alacritty"}, {"KITTY_PID", "Kitty"},
+        {"VSCODE_INJECTION", "VS Code"},      {"TERMUX_VERSION", "Termux"},
+        {"KONSOLE_VERSION", "Konsole"},       {"GNOME_TERMINAL_SCREEN", "GNOME Terminal"},
+        {"WT_SESSION", "Windows Terminal"},   {"TERMINATOR_UUID", "Terminator"},
+    };
 
     for(size_t i = 0; i < sizeof(terminals) / sizeof(terminals[0]); ++i)
         if(getenv(terminals[i][0]))
@@ -47,7 +50,7 @@ SInfo *term(void) {
         res->retval = ERR_OOM;
         return res;
     }
-    
+
     if(_term_ssh && getenv("SSH_CONNECTION")) {
         char *tmpptr = realloc(res->string, strlen(res->string) + strlen(" (SSH)") + 1);
         if(tmpptr) {

@@ -8,7 +8,6 @@
 
 #include "info.h"
 #include "../config/config.h"
-#include "../utils/wrappers.h"
 
 // get the cpu name and frequency
 SInfo *cpu(void) {
@@ -131,13 +130,11 @@ SInfo *cpu(void) {
         memmove(end - 2, end + 7, strlen(end + 7) + 1);
     if((end = strstr(cpu_info, " with Radeon Graphics")))
         *end = 0;
-    if((end = strstr(cpu_info, "-Core Processor"))) {
-        if(end >= cpu_info + 5) {
-            end -= 5;
-            end = strchr(end, ' ');
-            if(end != NULL)
-                *end = 0;
-        }
+    if((end = strstr(cpu_info, "-Core Processor")) && (end >= cpu_info + 5)) {
+        end -= 5;
+        end = strchr(end, ' ');
+        if(end != NULL)
+            *end = 0;
     }
 
     if(!_cpu_brand) {
