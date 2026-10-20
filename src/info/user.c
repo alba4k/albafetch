@@ -6,7 +6,7 @@
 #include "info.h"
 #include "../utils/wrappers.h"
 
-// print the current user
+// get the current user name
 SInfo *user(void) {
     SInfo *res = malloc(sizeof(SInfo));
     if(res == NULL)
