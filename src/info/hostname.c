@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "info.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // idk why but this is sometimes not defined
 #ifndef HOST_NAME_MAX

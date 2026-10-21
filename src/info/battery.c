@@ -1,20 +1,20 @@
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
-#include <IOKit/ps/IOPowerSources.h>
 #include <IOKit/ps/IOPSKeys.h>
+#include <IOKit/ps/IOPowerSources.h>
 #else
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #ifdef __ANDROID__
-#include <ctype.h>
 #include "../utils/wrappers.h"
+#include <ctype.h>
 #endif // __ANDROID__
 #endif // __APPLE__
 
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 SInfo *battery(void) {
     SInfo *res = malloc(sizeof(SInfo));

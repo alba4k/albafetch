@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "info.h"
 #include "../config/config.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // get the current terminal
 SInfo *term(void) {

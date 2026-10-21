@@ -1,12 +1,12 @@
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 
 // get all local ips
 SInfo *localIp(void) {

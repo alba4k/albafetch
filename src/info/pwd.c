@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 // get the current working directory
 SInfo *pwd(void) {

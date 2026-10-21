@@ -14,9 +14,9 @@
 #endif
 #include <sys/wait.h>
 
-#include "info.h"
 #include "../config/config.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 /*
  * I know that I could probably use specific libraries (like ALPM

@@ -7,9 +7,9 @@
 #include <unistd.h>
 #endif // __linux__
 
-#include "info.h"
 #include "../config/config.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // get the parent process name (usually the shell)
 SInfo *shell(void) {

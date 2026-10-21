@@ -1,10 +1,10 @@
-#include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <string.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
-#include "info.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // get the current Cursor Theme
 SInfo *cursorTheme(void) {

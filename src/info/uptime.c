@@ -8,8 +8,8 @@
 #include <sys/sysinfo.h>
 #endif // __APPLE__
 
-#include "info.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // print the current uptime
 SInfo *uptime(void) {

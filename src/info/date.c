@@ -1,5 +1,5 @@
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 #include <stdio.h>
 #include <stdlib.h>

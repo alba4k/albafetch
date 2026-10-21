@@ -1,13 +1,13 @@
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #endif // __APPLE__
 
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 // get the cpu name and frequency
 SInfo *cpu(void) {

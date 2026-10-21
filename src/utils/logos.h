@@ -494,7 +494,7 @@ static char *logos[][32] = {
      "            \033[32m~|Invnvnvvnvvvnnv}+`  ",
      "                \033[32m-~|{*l}*|~        ",
      NULL},
-     {// Vylen Linux
+    {// Vylen Linux
      "vylen",
      "\033[32m",
      "          .^^^^^^:    :^^^^^^.          ",

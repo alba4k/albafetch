@@ -2,9 +2,9 @@
 #include <string.h>
 #include <sys/utsname.h>
 
-#include "info.h"
 #include "../config/config.h"
 #include "../utils/queue.h"
+#include "info.h"
 
 #ifdef __ANDROID__
 #include "../utils/wrappers.h"

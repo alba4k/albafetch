@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "info.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // get the current user name
 SInfo *user(void) {

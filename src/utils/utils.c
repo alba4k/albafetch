@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utils.h"
-#include "wrappers.h"
 #include "../config/config.h"
 #include "../config/parsing.h"
+#include "utils.h"
+#include "wrappers.h"
 
 // copy an ascii art from file to mem
 void *fileToLogo(char *file) {

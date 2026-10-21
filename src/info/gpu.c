@@ -1,18 +1,18 @@
 // TODO: refactor this shit
 
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 #include <string.h>
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #ifdef __APPLE__
-#include <sys/utsname.h>
 #include "../macos/macos_infos.h"
 #include "../utils/wrappers.h"
+#include <sys/utsname.h>
 #elif defined(VULKAN_EXISTS)
 #include <vulkan/vulkan.h>
 #endif

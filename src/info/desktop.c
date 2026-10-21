@@ -1,11 +1,11 @@
-#include "info.h"
 #include "../config/config.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 #include <string.h>
 
-#include <stdio.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 // get the current desktop environment
@@ -23,15 +23,15 @@ SInfo *desktop(void) {
         return res;
     }
 #else
-    char *de_name = getenv("SWAYSOCK")            ? "Sway" :
-        (de_name = getenv("XDG_CURRENT_DESKTOP")) ? de_name :
-        (de_name = getenv("DESKTOP_SESSION"))     ? de_name :
-        getenv("KDE_SESSION_VERSION")             ? "KDE" :
-        getenv("GNOME_DESKTOP_SESSION_ID")        ? "GNOME" :
-        getenv("MATE_DESKTOP_SESSION_ID")         ? "MATE" :
-        getenv("TDE_FULL_SESSION")                ? "Trinity" :
-                                                    // strcmp("linux", getenv("TERM") == 0 ? "none" :      // running in tty
-                                                    NULL;
+    char *de_name = getenv("SWAYSOCK")                        ? "Sway" :
+                    (de_name = getenv("XDG_CURRENT_DESKTOP")) ? de_name :
+                    (de_name = getenv("DESKTOP_SESSION"))     ? de_name :
+                    getenv("KDE_SESSION_VERSION")             ? "KDE" :
+                    getenv("GNOME_DESKTOP_SESSION_ID")        ? "GNOME" :
+                    getenv("MATE_DESKTOP_SESSION_ID")         ? "MATE" :
+                    getenv("TDE_FULL_SESSION")                ? "Trinity" :
+                                                                // strcmp("linux", getenv("TERM") == 0 ? "none" :      // running in tty
+                                                                NULL;
     if(de_name == NULL) {
         res->retval = ERR_NO_INFO;
         return res;

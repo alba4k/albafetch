@@ -3,8 +3,8 @@
 #include <string.h>
 #include <sys/utsname.h>
 
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 // print the running kernel version (uname -r)
 SInfo *kernel(void) {

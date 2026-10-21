@@ -1,12 +1,12 @@
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <netdb.h>
-#include <unistd.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
-#include "info.h"
 #include "../utils/wrappers.h"
+#include "info.h"
 
 // Also, this doesn't seem to be working with the Wifi of a Hotel I'm currently staying in
 // I wonder why. There seems to be no IP adress in buf, but using curl works just fine.

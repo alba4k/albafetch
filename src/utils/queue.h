@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define QUEUE_OK    0
 #define QUEUE_EMPTY (-1)

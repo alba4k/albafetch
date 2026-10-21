@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "info.h"
 #include "../config/config.h"
+#include "info.h"
 
 // get the current login shell
 SInfo *loginShell(void) {

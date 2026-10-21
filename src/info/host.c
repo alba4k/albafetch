@@ -1,15 +1,15 @@
 #include <string.h>
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #else
 #ifdef __ANDROID__
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "../utils/wrappers.h"
 #else

@@ -2,13 +2,13 @@
 
 #ifdef __APPLE__
 
-#include <sys/sysctl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/sysctl.h>
 
+#include <AvailabilityMacros.h>
 #include <mach/mach.h>
 #include <stdint.h>
-#include <AvailabilityMacros.h>
 
 #include "bsdwrap.h"
 
