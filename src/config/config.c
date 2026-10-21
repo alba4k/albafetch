@@ -14,7 +14,7 @@
 #include <string.h>
 
 // a return code of 0 means that the option was parsed successfully
-int parseConfigStr(const char *source, const char *field, char *dest, const size_t maxlen) {
+static int parseConfigStr(const char *source, const char *field, char *dest, const size_t maxlen) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -54,7 +54,7 @@ int parseConfigStr(const char *source, const char *field, char *dest, const size
 }
 
 // a return code of 0 means that the option was parsed successfully
-int parseConfigInt(const char *source, const char *field, int *dest, const unsigned max) {
+static int parseConfigInt(const char *source, const char *field, int *dest, const unsigned max) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -91,7 +91,7 @@ int parseConfigInt(const char *source, const char *field, int *dest, const unsig
 }
 
 // a return code of 0 means that the option was parsed successfully
-int parseConfigBool(const char *source, const char *field, bool *dest) {
+static int parseConfigBool(const char *source, const char *field, bool *dest) {
     char *ptr, *end;
 
     // looks for the keyword
@@ -207,10 +207,13 @@ void parseConfig(bool error, const char *file, struct SModule *modules, void **a
 
     // BOOLEAN OPTIONS (check utils/utils.h)
 
-    const char *booleanOptions[] = {"align_infos", "bold",           "colored_title", "os_arch",   "kernel_short",    "desktop_type",  "shell_path",    "term_ssh",
-                                    "pkg_mgr",     "pkg_pacman",     "pkg_dpkg",      "pkg_rpm",   "pkg_flatpak",     "pkg_snap",      "pkg_brew",      "pkg_pip",
-                                    "cpu_brand",   "cpu_freq",       "cpu_count",     "gpu_brand", "mem_perc",        "loc_localhost", "loc_docker",    "pwd_path",
-                                    "kernel_type", "col_background", "bat_status",    "swap_perc", "desktop_version", "term_version",  "shell_version", "cpu_temp"};
+    const char *booleanOptions[] = {
+        "align_infos", "bold",           "colored_title", "os_arch",   "kernel_short",    "desktop_type",  "shell_path",    "term_ssh",
+        "pkg_mgr",     "pkg_pacman",     "pkg_dpkg",      "pkg_rpm",   "pkg_flatpak",     "pkg_snap",      "pkg_brew",      "pkg_pip",
+        "cpu_brand",   "cpu_freq",       "cpu_count",     "gpu_brand", "mem_perc",        "loc_localhost", "loc_docker",    "pwd_path",
+        "kernel_type", "col_background", "bat_status",    "swap_perc", "desktop_version", "term_version",  "shell_version", "cpu_temp",
+        "pkg_emerald"
+    };
 
     bool buffer;
     for(size_t i = 0; i < sizeof(booleanOptions) / sizeof(booleanOptions[0]); ++i) {
