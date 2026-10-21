@@ -21,13 +21,14 @@
 ### Noticeable fixes
 * Skip `Default string-WCP` vendor version
 * Fixed `rpm` package counts
+* First line of custom ASCII was skipped when not a color
 
 ### Technical fixes
 * Improved fread() usage
 * Rewrote info gathering structure:
     - should slightly reduce memory consumption
     - easier future parallelization? no more resource sharing
-* Memory safety improvements
+* Memory safety improvements and refactoring
 
 ## Dependencies
 * dropped `libpci`

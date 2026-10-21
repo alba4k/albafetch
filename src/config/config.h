@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/utils.h"
+#include "../utils/info_module.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -115,4 +115,4 @@ extern struct SConfig config;
 #define _cpu_temp       (config.boolean_options & 0x80000000ULL)
 #define _pkg_emerald    (config.boolean_options & 0x100000000ULL)
 
-void parseConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);
+void parseConfig(bool error, const char *file, SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo);

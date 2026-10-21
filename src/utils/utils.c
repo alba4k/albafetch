@@ -59,13 +59,13 @@ void *fileToLogo(char *file) {
     if(config.color[0] == 0) {
         unescape(buffer);
 
-        mem = malloc(LINE_LEN);
+        mem = strdup(buffer);
         if(mem == NULL) {
             perror("malloc");
             return NULL;
         }
 
-        safeStrncpy(mem, buffer, LINE_LEN);
+        i++;
     }
 
     // for every remaining line of the logo...
@@ -105,44 +105,6 @@ void *fileToLogo(char *file) {
     config.logo = logo;
 
     return mem;
-}
-
-// add a module containing id to array
-void addModule(struct SModule *array, char *id) {
-    struct SModule *new = malloc(sizeof(struct SModule));
-    if(new == NULL)
-        return;
-    struct SModule *last = array;
-
-    for(struct SModule *current = array; current->next; current = current->next)
-        last = current->next;
-
-    last->next = new;
-
-    new->id = malloc(strlen(id) + 1);
-    if(new->id == NULL) {
-        free(new);
-        return;
-    }
-    strcpy(new->id, id);
-
-    new->label = NULL;
-    new->func = NULL;
-
-    new->next = NULL;
-}
-
-// free every module in array
-void destroyArray(struct SModule *array) {
-    struct SModule *current = array;
-    struct SModule *next;
-
-    while(current) {
-        next = current->next;
-        free(current->id);
-        free(current);
-        current = next;
-    }
 }
 
 // print a certain line of the logo

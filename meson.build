@@ -38,6 +38,7 @@ src = [
   'src/info/uptime.c',
   'src/info/user.c',
   'src/utils/debug.c',
+  'src/utils/info_module.c',
   'src/utils/queue.c',
   'src/utils/utils.c',
   'src/utils/wrappers.c',

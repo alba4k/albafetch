@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
 
     char printed[1024] = ""; // line-by-line output of albafetch
 
-    struct SModule *modules = malloc(sizeof(struct SModule));
+    SModule *modules = malloc(sizeof(SModule));
     if(modules == NULL)
         return ERR_OOM;
     modules->id = NULL;
@@ -405,44 +405,6 @@ int main(int argc, char **argv) {
     if(win.ws_col == 0)
         win.ws_col = -1;
 
-    struct SInfoModule {
-        char *id;             // module identifier
-        char *label;          // module label
-        SInfo *(*func)(void); // function to run
-    };
-    struct SInfoModule module_table[] = {
-        // {"identifier", label, func},
-        {"separator", config.separator_prefix, NULL},
-        {"space", config.spacing_prefix, NULL},
-        {"title", config.title_prefix, NULL},
-        {"user", config.user_prefix, user},
-        {"hostname", config.hostname_prefix, hostname},
-        {"uptime", config.uptime_prefix, uptime},
-        {"os", config.os_prefix, os},
-        {"kernel", config.kernel_prefix, kernel},
-        {"desktop", config.desktop_prefix, desktop},
-        {"gtk_theme", config.gtk_theme_prefix, gtkTheme},
-        {"icon_theme", config.icon_theme_prefix, iconTheme},
-        {"cursor_theme", config.cursor_theme_prefix, cursorTheme},
-        {"shell", config.shell_prefix, shell},
-        {"login_shell", config.login_shell_prefix, loginShell},
-        {"term", config.term_prefix, term},
-        {"packages", config.pkg_prefix, packages},
-        {"host", config.host_prefix, host},
-        {"bios", config.bios_prefix, bios},
-        {"cpu", config.cpu_prefix, cpu},
-        {"gpu", config.gpu_prefix, gpu},
-        {"memory", config.mem_prefix, memory},
-        {"swap", config.swap_prefix, swap},
-        {"public_ip", config.pub_prefix, publicIp},
-        {"local_ip", config.loc_prefix, localIp},
-        {"pwd", config.pwd_prefix, pwd},
-        {"date", config.date_prefix, date},
-        {"battery", config.bat_prefix, battery},
-        {"colors", config.colors_prefix, colors},
-        {"light_colors", config.light_colors_prefix, lightColors},
-    };
-
     // this sets the default module order in case it was not set in a config file
     if(modules->next == NULL) {
         char *default_order[] = {
@@ -454,21 +416,12 @@ int main(int argc, char **argv) {
             addModule(modules, default_order[i]);
     }
 
-    // filling in the linked list (with function pointers and labels) based on the ids
-    // I prefer doing it here than in addModule as this part only runs when it's needed
-    for(struct SModule *current = modules->next; current; current = current->next)
-        for(size_t i = 0; i < sizeof(module_table) / sizeof(module_table[0]); ++i)
-            if(strcmp(module_table[i].id, current->id) == 0) {
-                current->label = module_table[i].label;
-                current->func = module_table[i].func;
-            }
-
     if(_align) {
         size_t current_len;
         asking_align = 0;
 
         // determining how far the text should be aligned
-        for(struct SModule *current = modules->next; current; current = current->next) {
+        for(SModule *current = modules->next; current; current = current->next) {
             current_len = realStrlen(current->label);
 
             if(current_len > (size_t)asking_align)
@@ -481,7 +434,7 @@ int main(int argc, char **argv) {
     }
 
     // printing every module
-    for(struct SModule *current = modules->next; current; current = current->next) {
+    for(SModule *current = modules->next; current; current = current->next) {
         if(strcmp(current->id, "separator") == 0) { // separators are handled differently
             if(printed[0] == 0)                     // first thing being printed
                 continue;

@@ -123,7 +123,7 @@ static int parseConfigBool(const char *source, const char *field, bool *dest) {
 }
 
 // parse the provided config file
-void parseConfig(bool error, const char *file, struct SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
+void parseConfig(bool error, const char *file, SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
     FILE *fp = fopen(file, "r");
 
     if(fp == NULL) {
