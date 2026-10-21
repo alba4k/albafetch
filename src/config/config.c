@@ -212,6 +212,7 @@ void parseConfig(bool error, const char *file, struct SModule *modules, void **a
         "pkg_mgr",     "pkg_pacman",     "pkg_dpkg",      "pkg_rpm",   "pkg_flatpak",     "pkg_snap",      "pkg_brew",      "pkg_pip",
         "cpu_brand",   "cpu_freq",       "cpu_count",     "gpu_brand", "mem_perc",        "loc_localhost", "loc_docker",    "pwd_path",
         "kernel_type", "col_background", "bat_status",    "swap_perc", "desktop_version", "term_version",  "shell_version", "cpu_temp",
+        "pkg_emerald"
     };
 
     bool buffer;
