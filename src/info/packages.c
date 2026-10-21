@@ -70,6 +70,35 @@ skip_pacman:;
     path[0] = 0;
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
+    strncat(path, "/var/lib/emerald/db", sizeof(path) - strlen(path) - 1);
+    if(_pkg_emerald && (dir = opendir(path)) != NULL) {
+        count = 0;
+        while((entry = readdir(dir)) != NULL)
+            if(entry->d_name[0] != '.')
+                ++count;
+        closedir(dir);
+
+        if(count == 0)
+            goto skip_emerald;
+
+        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (emerald)" : "");
+        done = true;
+
+        char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
+        if(tmpptr == NULL)
+            goto skip_emerald;
+
+        if(res->string == NULL)
+            tmpptr[0] = 0;
+
+        res->string = tmpptr;
+        strcat(res->string, buf);
+    }
+skip_emerald:;
+
+    path[0] = 0;
+    if(prefix)
+        safeStrncpy(path, prefix, sizeof(path));
     strncat(path, "/var/lib/dpkg/status", sizeof(buf) - strlen(path) - 1);
     if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
         char line[sizeof(buf) * 2];
