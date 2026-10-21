@@ -50,7 +50,7 @@
 // This contains the default config values
 struct SConfig config = {
     // Default values for boolean options (least to most significant bit)
-    // 0111 0101 1000 1111 1110 1111 1001 0110 0000...
+    // 0111 0101 1111 1110 1111 1001 0111 0000 1...
     .boolean_options = 0x10e9f7faeULL,
 
     .logo = NULL,
