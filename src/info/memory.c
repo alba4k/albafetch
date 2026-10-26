@@ -8,8 +8,6 @@
 
 #ifdef __APPLE__
 #include "../macos/macos_infos.h"
-#else
-#include <sys/sysinfo.h>
 #endif // __APPLE__
 
 // get used and total memory
@@ -37,18 +35,34 @@ SInfo *memory(void) {
     snprintf(res->string, 64, "%lu / %lu MiB", usedram / 1048576, totalram / 1048576);
 
 #else
-    struct sysinfo info;
-    if(sysinfo(&info)) {
+    FILE *meminfo = fopen("/proc/meminfo", "r");
+    if(meminfo == NULL) {
+        res->retval = ERR_NO_FILE;
+        return res;
+    }
+
+    unsigned long totalram = 0;
+    unsigned long available = 0;
+    int found = 0;
+
+    char line[256];
+    while(fgets(line, sizeof(line), meminfo)) {
+        if(sscanf(line, "MemTotal: %lu kB", &totalram) == 1)
+            found++;
+        else if(sscanf(line, "MemAvailable: %lu kB", &available) == 1) {
+            found++;
+    
+        if(found >= 2)
+            break;
+    }
+    fclose(meminfo);
+
+    if(found < 2) {
         res->retval = ERR_NO_INFO;
         return res;
     }
 
-    unsigned long totalram = info.totalram / 1024;
-    unsigned long freeram = info.freeram / 1024;
-    // unsigned long sharedram = info.sharedram / 1024;
-
-    unsigned long usedram = totalram - freeram;
-    // usedram -= sharedram;
+    unsigned long usedram = totalram - available;
 
     res->string = malloc(64);
     if(res->string == NULL) {
