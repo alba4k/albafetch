@@ -49,9 +49,9 @@ SInfo *memory(void) {
     while(fgets(line, sizeof(line), meminfo)) {
         if(sscanf(line, "MemTotal: %lu kB", &totalram) == 1)
             found++;
-        else if(sscanf(line, "MemAvailable: %lu kB", &available) == 1) {
+        else if(sscanf(line, "MemAvailable: %lu kB", &available) == 1)
             found++;
-    
+
         if(found >= 2)
             break;
     }
