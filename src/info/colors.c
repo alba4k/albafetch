@@ -19,7 +19,7 @@ SInfo *colors(void) {
     }
 
     for(int i = 0; i < 8; ++i)
-        sprintf(res->string + strlen(res->string), "\033[%s%dm%s", _col_background ? "4" : "3", i, config.col_block_str);
+        sprintf(res->string + strlen(res->string), "\033[%s%dm%s", config.col_background ? "4" : "3", i, config.col_block_str);
 
     strcat(res->string, "\033[0m");
 

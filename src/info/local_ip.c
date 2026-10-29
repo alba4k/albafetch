@@ -27,7 +27,7 @@ SInfo *localIp(void) {
         // checking if the ip is valid
         if(addrs->ifa_addr && addrs->ifa_addr->sa_family == AF_INET) {
             // filtering out docker or localhost ips
-            if((strcmp(addrs->ifa_name, "lo") != 0 || _loc_localhost) && (strcmp(addrs->ifa_name, "docker0") != 0 || _loc_docker)) {
+            if((strcmp(addrs->ifa_name, "lo") != 0 || config.loc_localhost) && (strcmp(addrs->ifa_name, "docker0") != 0 || config.loc_docker)) {
                 struct sockaddr_in *pAddr = (struct sockaddr_in *)addrs->ifa_addr;
 
                 char buf[64] = "";

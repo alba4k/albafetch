@@ -44,55 +44,9 @@
  * storage
  * steam installed "packages" (off by default)
  * rewrite config parsing and make it decent (check rewrite-config-parsing branch)
+ * rewrite cmdline parsing
  * write manpage and wiki
  */
-
-// This contains the default config values
-struct SConfig config = {
-    // Default values for boolean options (least to most significant bit)
-    // 0111 0101 1111 1110 1111 1001 0111 0000 1...
-    .boolean_options = 0x10e9f7faeULL,
-
-    .logo = NULL,
-    .color = "",
-    .dash = ": ",
-    .separator = "-",
-    .spacing = 5,
-
-    .gpu_index = 0,
-    .date_format = "%02d/%02d/%d %02d:%02d:%02d",
-    .col_block_str = "   ",
-
-    .separator_prefix = "",
-    .spacing_prefix = "",
-    .title_prefix = "",
-    .user_prefix = "User",
-    .hostname_prefix = "Hostname",
-    .uptime_prefix = "Uptime",
-    .os_prefix = "OS",
-    .kernel_prefix = "Kernel",
-    .desktop_prefix = "Desktop",
-    .gtk_theme_prefix = "Theme",
-    .icon_theme_prefix = "Icons",
-    .cursor_theme_prefix = "Cursor",
-    .shell_prefix = "Shell",
-    .login_shell_prefix = "Login",
-    .term_prefix = "Terminal",
-    .pkg_prefix = "Packages",
-    .host_prefix = "Host",
-    .bios_prefix = "BIOS",
-    .cpu_prefix = "CPU",
-    .gpu_prefix = "GPU",
-    .mem_prefix = "Memory",
-    .swap_prefix = "Swap",
-    .pub_prefix = "Public IP",
-    .loc_prefix = "Local IP",
-    .pwd_prefix = "Directory",
-    .date_prefix = "Date",
-    .bat_prefix = "Battery",
-    .colors_prefix = "",
-    .light_colors_prefix = "",
-};
 
 int main(int argc, char **argv) {
     // are the following command line args used?
@@ -105,7 +59,7 @@ int main(int argc, char **argv) {
     int asking_align = 0;
     // these store either the default values or the ones defined in the config
     // they are needed to know what is used if no arguments are given (for --help)
-    bool default_bold = _bold;
+    bool default_bold = config.bold;
     char default_color[8] = "";
     char default_logo[16] = "";
 
@@ -148,10 +102,9 @@ int main(int argc, char **argv) {
         else if(strcmp(argv[i], "--debug") == 0) {
             puts("version: \033[1m\033[34m" VERSION "\033[0m, commit: \033[1m\033[34m" COMMIT "\033[0m\n");
 
-            // just setting every option to 1 (except maybe _pkg_pip cause pip is slow af)
-            config.boolean_options = 0xffffffffffffffff;
+            // setting up the config options
             if((argc > i + 1) && (strcmp(argv[i + 1], "--no-pip") == 0))
-                config.boolean_options = config.boolean_options & ~(_pkg_pip);
+                config.pkg_pip = false;
 
             double time;
             int errors = runDebug(&time);
@@ -177,12 +130,12 @@ int main(int argc, char **argv) {
     // albafetch will first parse ~/.config/albafetch.conf
     // ~/.config/albafetch/albafetch.conf if the former is not found
     if(use_config) { // --no-config was not used
-        bool error = true;
+        bool print_errors = true;
 
         if(config_file[0] == 0) { // --config was not used, using the default path
             char *home = getenv("HOME");
             char *config_home = getenv("XDG_CONFIG_HOME");
-            error = false;
+            print_errors = false;
 
             if(config_home) { // is XDG_CONFIG_HOME set?
                 snprintf(config_file, sizeof(config_file), "%s/albafetch.conf", config_home);
@@ -198,7 +151,14 @@ int main(int argc, char **argv) {
                 strcpy(config_file, "/etc/xdg/albafetch.conf");
         }
 
-        parseConfig(error, config_file, modules, &ascii_ptr, &default_bold, default_color, default_logo);
+        FILE *fp = fopen(config_file, "r");
+
+        if(fp == NULL) {
+            if(print_errors)
+                perror(config_file);
+        }
+        else
+            parseConfig(fp, modules, &ascii_ptr, &default_bold, default_color, default_logo);
     }
 
     if(ascii_file) {
@@ -310,11 +270,10 @@ int main(int argc, char **argv) {
     }
     if(asking_bold) {
         if(asking_bold < argc) {
-            // modifying the 2nd least significant bit of boolean_options
             if(strcmp(argv[asking_bold], "on") == 0)
-                config.boolean_options |= ((uint64_t)1 << 1);
+                config.bold = true;
             else if(strcmp(argv[asking_bold], "off") == 0)
-                config.boolean_options &= ~((uint64_t)1 << 1);
+                config.bold = false;
             else
                 fputs("\033[31m\033[1mERROR\033[0m: --bold should be followed by either \"on\" or \"off\"!\n", stderr);
         }
@@ -326,51 +285,51 @@ int main(int argc, char **argv) {
         // it won't be used anyway lol
         destroyArray(modules);
 
-        printf("%s%salbafetch\033[0m - a system fetch utility\n", config.color, _bold ? "\033[1m" : "");
+        printf("%s%salbafetch\033[0m - a system fetch utility\n", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\n%s%sFLAGS\033[0m:\n", config.color, _bold ? "\033[1m" : "");
+        printf("\n%s%sFLAGS\033[0m:\n", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n", config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "");
+        printf("\t%s%s-h\033[0m,%s%s --help\033[0m:\t Print this help menu and exit\n", config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s-v\033[0m,%s%s --version\033[0m:\t Print the version and exit\n", config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "");
+        printf("\t%s%s-v\033[0m,%s%s --version\033[0m:\t Print the version and exit\n", config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s--debug\033[0m:\t Test all modules and exit\n", config.color, _bold ? "\033[1m" : "");
+        printf("\t%s%s--debug\033[0m:\t Test all modules and exit\n", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s--no-pip\033[0m:\t Disables pip in testing because of speed concerns\n", config.color, _bold ? "\033[1m" : "");
+        printf("\t%s%s--no-pip\033[0m:\t Disables pip in testing because of speed concerns\n", config.color, config.bold ? "\033[1m" : "");
 
         printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
                "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"
                " \033[34mblue\033[0m, \033[35mpurple\033[0m, \033[36mcyan\033[0m, \033[90mgray\033[0m,"
                " \033[37mwhite\033[0m]\n",
-               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1],
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_color[0] ? default_color : config.logo[1],
                default_color[0] ? "default" : "logo default");
 
         printf("\t%s%s-b\033[0m,%s%s --bold\033[0m:\t Specifies if bold should be used in colored parts (default: %s\033[0m)\n"
                "\t\t\t   [\033[1mon\033[0m, off]\n",
-               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_bold ? "\033[1mon" : "off");
 
         printf("\t%s%s-l\033[0m,%s%s --logo\033[0m:\t Changes the logo that will be displayed (default: %s)\n"
                "\t\t\t   [alpine, android, apple, arch, arch_small, artix, debian, devuan, endeavouros, fedora, fedora-asahi-remix]\n"
                "\t\t\t   [garuda, gentoo, linux, linuxmint, mageia, manjaro, neon, nixos, none, parrot, pop, rocky, ubuntu, void, windows]\n",
-               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", default_logo[0] ? default_logo : "OS Default");
 
         printf("\t%s%s--ascii\033[0m:\t Specifies a file containing a custom ascii art to use as logo (default: none)\n"
                "\t\t\t   [path]\n",
-               config.color, _bold ? "\033[1m" : "");
+               config.color, config.bold ? "\033[1m" : "");
 
         printf("\t%s%s-a\033[0m, %s%s--align\033[0m:\t Aligns the infos if set (default: %s)\n"
                "\t\t\t   [on, off]\n",
-               config.color, _bold ? "\033[1m" : "", config.color, _bold ? "\033[1m" : "", _align ? "on" : "off");
+               config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "", config.align_infos ? "on" : "off");
 
         printf("\t%s%s--config\033[0m:\t Specifies a custom config (default: ~/.config/albafetch.conf)\n"
                "\t\t\t   [path]\n",
-               config.color, _bold ? "\033[1m" : "");
+               config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s--no-logo\033[0m:\t Prints the infos without a logo or ascii art\n", config.color, _bold ? "\033[1m" : "");
+        printf("\t%s%s--no-logo\033[0m:\t Prints the infos without a logo or ascii art\n", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\t%s%s--no-config\033[0m:\t Ignores any provided or existing config file\n", config.color, _bold ? "\033[1m" : "");
+        printf("\t%s%s--no-config\033[0m:\t Ignores any provided or existing config file\n", config.color, config.bold ? "\033[1m" : "");
 
-        printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n", config.color, _bold ? "\033[1m" : "");
+        printf("\nReport a bug: %s%s\033[4mhttps://github.com/alba4k/albafetch/issues\033[0m\n", config.color, config.bold ? "\033[1m" : "");
 
         return RET_OK;
     }
@@ -378,9 +337,9 @@ int main(int argc, char **argv) {
     if(asking_align) {
         if(asking_align < argc) {
             if(strcmp(argv[asking_align], "on") == 0)
-                config.boolean_options |= (uint64_t)1;
+                config.align_infos = true;
             else if(strcmp(argv[asking_align], "off") == 0)
-                config.boolean_options &= ~((uint64_t)1);
+                config.align_infos = false;
             else
                 fputs("\033[31m\033[1mERROR\033[0m: --align should be followed by either \"on\" or \"off\"!\n", stderr);
         }
@@ -416,7 +375,7 @@ int main(int argc, char **argv) {
             addModule(modules, default_order[i]);
     }
 
-    if(_align) {
+    if(config.align_infos) {
         size_t current_len;
         asking_align = 0;
 
@@ -499,9 +458,9 @@ int main(int argc, char **argv) {
             strcat(printed, config.color);
             strcat(printed, current->label);
 
-            if(_title_color)
-                snprintf(printed + strlen(printed), sizeof(printed) - strlen(printed), "%s%s%s%s@%s%s%s", config.color, _bold ? "\033[1m" : "", name->string, "\033[0m",
-                         _bold ? "\033[1m" : "", config.color, host->string);
+            if(config.colored_title)
+                snprintf(printed + strlen(printed), sizeof(printed) - strlen(printed), "%s%s%s%s@%s%s%s", config.color, config.bold ? "\033[1m" : "", name->string, "\033[0m",
+                         config.bold ? "\033[1m" : "", config.color, host->string);
             else
                 snprintf(printed + strlen(printed), sizeof(printed) - strlen(printed), "%s%s@%s", "\033[0m", name->string, host->string);
 

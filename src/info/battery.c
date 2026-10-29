@@ -135,7 +135,7 @@ SInfo *battery(void) {
 #endif // __APPLE__
 #endif // __ANDROID__
 
-    if(capacity[0] != 0 && status[0] != 0 && _bat_status) {
+    if(capacity[0] != 0 && status[0] != 0 && config.bat_status) {
         const size_t len = strlen(capacity) + strlen(status) + 5;
         res->string = malloc(len);
         if(res->string == NULL) {
@@ -153,7 +153,7 @@ SInfo *battery(void) {
         }
         snprintf(res->string, len, "%s%%", capacity);
     }
-    else if(status[0] != 0 && (_bat_status)) {
+    else if(status[0] != 0 && config.bat_status) {
         res->string = strdup(status);
         if(res->string == NULL) {
             res->retval = ERR_OOM;

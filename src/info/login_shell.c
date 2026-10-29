@@ -19,7 +19,7 @@ SInfo *loginShell(void) {
         return res;
     }
 
-    if(_shell_path)
+    if(config.shell_path)
         buf = basename(buf);
 
     res->string = strdup(buf);

@@ -22,7 +22,7 @@ SInfo *os(void) {
     uname(&name);
 
 #ifdef __APPLE__
-    if(_os_arch) {
+    if(config.os_arch) {
         res->string = malloc(strlen("macOS") + 16);
         if(res->string == NULL) {
             res->retval = ERR_OOM;
@@ -41,7 +41,7 @@ SInfo *os(void) {
     char *args[] = {"getprop", "ro.build.version.release", NULL};
     execCmd(version, 16, args);
 
-    if(_os_arch) {
+    if(config.os_arch) {
         res->string = malloc(32);
         if(res->string == NULL) {
             res->retval = ERR_OOM;
@@ -94,7 +94,7 @@ SInfo *os(void) {
     if(end)
         *end = 0;
 
-    if(_os_arch) {
+    if(config.os_arch) {
         const size_t len = strlen(os_name) + strlen(name.machine) + 4;
         res->string = malloc(len);
         if(res->string == NULL) {

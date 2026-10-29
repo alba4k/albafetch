@@ -13,6 +13,98 @@
 #include <stdlib.h>
 #include <string.h>
 
+// clang-format off
+#define BOOL_OPTIONS(X) \
+    X(align_infos)     X(bat_status)       X(bold)            X(col_background) X(colored_title)   X(cpu_brand)     \
+    X(cpu_count)       X(cpu_freq)         X(cpu_temp)        X(desktop_type)   X(desktop_version) X(gpu_brand)     \
+    X(kernel_short)    X(kernel_type)      X(loc_docker)      X(loc_localhost)  X(mem_perc)        X(os_arch)       \
+    X(pkg_brew)        X(pkg_dpkg)         X(pkg_emerald)     X(pkg_flatpak)    X(pkg_mgr)         X(pkg_pacman)    \
+    X(pkg_pip)         X(pkg_rpm)          X(pkg_snap)        X(pwd_path)       X(shell_path)      X(shell_version) \
+    X(swap_perc)       X(term_ssh)         X(term_version)
+
+#define PARSE(name) if(parseConfigBool(conf, #name, &buffer) == RET_OK) config.name = buffer;
+
+#define OPTION_ITEM(name) { #name, config.name }
+// clang-format on
+
+// This contains the default config values
+struct SConfig config = {
+    .logo = NULL,
+    .color = "",
+    .dash = ": ",
+    .separator = "-",
+    .spacing = 5,
+
+    .gpu_index = 0,
+    .date_format = "%02d/%02d/%d %02d:%02d:%02d",
+    .col_block_str = "   ",
+
+    .separator_prefix = "",
+    .spacing_prefix = "",
+    .title_prefix = "",
+    .user_prefix = "User",
+    .hostname_prefix = "Hostname",
+    .uptime_prefix = "Uptime",
+    .os_prefix = "OS",
+    .kernel_prefix = "Kernel",
+    .desktop_prefix = "Desktop",
+    .gtk_theme_prefix = "Theme",
+    .icon_theme_prefix = "Icons",
+    .cursor_theme_prefix = "Cursor",
+    .shell_prefix = "Shell",
+    .login_shell_prefix = "Login",
+    .term_prefix = "Terminal",
+    .pkg_prefix = "Packages",
+    .host_prefix = "Host",
+    .bios_prefix = "BIOS",
+    .cpu_prefix = "CPU",
+    .gpu_prefix = "GPU",
+    .mem_prefix = "Memory",
+    .swap_prefix = "Swap",
+    .pub_prefix = "Public IP",
+    .loc_prefix = "Local IP",
+    .pwd_prefix = "Directory",
+    .date_prefix = "Date",
+    .bat_prefix = "Battery",
+    .colors_prefix = "",
+    .colors_light_prefix = "",
+
+    .align_infos = false,
+    .bold = true,
+    .colored_title = true,
+
+    .bat_status = true,
+    .col_background = true,
+    .cpu_brand = true,
+    .cpu_count = true,
+    .cpu_freq = true,
+    .cpu_temp = false,
+    .desktop_type = true,
+    .desktop_version = false,
+    .gpu_brand = true,
+    .kernel_short = false,
+    .kernel_type = false,
+    .loc_docker = false,
+    .loc_localhost = false,
+    .mem_perc = true,
+    .os_arch = true,
+    .pkg_brew = true,
+    .pkg_dpkg = true,
+    .pkg_emerald = true,
+    .pkg_flatpak = true,
+    .pkg_mgr = true,
+    .pkg_pacman = true,
+    .pkg_pip = false,
+    .pkg_rpm = true,
+    .pkg_snap = true,
+    .pwd_path = true,
+    .shell_path = false,
+    .shell_version = false,
+    .swap_perc = true,
+    .term_ssh = true,
+    .term_version = false,
+};
+
 // a return code of 0 means that the option was parsed successfully
 static int parseConfigStr(const char *source, const char *field, char *dest, const size_t maxlen) {
     char *ptr, *end;
@@ -123,15 +215,7 @@ static int parseConfigBool(const char *source, const char *field, bool *dest) {
 }
 
 // parse the provided config file
-void parseConfig(bool error, const char *file, SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
-    FILE *fp = fopen(file, "r");
-
-    if(fp == NULL) {
-        if(error)
-            perror(file);
-        return;
-    }
-
+void parseConfig(FILE *fp, SModule *modules, void **ascii_ptr, bool *default_bold, char *default_color, char *default_logo) {
     fseek(fp, 0, SEEK_END);
     size_t len = (size_t)ftell(fp);
     fseek(fp, 0, SEEK_SET);
@@ -207,22 +291,10 @@ void parseConfig(bool error, const char *file, SModule *modules, void **ascii_pt
 
     // BOOLEAN OPTIONS (check utils/utils.h)
 
-    const char *booleanOptions[] = {"align_infos",     "bold",         "colored_title", "os_arch",     "kernel_short",   "desktop_type", "shell_path",
-                                    "term_ssh",        "pkg_mgr",      "pkg_pacman",    "pkg_dpkg",    "pkg_rpm",        "pkg_flatpak",  "pkg_snap",
-                                    "pkg_brew",        "pkg_pip",      "cpu_brand",     "cpu_freq",    "cpu_count",      "gpu_brand",    "mem_perc",
-                                    "loc_localhost",   "loc_docker",   "pwd_path",      "kernel_type", "col_background", "bat_status",   "swap_perc",
-                                    "desktop_version", "term_version", "shell_version", "cpu_temp",    "pkg_emerald"};
-
     bool buffer;
-    for(size_t i = 0; i < sizeof(booleanOptions) / sizeof(booleanOptions[0]); ++i) {
-        if(parseConfigBool(conf, booleanOptions[i], &buffer) == 0) {
-            if(buffer)
-                config.boolean_options |= ((uint64_t)1 << i);
-            else
-                config.boolean_options &= ~((uint64_t)1 << i);
-        }
-    }
-    *default_bold = _bold;
+    BOOL_OPTIONS(PARSE)
+
+    *default_bold = config.bold;
 
     // OTHER MODULE-RELATED OPTIONS
 
@@ -233,47 +305,17 @@ void parseConfig(bool error, const char *file, SModule *modules, void **ascii_pt
     parseConfigStr(conf, "col_block_str", config.col_block_str, sizeof(config.col_block_str));
 
     // LABELS
-
-    struct SPrefix {
-        char *option;
-        const char *config_name;
-    };
-
-    struct SPrefix prefixes[] = {
-        //  {config.module_prefix, "module_prefix"}
-        {config.separator_prefix, "separator_prefix"},
-        {config.spacing_prefix, "spacing_prefix"},
-        {config.title_prefix, "title_prefix"},
-        {config.user_prefix, "user_prefix"},
-        {config.hostname_prefix, "hostname_prefix"},
-        {config.uptime_prefix, "uptime_prefix"},
-        {config.os_prefix, "os_prefix"},
-        {config.kernel_prefix, "kernel_prefix"},
-        {config.desktop_prefix, "desktop_prefix"},
-        {config.gtk_theme_prefix, "gtk_theme_prefix"},
-        {config.icon_theme_prefix, "icon_theme_prefix"},
-        {config.cursor_theme_prefix, "cursor_theme_prefix"},
-        {config.shell_prefix, "shell_prefix"},
-        {config.login_shell_prefix, "login_shell_prefix"},
-        {config.term_prefix, "term_prefix"},
-        {config.pkg_prefix, "pkg_prefix"},
-        {config.host_prefix, "host_prefix"},
-        {config.bios_prefix, "bios_prefix"},
-        {config.cpu_prefix, "cpu_prefix"},
-        {config.gpu_prefix, "gpu_prefix"},
-        {config.mem_prefix, "mem_prefix"},
-        {config.swap_prefix, "swap_prefix"},
-        {config.pub_prefix, "pub_prefix"},
-        {config.loc_prefix, "loc_prefix"},
-        {config.pwd_prefix, "pwd_prefix"},
-        {config.date_prefix, "date_prefix"},
-        {config.bat_prefix, "bat_prefix"},
-        {config.colors_prefix, "colors_prefix"},
-        {config.light_colors_prefix, "colors_light_prefix"},
+    char *prefixes[][2] = {
+        OPTION_ITEM(bat_prefix),          OPTION_ITEM(bios_prefix),      OPTION_ITEM(colors_light_prefix), OPTION_ITEM(colors_prefix),  OPTION_ITEM(cpu_prefix),
+        OPTION_ITEM(cursor_theme_prefix), OPTION_ITEM(date_prefix),      OPTION_ITEM(desktop_prefix),      OPTION_ITEM(gpu_prefix),     OPTION_ITEM(gtk_theme_prefix),
+        OPTION_ITEM(host_prefix),         OPTION_ITEM(hostname_prefix),  OPTION_ITEM(icon_theme_prefix),   OPTION_ITEM(kernel_prefix),  OPTION_ITEM(loc_prefix),
+        OPTION_ITEM(login_shell_prefix),  OPTION_ITEM(mem_prefix),       OPTION_ITEM(os_prefix),           OPTION_ITEM(pkg_prefix),     OPTION_ITEM(pub_prefix),
+        OPTION_ITEM(pwd_prefix),          OPTION_ITEM(separator_prefix), OPTION_ITEM(shell_prefix),        OPTION_ITEM(spacing_prefix), OPTION_ITEM(swap_prefix),
+        OPTION_ITEM(term_prefix),         OPTION_ITEM(title_prefix),     OPTION_ITEM(uptime_prefix),       OPTION_ITEM(user_prefix),
     };
 
     for(size_t i = 0; i < sizeof(prefixes) / sizeof(prefixes[0]); ++i)
-        parseConfigStr(conf, prefixes[i].config_name, prefixes[i].option, 64);
+        parseConfigStr(conf, prefixes[i][0], prefixes[i][1], 64);
 
     // MODULES
 

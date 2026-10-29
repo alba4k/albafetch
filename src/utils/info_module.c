@@ -34,7 +34,7 @@ static const SModule mod_table[] = {
     {"date", config.date_prefix, date, NULL},
     {"battery", config.bat_prefix, battery, NULL},
     {"colors", config.colors_prefix, colors, NULL},
-    {"light_colors", config.light_colors_prefix, lightColors, NULL},
+    {"light_colors", config.colors_light_prefix, lightColors, NULL},
 };
 
 // add a module containing id to array and return it

@@ -43,7 +43,7 @@ SInfo *desktop(void) {
         return res;
     }
 
-    if(_de_version) {
+    if(config.desktop_version) {
         char version[32] = "";
         if(strcmp(de_name, "Hyprland") == 0) {
             char *argv[] = {"hyprctl", "version", NULL};
@@ -79,7 +79,7 @@ SInfo *desktop(void) {
         }
     }
 
-    if(_de_type) {
+    if(config.desktop_type) {
         char buf[16] = "";
 
         if(getenv("WAYLAND_DISPLAY"))

@@ -34,7 +34,7 @@ SInfo *cpu(void) {
         return res;
     }
 
-    if(!_cpu_freq) {
+    if(!config.cpu_freq) {
         if((end = strstr(buf, " @")))
             *end = 0;
         else if((end = strchr(buf, '@')))
@@ -66,7 +66,7 @@ SInfo *cpu(void) {
     }
 
     cpu_info = buf;
-    if(_cpu_count) {
+    if(config.cpu_count) {
         end = cpu_info;
         while((end = strstr(end, "processor"))) {
             ++count;
@@ -107,7 +107,7 @@ SInfo *cpu(void) {
     // Printing the clock frequency the first thread is currently running at
     ++end;
     char *frequency = strstr(end, "cpu MHz");
-    if(frequency && _cpu_freq && (frequency = strchr(frequency, ':'))) {
+    if(frequency && config.cpu_freq && (frequency = strchr(frequency, ':'))) {
         frequency += 2;
 
         end = strchr(frequency, '\n');
@@ -137,7 +137,7 @@ SInfo *cpu(void) {
             *end = 0;
     }
 
-    if(!_cpu_brand) {
+    if(!config.cpu_brand) {
         if((end = strstr(cpu_info, "Intel ")))
             memmove(end, end + 6, strlen(end + 6) + 1);
         else if((end = strstr(cpu_info, "Apple ")))
@@ -168,7 +168,7 @@ SInfo *cpu(void) {
     while((end = strstr(res->string, "  ")))
         memmove(end, end + 1, strlen(end));
 
-    if(count && _cpu_count) {
+    if(count && config.cpu_count) {
         char core_count[16];
         snprintf(core_count, sizeof(core_count), " (%d)", count);
 
@@ -178,7 +178,7 @@ SInfo *cpu(void) {
             strcat(res->string, core_count);
         }
     }
-    if(_cpu_temp) {
+    if(config.cpu_temp) {
         FILE *fp = fopen("/sys/class/thermal/thermal_zone2/temp", "r");
         if(fp == NULL)
             return res;

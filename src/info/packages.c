@@ -49,7 +49,7 @@ SInfo *packages(void) {
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
     strncat(path, "/var/lib/pacman/local", sizeof(path) - strlen(path) - 1);
-    if(_pkg_pacman && (dir = opendir(path)) != NULL) {
+    if(config.pkg_pacman && (dir = opendir(path)) != NULL) {
         while((entry = readdir(dir)) != NULL)
             if(entry->d_type == DT_DIR && entry->d_name[0] != '.')
                 ++count;
@@ -58,7 +58,7 @@ SInfo *packages(void) {
         if(count == 0)
             goto skip_pacman;
 
-        snprintf(buf, sizeof(buf), "%u%s", count, _pkg_mgr ? " (pacman)" : "");
+        snprintf(buf, sizeof(buf), "%u%s", count, config.pkg_mgr ? " (pacman)" : "");
 
         res->string = strdup(buf);
 
@@ -71,7 +71,7 @@ skip_pacman:;
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
     strncat(path, "/var/lib/emerald/db", sizeof(path) - strlen(path) - 1);
-    if(_pkg_emerald && (dir = opendir(path)) != NULL) {
+    if(config.pkg_emerald && (dir = opendir(path)) != NULL) {
         count = 0;
         while((entry = readdir(dir)) != NULL)
             if(entry->d_name[0] != '.')
@@ -81,7 +81,7 @@ skip_pacman:;
         if(count == 0)
             goto skip_emerald;
 
-        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (emerald)" : "");
+        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (emerald)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
@@ -100,7 +100,7 @@ skip_emerald:;
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
     strncat(path, "/var/lib/dpkg/status", sizeof(buf) - strlen(path) - 1);
-    if(_pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
+    if(config.pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
         char line[sizeof(buf) * 2];
         int count = 0;
 
@@ -114,7 +114,7 @@ skip_emerald:;
         if(count == 0)
             goto skip_dpkg;
 
-        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (dpkg)" : "");
+        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (dpkg)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
@@ -140,7 +140,7 @@ skip_dpkg:;
             safeStrncpy(path, prefix, sizeof(buf));
         strncat(path, "/usr/lib/sysimage/rpm/rpmdb.sqlite", sizeof(path) - strlen(path) - 1);
     }
-    if(_pkg_rpm && access(path, F_OK) == 0) {
+    if(config.pkg_rpm && access(path, F_OK) == 0) {
         sqlite3 *db;
         sqlite3_stmt *stmt;
 
@@ -162,7 +162,7 @@ skip_dpkg:;
         if(count <= 0)
             goto skip_rpm;
 
-        snprintf(buf, sizeof(buf), "%s%d%s", done ? ", " : "", count, _pkg_mgr ? " (rpm)" : "");
+        snprintf(buf, sizeof(buf), "%s%d%s", done ? ", " : "", count, config.pkg_mgr ? " (rpm)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
@@ -187,7 +187,7 @@ skip_rpm_c:
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
     strncat(path, "/var/lib/flatpak/runtime", sizeof(path) - strlen(path) - 1);
-    if(_pkg_flatpak && (dir = opendir(path)) != NULL) {
+    if(config.pkg_flatpak && (dir = opendir(path)) != NULL) {
         count = 0;
         while((entry = readdir(dir)) != NULL)
             if(entry->d_type == DT_DIR && entry->d_name[0] != '.')
@@ -197,7 +197,7 @@ skip_rpm_c:
         if(count == 0)
             goto skip_flatpak;
 
-        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (flatpak)" : "");
+        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (flatpak)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
@@ -216,7 +216,7 @@ skip_flatpak:;
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
     strncat(path, "/var/snap", sizeof(path) - strlen(path) - 1);
-    if(_pkg_snap && (dir = opendir(path)) != NULL) {
+    if(config.pkg_snap && (dir = opendir(path)) != NULL) {
         count = 0;
         while((entry = readdir(dir)) != NULL)
             if(entry->d_type == DT_DIR && entry->d_name[0] != '.')
@@ -225,7 +225,7 @@ skip_flatpak:;
 
         if(count == 0)
             goto skip_snap;
-        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (snap)" : "");
+        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (snap)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
@@ -241,7 +241,7 @@ skip_flatpak:;
 skip_snap:;
 #endif
 
-    if(_pkg_brew && binaryInPath("brew")) {
+    if(config.pkg_brew && binaryInPath("brew")) {
         char *args[] = {"brew", "--cellar", NULL};
         execCmd(buf2, 64, args);
 
@@ -261,7 +261,7 @@ skip_snap:;
         if(count == 0)
             goto skip_brew;
 
-        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, _pkg_mgr ? " (brew)" : "");
+        snprintf(buf, sizeof(buf), "%s%u%s", done ? ", " : "", count, config.pkg_mgr ? " (brew)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);
@@ -276,14 +276,14 @@ skip_snap:;
     }
 skip_brew:;
 
-    if(_pkg_pip && binaryInPath("pip")) {
+    if(config.pkg_pip && binaryInPath("pip")) {
         char *args[] = {"sh", "-c", "pip list 2>/dev/null | wc -l", NULL};
         execCmd(buf2, 16, args);
 
         if(buf2[0] == '0')
             goto skip_pip;
 
-        snprintf(buf, sizeof(buf) - strlen(buf), "%s%d%s", done ? ", " : "", atoi(buf2) - 2, _pkg_mgr ? " (pip)" : "");
+        snprintf(buf, sizeof(buf) - strlen(buf), "%s%d%s", done ? ", " : "", atoi(buf2) - 2, config.pkg_mgr ? " (pip)" : "");
         done = true;
 
         char *tmpptr = realloc(res->string, (res->string ? strlen(res->string) : 0) + strlen(buf) + 1);

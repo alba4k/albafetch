@@ -110,7 +110,7 @@ SInfo *gpu(void) {
         while((end = strstr(gpus[i], "(R)")))
             memmove(end, end + 3, strlen(end + 3) + 1);
 
-        if(!_gpu_brand) {
+        if(!config.gpu_brand) {
             if(strstr(gpus[i], "Intel ") || strstr(gpus[i], "Apple "))
                 memmove(gpus[i], gpus[i] + 6, strlen(gpus[i] + 6) + 1);
             else if(strstr(gpus[i], "AMD "))

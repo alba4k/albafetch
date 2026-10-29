@@ -45,7 +45,7 @@ SInfo *swap(void) {
     }
     snprintf(res->string, 64, "%lu MiB / %lu MiB", usedswap / 1024, totalswap / 1024);
 
-    if(_swap_perc) {
+    if(config.swap_perc) {
         const size_t len = 64 - strlen(res->string);
         char perc[len];
 

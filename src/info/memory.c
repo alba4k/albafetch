@@ -72,7 +72,7 @@ SInfo *memory(void) {
     snprintf(res->string, 64, "%lu / %lu MiB", usedram / 1024, totalram / 1024);
 #endif
 
-    if(_mem_perc) {
+    if(config.mem_perc) {
         const size_t len = 64 - strlen(res->string);
         char perc[len];
 

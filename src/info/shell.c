@@ -39,7 +39,7 @@ SInfo *shell(void) {
         }
 
         safeStrncpy(shell_name, basename(shell), sizeof(shell_name));
-        res->string = strdup(_shell_path ? shell : shell_name);
+        res->string = strdup(config.shell_path ? shell : shell_name);
         if(res->string == NULL) {
             res->retval = ERR_OOM;
             return res;
@@ -61,13 +61,13 @@ SInfo *shell(void) {
     }
 
     safeStrncpy(shell_name, basename(shell), sizeof(shell_name));
-    res->string = strdup(_shell_path ? shell : shell_name);
+    res->string = strdup(config.shell_path ? shell : shell_name);
     if(res->string == NULL) {
         res->retval = ERR_OOM;
         return res;
     }
 #endif
-    if(_shell_version) {
+    if(config.shell_version) {
         char version[32] = "";
         if(strcmp(shell_name, "fish") == 0) {
             char *argv[] = {"fish", "--version", NULL}; // using `fish -c "echo $FISH_VERSION"` would be slower

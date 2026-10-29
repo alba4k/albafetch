@@ -51,7 +51,7 @@ SInfo *term(void) {
         return res;
     }
 
-    if(_term_ssh && getenv("SSH_CONNECTION")) {
+    if(config.term_ssh && getenv("SSH_CONNECTION")) {
         char *tmpptr = realloc(res->string, strlen(res->string) + strlen(" (SSH)") + 1);
         if(tmpptr) {
             res->string = tmpptr;
@@ -59,7 +59,7 @@ SInfo *term(void) {
         }
     }
 
-    if(_term_version) {
+    if(config.term_version) {
         char version[32] = "";
         if(strcmp(terminal, "Kitty") == 0) {
             char *argv[] = {"kitty", "--version", NULL};

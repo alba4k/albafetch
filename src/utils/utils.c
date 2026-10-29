@@ -124,7 +124,7 @@ void getLogoLine(char *dest, unsigned *line) {
 
 // print no more than maxlen visible characters of line
 void printLine(char *line, const size_t maxlen) {
-    if(_bold)
+    if(config.bold)
         fputs("\033[1m", stdout);
     fputs(config.color, stdout);
 

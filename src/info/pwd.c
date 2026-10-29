@@ -20,7 +20,7 @@ SInfo *pwd(void) {
         return res;
     }
 
-    if(!_pwd_path) {
+    if(!config.pwd_path) {
         char *dir = basename(res->string);
         memmove(res->string, dir, strlen(dir) + 1);
     }

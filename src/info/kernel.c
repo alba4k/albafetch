@@ -18,16 +18,14 @@ SInfo *kernel(void) {
     uname(&name);
     char *ptr = name.release, *type = NULL;
 
-    if(_kernel_type)
+    if(config.kernel_type)
         while((ptr = strchr(ptr, '-')))
             type = ++ptr;
 
-    if(_kernel_short) {
-        if((ptr = strchr(name.release, '-')))
-            *ptr = 0;
-    }
+    if(config.kernel_short && (ptr = strchr(name.release, '-')))
+        *ptr = 0;
 
-    if(_kernel_type && type) {
+    if(config.kernel_type && type) {
         size_t s = strlen(name.release) + strlen(type) + 4;
         res->string = malloc(s);
         if(res->string == NULL) {
