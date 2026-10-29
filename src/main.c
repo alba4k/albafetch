@@ -103,8 +103,14 @@ int main(int argc, char **argv) {
             puts("version: \033[1m\033[34m" VERSION "\033[0m, commit: \033[1m\033[34m" COMMIT "\033[0m\n");
 
             // setting up the config options
-            if((argc > i + 1) && (strcmp(argv[i + 1], "--no-pip") == 0))
-                config.pkg_pip = false;
+            config.cpu_temp = true;
+            config.desktop_version = true;
+            config.pkg_pip = true;
+            config.shell_version = true;
+            config.term_version = true;
+            config.loc_docker = true;
+            config.kernel_type = true;
+            config.loc_localhost = true;
 
             double time;
             int errors = runDebug(&time);
@@ -293,8 +299,6 @@ int main(int argc, char **argv) {
         printf("\t%s%s-v\033[0m,%s%s --version\033[0m:\t Print the version and exit\n", config.color, config.bold ? "\033[1m" : "", config.color, config.bold ? "\033[1m" : "");
 
         printf("\t%s%s--debug\033[0m:\t Test all modules and exit\n", config.color, config.bold ? "\033[1m" : "");
-
-        printf("\t%s%s--no-pip\033[0m:\t Disables pip in testing because of speed concerns\n", config.color, config.bold ? "\033[1m" : "");
 
         printf("\t%s%s-c\033[0m,%s%s --color\033[0m:\t Change the output color (%s%s\033[0m)\n"
                "\t\t\t   [\033[30mblack\033[0m, \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m,"

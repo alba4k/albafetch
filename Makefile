@@ -36,7 +36,7 @@ run: compile
 	build/albafetch
 
 debug: compile
-	build/albafetch --debug --no-pip
+	build/albafetch --debug
 
 deb: compile
 	cd debian; \
