@@ -21,7 +21,8 @@ int execCmd(char *buf, size_t len, char *const *argv) {
     if(pipe(stdout_pipes) != 0 || pipe(stderr_pipes) != 0)
         return ERR_GENERIC;
 
-    if(fork() == 0) {
+    pid_t pid = fork();
+    if(pid == 0) {
         close(stdout_pipes[0]);
         close(stderr_pipes[0]);
         dup2(stdout_pipes[1], STDOUT_FILENO);
@@ -32,7 +33,7 @@ int execCmd(char *buf, size_t len, char *const *argv) {
         exit(1); // in case execvp fails
     }
 
-    wait(0);
+    waitpid(pid, NULL, 0);
 
     close(stderr_pipes[0]);
     close(stderr_pipes[1]);

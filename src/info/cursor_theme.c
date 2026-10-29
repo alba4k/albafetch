@@ -1,47 +1,27 @@
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
-#include "../utils/wrappers.h"
+#include "../utils/utils.h"
 #include "info.h"
 
-// get the current Cursor Theme
+// get the current cursor theme
 SInfo *cursorTheme(void) {
     SInfo *res = malloc(sizeof(SInfo));
     if(res == NULL)
         return NULL;
-    res->string = NULL;
-    res->retval = RET_OK;
+    
+    char *theme = getenv("XCURSOR_THEME");
+    if(theme) {
+        res->string = strdup(theme);
+        if(res->string) {
+            res->retval = RET_OK;
 
-    // try using gsettings
-    // reading ~/.config/gtk-3.0/settings.ini could also be an option
-    if(!binaryInPath("gsettings")) {
-        res->retval = ERR_UNSUPPORTED;
-        return res;
+            return res;
+        }
     }
 
-    char buf[64] = "";
-    char *args[] = {"gsettings", "get", "org.gnome.desktop.interface", "cursor-theme", NULL};
-    execCmd(buf, 64, args);
-
-    // cleanup
-    if(buf[0] == 0) {
-        res->retval = ERR_NO_INFO;
-        return res;
-    }
-
-    if(buf[0] == '\'') {
-        memmove(buf, buf + 1, strlen(buf));
-
-        char *ptr = strchr(buf, '\'');
-        if(ptr)
-            *ptr = 0;
-    }
-
-    res->string = strdup(buf);
-    if(res->string == NULL)
-        res->retval = ERR_OOM;
+    res->string = getGtkVar("gtk-cursor-theme-name");
+    res->retval = res->string == NULL ? ERR_GENERIC : RET_OK;
 
     return res;
 }

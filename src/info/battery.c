@@ -8,12 +8,12 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef __ANDROID__
-#include "../utils/wrappers.h"
 #include <ctype.h>
 #endif // __ANDROID__
 #endif // __APPLE__
 
 #include "../config/config.h"
+#include "../utils/wrappers.h"
 #include "info.h"
 
 SInfo *battery(void) {
@@ -112,25 +112,35 @@ SInfo *battery(void) {
     CFRelease(powerSourcesList);
     CFRelease(powerSourceInfo);
 #else
-    FILE *fp = NULL;
-
-    if((fp = fopen("/sys/class/power_supply/BAT0/capacity", "r"))) {
-        size_t read = fread(capacity, sizeof(*capacity), 5, fp);
-        fclose(fp);
-
-        if(read > 0)
-            capacity[read - 1] = 0;
-        else
-            status[0] = 0;
+    FILE *fp = fopen("/sys/class/power_supply/BAT0/uevent", "r");
+    if(fp == NULL)
+        fp = fopen("/sys/class/power_supply/BAT1/uevent", "r");
+    if(fp == NULL) {
+        res->retval = ERR_NO_FILE;
+        return res;
     }
-    if((fp = fopen("/sys/class/power_supply/BAT0/status", "r"))) {
-        size_t read = fread(status, sizeof(*status), 12, fp);
-        fclose(fp);
 
-        if(read > 0)
-            status[read - 1] = 0;
-        else
-            status[0] = 0;
+    char buf[1024];
+    char *end;
+    size_t len = fread(buf, 1, sizeof(buf) - 1, fp);
+    fclose(fp);
+    buf[len] = 0;
+
+    char *ptr = strstr(buf, "POWER_SUPPLY_CAPACITY=");
+    if(ptr) {
+        ptr += strlen("POWER_SUPPLY_CAPACITY=");
+        if((end = strchr(ptr, '\n')))
+            *end = 0;
+        safeStrncpy(capacity, ptr, sizeof(capacity));
+        if(end)
+            *end = '\n';
+    }
+
+    if((ptr = strstr(buf, "POWER_SUPPLY_STATUS="))) {
+        ptr += strlen("POWER_SUPPLY_STATUS=");
+        if((end = strchr(ptr, '\n')))
+            *end = 0;
+        safeStrncpy(status, ptr, sizeof(status));
     }
 #endif // __APPLE__
 #endif // __ANDROID__

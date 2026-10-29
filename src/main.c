@@ -192,7 +192,6 @@ int main(int argc, char **argv) {
                 config.logo = logos[i];
                 break;
             }
-
 #else
 #ifdef __ANDROID__
         config.logo = logos[2];

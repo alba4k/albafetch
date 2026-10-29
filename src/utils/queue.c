@@ -120,10 +120,13 @@ void readAfterSequence(FILE *fp, const char *seq, char *buffer, size_t buffer_si
         buffer[0] = 0; // make buffer an empty string if the sequence is not found
 
     // Actually read for the rest of the file, or the buffer.
-    for(size_t i = 0; i < buffer_size; ++i) {
-        if((ch = fgetc(fp)) == EOF)
+    for(size_t i = 0; i < buffer_size - 1; ++i) {
+        if((ch = fgetc(fp)) == EOF) {
+            buffer[i] = 0;
             break;
+        }
 
         buffer[i] = ch;
     }
+    buffer[buffer_size - 1] = 0; // terminate
 }

@@ -4,6 +4,7 @@
 
 #include "../config/config.h"
 #include "../config/parsing.h"
+#include "queue.h"
 #include "utils.h"
 #include "wrappers.h"
 
@@ -169,4 +170,41 @@ void printLine(char *line, const size_t maxlen) {
 
     fputs("\033[0m\n", stdout);
     fflush(stdout);
+}
+
+// return heap-allocated string containing that gtk variable (config syntax)
+char *getGtkVar(const char *var) {
+    char *home = getenv("HOME");
+    if(home == NULL)
+        return NULL;
+
+    char path[strlen(home) + strlen("/.config/gtk-3.0/settings.ini") + 1];
+    strcpy(path, home);
+    strcat(path, "/.config/gtk-3.0/settings.ini");
+
+    FILE *fp = fopen(path, "r");
+    if(fp == NULL)
+        return NULL;
+
+    char *buf = malloc(64);
+    if(buf == NULL)
+        return NULL;
+    buf[0] = 0;
+
+    readAfterSequence(fp, var, buf, 64);
+    fclose(fp);
+
+    if(buf[0] == 0) {
+        free(buf);
+        return NULL;
+    }
+
+    char *end = strchr(buf, '\n');
+    if(end)
+        *end = 0;
+
+    if((buf[0] == '"' || buf[0] == '\'') && ((end = strchr(buf + 1, '"')) || (end = strchr(buf + 1, '\''))))
+        *end = 0;
+
+    return buf;
 }
