@@ -50,7 +50,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: runner.os == 'macOS'
         with:
-          name: albafetch-darwin-x64
+          name: albafetch-darwin-arm64
           path: ${{ github.workspace }}/result/bin/albafetch
 
       - name: build (linux/aarch64-multiplatform)

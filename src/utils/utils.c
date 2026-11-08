@@ -60,11 +60,12 @@ void *fileToLogo(char *file) {
     if(config.color[0] == 0) {
         unescape(buffer);
 
-        mem = strdup(buffer);
+        mem = malloc(LINE_LEN);
         if(mem == NULL) {
             perror("malloc");
             return NULL;
         }
+        safeStrncpy(mem, buffer, LINE_LEN);
 
         i++;
     }

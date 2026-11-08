@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,39 +16,41 @@
 
 // Run a command using execvp and copy the output into buf
 int execCmd(char *buf, size_t len, char *const *argv) {
-    int stderr_pipes[2];
     int stdout_pipes[2];
 
-    if(pipe(stdout_pipes) != 0 || pipe(stderr_pipes) != 0)
+    if(pipe(stdout_pipes) != 0)
         return ERR_GENERIC;
 
     pid_t pid = fork();
     if(pid == 0) {
         close(stdout_pipes[0]);
-        close(stderr_pipes[0]);
         dup2(stdout_pipes[1], STDOUT_FILENO);
-        dup2(stderr_pipes[1], STDERR_FILENO);
+
+        int devnull = open("/dev/null", O_WRONLY);
+        if(devnull != -1)
+            dup2(devnull, STDERR_FILENO);
 
         execvp(argv[0], argv);
 
         exit(1); // in case execvp fails
     }
 
-    waitpid(pid, NULL, 0);
-
-    close(stderr_pipes[0]);
-    close(stderr_pipes[1]);
-
     close(stdout_pipes[1]);
 
-    ssize_t rlen = read(stdout_pipes[0], buf, len);
-    if(rlen < 0) {
-        close(stdout_pipes[0]);
-        return ERR_GENERIC;
-    }
+    // the pipe has to be read before waiting, or a child filling it would block forever
+    size_t total = 0;
+    ssize_t rlen = 0;
+    while(total < len && (rlen = read(stdout_pipes[0], buf + total, len - total)) > 0)
+        total += (size_t)rlen;
 
-    buf[rlen == 0 ? 0 : rlen - 1] = 0;
+    // closed before waiting, so that a child with more output than fits in buf gets SIGPIPE
     close(stdout_pipes[0]);
+    waitpid(pid, NULL, 0);
+
+    if(rlen < 0)
+        return ERR_GENERIC;
+
+    buf[total == 0 ? 0 : total - 1] = 0;
     return RET_OK;
 }
 

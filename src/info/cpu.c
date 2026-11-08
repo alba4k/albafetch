@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifdef __APPLE__
 #include <sys/sysctl.h>
@@ -67,11 +68,10 @@ SInfo *cpu(void) {
 
     cpu_info = buf;
     if(config.cpu_count) {
-        end = cpu_info;
-        while((end = strstr(end, "processor"))) {
-            ++count;
-            ++end;
-        }
+        // buf can't hold all of /proc/cpuinfo on machines with many threads
+        long online = sysconf(_SC_NPROCESSORS_ONLN);
+        if(online > 0)
+            count = (int)online;
     }
 
     cpu_info = strstr(cpu_info, "model name");

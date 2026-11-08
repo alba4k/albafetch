@@ -99,7 +99,7 @@ skip_emerald:;
     path[0] = 0;
     if(prefix)
         safeStrncpy(path, prefix, sizeof(path));
-    strncat(path, "/var/lib/dpkg/status", sizeof(buf) - strlen(path) - 1);
+    strncat(path, "/var/lib/dpkg/status", sizeof(path) - strlen(path) - 1);
     if(config.pkg_dpkg && (fp = fopen(path, "r")) != NULL) {
         char line[sizeof(buf) * 2];
         int count = 0;
@@ -137,7 +137,7 @@ skip_dpkg:;
     if(access(path, F_OK) != 0) {
         path[0] = 0;
         if(prefix)
-            safeStrncpy(path, prefix, sizeof(buf));
+            safeStrncpy(path, prefix, sizeof(path));
         strncat(path, "/usr/lib/sysimage/rpm/rpmdb.sqlite", sizeof(path) - strlen(path) - 1);
     }
     if(config.pkg_rpm && access(path, F_OK) == 0) {
@@ -148,7 +148,7 @@ skip_dpkg:;
         snprintf(uri, sizeof(uri), "file:%s?immutable=1", path);
 
         if(sqlite3_open_v2(uri, &db, SQLITE_OPEN_READONLY | SQLITE_OPEN_URI, NULL) != SQLITE_OK)
-            goto skip_rpm_c;
+            goto skip_rpm_b;
         if(sqlite3_prepare_v2(db, "SELECT count(*) FROM Packages", -1, &stmt, NULL) != SQLITE_OK) {
             sqlite3_close(db);
             goto skip_rpm_b;
@@ -177,10 +177,9 @@ skip_dpkg:;
 
     skip_rpm:
         sqlite3_finalize(stmt);
-    skip_rpm_b:
         sqlite3_close(db);
     }
-skip_rpm_c:
+skip_rpm_b:
 #endif
 
     path[0] = 0;

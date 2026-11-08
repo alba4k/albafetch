@@ -168,8 +168,11 @@ int main(int argc, char **argv) {
     }
 
     if(ascii_file) {
-        free(ascii_ptr);
-        ascii_ptr = fileToLogo(ascii_file);
+        void *new_ascii = fileToLogo(ascii_file);
+        if(new_ascii) {
+            free(ascii_ptr);
+            ascii_ptr = new_ascii;
+        }
     }
 
     if(asking_logo) { // --logo was used
@@ -224,7 +227,7 @@ int main(int argc, char **argv) {
 
             // because Arch Linux ARM has to be special for some reason
             if(strcmp(os_id, "archarm") == 0)
-                os_id[5] = 0;
+                os_id[4] = 0;
 
             // clean up because of some distros randomly using " or ' when they shouldnt be
             if(os_id[0] == '\'' || os_id[0] == '"') {
@@ -264,8 +267,10 @@ int main(int argc, char **argv) {
 
             bool done = false;
             for(int j = 0; j < 9; ++j)
-                if(strcmp(argv[asking_color], *colors[j]) == 0)
+                if(strcmp(argv[asking_color], *colors[j]) == 0) {
                     safeStrncpy(config.color, colors[j][1], sizeof(config.color));
+                    done = true;
+                }
 
             if(!done)
                 fprintf(stderr, "\033[31m\033[1mERROR\033[0m: invalid color \"%s\"!\n", argv[asking_color]);

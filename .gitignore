@@ -2,6 +2,7 @@
 .idea
 build/
 debian/albafetch*
+vgcore.*
 
 # nix stuff
 .direnv/
